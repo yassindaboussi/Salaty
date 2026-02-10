@@ -26,7 +26,9 @@ function createPlayerWindow() {
 
   // ── Open DevTools for this window so [MiniPlayer Theme] logs are visible ──
   // Remove this line once the theme issue is confirmed fixed.
-  playerWindow.webContents.openDevTools({ mode: 'detach' });
+  if (process.argv.includes('--enable-logging')) {
+    playerWindow.webContents.openDevTools({ mode: 'detach' });
+  }
 
   console.log('[PlayerManager] Mini-player window created');
 }
