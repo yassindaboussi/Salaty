@@ -8,25 +8,24 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding: 16px; /* Même padding que les autres conteneurs */
+  gap: 12px; /* Même gap que les autres conteneurs */
 }
 
-/* Settings Header - Keep Original Design */
+/* ========== HEADER - EXACTEMENT COMME LES AUTRES PAGES ========== */
 .settings-header {
   display: flex;
   align-items: center;
-  padding: 16px 20px 12px;
+  justify-content: space-between;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border-color);
-  flex-shrink: 0;
+  position: relative;
+  direction: ltr !important;
+  gap: 8px;
+  -webkit-app-region: drag;
 }
 
-.settings-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0 auto 0 12px;
-  letter-spacing: -0.3px;
-}
-
+/* Back button - Utilise les styles globaux de components.css */
 .back-btn {
   width: 32px;
   height: 32px;
@@ -42,9 +41,11 @@
   font-size: 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-right: 12px;
   -webkit-app-region: no-drag;
   flex-shrink: 0;
+  margin: 0;
+  z-index: 2;
+  position: relative;
 }
 
 .back-btn:hover {
@@ -61,16 +62,146 @@
   transform: translateX(-2px);
 }
 
+/* Title - Centré avec flexbox comme les autres pages */
+.settings-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  pointer-events: none;
+  z-index: 1;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Control buttons container */
+.settings-controls {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+  z-index: 2;
+  position: relative;
+  -webkit-app-region: no-drag;
+}
+
+/* Control buttons - Styles globaux de components.css */
+.control-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  -webkit-app-region: no-drag;
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.control-btn:active {
+  transform: translateY(0);
+}
+
+.control-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: rgba(255, 255, 255, 0.9);
+}
+
+.control-btn i {
+  font-size: 12px;
+}
+
+.minimize-btn:hover {
+  background: rgba(247, 183, 49, 0.2);
+}
+
+.close-btn:hover {
+  background: rgba(255, 59, 48, 0.2);
+}
+
+.fullscreen-btn:hover {
+  background: rgba(74, 144, 226, 0.2);
+}
+
+/* Force la cohérence de mise en page pour TOUTES les langues */
+[dir="rtl"] .settings-header,
+[dir="ltr"] .settings-header,
+.settings-header {
+  direction: ltr !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+[dir="rtl"] .back-btn,
+[dir="ltr"] .back-btn,
+.back-btn {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+[dir="rtl"] .settings-title,
+[dir="ltr"] .settings-title,
+.settings-title {
+  flex: 1 !important;
+  text-align: center !important;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  width: auto !important;
+  margin: 0 !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+[dir="rtl"] .settings-controls,
+[dir="ltr"] .settings-controls,
+.settings-controls {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  gap: 6px !important;
+}
+
+/* Ne pas inverser la flèche - toujours pointer vers la gauche */
+[dir="rtl"] .back-btn i,
+[dir="ltr"] .back-btn i,
+.back-btn i {
+  transform: none !important;
+}
+
+[dir="rtl"] .back-btn:hover i,
+[dir="ltr"] .back-btn:hover i,
+.back-btn:hover i {
+  transform: translateX(-2px) !important;
+}
+
+/* ========== FIN DE L'EN-TÊTE ========== */
+
 /* Settings Content - Scrollable Area */
 .settings-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px 5px 5px;
+  padding: 6px 0; /* Même padding que les autres pages */
   -webkit-app-region: no-drag;
 }
 
-/* Custom Scrollbar */
+/* TON DESIGN ORIGINAL DE SCROLLBAR - CONSERVÉ */
 .settings-content::-webkit-scrollbar {
   width: 6px;
 }
@@ -99,6 +230,7 @@
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
+  margin-right: 8px;
   transition: all 0.3s ease;
 }
 
@@ -259,6 +391,7 @@
   justify-content: center;
   gap: 8px;
   transition: all 0.2s ease;
+  margin-bottom: 12px;
 }
 
 .detect-btn:hover {
@@ -806,70 +939,6 @@
 }
 
 /* ========================================
-   RESPONSIVE DESIGN
-   ======================================== */
-
-/* Big Screen (850x600) */
-@media (min-width: 600px) {
-  .settings-content {
-    padding: 20px 24px 24px;
-  }
-  
-  .settings-section {
-    padding: 20px;
-  }
-  
-  .theme-grid {
-    grid-template-columns: repeat(6, 1fr);
-  }
-  
-  .language-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* Small Screen Adjustments (320x575) */
-@media (max-width: 400px) {
-  .settings-header {
-    padding: 12px 16px 10px;
-  }
-  
-  .settings-title {
-    font-size: 18px;
-  }
-  
-  .settings-content {
-    padding: 12px 16px 16px;
-  }
-  
-  .settings-section {
-    padding: 12px;
-    margin-bottom: 12px;
-  }
-  
-  .section-header {
-    margin-bottom: 12px;
-  }
-  
-  .section-icon {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .section-title {
-    font-size: 14px;
-  }
-  
-  .subsection + .subsection {
-    padding-top: 12px;
-  }
-  
-  .save-btn {
-    padding: 12px 20px;
-  }
-}
-
-/* ========================================
    LOCATION MANAGEMENT
    ======================================== */
 
@@ -1313,4 +1382,95 @@
   outline: none;
   border-color: var(--accent-color);
   box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Big Screen (850x600) */
+@media (min-width: 600px) {
+  .settings-content {
+    padding: 8px 0; /* Ajusté pour correspondre aux autres pages */
+  }
+  
+  .settings-section {
+    padding: 20px;
+  }
+  
+  .theme-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  
+  .language-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Small Screen Adjustments (320x575) */
+@media (max-width: 400px) {
+  .settings-container {
+    padding: 12px; /* Ajusté pour correspondre aux autres pages */
+    gap: 8px;
+  }
+  
+  .settings-header {
+    padding-bottom: 8px;
+    min-height: 32px;
+  }
+  
+  .settings-title {
+    font-size: 14px; /* Ajusté pour correspondre aux autres pages */
+  }
+  
+  .settings-controls {
+    gap: 4px;
+  }
+  
+  .control-btn {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .control-btn i,
+  .control-btn svg {
+    font-size: 10px;
+    width: 10px;
+    height: 10px;
+  }
+  
+  .back-btn {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .settings-content {
+    padding: 4px 0; /* Ajusté pour correspondre aux autres pages */
+  }
+  
+  .settings-section {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .section-header {
+    margin-bottom: 12px;
+  }
+  
+  .section-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .section-title {
+    font-size: 14px;
+  }
+  
+  .subsection + .subsection {
+    padding-top: 12px;
+  }
+  
+  .save-btn {
+    padding: 12px 20px;
+  }
 }

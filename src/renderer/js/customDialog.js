@@ -44,7 +44,9 @@ function showConfirmDialog(message, options = {}) {
     `;
 
     overlay.appendChild(dialog);
-    document.body.appendChild(overlay);
+    // add overlay inside the main app wrapper so theme variables propagate
+    const parent = document.getElementById('app') || document.body;
+    parent.appendChild(overlay);
 
     // Animate in
     requestAnimationFrame(() => {
@@ -58,7 +60,10 @@ function showConfirmDialog(message, options = {}) {
 
       // Remove from DOM after animation
       setTimeout(() => {
-        document.body.removeChild(overlay);
+        const parent = document.getElementById('app') || document.body;
+        if (parent.contains(overlay)) {
+          parent.removeChild(overlay);
+        }
       }, 300);
 
       resolve(action === 'confirm');
@@ -124,7 +129,8 @@ function showAlertDialog(message, options = {}) {
     `;
 
     overlay.appendChild(dialog);
-    document.body.appendChild(overlay);
+    const parent = document.getElementById('app') || document.body;
+    parent.appendChild(overlay);
 
     // Animate in
     requestAnimationFrame(() => {
@@ -138,7 +144,10 @@ function showAlertDialog(message, options = {}) {
 
       // Remove from DOM after animation
       setTimeout(() => {
-        document.body.removeChild(overlay);
+        const parent = document.getElementById('app') || document.body;
+        if (parent.contains(overlay)) {
+          parent.removeChild(overlay);
+        }
       }, 300);
 
       resolve();

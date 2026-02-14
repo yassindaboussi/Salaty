@@ -1,3 +1,4 @@
+
 // src/renderer/js/renderer.js
 const { ipcRenderer } = require('electron');
 const { setLanguage, t, applyLanguageDirection } = require('../js/translations');
@@ -30,9 +31,12 @@ function setupScreenSizeForPage(containerClass = '') {
     // Setup screen size toggle button
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     if (fullscreenBtn) {
-        fullscreenBtn.addEventListener('click', () => {
-            screenSizeManager.toggleScreenSize(containerClass);
-        });
+        fullscreenBtn.addEventListener('click', (event) => {
+    console.log('Fullscreen button clicked, target:', event.target);
+    console.log('Current page:', window.location.pathname);
+    event.stopPropagation();
+    screenSizeManager.toggleScreenSize(containerClass);
+});
     }
 }
 
@@ -122,8 +126,10 @@ async function initializeApp() {
     // Check which page we're on and initialize accordingly
     const path = window.location.pathname;
     if (path.includes('index.html') || path.endsWith('/')) {
+      setupScreenSizeForPage('app');
       initMainPage();
     } else if (path.includes('settings.html')) {
+      setupScreenSizeForPage('settings-container');
       initSettingsPage();
     } else if (path.includes('quran.html')) {
       initQuranPage();
