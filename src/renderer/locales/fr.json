@@ -179,7 +179,18 @@
     "noTracksFound": "Aucune piste trouvée",
     "errorLoadingTracks": "Erreur lors du chargement des pistes",
     "noTrackSelected": "Aucune piste sélectionnée",
-    "selectDhikr": "Choisir Dhikr"
+    "selectDhikr": "Choisir Dhikr",
+    "muslimRadio": "Radio Islamic",
+    "radioDesc": "Écouter la radio du Coran",
+    "nowPlaying": "En cours de lecture",
+    "availableStations": "Stations disponibles",
+    "connectingToStation": "Connexion à la station...",
+    "selectStationFirst": "Veuillez d'abord sélectionner une station",
+    "playbackError": "Erreur de lecture. Veuillez réessayer.",
+    "liveQuranRecitation": "Récitation du Coran en direct",
+    "radioFooterText": "Écoutez les récitations du Saint Coran 24h/24",
+    "selectStation": "Sélectionnez une station",
+    "chooseFromStations": "Choisissez parmi les stations ci-dessous"
   },
   "themes": {
     "navy": "Bleu marine",

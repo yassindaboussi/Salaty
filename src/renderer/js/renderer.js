@@ -18,6 +18,7 @@ const screenSizeManager = require('../js/screenSize');
 const { initLocationSwitcher } = require('../js/locationSwitcher');
 const { setupMiniPlayer } = require('../js/mini-player');
 const { initTasbihPage } = require('../js/tasbihUI');
+const { initRadioPage } = require('../js/radioUI');
 
 
 // ==================== SCREEN SIZE HELPER FUNCTIONS ====================
@@ -176,6 +177,11 @@ async function initializeApp() {
       // Setup screen size for playlist page
       setupScreenSizeForPage('playlist-container');
       // Note: playlist.js handles its own player initialization
+    } else if (path.includes('radio.html')) {
+      console.log('Initializing Radio page from renderer.js');
+      // Setup screen size for radio page
+      setupScreenSizeForPage('radio-container');
+      initRadioPage();
     }
 
     // Setup window controls (common to all pages)

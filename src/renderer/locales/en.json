@@ -179,7 +179,18 @@
     "noTracksFound": "No tracks found",
     "errorLoadingTracks": "Error loading tracks",
     "noTrackSelected": "No Track Selected",
-    "selectDhikr": "Select Dhikr"
+    "selectDhikr": "Select Dhikr",
+    "muslimRadio": "Muslim Radio",
+    "radioDesc": "Listen to Quran radio",
+    "nowPlaying": "Now Playing",
+    "availableStations": "Available Stations",
+    "connectingToStation": "Connecting to station...",
+    "selectStationFirst": "Please select a station first",
+    "playbackError": "Playback error. Please try again.",
+    "liveQuranRecitation": "Live Quran recitation",
+    "radioFooterText": "Listen to Holy Quran recitations 24/7",
+    "selectStation": "Select a station",
+    "chooseFromStations": "Choose from the stations below"
   },
   "themes": {
     "navy": "Navy",
