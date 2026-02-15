@@ -261,6 +261,15 @@
   color: #009688;
 }
 
+.livestreams-icon {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.2);
+}
+
+.livestreams-icon i {
+  color: #ffd700;
+}
+
 /* Feature Name */
 .feature-name {
   font-size: 13px;

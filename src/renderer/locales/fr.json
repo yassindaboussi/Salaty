@@ -190,7 +190,24 @@
     "liveQuranRecitation": "Récitation du Coran en direct",
     "radioFooterText": "Écoutez les récitations du Saint Coran 24h/24",
     "selectStation": "Sélectionnez une station",
-    "chooseFromStations": "Choisissez parmi les stations ci-dessous"
+    "chooseFromStations": "Choisissez parmi les stations ci-dessous",
+    "liveHaramain": "Haramain en Direct",
+    "liveHaramainDesc": "24/7 Makkah & Madina",
+    "livestreamsTitle": "Streams en Direct des Haramain",
+    "makkahTitle": "Makkah en Direct - Al Masjid al-Haram",
+    "madinaTitle": "Médine en Direct - Al Masjid an-Nabawi",
+    "unmute": "Activer le son",
+    "mute": "Couper le son",
+    "watchOnYoutube": "Regarder sur YouTube",
+    "prayerNote": "Les heures de prière peuvent varier. Veuillez vérifier les horaires locaux.",
+    "streamError": "Impossible de charger le flux. Veuillez réessayer plus tard.",
+    "makkahTab": "Makkah",
+    "madinaTab": "Médine",
+    "makkahLive": "Al Masjid al-Haram",
+    "madinaLive": "Al Masjid an-Nabawi",
+    "makkahLocation": "La Mecque",
+    "madinaLocation": "Médine",
+    "live": "En direct"
   },
   "themes": {
     "navy": "Bleu marine",
@@ -207,23 +224,83 @@
     "ramadan": "Ramadan"
   },
   "islamicEvents": {
-    "hijriNewYear": { "event": "Nouvel an Hégirien", "date": "1 Muharram", "description": "Début de l'année hégirienne. Il est recommandé de jeûner durant Muharram." },
-    "ashura": { "event": "Achoura", "date": "10 Muharram", "description": "Le jour où Allah a sauvé Moïse. Son jeûne expie l'année précédente." },
-    "mawlid": { "event": "Mawlid Nabawi", "date": "12 Rabi' al-Awwal (Approx)", "description": "Date approximative de la naissance du Prophète ﷺ.", "note": "Note : La date exacte fait débat." },
-    "israMiraj": { "event": "Isra et Miraj", "date": "27 Rajab (Approx)", "description": "Date commune pour le Voyage Nocturne.", "note": "Aucune date précise n'est confirmée par les textes authentiques." },
-    "eidAlFitr": { "event": "Aïd el-Fitr", "date": "1 Shawwal", "description": "Le premier jour après le jeûne du Ramadan." },
-    "arafat": { "event": "Jour d'Arafat", "date": "9 Dhul-Hijja", "description": "Le meilleur jour de l'année. Son jeûne expie l'année passée et à venir." },
-    "eidAlAdha": { "event": "Aïd el-Adha", "date": "10 Dhul-Hijja", "description": "Jours du sacrifice et les plus grands jours de l'Islam." },
-    "ramadanStart": { "event": "Début du Ramadan", "date": "1 Ramadan", "description": "Le mois du Jeûne et du Coran." },
-    "laylatAlQadr": { "event": "Nuit du Destin", "date": "Dernières 10 nuits", "description": "Meilleure que mille mois." },
+    "hijriNewYear": {
+      "event": "Nouvel an Hégirien",
+      "date": "1 Muharram",
+      "description": "Début de l'année hégirienne. Il est recommandé de jeûner durant Muharram."
+    },
+    "ashura": {
+      "event": "Achoura",
+      "date": "10 Muharram",
+      "description": "Le jour où Allah a sauvé Moïse. Son jeûne expie l'année précédente."
+    },
+    "mawlid": {
+      "event": "Mawlid Nabawi",
+      "date": "12 Rabi' al-Awwal (Approx)",
+      "description": "Date approximative de la naissance du Prophète ﷺ.",
+      "note": "Note : La date exacte fait débat."
+    },
+    "israMiraj": {
+      "event": "Isra et Miraj",
+      "date": "27 Rajab (Approx)",
+      "description": "Date commune pour le Voyage Nocturne.",
+      "note": "Aucune date précise n'est confirmée par les textes authentiques."
+    },
+    "eidAlFitr": {
+      "event": "Aïd el-Fitr",
+      "date": "1 Shawwal",
+      "description": "Le premier jour après le jeûne du Ramadan."
+    },
+    "arafat": {
+      "event": "Jour d'Arafat",
+      "date": "9 Dhul-Hijja",
+      "description": "Le meilleur jour de l'année. Son jeûne expie l'année passée et à venir."
+    },
+    "eidAlAdha": {
+      "event": "Aïd el-Adha",
+      "date": "10 Dhul-Hijja",
+      "description": "Jours du sacrifice et les plus grands jours de l'Islam."
+    },
+    "ramadanStart": {
+      "event": "Début du Ramadan",
+      "date": "1 Ramadan",
+      "description": "Le mois du Jeûne et du Coran."
+    },
+    "laylatAlQadr": {
+      "event": "Nuit du Destin",
+      "date": "Dernières 10 nuits",
+      "description": "Meilleure que mille mois."
+    },
     "tomorrowIs": "Demain : {event}",
     "tonightIs": "Ce soir : {event}",
-    "fastingMonday": { "event": "Jeûne du Lundi", "description": "Les actions sont présentées à Allah. Très recommandé." },
-    "fastingThursday": { "event": "Jeûne du Jeudi", "description": "Les actions sont présentées à Allah. Très recommandé." },
-    "whiteDays": { "event": "Jours Blancs", "date": "13, 14, 15 Hijri", "description": "Équivaut au jeûne perpétuel." },
-    "tasua": { "event": "Tasu'a", "date": "9 Muharram", "description": "Recommandé de jeûner avec Achoura." },
-    "shabanStart": { "event": "Mois de Sha‘bân", "date": "1 Sha‘bân", "description": "Mois où les actions sont élevées." },
-    "muharramStart": { "event": "Nouvel an Hégirien", "date": "1 Muharram", "description": "Début de l'année. Il est recommandé de jeûner." }
+    "fastingMonday": {
+      "event": "Jeûne du Lundi",
+      "description": "Les actions sont présentées à Allah. Très recommandé."
+    },
+    "fastingThursday": {
+      "event": "Jeûne du Jeudi",
+      "description": "Les actions sont présentées à Allah. Très recommandé."
+    },
+    "whiteDays": {
+      "event": "Jours Blancs",
+      "date": "13, 14, 15 Hijri",
+      "description": "Équivaut au jeûne perpétuel."
+    },
+    "tasua": {
+      "event": "Tasu'a",
+      "date": "9 Muharram",
+      "description": "Recommandé de jeûner avec Achoura."
+    },
+    "shabanStart": {
+      "event": "Mois de Sha‘bân",
+      "date": "1 Sha‘bân",
+      "description": "Mois où les actions sont élevées."
+    },
+    "muharramStart": {
+      "event": "Nouvel an Hégirien",
+      "date": "1 Muharram",
+      "description": "Début de l'année. Il est recommandé de jeûner."
+    }
   },
   "common": {
     "timetable": "Emploi du temps",
