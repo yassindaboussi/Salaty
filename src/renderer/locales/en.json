@@ -178,7 +178,8 @@
     "loadingTracks": "Loading tracks...",
     "noTracksFound": "No tracks found",
     "errorLoadingTracks": "Error loading tracks",
-    "noTrackSelected": "No Track Selected"
+    "noTrackSelected": "No Track Selected",
+    "selectDhikr": "Select Dhikr"
   },
   "themes": {
     "navy": "Navy",

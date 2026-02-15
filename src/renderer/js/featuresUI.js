@@ -128,6 +128,12 @@ function setupFeatureCards() {
   if (calendarCard) {
     calendarCard.addEventListener('click', openCalendar);
   }
+  
+  // Tasbih card
+  const tasbihCard = document.querySelector('[data-feature="tasbih"]');
+  if (tasbihCard) {
+    tasbihCard.addEventListener('click', openTasbih);
+  }
 }
 
 function openPlaylist() {
@@ -175,6 +181,13 @@ function openCalendar() {
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'hijri-calendar');
+}
+
+function openTasbih() {
+  console.log('Opening Tasbih...');
+  const size = screenSizeManager.getWindowSize();
+  ipcRenderer.invoke('resize-window', size.width, size.height);
+  ipcRenderer.invoke('navigate-to', 'tasbih');
 }
 
 module.exports = { initFeaturesPage };

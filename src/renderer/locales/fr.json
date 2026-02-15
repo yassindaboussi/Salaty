@@ -178,7 +178,8 @@
     "loadingTracks": "Chargement des pistes...",
     "noTracksFound": "Aucune piste trouvée",
     "errorLoadingTracks": "Erreur lors du chargement des pistes",
-    "noTrackSelected": "Aucune piste sélectionnée"
+    "noTrackSelected": "Aucune piste sélectionnée",
+    "selectDhikr": "Choisir Dhikr"
   },
   "themes": {
     "navy": "Bleu marine",

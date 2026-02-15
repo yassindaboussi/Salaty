@@ -1,0 +1,60 @@
+{
+  "dhikrList": [
+    {
+      "name": "سُبْحَانَ اللَّهِ",
+      "transliteration": "SubhanAllah",
+      "translation": "Glory be to Allah",
+      "count": 33,
+      "category": "tasbih"
+    },
+    {
+      "name": "الْحَمْدُ لِلَّهِ",
+      "transliteration": "Alhamdulillah",
+      "translation": "Praise be to Allah",
+      "count": 33,
+      "category": "tasbih"
+    },
+    {
+      "name": "اللَّهُ أَكْبَرُ",
+      "transliteration": "Allahu Akbar",
+      "translation": "Allah is the Greatest",
+      "count": 34,
+      "category": "tasbih"
+    },
+    {
+      "name": "لا إله إلا الله",
+      "transliteration": "La ilaha illallah",
+      "translation": "There is no god but Allah",
+      "count": 100,
+      "category": "tasbih"
+    },
+    {
+      "name": "أستغفر الله",
+      "transliteration": "Astaghfirullah",
+      "translation": "I seek forgiveness from Allah",
+      "count": 100,
+      "category": "tasbih"
+    },
+    {
+      "name": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+      "transliteration": "SubhanAllahi wa bihamdihi",
+      "translation": "Glory be to Allah and praise Him",
+      "count": 100,
+      "category": "tasbih"
+    },
+    {
+      "name": "سُبْحَانَ اللَّهِ الْعَظِيمِ",
+      "transliteration": "SubhanAllah al-Azeem",
+      "translation": "Glory be to Allah, the Great",
+      "count": 100,
+      "category": "tasbih"
+    },
+    {
+      "name": "لا حَوْلَ وَلا قُوَّةَ إِلا بِاللَّهِ",
+      "transliteration": "La hawla wa la quwwata illa billah",
+      "translation": "There is no power nor strength except with Allah",
+      "count": 100,
+      "category": "tasbih"
+    }
+  ]
+}

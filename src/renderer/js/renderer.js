@@ -17,6 +17,7 @@ const { initAthkarAlertsSystem } = require('../js/athkarAlerts');
 const screenSizeManager = require('../js/screenSize');
 const { initLocationSwitcher } = require('../js/locationSwitcher');
 const { setupMiniPlayer } = require('../js/mini-player');
+const { initTasbihPage } = require('../js/tasbihUI');
 
 
 // ==================== SCREEN SIZE HELPER FUNCTIONS ====================
@@ -158,12 +159,19 @@ async function initializeApp() {
       // Setup screen size for asma page
       setupScreenSizeForPage('asma-container');
       initAsmaPage();
-    } else if (path.includes('hijri-calendar.html')) {
+    } else if (path.includes('tasbih.html')) {
+      console.log('Initializing Tasbih page from renderer.js');
+      // Setup screen size for tasbih page
+      setupScreenSizeForPage('tasbih-container');
+      initTasbihPage();
+    }   
+    else if (path.includes('hijri-calendar.html')) {
       console.log('Initializing Hijri Calendar page from renderer.js');
       // Setup screen size for calendar page
       setupScreenSizeForPage('calendar-container');
       initHijriCalendar();
-    } else if (path.includes('playlist.html')) {
+    }
+     else if (path.includes('playlist.html')) {
       console.log('Initializing Playlist page from renderer.js');
       // Setup screen size for playlist page
       setupScreenSizeForPage('playlist-container');

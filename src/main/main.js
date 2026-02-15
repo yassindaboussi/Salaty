@@ -49,7 +49,7 @@ function createWindow() {
     frame: false,
     transparent: true,
     resizable: true,
-    alwaysOnTop: true,
+    alwaysOnTop: false,
     x: settings.position.x,
     y: settings.position.y,
     icon: iconPath,
