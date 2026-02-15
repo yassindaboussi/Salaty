@@ -56,6 +56,9 @@ function updateFeaturesUI() {
   const featureRadio = document.getElementById('featureRadio');
   const featureRadioDesc = document.getElementById('featureRadioDesc');
 
+  const featureLivestreams = document.getElementById('featureLivestreams');
+  const featureLivestreamsDesc = document.getElementById('featureLivestreamsDesc');
+
   // Coming soon badges
   const comingSoonBadges = document.querySelectorAll('.coming-soon-badge');
 
@@ -83,6 +86,8 @@ function updateFeaturesUI() {
   if (featurePlaylistDesc) featurePlaylistDesc.textContent = t('audioArchiveDesc');
   if (featureRadio) featureRadio.textContent = t('muslimRadio');
   if (featureRadioDesc) featureRadioDesc.textContent = t('radioDesc');
+  if (featureLivestreams) featureLivestreams.textContent = t('liveHaramain');
+  if (featureLivestreamsDesc) featureLivestreamsDesc.textContent = t('liveHaramainDesc');
 
   comingSoonBadges.forEach(badge => {
     badge.textContent = t('comingSoon');
@@ -138,10 +143,17 @@ function setupFeatureCards() {
   if (tasbihCard) {
     tasbihCard.addEventListener('click', openTasbih);
   }
+
   // Radio card
   const radioCard = document.querySelector('[data-feature="radio"]');
   if (radioCard) {
     radioCard.addEventListener('click', openRadio);
+  }
+
+  // Livestreams card
+  const livestreamsCard = document.querySelector('[data-feature="livestreams"]');
+  if (livestreamsCard) {
+    livestreamsCard.addEventListener('click', openLiveStreams);
   }
 }
 
@@ -206,5 +218,11 @@ function openRadio() {
   ipcRenderer.invoke('navigate-to', 'radio');
 }
 
+function openLiveStreams() {
+  console.log('Opening Live Streams...');
+  const size = screenSizeManager.getWindowSize();
+  ipcRenderer.invoke('resize-window', size.width, size.height);
+  ipcRenderer.invoke('navigate-to', 'livestreams');
+}
 
 module.exports = { initFeaturesPage };

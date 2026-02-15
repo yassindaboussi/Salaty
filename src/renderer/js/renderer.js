@@ -19,7 +19,7 @@ const { initLocationSwitcher } = require('../js/locationSwitcher');
 const { setupMiniPlayer } = require('../js/mini-player');
 const { initTasbihPage } = require('../js/tasbihUI');
 const { initRadioPage } = require('../js/radioUI');
-
+const { initLiveStreamsPage } = require('../js/livestreams');
 
 // ==================== SCREEN SIZE HELPER FUNCTIONS ====================
 /**
@@ -182,6 +182,11 @@ async function initializeApp() {
       // Setup screen size for radio page
       setupScreenSizeForPage('radio-container');
       initRadioPage();
+    } else if (path.includes('livestreams.html')) {
+      console.log('Initializing Live Streams page from renderer.js');
+      // Setup screen size for livestreams page
+      setupScreenSizeForPage('livestreams-container');
+      initLiveStreamsPage();
     }
 
     // Setup window controls (common to all pages)
