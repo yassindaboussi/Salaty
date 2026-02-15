@@ -179,7 +179,18 @@
     "noTracksFound": "لم يتم العثور على مقاطع",
     "errorLoadingTracks": "خطأ في تحميل المقاطع",
     "noTrackSelected": "لم يتم اختيار مقطع",
-    "selectDhikr": "اختر الذكر"
+    "selectDhikr": "اختر الذكر",
+    "muslimRadio": "راديو مسلم",
+    "radioDesc": "استمع إلى راديو القرآن",
+    "nowPlaying": "يتم التشغيل الآن",
+    "availableStations": "المحطات المتاحة",
+    "connectingToStation": "جاري الاتصال بالمحطة...",
+    "selectStationFirst": "الرجاء اختيار محطة أولاً",
+    "playbackError": "خطأ في التشغيل. حاول مرة أخرى.",
+    "liveQuranRecitation": "تلاوة القرآن مباشر",
+    "radioFooterText": "استمع إلى تلاوات القرآن الكريم 24/7",
+    "selectStation": "اختر محطة",
+    "chooseFromStations": "اختر من المحطات أدناه"
   },
   "themes": {
     "navy": "أزرق داكن",

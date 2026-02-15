@@ -53,6 +53,8 @@ function updateFeaturesUI() {
   const featureAsmaDesc = document.getElementById('featureAsmaDesc');
   const featureQiblaDesc = document.getElementById('featureQiblaDesc');
   const featurePlaylistDesc = document.getElementById('featurePlaylistDesc');
+  const featureRadio = document.getElementById('featureRadio');
+  const featureRadioDesc = document.getElementById('featureRadioDesc');
 
   // Coming soon badges
   const comingSoonBadges = document.querySelectorAll('.coming-soon-badge');
@@ -79,6 +81,8 @@ function updateFeaturesUI() {
   if (featureAsmaDesc) featureAsmaDesc.textContent = t('asmaDesc');
   if (featureQiblaDesc) featureQiblaDesc.textContent = t('qiblaDesc');
   if (featurePlaylistDesc) featurePlaylistDesc.textContent = t('audioArchiveDesc');
+  if (featureRadio) featureRadio.textContent = t('muslimRadio');
+  if (featureRadioDesc) featureRadioDesc.textContent = t('radioDesc');
 
   comingSoonBadges.forEach(badge => {
     badge.textContent = t('comingSoon');
@@ -133,6 +137,11 @@ function setupFeatureCards() {
   const tasbihCard = document.querySelector('[data-feature="tasbih"]');
   if (tasbihCard) {
     tasbihCard.addEventListener('click', openTasbih);
+  }
+  // Radio card
+  const radioCard = document.querySelector('[data-feature="radio"]');
+  if (radioCard) {
+    radioCard.addEventListener('click', openRadio);
   }
 }
 
@@ -189,5 +198,13 @@ function openTasbih() {
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'tasbih');
 }
+
+function openRadio() {
+  console.log('Opening Muslim Radio...');
+  const size = screenSizeManager.getWindowSize();
+  ipcRenderer.invoke('resize-window', size.width, size.height);
+  ipcRenderer.invoke('navigate-to', 'radio');
+}
+
 
 module.exports = { initFeaturesPage };
