@@ -124,6 +124,7 @@
     "bigScreen": "شاشة كبيرة",
     "smallScreen": "شاشة صغيرة",
     "notification": "إشعارات",
+    "hijriCalendar": "التقويم الهجري",
     "islamicCalendar": "التقويم الإسلامي والمناسبات",
     "today": "اليوم",
     "gregorian": "ميلادي",
@@ -177,7 +178,8 @@
     "loadingTracks": "جاري تحميل المقاطع...",
     "noTracksFound": "لم يتم العثور على مقاطع",
     "errorLoadingTracks": "خطأ في تحميل المقاطع",
-    "noTrackSelected": "لم يتم اختيار مقطع"
+    "noTrackSelected": "لم يتم اختيار مقطع",
+    "selectDhikr": "اختر الذكر"
   },
   "themes": {
     "navy": "أزرق داكن",
