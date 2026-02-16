@@ -9,6 +9,10 @@ let currentEditingLocationId = null;
 let locationCountrySelect = null;
 let locationCitySelect = null;
 
+// Holds the original values of the location being edited so we can
+// pass them as `prev` to analytics.locationAction('edited', ...).
+let _originalLocation = null;
+
 /**
  * Initialize location management UI
  */
@@ -92,9 +96,6 @@ async function loadLocationsList() {
 
   const locations = await locationManager.getLocations();
 
-  // analytics snapshot of locations stored by user
-  analytics.locationList(locations);
-
   if (locations.length === 0) {
     locationsList.innerHTML = `
       <div class="empty-state">
@@ -146,16 +147,17 @@ async function loadLocationsList() {
       const locationId = btn.dataset.id;
 
       if (action === 'activate') {
-        const loc = locations.find(l => l.id === locationId) || { id: locationId, name: '' };
+        const loc = locations.find(l => l.id === locationId);
         await locationManager.setActiveLocation(locationId);
-        analytics.locationActivated(loc); // ← ANALYTICS
+        analytics.locationAction('activated', loc);
         await loadLocationsList();
       } else if (action === 'edit') {
         await editLocation(locationId);
       } else if (action === 'delete') {
         if (confirm(t('confirmDeleteLocation'))) {
+          const loc = locations.find(l => l.id === locationId);
           await locationManager.deleteLocation(locationId);
-          analytics.locationDeleted(locationId); // ← ANALYTICS
+          analytics.locationAction('deleted', loc);
           await loadLocationsList();
         }
       }
@@ -232,7 +234,9 @@ function initLocationSelects() {
 }
 
 /**
- * Edit existing location
+ * Edit existing location.
+ * Snapshots the current values into _originalLocation so saveLocation()
+ * can attach them as `prev` in the analytics event.
  */
 async function editLocation(locationId) {
   const locations = await locationManager.getLocations();
@@ -241,6 +245,15 @@ async function editLocation(locationId) {
   if (!location) return;
 
   currentEditingLocationId = locationId;
+
+  // Snapshot the original values for the analytics diff on save
+  _originalLocation = {
+    name      : location.name,
+    city      : location.city,
+    country   : location.country,
+    isFavorite: location.isFavorite,
+  };
+
   document.getElementById('addEditLocationTitle').textContent = t('editLocation');
 
   const nameInput = document.getElementById('locationNameInput');
@@ -291,23 +304,24 @@ async function saveLocation() {
     return;
   }
 
-  const locationData = {
-    name,
-    country,
-    city,
-    isFavorite
-  };
-
+  const locationData = { name, country, city, isFavorite };
   let success = false;
 
   if (currentEditingLocationId) {
     const updated = await locationManager.updateLocation(currentEditingLocationId, locationData);
     success = updated !== null;
-    if (success) analytics.locationEdited({ id: currentEditingLocationId, ...locationData }); // ← ANALYTICS
+    if (success) {
+      analytics.locationAction('edited', {
+        ...locationData,
+        prev: _originalLocation,   // what it looked like before the change
+      });
+    }
   } else {
     const added = await locationManager.addLocation(locationData);
     success = added !== null;
-    if (success) analytics.locationAdded(locationData); // ← ANALYTICS
+    if (success) {
+      analytics.locationAction('added', locationData);
+    }
   }
 
   if (success) {
@@ -322,6 +336,7 @@ async function saveLocation() {
  */
 function resetAddEditForm() {
   currentEditingLocationId = null;
+  _originalLocation = null;
   document.getElementById('locationNameInput').value = '';
   document.getElementById('locationFavoriteToggle').checked = true;
 

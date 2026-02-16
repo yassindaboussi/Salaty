@@ -217,65 +217,54 @@ function playlistTrackPlay(albumName) {
   });
 }
 
-// ─── LOCATION MANAGEMENT HELPERS ───────────────────────────────────────────
+// ─── LOCATION MANAGEMENT HELPER ──────────────────────────────────────────────
 
 /**
- * User added a new location.
- * @param {{name:string,city:string,country:string,isFavorite:boolean}} loc
+ * Record any location management action as a single unified GA4 event.
+ *
+ * GA4 event name: location_action
+ *
+ * Parameters always sent:
+ *   action           — 'added' | 'edited' | 'deleted' | 'activated'
+ *   location_name    — label the user gave the location (e.g. "Home", "Work")
+ *   location_city    — city name
+ *   location_country — country name
+ *   is_favorite      — 'yes' | 'no'
+ *
+ * Extra parameters sent only for 'edited':
+ *   prev_name        — location name before the edit
+ *   prev_city        — city before the edit
+ *   prev_country     — country before the edit
+ *   prev_favorite    — 'yes' | 'no' before the edit
+ *
+ * @param {'added'|'edited'|'deleted'|'activated'} action
+ * @param {{
+ *   name       : string,
+ *   city       : string,
+ *   country    : string,
+ *   isFavorite : boolean,
+ *   prev      ?: { name:string, city:string, country:string, isFavorite:boolean }
+ * }} loc
  */
-function locationAdded(loc = {}) {
-  track('location_added', {
-    name        : String(loc.name || '').substring(0, 50),
-    city        : String(loc.city || '').substring(0, 50),
-    country     : String(loc.country || '').substring(0, 50),
-    is_favorite : loc.isFavorite ? 1 : 0,
-  });
-}
+function locationAction(action, loc = {}) {
+  const params = {
+    action          : action,
+    location_name   : String(loc.name    || '').substring(0, 50),
+    location_city   : String(loc.city    || '').substring(0, 50),
+    location_country: String(loc.country || '').substring(0, 50),
+    is_favorite     : loc.isFavorite ? 'yes' : 'no',
+  };
 
-/**
- * User edited an existing location.
- * @param {{id:string,name:string,city:string,country:string,isFavorite:boolean}} loc
- */
-function locationEdited(loc = {}) {
-  track('location_edited', {
-    location_id : loc.id || '',
-    name        : String(loc.name || '').substring(0, 50),
-    city        : String(loc.city || '').substring(0, 50),
-    country     : String(loc.country || '').substring(0, 50),
-    is_favorite : loc.isFavorite ? 1 : 0,
-  });
-}
+  // For edits: attach the previous values so you can see exactly what changed
+  if (action === 'edited' && loc.prev) {
+    params.prev_name     = String(loc.prev.name    || '').substring(0, 50);
+    params.prev_city     = String(loc.prev.city    || '').substring(0, 50);
+    params.prev_country  = String(loc.prev.country || '').substring(0, 50);
+    params.prev_favorite = loc.prev.isFavorite ? 'yes' : 'no';
+  }
 
-/**
- * User deleted a location.
- * @param {string} locationId
- */
-function locationDeleted(locationId) {
-  track('location_deleted', { location_id: locationId });
+  track('location_action', params);
 }
-
-/**
- * User activated/switched to a location.
- * @param {{id:string,name:string}} loc
- */
-function locationActivated(loc = {}) {
-  track('location_activated', {
-    location_id: loc.id || '',
-    name       : String(loc.name || '').substring(0, 50),
-  });
-}
-
-/**
- * Snapshot of entire location list (names + count).
- * @param {Array<{name:string}>} list
- */
-function locationList(list = []) {
-  track('location_list', {
-    count : list.length,
-    names : list.map(l => String(l.name || '').substring(0, 50)).join(','),
-  });
-}
-
 
 // ─── EXPORTS ─────────────────────────────────────────────────────────────────
 module.exports = {
@@ -322,9 +311,5 @@ module.exports = {
   playlistTrackPlay,
 
   // Location management
-  locationAdded,
-  locationEdited,
-  locationDeleted,
-  locationActivated,
-  locationList,
+  locationAction,
 };
