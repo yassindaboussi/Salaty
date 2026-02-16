@@ -1,5 +1,6 @@
 const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
+const analytics = require('./utils/analytics');
 
 let quranIframeLoaded = false;
 let quranLoadingTimeout = null;
@@ -140,6 +141,8 @@ function forceReloadQuran() {
   const quranIframe = document.getElementById('quranIframe');
   const quranLoading = document.getElementById('quranLoading');
 
+  analytics.quranLoadRetry(); // ← ANALYTICS
+
   if (quranLoading) {
     quranLoading.style.display = 'flex';
     quranLoading.innerHTML = `
@@ -172,6 +175,7 @@ function toggleQuranFullscreen() {
     document.body.classList.remove('fullscreen');
   }
 
+  analytics.quranFullscreen(isFullscreen); // ← ANALYTICS
   updateQuranUI();
 }
 

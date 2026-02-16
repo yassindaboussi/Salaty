@@ -3,6 +3,7 @@ const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const ipcHandlers = require('./ipc-handlers');
 const playerManager = require('./player-manager');
+const analytics    = require('../renderer/js/utils/analytics-manager');
 
 // Configure logging
 autoUpdater.logger = console;
@@ -32,6 +33,10 @@ function createWindow() {
 
   // Get settings after loading
   const settings = ipcHandlers.getSettingsData();
+
+   // ── ① Initialize analytics right after settings are available ──────────────
+   analytics.init(settings);
+   // ───────────────────────────────────────────────────────────────────────────
 
    // Determine initial window size based on settings
     const useBigScreen = settings.bigScreen || false;

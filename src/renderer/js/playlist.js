@@ -2,6 +2,7 @@ const { ipcRenderer } = require('electron'); // Import ipcRenderer
 const screenSizeManager = require('../js/screenSize');
 const { getArchiveOrgTracks } = require('../js/utils/trackUtils');
 const { setLanguage, t, getLanguage } = require('../js/translations');
+const analytics = require('../js/utils/analytics');
 
 // Helper to get translated string
 function getLocalized(obj) {
@@ -63,6 +64,7 @@ class PlaylistManager {
              this.displayTracks();
         } catch (error) {
              console.error('Error loading tracks:', error);
+             analytics.error('playlist_load_tracks', err.message || String(err)); // ← ANALYTICS
              let errorMsg = t('ui.errorLoadingTracks');
              if (errorMsg.includes('{album}')) {
                  errorMsg = errorMsg.replace('{album}', getLocalized(album.title) || album.id);
@@ -374,16 +376,20 @@ class PlaylistManager {
     }
 
     async playTrack(index) {
-        const track = this.tracks[index];
-        const urlToCheck = track.url;
-        const globalIndex = this.originalTracks.findIndex(t => t.url === urlToCheck);
+        const track       = this.tracks[index];
+        const globalIndex = this.originalTracks.findIndex(t => t.url === track.url);
+        if (globalIndex !== -1) {
+        ipcRenderer.send('player-command', {
+            type      : 'set-playlist',
+            tracks    : this.originalTracks,
+            startIndex: globalIndex
+        });
 
-        if(globalIndex !== -1) {
-             ipcRenderer.send('player-command', {
-                type: 'set-playlist',
-                tracks: this.originalTracks,
-                startIndex: globalIndex
-            });
+        // ── Track which album/track the user is playing ─────────────────────
+        const storedAlbum = localStorage.getItem('selectedAlbum');
+        let albumName = '';
+        try { albumName = storedAlbum ? getLocalized(JSON.parse(storedAlbum).title) : ''; } catch {}
+        analytics.playlistTrackPlay(albumName); // ← ANALYTICS
         }
     }
 

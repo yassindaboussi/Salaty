@@ -2,6 +2,7 @@
 const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
 const screenSizeManager = require('./screenSize');
+const analytics = require('./utils/analytics');
 
 // ==================== FEATURES PAGE FUNCTIONS ====================
 function initFeaturesPage() {
@@ -158,68 +159,68 @@ function setupFeatureCards() {
 }
 
 function openPlaylist() {
-  console.log('Opening Playlist...');
+  analytics.navigation('features', 'playlist'); // ← ANALYTICS
   ipcRenderer.invoke('resize-window', 850, 600);
   ipcRenderer.invoke('navigate-to', 'albums');
 }
 
 function openQuran() {
-  console.log('Opening Quran...');
+  analytics.navigation('features', 'quran'); // ← ANALYTICS
   ipcRenderer.invoke('resize-window', 850, 600);
   ipcRenderer.invoke('navigate-to', 'quran');
 }
 
 function openAthkar() {
-  console.log('Opening Athkar...');
+  analytics.navigation('features', 'athkar'); // ← ANALYTICS
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'athkar');
 }
 
 function openRamadhan() {
-  console.log('Opening Ramadhan...');
+  analytics.navigation('features', 'ramadan'); // ← ANALYTICS
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'ramadan');
 }
 
 function openQibla() {
-  console.log('Opening Qibla...');
+  analytics.navigation('features', 'qibla'); // ← ANALYTICS
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'qibla');
 }
 
 function openAsma() {
-  console.log('Opening Asma Allah...');
+  analytics.navigation('features', 'asma'); // ← ANALYTICS
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'asma');
 }
 
 function openCalendar() {
-  console.log('Opening Hijri Calendar...');
+  analytics.navigation('features', 'calendar'); // ← ANALYTICS
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'hijri-calendar');
 }
 
 function openTasbih() {
-  console.log('Opening Tasbih...');
+  analytics.navigation('features', 'tasbih'); // ← ANALYTICS
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'tasbih');
 }
 
 function openRadio() {
-  console.log('Opening Muslim Radio...');
+  analytics.navigation('features', 'radio'); // ← ANALYTICS
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'radio');
 }
 
 function openLiveStreams() {
-  console.log('Opening Live Streams...');
+  analytics.navigation('features', 'livestreams'); // ← ANALYTICS
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'livestreams');

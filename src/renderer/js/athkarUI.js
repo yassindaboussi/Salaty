@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
 const screenSizeManager = require('./screenSize');
 const { getAdkar } = require('./config-api/api'); // Added import
+const analytics = require('./utils/analytics');
 
 let athkarData = null;
 let currentCategory = null;
@@ -95,7 +96,7 @@ async function loadAthkarData() {
 
   } catch (error) {
     console.error('Error loading athkar data:', error);
-
+    analytics.error('athkar_load', err.message || String(err)); // ← ANALYTICS
     if (athkarLoading) {
       athkarLoading.innerHTML = `
         <div class="athkar-loading-content">
@@ -203,6 +204,9 @@ function setActiveCategory(category) {
       card.classList.remove('active');
     }
   });
+
+  // ── Track category view ──────────────────────────────────────────────────
+  analytics.athkarCategoryView(category); // ← ANALYTICS
 
   // Render athkar list for the selected category
   renderAthkarList();
@@ -340,17 +344,23 @@ function createAthkarCard(item, index) {
 }
 
 function incrementCount(athkarId, targetCount) {
-  console.log('Incrementing count for:', athkarId);
-
-  if (!athkarState[athkarId]) {
-    athkarState[athkarId] = 0;
-  }
+  if (!athkarState[athkarId]) athkarState[athkarId] = 0;
 
   if (athkarState[athkarId] < targetCount) {
     athkarState[athkarId]++;
     saveAthkarState();
     updateAthkarCard(athkarId, targetCount);
     showSuccessToast(t('countIncreased'));
+
+    // ── Check if entire category is now completed ─────────────────────────
+    if (athkarState[athkarId] >= targetCount) {
+      const items      = athkarData[currentCategory] || [];
+      const allDone    = items.every((item, idx) => {
+        const id = `${currentCategory}-${idx}`;
+        return (athkarState[id] || 0) >= (parseInt(item.count) || 1);
+      });
+      if (allDone) analytics.athkarCategoryCompleted(currentCategory); // ← ANALYTICS
+    }
   } else {
     showSuccessToast(t('maxCountReached'), true);
   }

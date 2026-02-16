@@ -7,6 +7,7 @@ const { showToast } = require('./toast');
 const { applyTheme } = require('./theme');
 const screenSizeManager = require('./screenSize');
 const { initLocationManagementUI } = require('./locationManagementUI');
+const analytics = require('./utils/analytics');
 
 let pendingTheme = 'navy';
 
@@ -77,7 +78,18 @@ function updateAllText() {
         'saveBtn': 'save',
         
         // Footer
-        'footerText': 'madeWith'
+        'footerText': 'madeWith',
+
+        // Add/Edit Location Modal - ADD THESE NEW ENTRIES
+        'addLocationBtn': 'addNewLocation',
+        'addEditLocationTitle': 'addLocation',
+        'locationNameLabel': 'locationNameLabel',
+        'locationCountryLabel': 'locationCountryLabel',
+        'locationCityLabel': 'locationCityLabel',
+        'favoriteLabel': 'favoriteLabel',
+        'favoriteDescription': 'favoriteDescription',
+        'cancelLabel': 'cancelLabel',
+        'saveLocationLabel': 'saveLocationLabel'
     };
 
     for (const [id, key] of Object.entries(textElements)) {
@@ -281,74 +293,54 @@ function initPreAdhanNotification() {
  * Save all settings
  */
 async function saveSettings() {
-    const cityInput = document.getElementById('cityInput');
-    const countryInput = document.getElementById('countryInput');
-    const athkarAlertsToggle = document.getElementById('athkarAlertsToggle');
-    const athkarIntervalInput = document.getElementById('athkarIntervalInput');
-    const preAdhanToggle = document.getElementById('preAdhanNotificationToggle');
-    const preAdhanInput = document.getElementById('preAdhanMinutesInput');
-    
-    // Get selected screen size from card
-    const selectedSizeCard = document.querySelector('.size-card.selected');
-    const selectedSize = selectedSizeCard ? selectedSizeCard.dataset.size : 'small';
+  const cityInput     = document.getElementById('cityInput');
+  const countryInput  = document.getElementById('countryInput');
+  const athkarToggle  = document.getElementById('athkarAlertsToggle');
+  const athkarInput   = document.getElementById('athkarIntervalInput');
+  const preAdhanToggle = document.getElementById('preAdhanNotificationToggle');
+  const preAdhanInput = document.getElementById('preAdhanMinutesInput');
+  const selectedSizeCard = document.querySelector('.size-card.selected');
+  const selectedSize  = selectedSizeCard ? selectedSizeCard.dataset.size : 'small';
 
-    // Validate location
-    const city = cityInput ? cityInput.value.trim() : '';
-    const country = countryInput ? countryInput.value.trim() : '';
+  const city    = cityInput    ? cityInput.value.trim()    : '';
+  const country = countryInput ? countryInput.value.trim() : '';
 
-    if (!city || !country) {
-        showToast(t('enterBothCityCountry'), 'error');
-        return;
+  if (!city || !country) {
+    showToast(t('enterBothCityCountry'), 'error');
+    return;
+  }
+
+  try {
+    state.settings.city       = city;
+    state.settings.country    = country;
+    state.settings.theme      = pendingTheme;
+    state.settings.bigScreen  = (selectedSize === 'big');
+
+    if (athkarToggle) state.settings.athkarAlertEnabled = athkarToggle.checked;
+    if (athkarInput) {
+      let v = parseInt(athkarInput.value);
+      state.settings.athkarAlertInterval = isNaN(v) || v < 1 ? 30 : v;
+    }
+    if (preAdhanToggle) state.settings.preAdhanNotificationEnabled = preAdhanToggle.checked;
+    if (preAdhanInput) {
+      let v = parseInt(preAdhanInput.value);
+      state.settings.preAdhanMinutes = isNaN(v) || v < 1 ? 5 : v;
     }
 
-    try {
-        // Update all settings
-        state.settings.city = city;
-        state.settings.country = country;
-        state.settings.theme = pendingTheme;
+    await ipcRenderer.invoke('save-settings', state.settings);
 
-        // Screen size - updated for card selection
-        state.settings.bigScreen = (selectedSize === 'big');
+    // ── Track settings save with preference snapshot ─────────────────────────
+    analytics.settingsSaved(state.settings); // ← ANALYTICS
+    // ────────────────────────────────────────────────────────────────────────
 
-        // Athkar alerts
-        if (athkarAlertsToggle) {
-            state.settings.athkarAlertEnabled = athkarAlertsToggle.checked;
-        }
-
-        if (athkarIntervalInput) {
-            let interval = parseInt(athkarIntervalInput.value);
-            if (isNaN(interval) || interval < 1) interval = 30;
-            state.settings.athkarAlertInterval = interval;
-        }
-
-        // Pre-Adhan notification
-        if (preAdhanToggle) {
-            state.settings.preAdhanNotificationEnabled = preAdhanToggle.checked;
-        }
-
-        if (preAdhanInput) {
-            let minutes = parseInt(preAdhanInput.value);
-            if (isNaN(minutes) || minutes < 1) minutes = 5;
-            state.settings.preAdhanMinutes = minutes;
-        }
-
-        // Save to storage
-        await ipcRenderer.invoke('save-settings', state.settings);
-
-        // Apply screen size changes immediately
-        await screenSizeManager.applyScreenSize();
-
-        // Show success message
-        showToast(t('settingsSaved'), 'success');
-
-        // Go back to main screen after a short delay
-        setTimeout(() => {
-            ipcRenderer.invoke('go-back');
-        }, 1500);
-    } catch (error) {
-        console.error('Error saving settings:', error);
-        showToast(t('errorSaving'), 'error');
-    }
+    await screenSizeManager.applyScreenSize();
+    showToast(t('settingsSaved'), 'success');
+    setTimeout(() => ipcRenderer.invoke('go-back'), 1500);
+  } catch (err) {
+    console.error('Error saving settings:', err);
+    analytics.error('settings_save', err.message || String(err)); // ← ANALYTICS
+    showToast(t('errorSaving'), 'error');
+  }
 }
 
 module.exports = {

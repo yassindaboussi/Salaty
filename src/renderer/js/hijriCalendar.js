@@ -1,6 +1,7 @@
 // hijriCalendar.js
 const { t } = require('./translations');
 const screenSizeManager = require('./screenSize');
+const analytics = require('./utils/analytics');
 
 // Hijri month names
 const HIJRI_MONTHS = {
@@ -83,6 +84,9 @@ async function navigateMonth(direction) {
         currentHijriYear--;
     }
 
+    // ── Track navigation direction ─────────────────────────────────────────
+     analytics.calendarMonthNavigated(direction === -1 ? 'prev' : 'next'); // ← ANALYTICS
+
     await renderCalendar();
 }
 
@@ -98,6 +102,7 @@ async function goToToday() {
         if (data.code === 200 && data.data.hijri) {
             currentHijriMonth = parseInt(data.data.hijri.month.number);
             currentHijriYear = parseInt(data.data.hijri.year);
+            analytics.calendarMonthNavigated('today'); // ← ANALYTICS
             await renderCalendar();
         }
     } catch (error) {
