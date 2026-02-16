@@ -2,6 +2,7 @@
 const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
 const screenSizeManager = require('./screenSize');
+const analytics = require('./utils/analytics');
 
 // Stream sources — keep here so we can restore them when switching tabs
 const STREAM_SOURCES = {
@@ -97,6 +98,9 @@ function initTabs() {
 
       // Load the new stream (only now)
       loadStream(streamKeys[index]);
+
+      // ── Track which stream the user switched to ───────────────────────────
+      analytics.livestreamSwitch(streamKeys[index]);
     });
   });
 }

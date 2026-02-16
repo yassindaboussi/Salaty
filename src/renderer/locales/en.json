@@ -207,7 +207,8 @@
     "madinaLive": "Al Masjid an-Nabawi",
     "makkahLocation": "Makkah al-Mukarramah",
     "madinaLocation": "Al-Madinah al-Munawwarah",
-    "live": "Live"
+    "live": "Live",
+    "addNewLocation": "Add New Location"
     },
   "themes": {
     "navy": "Navy",

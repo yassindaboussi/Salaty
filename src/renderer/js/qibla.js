@@ -5,6 +5,7 @@ const { t } = require('./translations');
 const { showToast } = require('./toast');
 const QiblaMap = require('salaty-qibla-map');
 const screenSizeManager = require('./screenSize');
+const analytics = require('./utils/analytics');
 
 let qiblaMapInstance = null;
 let currentUserLat = null;
@@ -66,16 +67,17 @@ async function initQiblaPage() {
 
         console.log(`Location detected via ${result.source}:`, lat, lng);
 
-        if (locationText) {
-            let label = `${result.city}, ${result.country}`;
-            if (result.source !== 'settings-photon') {
-                label += ' (Approx)';
-            }
-            locationText.textContent = label;
-        }
+        // ── Track how the location was resolved ──────────────────────────────
+        analytics.qiblaLocationResolved(result.source); // ← ANALYTICS
 
-    } catch (error) {
-        console.warn('All location detection methods failed:', error);
+        if (locationText) {
+        let label = `${result.city}, ${result.country}`;
+        if (result.source !== 'settings-photon') label += ' (Approx)';
+        locationText.textContent = label;
+        }
+    } catch (err) {
+        console.warn('All location detection methods failed:', err);
+        analytics.error('qibla_location', err.message || String(err)); // ← ANALYTICS
     }
 
     // Final check and Map Init

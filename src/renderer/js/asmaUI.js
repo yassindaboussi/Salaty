@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
 const screenSizeManager = require('./screenSize');
 const { getNamesOfAllah } = require('./config-api/api');
+const analytics = require('./utils/analytics');
 
 let asmaData = null;
 let currentLanguage = 'en';
@@ -122,26 +123,21 @@ function renderAsmaList() {
 
 function copyAsma(item, meaning, desc) {
   const text = `${item.name} - ${item.transliteration} - ${meaning}\n${desc}`;
-
   navigator.clipboard.writeText(text)
     .then(() => {
+      analytics.asmaCopied(); // ← ANALYTICS
       showSuccessToast(t('copiedToClipboard'));
     })
-    .catch(err => {
-      console.error('Failed to copy:', err);
-      showSuccessToast(t('failedToCopy'), true);
-    });
+    .catch(() => showSuccessToast(t('failedToCopy'), true));
 }
 
 function copyAsmaArabic(name) {
   navigator.clipboard.writeText(name)
     .then(() => {
+      analytics.asmaCopied(); // ← ANALYTICS
       showSuccessToast(t('copiedToClipboard'));
     })
-    .catch(err => {
-      console.error('Failed to copy:', err);
-      showSuccessToast(t('failedToCopy'), true);
-    });
+    .catch(() => showSuccessToast(t('failedToCopy'), true));
 }
 
 function showSuccessToast(message, isError = false) {

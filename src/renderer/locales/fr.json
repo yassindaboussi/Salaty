@@ -207,7 +207,8 @@
     "madinaLive": "Al Masjid an-Nabawi",
     "makkahLocation": "La Mecque",
     "madinaLocation": "Médine",
-    "live": "En direct"
+    "live": "En direct",
+    "addNewLocation": "Ajouter un nouvel emplacement"
   },
   "themes": {
     "navy": "Bleu marine",

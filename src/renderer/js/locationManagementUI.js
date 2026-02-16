@@ -3,6 +3,7 @@ const TomSelect = require('tom-select').default;
 const { t } = require('./translations');
 const { showToast } = require('./toast');
 const locationManager = require('./locationManager');
+const analytics = require('./utils/analytics');
 
 let currentEditingLocationId = null;
 let locationCountrySelect = null;
@@ -91,6 +92,9 @@ async function loadLocationsList() {
 
   const locations = await locationManager.getLocations();
 
+  // analytics snapshot of locations stored by user
+  analytics.locationList(locations);
+
   if (locations.length === 0) {
     locationsList.innerHTML = `
       <div class="empty-state">
@@ -142,13 +146,16 @@ async function loadLocationsList() {
       const locationId = btn.dataset.id;
 
       if (action === 'activate') {
+        const loc = locations.find(l => l.id === locationId) || { id: locationId, name: '' };
         await locationManager.setActiveLocation(locationId);
+        analytics.locationActivated(loc); // ← ANALYTICS
         await loadLocationsList();
       } else if (action === 'edit') {
         await editLocation(locationId);
       } else if (action === 'delete') {
         if (confirm(t('confirmDeleteLocation'))) {
           await locationManager.deleteLocation(locationId);
+          analytics.locationDeleted(locationId); // ← ANALYTICS
           await loadLocationsList();
         }
       }
@@ -294,13 +301,13 @@ async function saveLocation() {
   let success = false;
 
   if (currentEditingLocationId) {
-    // Update existing location
     const updated = await locationManager.updateLocation(currentEditingLocationId, locationData);
     success = updated !== null;
+    if (success) analytics.locationEdited({ id: currentEditingLocationId, ...locationData }); // ← ANALYTICS
   } else {
-    // Add new location
     const added = await locationManager.addLocation(locationData);
     success = added !== null;
+    if (success) analytics.locationAdded(locationData); // ← ANALYTICS
   }
 
   if (success) {

@@ -19,7 +19,8 @@ const { initLocationSwitcher } = require('../js/locationSwitcher');
 const { setupMiniPlayer } = require('../js/mini-player');
 const { initTasbihPage } = require('../js/tasbihUI');
 const { initRadioPage } = require('../js/radioUI');
-const { initLiveStreamsPage } = require('../js/livestreams');
+const { initLiveStreamsPage } = require('../js/livestreamsUI');
+const analytics = require('../js/utils/analytics');
 
 // ==================== SCREEN SIZE HELPER FUNCTIONS ====================
 /**
@@ -40,13 +41,6 @@ function setupScreenSizeForPage(containerClass = '') {
     screenSizeManager.toggleScreenSize(containerClass);
 });
     }
-}
-
-/**
- * Get current window size based on screen size setting
- */
-function getCurrentWindowSize() {
-    return screenSizeManager.getWindowSize();
 }
 
 /**
@@ -103,100 +97,92 @@ async function adjustIndexPageHeight() {
     }, 100); // 100ms debounce
 }
 
-// ==================== INITIALIZATION ====================
+// ─── MAIN INIT ───────────────────────────────────────────────────────────────
 async function initializeApp() {
   try {
-    // Load settings from main process
     const settings = await ipcRenderer.invoke('get-settings');
     if (settings) {
       state.settings = { ...state.settings, ...settings };
-      const theme = state.settings.theme || 'navy';
-
       setLanguage(state.settings.language || 'en');
-
-      // Apply theme and language
-      applyTheme(theme);
+      applyTheme(state.settings.theme || 'navy');
       applyLanguageDirection();
-
-      // Apply screen size preference
       await screenSizeManager.applyScreenSize();
-
-      // Initialize Athkar Alerts System
       initAthkarAlertsSystem();
     }
 
-    // Check which page we're on and initialize accordingly
-    const path = window.location.pathname;
-    if (path.includes('index.html') || path.endsWith('/')) {
+    // ── Detect current page and init the right module ─────────────────────────
+    const pagePath = window.location.pathname;
+
+    if (pagePath.includes('index.html') || pagePath.endsWith('/')) {
       setupScreenSizeForPage('app');
       initMainPage();
-    } else if (path.includes('settings.html')) {
+      // index is the home page — no featureOpen needed here
+
+    } else if (pagePath.includes('settings.html')) {
       setupScreenSizeForPage('settings-container');
       initSettingsPage();
-    } else if (path.includes('quran.html')) {
+      // Settings is a utility page, not a feature — no featureOpen
+
+    } else if (pagePath.includes('quran.html')) {
+      analytics.featureOpen('quran'); // ← ANALYTICS
       initQuranPage();
-    } else if (path.includes('athkar.html')) {
-      console.log('Initializing Athkar page from renderer.js');
-      // Setup screen size for athkar page
+
+    } else if (pagePath.includes('athkar.html')) {
+      analytics.featureOpen('athkar'); // ← ANALYTICS
       setupScreenSizeForPage('athkar-container');
       initAthkarPage();
-    } else if (path.includes('features.html')) {
-      console.log('Initializing Features page from renderer.js');
-      // Setup screen size for features page
+
+    } else if (pagePath.includes('features.html')) {
       setupScreenSizeForPage('features-container');
       initFeaturesPage();
-    } else if (path.includes('ramadan.html')) {
-      console.log('Initializing Ramadan page from renderer.js');
-      // Setup screen size for ramadan page
+      // features is a menu page, not a feature itself
+
+    } else if (pagePath.includes('ramadan.html')) {
+      analytics.featureOpen('ramadan'); // ← ANALYTICS
       setupScreenSizeForPage('ramadan-container');
       initRamadanPage();
-    } else if (path.includes('qibla.html')) {
-      console.log('Initializing Qibla page from renderer.js');
-      // Setup screen size for qibla page
+
+    } else if (pagePath.includes('qibla.html')) {
+      analytics.featureOpen('qibla'); // ← ANALYTICS
       setupScreenSizeForPage('qibla-container');
       initQiblaPage();
-    } else if (path.includes('asma.html')) {
-      console.log('Initializing Asmallah page from renderer.js');
-      // Setup screen size for asma page
+
+    } else if (pagePath.includes('asma.html')) {
+      analytics.featureOpen('asma'); // ← ANALYTICS
       setupScreenSizeForPage('asma-container');
       initAsmaPage();
-    } else if (path.includes('tasbih.html')) {
-      console.log('Initializing Tasbih page from renderer.js');
-      // Setup screen size for tasbih page
+
+    } else if (pagePath.includes('tasbih.html')) {
+      analytics.featureOpen('tasbih'); // ← ANALYTICS
       setupScreenSizeForPage('tasbih-container');
       initTasbihPage();
-    }   
-    else if (path.includes('hijri-calendar.html')) {
-      console.log('Initializing Hijri Calendar page from renderer.js');
-      // Setup screen size for calendar page
+
+    } else if (pagePath.includes('hijri-calendar.html')) {
+      analytics.featureOpen('calendar'); // ← ANALYTICS
       setupScreenSizeForPage('calendar-container');
       initHijriCalendar();
-    }
-     else if (path.includes('playlist.html')) {
-      console.log('Initializing Playlist page from renderer.js');
-      // Setup screen size for playlist page
+
+    } else if (pagePath.includes('playlist.html') || pagePath.includes('albums.html')) {
+      analytics.featureOpen('playlist'); // ← ANALYTICS
       setupScreenSizeForPage('playlist-container');
-      // Note: playlist.js handles its own player initialization
-    } else if (path.includes('radio.html')) {
-      console.log('Initializing Radio page from renderer.js');
-      // Setup screen size for radio page
+
+    } else if (pagePath.includes('radio.html')) {
+      analytics.featureOpen('radio'); // ← ANALYTICS
       setupScreenSizeForPage('radio-container');
       initRadioPage();
-    } else if (path.includes('livestreams.html')) {
-      console.log('Initializing Live Streams page from renderer.js');
-      // Setup screen size for livestreams page
+
+    } else if (pagePath.includes('livestreams.html')) {
+      analytics.featureOpen('livestreams'); // ← ANALYTICS
       setupScreenSizeForPage('livestreams-container');
       initLiveStreamsPage();
     }
 
-    // Setup window controls (common to all pages)
     setupWindowControls();
-
-    // Setup Mini Player (Global)
     setupMiniPlayer();
 
-  } catch (error) {
-    console.error('Error initializing app:', error);
+  } catch (err) {
+    analytics.error('renderer_init', err.message || String(err));
+    console.error('Error initializing app:', err);
   }
 }
 
@@ -309,69 +295,51 @@ function setupUpdateHandlers() {
 
 // ==================== MAIN PAGE FUNCTIONS ====================
 function initMainPage() {
-  // Initialize location switcher
   initLocationSwitcher();
 
-  // Setup navigation buttons
   const settingsBtn = document.getElementById('mainSettingsBtn');
   const featuresBtn = document.getElementById('mainFeaturesBtn');
 
   if (settingsBtn) {
-        settingsBtn.addEventListener('click', async () => {
-            // Use screen size preference for settings page
-            const size = screenSizeManager.getWindowSize();
-            await ipcRenderer.invoke('resize-window', size.width, size.height);
-            ipcRenderer.invoke('navigate-to', 'settings');
-        });
+    settingsBtn.addEventListener('click', async () => {
+      analytics.navigation('home', 'settings'); // ← ANALYTICS
+      const size = screenSizeManager.getWindowSize();
+      await ipcRenderer.invoke('resize-window', size.width, size.height);
+      ipcRenderer.invoke('navigate-to', 'settings');
+    });
   }
 
   if (featuresBtn) {
-        featuresBtn.addEventListener('click', async () => {
-            // Use screen size preference for features page
-            const size = screenSizeManager.getWindowSize();
-            await ipcRenderer.invoke('resize-window', size.width, size.height);
-            ipcRenderer.invoke('navigate-to', 'features');
-        });
-  }
-
-  // Initialize loading text
-  const loadingEl = document.getElementById('loadingText');
-  if (loadingEl) {
-    loadingEl.textContent = t('loadingPrayerTimes');
-  }
-
-  // Initialize Events Banner
-  const eventsBanner = document.getElementById('eventsBanner');
-  const closeEventBannerBtn = document.getElementById('closeEventBanner');
-
-  if (closeEventBannerBtn && eventsBanner) {
-    closeEventBannerBtn.addEventListener('click', () => {
-      eventsBanner.style.display = 'none';
+    featuresBtn.addEventListener('click', async () => {
+      analytics.navigation('home', 'features'); // ← ANALYTICS
+      const size = screenSizeManager.getWindowSize();
+      await ipcRenderer.invoke('resize-window', size.width, size.height);
+      ipcRenderer.invoke('navigate-to', 'features');
     });
   }
 
-  // Monitor DOM changes for automatic resizing on the index page
+  const loadingEl = document.getElementById('loadingText');
+  if (loadingEl) loadingEl.textContent = t('loadingPrayerTimes');
+
+  const eventsBanner     = document.getElementById('eventsBanner');
+  const closeEventBanner = document.getElementById('closeEventBanner');
+  if (closeEventBanner && eventsBanner) {
+    closeEventBanner.addEventListener('click', () => { eventsBanner.style.display = 'none'; });
+  }
+
   const appContainer = document.getElementById('app');
   if (appContainer) {
-    const observer = new MutationObserver(() => {
-        adjustIndexPageHeight();
-    });
-
+    const observer = new MutationObserver(adjustIndexPageHeight);
     observer.observe(appContainer, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['style', 'class', 'hidden']
+      childList: true, subtree: true, attributes: true,
+      attributeFilter: ['style', 'class', 'hidden'],
     });
   }
 
-  // Initial height adjustment
   adjustIndexPageHeight();
-
-  // Start prayer times functionality
   loadPrayerTimes();
-  setInterval(updateCurrentAndNextPrayer, 1000);
-  setInterval(loadPrayerTimes, 3600000);
+  setInterval(updateCurrentAndNextPrayer, 1_000);
+  setInterval(loadPrayerTimes, 3_600_000);
 }
 
 // ==================== START THE APP ====================

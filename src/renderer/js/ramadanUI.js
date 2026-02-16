@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 const { state } = require('./globalStore');
 const { t } = require('./translations');
 const screenSizeManager = require('./screenSize');
+const analytics = require('./utils/analytics');
 
 let ramadanData = [];
 let assignedHijriYear = null;
@@ -127,6 +128,7 @@ async function fetchRamadanData() {
 
     } catch (error) {
         console.error("Error fetching Ramadan data:", error);
+        analytics.error('ramadan_fetch', err.message || String(err));
         document.getElementById('trackerGrid').innerHTML = `<p style="text-align:center; color:white;">Error loading data. Check internet connection.</p>`;
     }
 }
@@ -288,23 +290,21 @@ function openDayModal(dayData, element) {
 }
 
 function toggleDayTracking(hijriDay, dayElement, btn) {
-    let trackedDays = JSON.parse(localStorage.getItem(`ramadanTracker_${assignedHijriYear}`) || '[]');
-
-    if (trackedDays.includes(hijriDay)) {
-        // Untrack
-        trackedDays = trackedDays.filter(d => d !== hijriDay);
-        dayElement.classList.remove('completed');
-        btn.style.background = 'rgba(255,255,255,0.1)';
-        btn.innerHTML = t('markAsCompleted');
-    } else {
-        // Track
-        trackedDays.push(hijriDay);
-        dayElement.classList.add('completed');
-        btn.style.background = 'var(--accent-color)';
-        btn.innerHTML = `<i class="fas fa-check"></i> ${t('fastingCompleted')}`;
-    }
-
-    localStorage.setItem(`ramadanTracker_${assignedHijriYear}`, JSON.stringify(trackedDays));
+  let trackedDays = JSON.parse(localStorage.getItem(`ramadanTracker_${assignedHijriYear}`) || '[]');
+  if (trackedDays.includes(hijriDay)) {
+    trackedDays = trackedDays.filter(d => d !== hijriDay);
+    dayElement.classList.remove('completed');
+    btn.style.background = 'rgba(255,255,255,0.1)';
+    btn.innerHTML = t('markAsCompleted');
+    analytics.ramadanDayTracked(hijriDay, 'unmark'); // ← ANALYTICS
+  } else {
+    trackedDays.push(hijriDay);
+    dayElement.classList.add('completed');
+    btn.style.background = 'var(--accent-color)';
+    btn.innerHTML = `<i class="fas fa-check"></i> ${t('fastingCompleted')}`;
+    analytics.ramadanDayTracked(hijriDay, 'mark'); // ← ANALYTICS
+  }
+  localStorage.setItem(`ramadanTracker_${assignedHijriYear}`, JSON.stringify(trackedDays));
 }
 
 // Remove the (EST) part for cleaner display if present
@@ -331,6 +331,7 @@ function initTabs() {
             const targetContent = document.getElementById(`content${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`);
             if (targetContent) {
                 targetContent.style.display = 'block';
+                 analytics.ramadanTabSwitch(tabId); // ← ANALYTICS
             }
         });
     });
