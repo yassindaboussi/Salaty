@@ -58,3 +58,8 @@ jspm_packages/
 # Env files
 .env
 .env.*
+
+# Build output
+dist/
+build/
+out/

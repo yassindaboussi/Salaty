@@ -71,6 +71,10 @@ function createWindow() {
     show: false
   });
 
+  // Setup IPC handlers BEFORE loading any pages
+  ipcHandlers.setupHandlers(mainWindow);
+  playerManager.setupPlayerIpc(mainWindow);
+
   // Affiche le DevTools seulement si --enable-logging est passé en argument
   if (process.argv.includes('--enable-logging')) {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
@@ -93,7 +97,7 @@ function createWindow() {
       if (playerWindow) playerWindow.hide();
   });
 
-  // Load main page
+  // Load main page AFTER IPC handlers are registered
   mainWindow.loadFile(path.join(__dirname, '../renderer/pages/index.html'));
 
   mainWindow.once('ready-to-show', () => {
@@ -143,10 +147,6 @@ function createWindow() {
       mainWindow.show();
     });
   }
-
-  // Setup IPC handlers
-  ipcHandlers.setupHandlers(mainWindow);
-  playerManager.setupPlayerIpc(mainWindow);
 
   // Update IPC Handlers
   ipcMain.on('start-download', () => {
@@ -199,9 +199,6 @@ if (!gotTheLock) {
 
   app.whenReady().then(() => {
     try {
-      // Load settings first
-      ipcHandlers.loadSettings();
-
       createWindow();
       // Check for updates after window creation
       // Adding a small delay to ensure window is ready
