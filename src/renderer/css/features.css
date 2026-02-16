@@ -261,13 +261,22 @@
   color: #009688;
 }
 
+.radio-icon {
+  background: rgba(179, 84, 50, 0.1);
+  border-color: rgba(194, 16, 16, 0.2);
+}
+
+.radio-icon i {
+  color: #ff5500;
+}
+
 .livestreams-icon {
-  background: rgba(255, 215, 0, 0.1);
-  border-color: rgba(255, 215, 0, 0.2);
+  background: rgba(20, 201, 35, 0.1);
+  border-color: rgba(53, 225, 40, 0.2);
 }
 
 .livestreams-icon i {
-  color: #ffd700;
+  color: #25981b;
 }
 
 /* Feature Name */
