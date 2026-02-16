@@ -58,7 +58,12 @@
         ]
       },
       "icon": "src/assets/icons/app_icon_512.png",
-      "identity": null
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "asarUnpack": [
+        "src/main/**/*"
+      ]
     },
     "linux": {
       "target": [

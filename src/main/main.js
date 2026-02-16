@@ -199,6 +199,9 @@ if (!gotTheLock) {
 
   app.whenReady().then(() => {
     try {
+      // Load settings first
+      ipcHandlers.loadSettings();
+
       createWindow();
       // Check for updates after window creation
       // Adding a small delay to ensure window is ready
