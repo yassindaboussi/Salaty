@@ -1,6 +1,85 @@
-const { ipcMain, app } = require('electron');
+const { ipcMain, app, BrowserWindow, screen } = require('electron');
 const fs = require('fs');
 const path = require('path');
+
+/* ── Athkar popup window (themed custom notification) ── */
+let athkarPopupWindow = null;
+
+const POPUP_WIDTH  = 340;
+const POPUP_MARGIN = 16;
+
+function showAthkarPopup({ theme, content, title }) {
+  // Destroy any previous popup still visible
+  if (athkarPopupWindow && !athkarPopupWindow.isDestroyed()) {
+    athkarPopupWindow.destroy();
+    athkarPopupWindow = null;
+  }
+
+  const { workArea } = screen.getPrimaryDisplay();
+
+  // Start off-screen + large height so the renderer can measure real content
+  athkarPopupWindow = new BrowserWindow({
+    width:  POPUP_WIDTH,
+    height: 800,          // generous height so content isn't clipped during measure
+    x: workArea.x + workArea.width,   // off-screen to the right while measuring
+    y: workArea.y + workArea.height - 800 - POPUP_MARGIN,
+    frame:       false,
+    transparent: true,
+    resizable:   false,
+    movable:     true,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    focusable:   true,
+    show: false,
+    webPreferences: {
+      nodeIntegration:  true,
+      contextIsolation: false,
+      webSecurity:      false
+    }
+  });
+
+  athkarPopupWindow.setAlwaysOnTop(true, 'pop-up-menu');
+  athkarPopupWindow.loadFile(
+    path.join(__dirname, '../renderer/pages/athkar-popup.html')
+  );
+
+  // Send content once the page is loaded; renderer will measure then call show-athkar-popup-ready
+  athkarPopupWindow.once('ready-to-show', () => {
+    athkarPopupWindow.webContents.send('init-athkar-popup', { theme, content, title });
+  });
+
+  athkarPopupWindow.on('closed', () => {
+    athkarPopupWindow = null;
+  });
+}
+
+ipcMain.on('show-athkar-popup', (_event, data) => {
+  showAthkarPopup(data);
+});
+
+ipcMain.on('close-athkar-popup', () => {
+  if (athkarPopupWindow && !athkarPopupWindow.isDestroyed()) {
+    athkarPopupWindow.destroy();
+    athkarPopupWindow = null;
+  }
+});
+
+// Renderer measured the real content height → resize to fit then show
+ipcMain.on('show-athkar-popup-ready', (_event, { height }) => {
+  if (!athkarPopupWindow || athkarPopupWindow.isDestroyed()) return;
+
+  const { workArea } = screen.getPrimaryDisplay();
+  const newHeight = Math.min(Math.max(height, 120), 520);
+
+  athkarPopupWindow.setBounds({
+    x:      workArea.x + workArea.width  - POPUP_WIDTH - POPUP_MARGIN,
+    y:      workArea.y + workArea.height - newHeight   - POPUP_MARGIN,
+    width:  POPUP_WIDTH,
+    height: newHeight
+  });
+
+  athkarPopupWindow.showInactive();
+});
 
 let settingsData = {
   city: 'Tunis',
