@@ -294,7 +294,7 @@ function initPreAdhanNotification() {
  * Initialize test popup buttons (Athkar & Adhan preview) – dev mode only
  */
 async function initTestPopupButtons() {
-    const isDev = await ipcRenderer.invoke('is-dev-mode');
+    const isDev = process.argv.includes('--enable-logging');
 
     const section   = document.getElementById('testPopupsSection');
     if (!isDev || !section) return;
