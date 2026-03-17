@@ -1,5 +1,5 @@
 // src/renderer/js/athkar-popup.js
-// Renderer script for the themed athkar notification popup window.
+// Renderer script for the themed notification popup window (athkar & adhan).
 
 const { ipcRenderer } = require('electron');
 
@@ -9,6 +9,8 @@ const app        = document.getElementById('app');
 const athkarText = document.getElementById('athkarText');
 const closeBtn   = document.getElementById('closeBtn');
 const titleEl    = document.getElementById('popupTitle');
+const iconEl     = document.querySelector('.popup-icon i');
+const openAppBtn = document.getElementById('openAppBtn');
 
 /* All supported theme classes (must match themes.css) */
 const THEME_CLASSES = [
@@ -34,20 +36,31 @@ function applyTheme(theme) {
 function closePopup() {
     app.classList.add('closing');
     setTimeout(() => {
-        ipcRenderer.send('close-athkar-popup');
+        ipcRenderer.send('close-themed-popup');
     }, 380); // match CSS fadeOut duration
 }
 
 /* ── Receive initialisation data from the main process ── */
-ipcRenderer.once('init-athkar-popup', (event, data) => {
-    const { theme, content, title } = data;
+ipcRenderer.once('init-themed-popup', (_event, data) => {
+    const { theme, content, title, icon, type } = data;
 
-    // Apply the saved app theme
     applyTheme(theme);
 
-    // Fill in content
     if (content)  athkarText.textContent = content;
     if (title)    titleEl.textContent    = title;
+
+    if (icon && iconEl) {
+        iconEl.className = `fas ${icon}`;
+    }
+
+    // Show "Open App" button only for adhan popups
+    if (type === 'adhan' && openAppBtn) {
+        openAppBtn.classList.remove('hidden');
+        openAppBtn.addEventListener('click', () => {
+            ipcRenderer.send('show-main-window'); // focus + affiche la fenêtre principale
+            closePopup();
+        });
+    }
 
     // Wait for the browser to fully paint the content, then measure the true height
     requestAnimationFrame(() => {
@@ -55,7 +68,7 @@ ipcRenderer.once('init-athkar-popup', (event, data) => {
             // document.body.scrollHeight is reliable here because html/body are height:auto
             const neededHeight = Math.ceil(document.body.scrollHeight) + 2;
             // Ask main to resize the window to fit the content and then show it
-            ipcRenderer.send('show-athkar-popup-ready', { height: neededHeight });
+            ipcRenderer.send('show-themed-popup-ready', { height: neededHeight });
 
             // Start auto-close timer only after the window is shown
             const autoCloseTimer = setTimeout(closePopup, CLOSE_DELAY_MS);

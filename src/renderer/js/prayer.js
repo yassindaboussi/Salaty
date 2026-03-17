@@ -1,7 +1,6 @@
 // src/renderer/js/prayer.js
 // Utilitaires pour la gestion de la date de prière (calcul, formatage, etc.)
 const { ipcRenderer } = require('electron');
-const path = require('path');
 const { translations, getLanguage, t } = require('../js/translations');
 const {   showToast, } = require('../js/toast');
 const { getSecondsFromTime, formatTime, getGregorianDate, getHijriDate, checkUpcomingEvent } = require('./utils/dateUtils');
@@ -238,14 +237,15 @@ function updateCurrentAndNextPrayer() {
 
         if (preAdhanEnabled && nextPrayer && timeRemaining <= preAdhanSeconds && timeRemaining > 0) {
             if (lastPreAdhanNotificationPrayer !== nextPrayer.key) {
-                // Remplacer showToast par une notification Windows
-                const notificationTitle = 'Salaty Time';
-                const notificationBody = t('adhanInXmin').replace('{prayer}', nextPrayer.name).replace('{minutes}', preAdhanMinutes);
+                const notificationBody = t('adhanInXmin')
+                    .replace('{prayer}', nextPrayer.name)
+                    .replace('{minutes}', preAdhanMinutes);
 
-                new Notification(notificationTitle, {
-                    body: notificationBody,
-                    icon: path.join(__dirname, '../../assets/icons/app_icon.png'),
-                    silent: true // Son par défaut désactivé pour éviter le spam, ou mettre false si désiré
+                // Themed popup instead of native OS notification
+                ipcRenderer.send('show-adhan-popup', {
+                    theme:   state.settings.theme || 'navy',
+                    title:   'Salaty Time · تنبيه الصلاة',
+                    content: notificationBody
                 });
 
                 lastPreAdhanNotificationPrayer = nextPrayer.key;

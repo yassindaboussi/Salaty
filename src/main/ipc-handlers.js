@@ -2,26 +2,34 @@ const { ipcMain, app, BrowserWindow, screen } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
-/* ── Athkar popup window (themed custom notification) ── */
+/* ── Themed popup windows (athkar & adhan) ── */
 let athkarPopupWindow = null;
+let adhanPopupWindow  = null;
 
 const POPUP_WIDTH  = 340;
 const POPUP_MARGIN = 16;
 
-function showAthkarPopup({ theme, content, title }) {
-  // Destroy any previous popup still visible
-  if (athkarPopupWindow && !athkarPopupWindow.isDestroyed()) {
-    athkarPopupWindow.destroy();
-    athkarPopupWindow = null;
+/**
+ * Create a themed notification popup (BrowserWindow).
+ * The window is hidden off-screen while the renderer measures the content;
+ * it becomes visible only after `show-themed-popup-ready` is received.
+ *
+ * @param {object} data   { theme, content, title, icon }
+ * @param {'athkar'|'adhan'} type
+ */
+function showThemedPopup(data, type) {
+  // Close any existing popup of the same type
+  const existing = type === 'adhan' ? adhanPopupWindow : athkarPopupWindow;
+  if (existing && !existing.isDestroyed()) {
+    existing.destroy();
   }
 
   const { workArea } = screen.getPrimaryDisplay();
 
-  // Start off-screen + large height so the renderer can measure real content
-  athkarPopupWindow = new BrowserWindow({
+  const win = new BrowserWindow({
     width:  POPUP_WIDTH,
-    height: 800,          // generous height so content isn't clipped during measure
-    x: workArea.x + workArea.width,   // off-screen to the right while measuring
+    height: 800,                               // generous height for content measurement
+    x: workArea.x + workArea.width,            // off-screen while measuring
     y: workArea.y + workArea.height - 800 - POPUP_MARGIN,
     frame:       false,
     transparent: true,
@@ -38,47 +46,54 @@ function showAthkarPopup({ theme, content, title }) {
     }
   });
 
-  athkarPopupWindow.setAlwaysOnTop(true, 'pop-up-menu');
-  athkarPopupWindow.loadFile(
-    path.join(__dirname, '../renderer/pages/athkar-popup.html')
-  );
+  win.setAlwaysOnTop(true, 'pop-up-menu');
+  win.loadFile(path.join(__dirname, '../renderer/pages/athkar-popup.html'));
 
-  // Send content once the page is loaded; renderer will measure then call show-athkar-popup-ready
-  athkarPopupWindow.once('ready-to-show', () => {
-    athkarPopupWindow.webContents.send('init-athkar-popup', { theme, content, title });
+  win.once('ready-to-show', () => {
+    win.webContents.send('init-themed-popup', { ...data, type });
   });
 
-  athkarPopupWindow.on('closed', () => {
-    athkarPopupWindow = null;
+  win.on('closed', () => {
+    if (type === 'adhan')  adhanPopupWindow  = null;
+    else                   athkarPopupWindow = null;
   });
+
+  if (type === 'adhan') adhanPopupWindow  = win;
+  else                  athkarPopupWindow = win;
 }
 
+/* ── IPC handlers ── */
+
 ipcMain.on('show-athkar-popup', (_event, data) => {
-  showAthkarPopup(data);
+  showThemedPopup({ icon: 'fa-moon', ...data }, 'athkar');
 });
 
-ipcMain.on('close-athkar-popup', () => {
-  if (athkarPopupWindow && !athkarPopupWindow.isDestroyed()) {
-    athkarPopupWindow.destroy();
-    athkarPopupWindow = null;
-  }
+ipcMain.on('show-adhan-popup', (_event, data) => {
+  showThemedPopup({ icon: 'fa-mosque', ...data }, 'adhan');
 });
 
-// Renderer measured the real content height → resize to fit then show
-ipcMain.on('show-athkar-popup-ready', (_event, { height }) => {
-  if (!athkarPopupWindow || athkarPopupWindow.isDestroyed()) return;
+// Renderer measured the real content height → resize then show
+ipcMain.on('show-themed-popup-ready', (event, { height }) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (!win || win.isDestroyed()) return;
 
   const { workArea } = screen.getPrimaryDisplay();
   const newHeight = Math.min(Math.max(height, 120), 520);
 
-  athkarPopupWindow.setBounds({
+  win.setBounds({
     x:      workArea.x + workArea.width  - POPUP_WIDTH - POPUP_MARGIN,
     y:      workArea.y + workArea.height - newHeight   - POPUP_MARGIN,
     width:  POPUP_WIDTH,
     height: newHeight
   });
 
-  athkarPopupWindow.showInactive();
+  win.showInactive();
+});
+
+// Renderer requests close (after fade-out animation)
+ipcMain.on('close-themed-popup', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win && !win.isDestroyed()) win.destroy();
 });
 
 let settingsData = {
@@ -431,6 +446,9 @@ function setupHandlers(mainWindow) {
     }
     return true;
   });
+
+  // Returns true when running in development (not packaged)
+  ipcMain.handle('is-dev-mode', () => !app.isPackaged);
 }
 
 module.exports = {

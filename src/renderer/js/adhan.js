@@ -1,5 +1,6 @@
+const { ipcRenderer } = require('electron');
 const { t } = require('../js/translations');
-
+const { state } = require('../js/globalStore');
 const path = require('path');
 
 let adhanAudio = null;
@@ -19,10 +20,12 @@ function showAdhanStopBtn(show) {
 
 function notifyPrayer(prayer, mode = true) {
     const prayerName = t(prayer.key, 'prayerNames');
-    new Notification('Salaty Time', {
-        body: `${t('currentPrayer')}: ${prayerName}`,
-        icon: path.join(__dirname, '../../assets/icons/app_icon.png'), // Correction du chemin
-        silent: true
+
+    // Themed popup instead of native OS notification
+    ipcRenderer.send('show-adhan-popup', {
+        theme:   state.settings.theme || 'navy',
+        title:   'Salaty Time · الأذان',
+        content: `${t('currentPrayer')}: ${prayerName}`
     });
 
     // Si mode silencieux, on s'arrête là (pas de son)

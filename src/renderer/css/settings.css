@@ -698,13 +698,13 @@
     grid-template-columns: 1fr;
     gap: 10px;
   }
-  
+
   .size-card {
     padding: 14px;
     flex-direction: row;
     text-align: left;
   }
-  
+
   .size-icon {
     width: 40px;
     height: 40px;
@@ -712,12 +712,12 @@
     margin-right: 12px;
     flex-shrink: 0;
   }
-  
+
   .size-info {
     flex: 1;
     align-items: flex-start;
   }
-  
+
   .size-check {
     position: static;
     margin-left: auto;
@@ -732,7 +732,7 @@
   .size-card {
     padding: 20px;
   }
-  
+
   .size-icon {
     width: 56px;
     height: 56px;
@@ -1393,15 +1393,15 @@
   .settings-content {
     padding: 8px 0; /* Ajusté pour correspondre aux autres pages */
   }
-  
+
   .settings-section {
     padding: 20px;
   }
-  
+
   .theme-grid {
     grid-template-columns: repeat(6, 1fr);
   }
-  
+
   .language-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -1413,64 +1413,104 @@
     padding: 12px; /* Ajusté pour correspondre aux autres pages */
     gap: 8px;
   }
-  
+
   .settings-header {
     padding-bottom: 8px;
     min-height: 32px;
   }
-  
+
   .settings-title {
     font-size: 14px; /* Ajusté pour correspondre aux autres pages */
   }
-  
+
   .settings-controls {
     gap: 4px;
   }
-  
+
   .control-btn {
     width: 24px;
     height: 24px;
   }
-  
+
   .control-btn i,
   .control-btn svg {
     font-size: 10px;
     width: 10px;
     height: 10px;
   }
-  
+
   .back-btn {
     width: 24px;
     height: 24px;
   }
-  
+
   .settings-content {
     padding: 4px 0; /* Ajusté pour correspondre aux autres pages */
   }
-  
+
   .settings-section {
     padding: 12px;
     margin-bottom: 12px;
   }
-  
+
   .section-header {
     margin-bottom: 12px;
   }
-  
+
   .section-icon {
     width: 28px;
     height: 28px;
   }
-  
+
   .section-title {
     font-size: 14px;
   }
-  
+
   .subsection + .subsection {
     padding-top: 12px;
   }
-  
+
   .save-btn {
     padding: 12px 20px;
   }
+}
+
+/* ── Test Popup Buttons ── */
+.test-popup-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.test-popup-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.test-popup-btn i {
+  color: var(--accent-color);
+  font-size: 14px;
+}
+
+.test-popup-btn:hover {
+  background: rgba(var(--accent-rgb), 0.15);
+  border-color: var(--accent-color);
+  transform: translateY(-1px);
+}
+
+.test-popup-btn:active {
+  transform: translateY(0);
+  opacity: 0.85;
 }

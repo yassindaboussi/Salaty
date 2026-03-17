@@ -141,6 +141,40 @@ html, body {
   word-break: break-word;
 }
 
+/* "Open App" button – adhan popup only */
+.popup-open-app-btn {
+  -webkit-app-region: no-drag;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--accent-color, #4a90e2);
+  border-radius: 9px;
+  background: rgba(var(--accent-rgb, 74, 144, 226), 0.12);
+  color: var(--accent-color, #4a90e2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  letter-spacing: 0.2px;
+}
+
+.popup-open-app-btn:hover {
+  background: rgba(var(--accent-rgb, 74, 144, 226), 0.25);
+  transform: translateY(-1px);
+}
+
+.popup-open-app-btn:active {
+  transform: translateY(0);
+  opacity: 0.85;
+}
+
+.hidden {
+  display: none !important;
+}
+
 /* Progress bar at bottom */
 .popup-progress {
   height: 3px;
