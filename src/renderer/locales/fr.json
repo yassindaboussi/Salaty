@@ -78,6 +78,8 @@
     "ok": "OK",
     "switchLocation": "Changer",
     "close": "Fermer",
+    "prayerWidget": "Widget de prières",
+    "prayerWidgetTooltip": "Ouvrir le widget de prières",
     "resetAllConfirm": "Réinitialiser",
     "stopAdhan": "Arrêter l'Adhan",
     "islamicFeatures": "Fonctionnalités Islamiques",

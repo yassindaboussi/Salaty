@@ -6,6 +6,81 @@ const path = require('path');
 let athkarPopupWindow = null;
 let adhanPopupWindow  = null;
 
+/* ── Prayer Widget window ── */
+let prayerWidgetWindow = null;
+
+const WIDGET_WIDTH  = 360;
+const WIDGET_HEIGHT = 36;
+
+function createPrayerWidget() {
+  if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()) {
+    prayerWidgetWindow.focus();
+    return;
+  }
+
+  const { bounds, workArea } = screen.getPrimaryDisplay();
+
+  // Centre en haut de l'écran, collé au bord supérieur
+  const wx = bounds.x + Math.round((bounds.width - WIDGET_WIDTH) / 2);
+  const wy = workArea.y; // bord supérieur de la zone de travail
+
+  prayerWidgetWindow = new BrowserWindow({
+    width:       WIDGET_WIDTH,
+    height:      WIDGET_HEIGHT,
+    x:           wx,
+    y:           wy,
+    frame:       false,
+    transparent: true,
+    resizable:   false,
+    movable:     true,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    focusable:   true,
+    show:        false,
+    webPreferences: {
+      nodeIntegration:  true,
+      contextIsolation: false,
+      webSecurity:      false
+    }
+  });
+
+  prayerWidgetWindow.setAlwaysOnTop(true, 'pop-up-menu');
+  prayerWidgetWindow.loadFile(
+    path.join(__dirname, '../renderer/pages/prayer-widget.html')
+  );
+
+  prayerWidgetWindow.once('ready-to-show', () => {
+    prayerWidgetWindow.show();
+  });
+
+  prayerWidgetWindow.on('closed', () => {
+    prayerWidgetWindow = null;
+  });
+}
+
+ipcMain.handle('toggle-prayer-widget', () => {
+  if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()) {
+    prayerWidgetWindow.destroy();
+    prayerWidgetWindow = null;
+    return false; // closed
+  }
+  createPrayerWidget();
+  return true; // opened
+});
+
+ipcMain.on('close-prayer-widget', () => {
+  if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()) {
+    prayerWidgetWindow.destroy();
+    prayerWidgetWindow = null;
+  }
+});
+
+ipcMain.on('widget-set-always-on-top', (_event, value) => {
+  if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()) {
+    prayerWidgetWindow.setAlwaysOnTop(value, 'pop-up-menu');
+  }
+});
+
 const POPUP_WIDTH  = 340;
 const POPUP_MARGIN = 16;
 
@@ -244,11 +319,15 @@ function setupHandlers(mainWindow) {
       }
 
       // Notify player window (mini player) via player-manager
-      // We'll import getPlayerWindow() and call it here
       const playerManager = require('./player-manager');
       const playerWindow = playerManager.getPlayerWindow();
       if (playerWindow && !playerWindow.isDestroyed()) {
         playerWindow.webContents.send('theme-changed', newSettings.theme);
+      }
+
+      // Notify prayer widget
+      if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()) {
+        prayerWidgetWindow.webContents.send('theme-changed', newSettings.theme);
       }
     }
 
@@ -374,7 +453,7 @@ function setupHandlers(mainWindow) {
               console.error('Error parsing location data:', error);
               reject(error);
             }
-            
+
           });
         }).on('error', (error) => {
           console.error('HTTP request error:', error);
