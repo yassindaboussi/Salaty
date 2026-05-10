@@ -78,6 +78,8 @@
     "ok": "OK",
     "switchLocation": "Switch",
     "close": "Close",
+    "prayerWidget": "Prayer Widget",
+    "prayerWidgetTooltip": "Open prayer widget",
     "resetAllConfirm": "Reset All",
     "stopAdhan": "Stop Adhan",
     "islamicFeatures": "Islamic Features",
