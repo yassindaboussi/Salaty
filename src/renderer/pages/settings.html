@@ -24,7 +24,7 @@
           <i class="fas fa-arrow-left"></i>
         </button>
         <h2 class="settings-title" id="settingsTitle">Settings</h2>
-        
+
         <!-- Window Controls -->
         <div class="settings-controls">
           <!-- Minimize button -->
@@ -33,12 +33,12 @@
               <path d="M19 13H5v-2h14v2z" />
             </svg>
           </button>
-          
+
           <!-- Fullscreen button -->
           <button class="control-btn fullscreen-btn" id="fullscreenBtn" aria-label="Toggle Fullscreen">
             <i class="fas fa-expand"></i>
           </button>
-          
+
           <!-- Close button -->
           <button class="control-btn close-btn" id="closeBtn" aria-label="Close">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -259,6 +259,24 @@
                   <span class="input-unit" id="minutesLabel2">min</span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Test Popups – visible in dev mode only -->
+          <div class="subsection" id="testPopupsSection" style="display:none;">
+            <div class="toggle-info" style="margin-bottom: 10px;">
+              <label class="subsection-label" id="testPopupsLabel">Test Popups</label>
+              <span class="toggle-description" id="testPopupsDesc">Preview the themed notification popups</span>
+            </div>
+            <div class="test-popup-btns">
+              <button class="test-popup-btn" id="testAthkarPopupBtn">
+                <i class="fas fa-moon"></i>
+                <span id="testAthkarPopupLabel">Test Athkar</span>
+              </button>
+              <button class="test-popup-btn" id="testAdhanPopupBtn">
+                <i class="fas fa-mosque"></i>
+                <span id="testAdhanPopupLabel">Test Adhan</span>
+              </button>
             </div>
           </div>
         </div>

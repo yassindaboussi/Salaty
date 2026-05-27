@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Athkar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/themes.css">
+  <link rel="stylesheet" href="../css/athkar-popup.css">
+</head>
+<body>
+  <div id="app" class="theme-navy">
+    <div class="popup-card">
+
+      <div class="popup-header">
+        <div class="popup-icon">
+          <i class="fas fa-moon"></i>
+        </div>
+        <span class="popup-title" id="popupTitle">Salaty Time · أذكار</span>
+        <button class="popup-close-btn" id="closeBtn" title="Fermer">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="popup-divider"></div>
+
+      <div class="popup-body">
+        <p class="popup-athkar-text" id="athkarText">…</p>
+      </div>
+
+      <!-- Shown only for adhan popups -->
+      <button class="popup-open-app-btn hidden" id="openAppBtn">
+        <i class="fas fa-hand-paper"></i>
+        <span id="openAppLabel">Ouvrir l'application</span>
+      </button>
+
+      <div class="popup-progress">
+        <div class="popup-progress-bar" id="progressBar"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../js/athkar-popup.js"></script>
+</body>
+</html>
+

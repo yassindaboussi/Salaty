@@ -1,5 +1,5 @@
+const { ipcRenderer } = require('electron');
 const { state } = require('./globalStore');
-const { t } = require('./translations');
 const { getAdkar } = require('./config-api/api');
 let adkarData = require('../data/adkar.json');
 
@@ -39,28 +39,12 @@ function showAthkarAlert() {
 
     const randomAthkar = tasbih[Math.floor(Math.random() * tasbih.length)];
 
-    // Notification Logic
-    const notificationOptions = {
-        body: randomAthkar.content,
-        icon: '../../assets/icons/app_icon.png',
-        requireInteraction: true // Keep open so we can control duration manually
-    };
-
-    const spawnNotification = () => {
-        const notif = new Notification('Salaty Time - Athkar', notificationOptions);
-        // Auto close after 10 seconds
-        setTimeout(() => notif.close(), 10000);
-    };
-
-    if (Notification.permission === 'granted') {
-         spawnNotification();
-    } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-                spawnNotification();
-            }
-        });
-    }
+    // Send to the main process to open a themed BrowserWindow popup
+    ipcRenderer.send('show-athkar-popup', {
+        theme:   state.settings.theme || 'navy',
+        content: randomAthkar.content,
+        title:   'Salaty Time · أذكار'
+    });
 }
 
 module.exports = {

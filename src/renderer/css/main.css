@@ -452,3 +452,42 @@ a,
   z-index: 1100;
   position: relative;
 }
+
+/* ── Prayer Widget Toggle Button ── */
+.widget-toggle-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all 0.25s ease;
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+}
+
+.widget-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.widget-toggle-btn--active {
+  background: rgba(var(--accent-rgb, 74, 144, 226), 0.3);
+  border-color: var(--accent-color, #4a90e2);
+  color: var(--accent-color, #4a90e2);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb, 74, 144, 226), 0.3);
+}
+
+.widget-toggle-btn--active:hover {
+  background: rgba(var(--accent-rgb, 74, 144, 226), 0.45);
+}
+

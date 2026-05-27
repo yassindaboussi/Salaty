@@ -297,8 +297,9 @@ function setupUpdateHandlers() {
 function initMainPage() {
   initLocationSwitcher();
 
-  const settingsBtn = document.getElementById('mainSettingsBtn');
-  const featuresBtn = document.getElementById('mainFeaturesBtn');
+  const settingsBtn    = document.getElementById('mainSettingsBtn');
+  const featuresBtn    = document.getElementById('mainFeaturesBtn');
+  const widgetBtn      = document.getElementById('prayerWidgetBtn');
 
   if (settingsBtn) {
     settingsBtn.addEventListener('click', async () => {
@@ -315,6 +316,13 @@ function initMainPage() {
       const size = screenSizeManager.getWindowSize();
       await ipcRenderer.invoke('resize-window', size.width, size.height);
       ipcRenderer.invoke('navigate-to', 'features');
+    });
+  }
+
+  if (widgetBtn) {
+    widgetBtn.addEventListener('click', async () => {
+      const isOpen = await ipcRenderer.invoke('toggle-prayer-widget');
+      widgetBtn.classList.toggle('widget-toggle-btn--active', isOpen);
     });
   }
 

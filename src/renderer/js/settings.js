@@ -39,6 +39,7 @@ function initSettingsPage() {
     initAthkarAlerts();
     initPreAdhanNotification();
     initScreenSizeSetting();
+    initTestPopupButtons();
 }
 
 /**
@@ -48,14 +49,14 @@ function updateAllText() {
     const textElements = {
         // Header
         'settingsTitle': 'settings',
-        
+
         // Location Section
         'locationSectionTitle': 'location',
         'countryLabel': 'country',
         'cityLabel': 'city',
         'detectLocationLabel': 'detectLocation',
         'manageLocationsLabel': 'manageLocationsLabel',
-        
+
         // Appearance Section
         'appearanceSectionTitle': 'theme',
         'themeLabel': 'theme',
@@ -63,7 +64,7 @@ function updateAllText() {
         'screenSizeSettingLabel': 'screenSizeSettingLabel',
         'smallScreenLabel': 'smallScreen',
         'bigScreenLabel': 'bigScreen',
-        
+
         // Notifications Section
         'notificationsSectionTitle': 'notification',
         'athkarAlertsLabel': 'athkarAlerts',
@@ -76,7 +77,7 @@ function updateAllText() {
         'minutesLabel2': 'minutes',
 
         'saveBtn': 'save',
-        
+
         // Footer
         'footerText': 'madeWith',
 
@@ -115,31 +116,31 @@ function initThemeSelection() {
     if (!themeContainer) return;
 
     const themeCards = themeContainer.querySelectorAll('.theme-card');
-    
+
     themeCards.forEach(card => {
         const theme = card.dataset.theme;
-        
+
         // Update theme name
         const nameElement = card.querySelector('.theme-name');
         if (nameElement) {
             nameElement.textContent = t(theme, 'themes');
         }
-        
+
         // Mark selected theme
         if (theme === pendingTheme) {
             card.classList.add('selected');
         } else {
             card.classList.remove('selected');
         }
-        
+
         // Add click handler
         card.addEventListener('click', () => {
             pendingTheme = theme;
-            
+
             // Update visual selection
             themeCards.forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
-            
+
             // Apply theme preview
             applyTheme(pendingTheme);
         });
@@ -168,7 +169,7 @@ function initLanguageSelection() {
     if (!languageContainer) return;
 
     const languageCards = languageContainer.querySelectorAll('.language-card');
-    
+
     languageCards.forEach(card => {
         // Mark selected language
         if (card.dataset.lang === state.settings.language) {
@@ -176,17 +177,17 @@ function initLanguageSelection() {
         } else {
             card.classList.remove('selected');
         }
-        
+
         // Add click handler
         card.addEventListener('click', () => {
             const newLang = card.dataset.lang;
             state.settings.language = newLang;
             setLanguage(newLang);
-            
+
             // Update visual selection
             languageCards.forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
-            
+
             // Apply language direction and update UI
             applyLanguageDirection();
             updateAllText();
@@ -202,22 +203,22 @@ function initScreenSizeSetting() {
     if (!sizeContainer) return;
 
     const sizeCards = sizeContainer.querySelectorAll('.size-card');
-    
+
     // Set initial selection
     sizeCards.forEach(card => {
         const size = card.dataset.size;
-        if ((size === 'big' && state.settings.bigScreen) || 
+        if ((size === 'big' && state.settings.bigScreen) ||
             (size === 'small' && !state.settings.bigScreen)) {
             card.classList.add('selected');
         } else {
             card.classList.remove('selected');
         }
-        
+
         // Add click handler
         card.addEventListener('click', () => {
             const newSize = card.dataset.size;
             state.settings.bigScreen = (newSize === 'big');
-            
+
             // Update visual selection
             sizeCards.forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
@@ -287,6 +288,42 @@ function initPreAdhanNotification() {
 
     // Listen for changes
     toggle.addEventListener('change', updateUI);
+}
+
+/**
+ * Initialize test popup buttons (Athkar & Adhan preview) – dev mode only
+ */
+async function initTestPopupButtons() {
+    const isDev = process.argv.includes('--enable-logging');
+
+    const section   = document.getElementById('testPopupsSection');
+    if (!isDev || !section) return;
+
+    // Reveal the section
+    section.style.display = '';
+
+    const athkarBtn = document.getElementById('testAthkarPopupBtn');
+    const adhanBtn  = document.getElementById('testAdhanPopupBtn');
+
+    if (athkarBtn) {
+        athkarBtn.addEventListener('click', () => {
+            ipcRenderer.send('show-athkar-popup', {
+                theme:   pendingTheme || state.settings.theme || 'navy',
+                title:   'Salaty Time · أذكار',
+                content: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ'
+            });
+        });
+    }
+
+    if (adhanBtn) {
+        adhanBtn.addEventListener('click', () => {
+            ipcRenderer.send('show-adhan-popup', {
+                theme:   pendingTheme || state.settings.theme || 'navy',
+                title:   'Salaty Time · الأذان',
+                content: 'حان وقت صلاة الفجر'
+            });
+        });
+    }
 }
 
 /**

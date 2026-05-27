@@ -1,6 +1,175 @@
-const { ipcMain, app } = require('electron');
+const { ipcMain, app, BrowserWindow, screen } = require('electron');
 const fs = require('fs');
 const path = require('path');
+
+/* ── Themed popup windows (athkar & adhan) ── */
+let athkarPopupWindow = null;
+let adhanPopupWindow  = null;
+
+/* ── Prayer Widget window ── */
+let prayerWidgetWindow = null;
+
+const WIDGET_WIDTH  = 360;
+const WIDGET_HEIGHT = 36;
+
+function createPrayerWidget() {
+  if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()) {
+    prayerWidgetWindow.focus();
+    return;
+  }
+
+  const { bounds, workArea } = screen.getPrimaryDisplay();
+
+  // Centre en haut de l'écran, collé au bord supérieur
+  const wx = bounds.x + Math.round((bounds.width - WIDGET_WIDTH) / 2);
+  const wy = workArea.y; // bord supérieur de la zone de travail
+
+  prayerWidgetWindow = new BrowserWindow({
+    width:       WIDGET_WIDTH,
+    height:      WIDGET_HEIGHT,
+    x:           wx,
+    y:           wy,
+    frame:       false,
+    transparent: true,
+    resizable:   false,
+    movable:     true,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    focusable:   true,
+    show:        false,
+    webPreferences: {
+      nodeIntegration:  true,
+      contextIsolation: false,
+      webSecurity:      false
+    }
+  });
+
+  prayerWidgetWindow.setAlwaysOnTop(true, 'pop-up-menu');
+  prayerWidgetWindow.loadFile(
+    path.join(__dirname, '../renderer/pages/prayer-widget.html')
+  );
+
+  prayerWidgetWindow.once('ready-to-show', () => {
+    prayerWidgetWindow.show();
+  });
+
+  prayerWidgetWindow.on('closed', () => {
+    prayerWidgetWindow = null;
+  });
+}
+
+ipcMain.handle('toggle-prayer-widget', () => {
+  if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()) {
+    prayerWidgetWindow.destroy();
+    prayerWidgetWindow = null;
+    return false; // closed
+  }
+  createPrayerWidget();
+  return true; // opened
+});
+
+ipcMain.on('close-prayer-widget', () => {
+  if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()) {
+    prayerWidgetWindow.destroy();
+    prayerWidgetWindow = null;
+  }
+});
+
+ipcMain.on('widget-set-always-on-top', (_event, value) => {
+  if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()) {
+    prayerWidgetWindow.setAlwaysOnTop(value, 'pop-up-menu');
+  }
+});
+
+const POPUP_WIDTH  = 340;
+const POPUP_MARGIN = 16;
+
+/**
+ * Create a themed notification popup (BrowserWindow).
+ * The window is hidden off-screen while the renderer measures the content;
+ * it becomes visible only after `show-themed-popup-ready` is received.
+ *
+ * @param {object} data   { theme, content, title, icon }
+ * @param {'athkar'|'adhan'} type
+ */
+function showThemedPopup(data, type) {
+  // Close any existing popup of the same type
+  const existing = type === 'adhan' ? adhanPopupWindow : athkarPopupWindow;
+  if (existing && !existing.isDestroyed()) {
+    existing.destroy();
+  }
+
+  const { workArea } = screen.getPrimaryDisplay();
+
+  const win = new BrowserWindow({
+    width:  POPUP_WIDTH,
+    height: 800,                               // generous height for content measurement
+    x: workArea.x + workArea.width,            // off-screen while measuring
+    y: workArea.y + workArea.height - 800 - POPUP_MARGIN,
+    frame:       false,
+    transparent: true,
+    resizable:   false,
+    movable:     true,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    focusable:   true,
+    show: false,
+    webPreferences: {
+      nodeIntegration:  true,
+      contextIsolation: false,
+      webSecurity:      false
+    }
+  });
+
+  win.setAlwaysOnTop(true, 'pop-up-menu');
+  win.loadFile(path.join(__dirname, '../renderer/pages/athkar-popup.html'));
+
+  win.once('ready-to-show', () => {
+    win.webContents.send('init-themed-popup', { ...data, type });
+  });
+
+  win.on('closed', () => {
+    if (type === 'adhan')  adhanPopupWindow  = null;
+    else                   athkarPopupWindow = null;
+  });
+
+  if (type === 'adhan') adhanPopupWindow  = win;
+  else                  athkarPopupWindow = win;
+}
+
+/* ── IPC handlers ── */
+
+ipcMain.on('show-athkar-popup', (_event, data) => {
+  showThemedPopup({ icon: 'fa-moon', ...data }, 'athkar');
+});
+
+ipcMain.on('show-adhan-popup', (_event, data) => {
+  showThemedPopup({ icon: 'fa-mosque', ...data }, 'adhan');
+});
+
+// Renderer measured the real content height → resize then show
+ipcMain.on('show-themed-popup-ready', (event, { height }) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (!win || win.isDestroyed()) return;
+
+  const { workArea } = screen.getPrimaryDisplay();
+  const newHeight = Math.min(Math.max(height, 120), 520);
+
+  win.setBounds({
+    x:      workArea.x + workArea.width  - POPUP_WIDTH - POPUP_MARGIN,
+    y:      workArea.y + workArea.height - newHeight   - POPUP_MARGIN,
+    width:  POPUP_WIDTH,
+    height: newHeight
+  });
+
+  win.showInactive();
+});
+
+// Renderer requests close (after fade-out animation)
+ipcMain.on('close-themed-popup', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win && !win.isDestroyed()) win.destroy();
+});
 
 let settingsData = {
   city: 'Tunis',
@@ -150,11 +319,15 @@ function setupHandlers(mainWindow) {
       }
 
       // Notify player window (mini player) via player-manager
-      // We'll import getPlayerWindow() and call it here
       const playerManager = require('./player-manager');
       const playerWindow = playerManager.getPlayerWindow();
       if (playerWindow && !playerWindow.isDestroyed()) {
         playerWindow.webContents.send('theme-changed', newSettings.theme);
+      }
+
+      // Notify prayer widget
+      if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()) {
+        prayerWidgetWindow.webContents.send('theme-changed', newSettings.theme);
       }
     }
 
@@ -280,7 +453,7 @@ function setupHandlers(mainWindow) {
               console.error('Error parsing location data:', error);
               reject(error);
             }
-            
+
           });
         }).on('error', (error) => {
           console.error('HTTP request error:', error);
@@ -352,6 +525,9 @@ function setupHandlers(mainWindow) {
     }
     return true;
   });
+
+  // Returns true when running in development (not packaged)
+  ipcMain.handle('is-dev-mode', () => !app.isPackaged);
 }
 
 module.exports = {
