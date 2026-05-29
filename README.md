@@ -9,7 +9,7 @@ A modern, lightweight **Electron.js** desktop application for Islamic prayer tim
 <p align="center">
   <img src="https://img.shields.io/badge/Electron-42.x-47848F?logo=electron&logoColor=white" />
   <img src="https://img.shields.io/badge/Platform-Windows%20·%20macOS%20·%20Linux-blue" />
-  <img src="https://img.shields.io/badge/Version-1.1.0-green" />
+  <img src="https://img.shields.io/badge/Version-1.1.1-green" />
   <img src="https://img.shields.io/badge/License-MIT-yellow" />
 </p>
 
