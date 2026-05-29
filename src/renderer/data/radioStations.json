@@ -13,7 +13,7 @@
         "ar": "تونس"
       },
       "url": "https://live.radioquran.tn/live",
-      "image": "../../assets/images/radio/logo_radio_tunisie.jpg",
+      "image": "../../../assets/images/radio/logo_radio_tunisie.jpg",
       "description": {
         "en": "Live Quran recitation from Tunisia",
         "fr": "Récitation du Coran en direct de Tunisie",
@@ -33,7 +33,7 @@
         "ar": "تونس"
       },
       "url": "https://radio.radiotunisienne.tn/radiozaitouna",
-      "image": "../../assets/images/radio/logo_radio_zitouna.webp",
+      "image": "../../../assets/images/radio/logo_radio_zitouna.webp",
       "description": {
         "en": "Live Quran recitation and Islamic programs from Tunisia (Radio Zitouna FM)",
         "fr": "Récitation du Coran en direct et programmes islamiques de Tunisie (Radio Zitouna FM)",
@@ -53,7 +53,7 @@
         "ar": "الجزائر"
       },
       "url": "https://radiocoran.ice.infomaniak.ch/coran.mp3",
-      "image": "../../assets/images/radio/logo_radio_algerie.jpg",
+      "image": "../../../assets/images/radio/logo_radio_algerie.jpg",
       "description": {
         "en": "Live Quran recitation from Algeria",
         "fr": "Récitation du Coran en direct d'Algérie",
@@ -73,7 +73,7 @@
         "ar": "لبنان"
       },
       "url": "https://audio.osina.cloud:7987/stream",
-      "image": "../../assets/images/radio/logo_radio_lebanon.jpg",
+      "image": "../../../assets/images/radio/logo_radio_lebanon.jpg",
       "description": {
         "en": "Live Quran recitation from Lebanon",
         "fr": "Récitation du Coran en direct du Liban",
@@ -93,7 +93,7 @@
         "ar": "المملكة العربية السعودية"
       },
       "url": "https://n0e.radiojar.com/4wqre23fytzuv",
-      "image": "../../assets/images/radio/logo_radio_saudi.png",
+      "image": "../../../assets/images/radio/logo_radio_saudi.png",
       "description": {
         "en": "Live Quran recitation from Saudi Arabia",
         "fr": "Récitation du Coran en direct d'Arabie Saoudite",
@@ -113,7 +113,7 @@
         "ar": "مصر"
       },
       "url": "https://n0e.radiojar.com/8s5u5tpdtwzuv",
-      "image": "../../assets/images/radio/logo_radio_egypt.jpg",
+      "image": "../../../assets/images/radio/logo_radio_egypt.jpg",
       "description": {
         "en": "Live Quran recitation and Islamic programs from Cairo",
         "fr": "Récitations du Coran et programmes islamiques en direct du Caire",

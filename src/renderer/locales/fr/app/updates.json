@@ -1,0 +1,18 @@
+{
+  "updateAvailable": "Mise à jour disponible",
+  "newVersionAvailable": "La version {version} est disponible. Télécharger ?",
+  "download": "Télécharger",
+  "updateReady": "Mise à jour prête",
+  "updateDownloaded": "Mise à jour téléchargée. Installer ?",
+  "install": "Installer",
+  "later": "Plus tard",
+  "aboutTitle": "À propos",
+  "upToDate": "Vous êtes à jour",
+  "checkForUpdates": "Vérifier les mises à jour",
+  "checkingForUpdates": "Vérification en cours…",
+  "updateCheckFailed": "Échec — réessayez plus tard",
+  "isAvailable": "disponible — cliquez pour télécharger",
+  "downloading": "Téléchargement",
+  "readyToInstall": "Prêt à installer — redémarrez pour appliquer",
+  "restartAndInstall": "Redémarrer et installer"
+}

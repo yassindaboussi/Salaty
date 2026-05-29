@@ -1,0 +1,16 @@
+{
+  "loadingPrayerTimes": "Loading prayer times...",
+  "currentPrayer": "Current Prayer",
+  "nextPrayer": "Next Prayer",
+  "endTime": "End time",
+  "locationNotSet": "Location not set",
+  "prayerWidget": "Prayer Widget",
+  "prayerWidgetTooltip": "Open prayer widget",
+  "stopAdhan": "Stop Adhan",
+  "enableAdhan": "Enable Adhan",
+  "disableAdhan": "Disable Adhan",
+  "silentAdhan": "Silent Mode (Notification only)",
+  "soundAdhan": "Sound Mode (Adhan + Notification)",
+  "adhanInXmin": "Adhan for {prayer} is in {minutes} minutes",
+  "daysUntilRamadan": "Days until Ramadan: {days}"
+}

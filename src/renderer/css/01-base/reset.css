@@ -1,0 +1,52 @@
+/* Reset & Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  /* Dark background on every layer — if any gap shows between the app-container
+     and the OS window edge (e.g. during a resize or before JS runs), it's dark
+     not white. Matches the window backgroundColor set in window-options.js. */
+  background: #0b1220;
+  overflow: hidden;
+}
+
+body {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  background: var(--bg-primary, #0b1220);
+  user-select: none;
+}
+
+.app-container {
+  width: 100%;
+  height: 100vh;
+  border-radius: 20px;
+  background: linear-gradient(
+    145deg,
+    rgba(18, 27, 46, 0.98),
+    rgba(6, 12, 24, 0.98)
+  );
+  backdrop-filter: none;
+  box-shadow: 8px 8px 32px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  position: relative;
+  -webkit-app-region: drag;
+}
+
+/* Page transition fade-in.
+   Every HTML page body starts with class "page-loading" (opacity:0).
+   renderer.js removes it once the page is fully initialised,
+   triggering this CSS transition — smooth fade in on every navigation. */
+body.page-loading {
+  opacity: 0;
+}
+body {
+  transition: opacity 0.18s ease;
+}

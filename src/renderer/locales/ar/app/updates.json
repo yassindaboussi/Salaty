@@ -1,0 +1,18 @@
+{
+  "updateAvailable": "تحديث متوفر",
+  "newVersionAvailable": "الإصدار {version} متوفر. هل تريد التحميل؟",
+  "download": "تحميل",
+  "updateReady": "التحديث جاهز",
+  "updateDownloaded": "تم تحميل التحديث. هل تريد التثبيت الآن؟",
+  "install": "تثبيت",
+  "later": "لاحقاً",
+  "aboutTitle": "الإصدار والتحديثات",
+  "upToDate": "أنت تستخدم أحدث إصدار",
+  "checkForUpdates": "التحقق من التحديثات",
+  "checkingForUpdates": "جارٍ التحقق…",
+  "updateCheckFailed": "فشل التحقق — حاول مرة أخرى",
+  "isAvailable": "متوفر — انقر للتحميل",
+  "downloading": "جارٍ التحميل",
+  "readyToInstall": "جاهز للتثبيت — أعد التشغيل للتطبيق",
+  "restartAndInstall": "إعادة التشغيل والتثبيت"
+}

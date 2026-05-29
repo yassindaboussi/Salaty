@@ -1,0 +1,14 @@
+{
+  "ramadhan": "Ramadhan",
+  "ramadanMubarak": "Ramadan Mubarak!",
+  "ramadanDay": "Ramadan Day {day}",
+  "daysUntilRamadanCount": "{days} Days until Ramadan",
+  "ramadanEnded": "Ramadan Ended",
+  "iftar": "Iftar",
+  "suhoor": "Suhoor",
+  "markAsCompleted": "Mark as Completed",
+  "fastingCompleted": "Fasting Completed",
+  "todayFasting": "Today's Fasting",
+  "fastingTracker": "Fasting Tracker",
+  "ramadhanDesc": "Fasting times & tracker"
+}

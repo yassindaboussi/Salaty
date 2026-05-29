@@ -1,0 +1,387 @@
+/* ============================================
+   MODERN FLOATING ADHAN STOP BUTTON
+   Elegant + subtle calm breathing/glow animation
+   Respectful for prayer context – slow & minimal
+   ============================================ */
+
+.adhan-stop-btn-wide {
+  /* Floating position */
+  position: fixed;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+
+  /* Bigger size */
+  width: 155px;
+  height: 155px;
+  border-radius: 50%;
+
+  /* Theme gradient with soft dark mix */
+  background: linear-gradient(
+    135deg,
+    var(--accent-color, #4a6bff),
+    color-mix(in srgb, var(--accent-color) 70%, #000 30%)
+  );
+
+  /* Base shadow + prepared for glow animation */
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.28),
+    0 6px 20px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+
+  /* Border */
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  cursor: pointer;
+
+  /* Smooth transitions */
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.7s ease;
+
+  /* Subtle continuous breathing */
+  animation: calmBreath 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* ── Gentle breathing + soft outer glow ── */
+@keyframes calmBreath {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.28),
+      0 6px 20px rgba(0, 0, 0, 0.18),
+      0 0 0 0 rgba(var(--accent-rgb, 74, 107, 255), 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.035);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.35),
+      0 10px 35px rgba(0, 0, 0, 0.22),
+      0 0 0 24px rgba(var(--accent-rgb, 74, 107, 255), 0),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+}
+
+:root {
+  --accent-rgb: 74, 107, 255;
+}
+
+/* Hover */
+.adhan-stop-btn-wide:hover {
+  transform: translateX(-50%) scale(1.07);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.4),
+    0 14px 40px rgba(0, 0, 0, 0.28),
+    0 0 0 30px rgba(var(--accent-rgb, 74, 107, 255), 0.13),
+    inset 0 2px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* Active */
+.adhan-stop-btn-wide:active {
+  transform: translateX(-50%) scale(0.965);
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Icon */
+.adhan-stop-btn-wide .adhan-stop-icon {
+  font-size: 3.8em; /* scaled up with button */
+  color: rgba(255, 255, 255, 0.97);
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+  transition: transform 0.45s ease;
+}
+
+.adhan-stop-btn-wide:hover .adhan-stop-icon {
+  transform: scale(1.1) rotate(6deg);
+}
+
+/* ── Updated: smoother, modern text style ── */
+.adhan-stop-btn-wide .adhan-stop-text {
+  font-size: 1.05em; /* a bit larger for bigger button */
+  font-weight: 450; /* lighter & more elegant – not bold */
+  letter-spacing: 0.4px;
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  /* Optional nicer alternatives (add if you load the font): */
+  /* font-family: "SF Pro Display", "Inter", "Roboto", system-ui, sans-serif; */
+}
+
+/* ============================================
+   RESPONSIVE – scaled proportionally
+   ============================================ */
+@media (max-width: 768px) {
+  .adhan-stop-btn-wide {
+    width: 160px;
+    height: 160px;
+    bottom: 40px;
+  }
+  .adhan-stop-btn-wide .adhan-stop-icon {
+    font-size: 3.3em;
+  }
+  .adhan-stop-btn-wide .adhan-stop-text {
+    font-size: 0.98em;
+  }
+}
+
+@media (max-width: 480px) {
+  .adhan-stop-btn-wide {
+    width: 140px;
+    height: 140px;
+    bottom: 30px;
+  }
+  .adhan-stop-btn-wide .adhan-stop-icon {
+    font-size: 2.9em;
+  }
+  .adhan-stop-btn-wide .adhan-stop-text {
+    font-size: 0.92em;
+  }
+}
+
+/* Rest remains the same – visibility, reduced-motion, focus, etc. */
+
+.adhan-stop-btn-hidden {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+.adhan-stop-btn-wide:not(.adhan-stop-btn-hidden) {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adhan-stop-btn-wide {
+    animation: none !important;
+  }
+  .adhan-stop-btn-wide,
+  .adhan-stop-btn-wide:hover,
+  .adhan-stop-btn-wide:active {
+    transform: translateX(-50%) scale(1) !important;
+    transition: none !important;
+  }
+  .adhan-stop-btn-wide:hover .adhan-stop-icon {
+    transform: none !important;
+  }
+}
+
+.adhan-stop-btn-wide:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 5px;
+}
+/* =============================================================================
+   ADHAN PLAYER OVERLAY  —  global, injected into every page by adhan-player.js
+   Uses only the CSS variables that exist in every theme:
+     --bg-surface      (theme-aware semi-transparent background)
+     --bg-primary      (deep background)
+     --accent-color    (theme accent — button, icon, pulse)
+     --border-color    (theme border)
+     --text-primary    (white or dark depending on theme)
+     --text-secondary  (muted text)
+   ============================================================================= */
+
+.adhan-player-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  pointer-events: none;
+  padding: 0 12px 14px;
+  box-sizing: border-box;
+}
+
+/* ── Visibility states ─────────────────────────────────────────────────────── */
+.adhan-player-overlay--hidden {
+  opacity: 0;
+  transform: translateY(110%);
+  transition:
+    transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.adhan-player-overlay--visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    transform 0.52s cubic-bezier(0.34, 1.48, 0.64, 1),
+    opacity 0.3s ease;
+  pointer-events: auto;
+}
+
+/* ── The bar itself ────────────────────────────────────────────────────────── */
+.adhan-player-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px 13px 14px;
+  border-radius: 18px;
+
+  /* Use --bg-primary with opacity for glass effect — works on every theme */
+  background-color: var(--bg-primary, #0a1128);
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+
+  border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ── Mosque icon + pulse ring ──────────────────────────────────────────────── */
+.adhan-player-bar__icon-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adhan-player-bar__mosque-icon {
+  font-size: 1.55rem;
+  color: var(--accent-color, #4a6bff);
+  filter: drop-shadow(0 0 6px var(--accent-color, #4a6bff));
+  z-index: 1;
+  position: relative;
+}
+
+.adhan-player-bar__pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--accent-color, #4a6bff);
+  opacity: 0.6;
+  animation: adhanPulse 2.6s ease-in-out infinite;
+}
+
+@keyframes adhanPulse {
+  0%,
+  100% {
+    transform: scale(0.82);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+/* ── Text block ────────────────────────────────────────────────────────────── */
+.adhan-player-bar__text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.adhan-player-bar__prayer-name {
+  font-size: 0.96rem;
+  font-weight: 650;
+  color: var(--text-primary, #ffffff);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adhan-player-bar__time {
+  font-size: 0.78rem;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.55));
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+}
+
+/* ── Stop button ───────────────────────────────────────────────────────────── */
+.adhan-player-bar__stop-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+
+  /* Full theme-accent background */
+  background: var(--accent-color, #4a6bff);
+
+  /* Text: use --bg-primary so it contrasts against the accent on light themes */
+  color: var(--bg-primary, #0a1128);
+
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.18s ease,
+    box-shadow 0.22s ease;
+}
+
+/* Fall back to white text on themes where bg-primary is very dark */
+.adhan-player-bar__stop-btn {
+  color: var(--text-primary, #ffffff);
+  mix-blend-mode: normal;
+}
+
+.adhan-player-bar__stop-btn i {
+  font-size: 0.85rem;
+}
+
+.adhan-player-bar__stop-btn:hover {
+  transform: scale(1.06);
+  filter: brightness(1.12) saturate(1.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.adhan-player-bar__stop-btn:active {
+  transform: scale(0.96);
+  transition-duration: 0.08s;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .adhan-player-overlay--hidden,
+  .adhan-player-overlay--visible {
+    transition: opacity 0.2s ease !important;
+    transform: none !important;
+  }
+  .adhan-player-bar__pulse {
+    animation: none !important;
+  }
+}

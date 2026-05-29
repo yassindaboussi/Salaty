@@ -1,0 +1,11 @@
+{
+  "quran": "Quran",
+  "holyQuran": "Holy Quran",
+  "loadingQuran": "Loading Quran...",
+  "listenReadQuran": "Listen, read and reflect on the Holy Quran",
+  "enterFullscreen": "Enter Fullscreen",
+  "exitFullscreen": "Exit Fullscreen",
+  "quranError": "Error loading Quran. Please check your connection.",
+  "refreshQuran": "Refresh Quran",
+  "quranDesc": "Listen, read and reflect"
+}

@@ -1,0 +1,22 @@
+{
+  "audioArchive": "Audio Archive", "audioArchiveDesc": "Listen to Islamic audio",
+  "searchAlbums": "Search albums...", "searchInPlaylist": "Search in playlist...",
+  "errorLoadingAlbums": "Error loading album details.", "noAlbumSelected": "No album selected.",
+  "loadingTracks": "Loading tracks...", "noTracksFound": "No tracks found",
+  "errorLoadingTracks": "Error loading tracks", "noTrackSelected": "No Track Selected",
+  "muslimRadio": "Muslim Radio", "radioDesc": "Listen to Quran radio",
+  "nowPlaying": "Now Playing", "availableStations": "Available Stations",
+  "connectingToStation": "Connecting to station...", "selectStationFirst": "Please select a station first",
+  "playbackError": "Playback error. Please try again.", "liveQuranRecitation": "Live Quran recitation",
+  "radioFooterText": "Listen to Holy Quran recitations 24/7", "selectStation": "Select a station",
+  "chooseFromStations": "Choose from the stations below",
+  "liveHaramain": "Live Haramain", "liveHaramainDesc": "24/7 Makkah & Madina",
+  "livestreamsTitle": "Live Haramain Streams",
+  "makkahTitle": "Makkah Live - Al Masjid al-Haram", "madinaTitle": "Madina Live - Al Masjid an-Nabawi",
+  "unmute": "Unmute", "mute": "Mute", "watchOnYoutube": "Watch on YouTube",
+  "streamError": "Unable to load stream. Please try again later.",
+  "makkahTab": "Makkah", "madinaTab": "Madina",
+  "makkahLive": "Al Masjid al-Haram", "madinaLive": "Al Masjid an-Nabawi",
+  "makkahLocation": "Makkah al-Mukarramah", "madinaLocation": "Al-Madinah al-Munawwarah",
+  "live": "Live"
+}

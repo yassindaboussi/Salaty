@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Muslim Radio - Salaty Time</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../../css/app.css" />
+    <link rel="stylesheet" href="../../css/04-pages/radio.css" />
+    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
+  </head>
+  <body class="page-loading">
+    <div class="app-container theme-dark" id="app">
+      <div class="drag-area"></div>
+
+      <div class="radio-container">
+        <!-- HEADER - UNCHANGED -->
+        <div class="radio-header">
+          <button
+            class="back-btn"
+            id="backBtn"
+            aria-label="Back to Features"
+            data-tooltip="tooltipBack"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h2 class="radio-title" id="radioTitle"></h2>
+          <div class="radio-controls">
+            <button
+              class="control-btn minimize-btn"
+              id="minimizeBtn"
+              aria-label="Minimize"
+              data-tooltip="tooltipMinimize"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 13H5v-2h14v2z" />
+              </svg>
+            </button>
+            <button
+              class="control-btn fullscreen-btn"
+              id="fullscreenBtn"
+              aria-label="Toggle Fullscreen"
+              data-tooltip="tooltipExpand"
+            >
+              <i class="fas fa-expand"></i>
+            </button>
+            <button
+              class="control-btn close-btn"
+              id="closeBtn"
+              aria-label="Close"
+              data-tooltip="tooltipClose"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="radio-content" id="radioContent">
+          <!-- NOW PLAYING — VINYL DISC -->
+          <div class="now-playing-section">
+            <!-- Vinyl disc with tonearm -->
+            <div class="vinyl-wrapper">
+              <!-- Tonearm -->
+              <div class="tonearm idle" id="tonearm">
+                <svg
+                  viewBox="0 0 60 60"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <!-- Pivot base -->
+                  <circle
+                    cx="8"
+                    cy="8"
+                    r="5"
+                    fill="rgba(255,255,255,0.15)"
+                    stroke="rgba(255,255,255,0.3)"
+                    stroke-width="1"
+                  />
+                  <circle cx="8" cy="8" r="2" fill="rgba(255,170,0,0.8)" />
+                  <!-- Arm body -->
+                  <line
+                    x1="8"
+                    y1="8"
+                    x2="42"
+                    y2="50"
+                    stroke="rgba(255,255,255,0.25)"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                  />
+                  <!-- Cartridge head -->
+                  <rect
+                    x="38"
+                    y="46"
+                    width="8"
+                    height="5"
+                    rx="2"
+                    fill="rgba(255,170,0,0.6)"
+                    stroke="rgba(255,170,0,0.8)"
+                    stroke-width="0.8"
+                  />
+                  <!-- Needle tip -->
+                  <line
+                    x1="43"
+                    y1="51"
+                    x2="44"
+                    y2="55"
+                    stroke="rgba(255,255,255,0.6)"
+                    stroke-width="1"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </div>
+
+              <!-- Disc -->
+              <div class="vinyl-disc" id="vinylDisc">
+                <div class="vinyl-disc-inner">
+                  <!-- Center label / art -->
+                  <div class="vinyl-center" id="vinylCenter">
+                    <div class="vinyl-center-default" id="vinylDefault">
+                      <i class="fas fa-broadcast-tower"></i>
+                    </div>
+                    <img
+                      src=""
+                      alt=""
+                      id="stationImage"
+                      style="
+                        display: none;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        position: absolute;
+                        inset: 0;
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /vinyl-wrapper -->
+
+            <!-- Station info text -->
+            <div class="now-playing-info">
+              <div class="now-playing-label" id="nowPlayingBadge"></div>
+              <div class="station-name" id="stationName"></div>
+              <div class="station-description" id="stationDescription"></div>
+              <!-- Animated sound bars (visible when playing) -->
+              <div class="sound-bars" id="playingAnimation">
+                <span></span><span></span><span></span><span></span
+                ><span></span>
+              </div>
+            </div>
+          </div>
+          <!-- /now-playing-section -->
+
+          <!-- PLAYER CONTROLS — always visible, minimal -->
+          <div class="player-controls" id="playerControls">
+            <!-- Stop -->
+            <button
+              class="player-btn"
+              id="stopBtn"
+              title="Stop"
+              data-tooltip="tooltipStop"
+            >
+              <i class="fas fa-stop"></i>
+            </button>
+
+            <!-- Play / Pause — primary -->
+            <button
+              class="player-btn"
+              id="playPauseBtn"
+              data-tooltip="tooltipPlayPause"
+            >
+              <i class="fas fa-play" id="playPauseIcon"></i>
+            </button>
+
+            <!-- Volume -->
+            <div class="volume-control">
+              <button
+                class="player-btn"
+                id="muteBtn"
+                data-tooltip="tooltipMute"
+              >
+                <i class="fas fa-volume-up" id="volumeIcon"></i>
+              </button>
+              <input
+                type="range"
+                class="volume-slider"
+                id="volumeSlider"
+                min="0"
+                max="100"
+                value="80"
+              />
+            </div>
+          </div>
+
+          <!-- DIVIDER -->
+          <div class="stations-divider">
+            <div class="stations-divider-line"></div>
+            <span class="stations-divider-label" id="stationsLabel"></span>
+            <div class="stations-divider-line"></div>
+          </div>
+
+          <!-- STATIONS LIST -->
+          <div class="stations-section">
+            <div class="stations-grid" id="stationsGrid">
+              <!-- Dynamically loaded -->
+            </div>
+          </div>
+
+          <!-- LOADING -->
+          <div class="radio-loading" id="radioLoading" style="display: none">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <span id="loadingText"></span>
+          </div>
+        </div>
+        <!-- /radio-content -->
+
+        <!-- FOOTER -->
+        <div class="radio-footer">
+          <div class="radio-footer-text" id="radioFooterText"></div>
+        </div>
+      </div>
+      <!-- /radio-container -->
+    </div>
+
+    <script src="../../js/core/renderer.js"></script>
+  </body>
+</html>

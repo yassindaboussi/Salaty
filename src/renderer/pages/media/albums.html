@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audio Albums - Salaty</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../../css/app.css" />
+    <link rel="stylesheet" href="../../css/04-pages/albums.css" />
+    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
+  </head>
+  <body class="page-loading">
+    <div class="app-container theme-navy" id="app">
+      <div class="drag-area"></div>
+
+      <div class="albums-container">
+        <!-- Header -->
+        <div class="albums-header">
+          <button
+            class="back-btn"
+            id="backBtn"
+            aria-label="Back"
+            data-tooltip="tooltipBack"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+
+          <h2 class="albums-title">Audio Archive</h2>
+
+          <div class="albums-controls">
+            <button
+              class="control-btn minimize-btn"
+              id="minimizeBtn"
+              aria-label="Minimize"
+              data-tooltip="tooltipMinimize"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 13H5v-2h14v2z" />
+              </svg>
+            </button>
+            <!-- Fullscreen button -->
+            <button
+              class="control-btn fullscreen-btn"
+              id="fullscreenBtn"
+              aria-label="Toggle Fullscreen"
+              data-tooltip="tooltipExpand"
+            >
+              <i class="fas fa-expand"></i>
+            </button>
+
+            <button
+              class="control-btn close-btn"
+              id="closeBtn"
+              aria-label="Close"
+              data-tooltip="tooltipClose"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search Box -->
+        <div class="search-container">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="Search albums..."
+            />
+          </div>
+        </div>
+
+        <!-- Albums Grid -->
+        <div class="albums-grid" id="albumsGrid">
+          <!-- Albums will be injected here -->
+        </div>
+      </div>
+    </div>
+    <script src="../../js/media/albums.js"></script>
+    <script src="../../js/core/globalStore.js"></script>
+    <script src="../../js/core/tooltip-init.js"></script>
+  </body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Athkar - Salaty Time</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../../css/app.css" />
+    <link rel="stylesheet" href="../../css/04-pages/athkar.css" />
+    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
+  </head>
+  <body class="page-loading">
+    <div class="app-container theme-dark" id="app">
+      <div class="drag-area"></div>
+
+      <div class="athkar-container">
+        <div class="athkar-header">
+          <!-- Back button -->
+          <button
+            class="back-btn"
+            id="backBtn"
+            aria-label="Back to Main"
+            data-tooltip="tooltipBack"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+
+          <!-- Centered title -->
+          <h2 class="athkar-title" id="athkarTitle">Athkar</h2>
+
+          <!-- Controls with minimize, fullscreen, reset, and close -->
+          <div class="athkar-controls">
+            <!-- Reset all button -->
+            <button
+              class="control-btn reset-all-btn"
+              id="resetAllBtn"
+              aria-label="Reset All Counts"
+              data-tooltip="tooltipResetAll"
+            >
+              <i class="fas fa-redo"></i>
+            </button>
+
+            <!-- Minimize button -->
+            <button
+              class="control-btn minimize-btn"
+              id="minimizeBtn"
+              aria-label="Minimize"
+              data-tooltip="tooltipMinimize"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 13H5v-2h14v2z" />
+              </svg>
+            </button>
+
+            <!-- Fullscreen button -->
+            <button
+              class="control-btn fullscreen-btn"
+              id="fullscreenBtn"
+              aria-label="Toggle Fullscreen"
+              data-tooltip="tooltipExpand"
+            >
+              <i class="fas fa-expand"></i>
+            </button>
+
+            <!-- Close button -->
+            <button
+              class="control-btn close-btn"
+              id="closeBtn"
+              aria-label="Close"
+              data-tooltip="tooltipClose"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Navigation -->
+        <div class="category-nav" id="categoryNav">
+          <!-- Categories will be dynamically loaded -->
+        </div>
+
+        <!-- Athkar Content -->
+        <div class="athkar-content" id="athkarContent">
+          <div class="athkar-loading" id="athkarLoading">
+            <div class="athkar-loading-content">
+              <i class="fas fa-book-open fa-spin"></i>
+              <span id="loadingText">Loading Athkar...</span>
+            </div>
+          </div>
+
+          <div class="athkar-list" id="athkarList">
+            <!-- Athkar cards will be loaded here -->
+          </div>
+        </div>
+
+        <div class="athkar-footer">
+          <div class="athkar-footer-text" id="athkarFooterText">
+            Remembrances from the Sunnah
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../../js/core/renderer.js"></script>
+  </body>
+</html>

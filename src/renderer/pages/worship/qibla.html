@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Qibla Finder - Salaty Time</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../../css/app.css" />
+    <link rel="stylesheet" href="../../css/04-pages/qibla.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
+  </head>
+  <body class="page-loading">
+    <div class="app-container theme-dark" id="app">
+      <div class="drag-area"></div>
+
+      <div class="qibla-container">
+        <div class="qibla-header">
+          <button
+            class="back-btn"
+            id="backBtn"
+            aria-label="Back"
+            data-tooltip="tooltipBack"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+
+          <h2 class="qibla-title" id="qiblaTitle">Qibla Finder</h2>
+
+          <div class="qibla-controls">
+            <!-- Minimize button -->
+            <button
+              class="control-btn minimize-btn"
+              id="minimizeBtn"
+              aria-label="Minimize"
+              data-tooltip="tooltipMinimize"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 13H5v-2h14v2z" />
+              </svg>
+            </button>
+
+            <!-- Fullscreen button -->
+            <button
+              class="control-btn fullscreen-btn"
+              id="fullscreenBtn"
+              aria-label="Toggle Fullscreen"
+              data-tooltip="tooltipExpand"
+            >
+              <i class="fas fa-expand"></i>
+            </button>
+
+            <!-- Close button -->
+            <button
+              class="control-btn close-btn"
+              id="closeBtn"
+              aria-label="Close"
+              data-tooltip="tooltipClose"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="qibla-instruction-bar">
+          <i class="fas fa-hand-pointer"></i>
+          <span id="instructionText"
+            >Vous pouvez déplacer le marqueur pour corriger votre position</span
+          >
+        </div>
+
+        <div class="qibla-content">
+          <div class="location-status">
+            <p id="locationText">Detecting location...</p>
+          </div>
+
+          <div id="qiblaMap"></div>
+
+          <button
+            id="zoomLocationBtn"
+            class="zoom-btn"
+            aria-label="Zoom to my location"
+            data-tooltip="tooltipZoomLocation"
+          >
+            <i class="fas fa-crosshairs"></i>
+          </button>
+
+          <div class="qibla-info">
+            <h1 id="qiblaDegree">--°</h1>
+            <p id="qiblaDirectionLabel">from North Clockwise</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../../js/core/renderer.js"></script>
+  </body>
+</html>

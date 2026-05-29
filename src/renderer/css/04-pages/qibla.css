@@ -1,0 +1,362 @@
+/* Container - Matches Features Page structure */
+.qibla-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+  position: relative;
+}
+
+/* ========== HEADER - EXACTLY LIKE FEATURES PAGE ========== */
+.qibla-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  z-index: 101;
+  gap: 8px;
+  direction: ltr !important;
+}
+
+/* Back button - NO STYLES HERE, use global styles */
+/* The .back-btn styles should come from components.css */
+
+/* Title - Centered with flex EXACTLY like Features */
+.qibla-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  pointer-events: none;
+  z-index: 1;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Control buttons container EXACTLY like Features */
+.qibla-controls {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+  z-index: 102;
+  position: relative;
+}
+
+/* Control buttons - NO STYLES HERE, use global styles */
+/* The .control-btn styles should come from components.css */
+
+/* Force consistent layout for ALL languages - EXACTLY like Features */
+[dir="rtl"] .qibla-header,
+[dir="ltr"] .qibla-header,
+.qibla-header {
+  direction: ltr !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+[dir="rtl"] .back-btn,
+[dir="ltr"] .back-btn,
+.back-btn {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+[dir="rtl"] .qibla-title,
+[dir="ltr"] .qibla-title,
+.qibla-title {
+  flex: 1 !important;
+  text-align: center !important;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  width: auto !important;
+  margin: 0 !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+[dir="rtl"] .qibla-controls,
+[dir="ltr"] .qibla-controls,
+.qibla-controls {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  gap: 6px !important;
+}
+
+/* Don't flip arrow in any language - always point left */
+[dir="rtl"] .back-btn i,
+[dir="ltr"] .back-btn i,
+.back-btn i {
+  transform: none !important;
+}
+
+[dir="rtl"] .back-btn:hover i,
+[dir="ltr"] .back-btn:hover i,
+.back-btn:hover i {
+  transform: translateX(-2px) !important;
+}
+
+/* ========== END OF HEADER - NOW MATCHES FEATURES PAGE ========== */
+
+/* Instruction Bar */
+.qibla-instruction-bar {
+  background: rgba(var(--accent-color-rgb), 0.15);
+  border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+  color: white !important; /* Force white text */
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  text-align: center;
+}
+
+.qibla-instruction-bar i {
+  color: white;
+  font-size: 0.9rem;
+}
+
+/* Map Content Area */
+.qibla-content {
+  flex: 1;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: var(--card-bg);
+}
+
+#qiblaMap {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  -webkit-app-region: no-drag;
+}
+
+/* Overlays on Map */
+.location-status {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: rgba(var(--card-bg-rgb), 0.95);
+  backdrop-filter: blur(8px);
+  padding: 6px 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: white;
+  border: 1px solid var(--border-color);
+}
+
+/* Info Box - Bottom Left */
+.qibla-info {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: rgba(var(--card-bg-rgb), 0.95);
+  padding: 12px 20px;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  border: 1px solid var(--border-color);
+  min-width: 120px;
+}
+
+.qibla-info h1 {
+  font-size: 1.8rem;
+  margin: 0;
+  color: var(--primary-color);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.qibla-info p {
+  opacity: 0.8;
+  margin-top: 2px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0;
+  color: white;
+}
+
+/* Zoom Button - Bottom Right */
+.zoom-btn {
+  position: absolute;
+  bottom: 30px;
+  right: 20px;
+  z-index: 1000;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
+  -webkit-app-region: no-drag;
+}
+
+.zoom-btn:hover {
+  transform: scale(1.1);
+  background: var(--accent-color);
+}
+
+.zoom-btn:active {
+  transform: scale(0.95);
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+  .qibla-container {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .qibla-header {
+    padding-bottom: 8px;
+    min-height: 32px;
+  }
+
+  .qibla-title {
+    font-size: 16px;
+  }
+
+  .qibla-controls {
+    gap: 4px;
+  }
+
+  .control-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .qibla-instruction-bar {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .location-status {
+    top: 10px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+  }
+
+  .qibla-info {
+    bottom: 15px;
+    left: 15px;
+    padding: 10px 16px;
+    min-width: 100px;
+  }
+
+  .qibla-info h1 {
+    font-size: 1.6rem;
+  }
+
+  .zoom-btn {
+    bottom: 25px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+  .qibla-container {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .qibla-title {
+    font-size: 14px;
+  }
+
+  .control-btn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .control-btn i,
+  .control-btn svg {
+    font-size: 10px;
+    width: 10px;
+    height: 10px;
+  }
+
+  .qibla-instruction-bar {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+  }
+
+  .qibla-instruction-bar i {
+    font-size: 0.8rem;
+  }
+
+  .location-status {
+    top: 8px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+  }
+
+  .qibla-info {
+    bottom: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    min-width: 90px;
+  }
+
+  .qibla-info h1 {
+    font-size: 1.4rem;
+  }
+
+  .qibla-info p {
+    font-size: 0.65rem;
+  }
+
+  .zoom-btn {
+    bottom: 20px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .qibla-header {
+    gap: 4px;
+  }
+
+  .qibla-title {
+    font-size: 13px;
+  }
+
+  .qibla-instruction-bar span {
+    font-size: 0.7rem;
+  }
+}
