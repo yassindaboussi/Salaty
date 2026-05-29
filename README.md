@@ -1,231 +1,276 @@
 <div align="center">
 
-# Salaty Time
+# 🕌 Salaty Time
 
-A modern, lightweight **Electron.js** desktop application for Islamic prayer times, Adhan alerts, Quran, Athkar, Qibla direction, Islamic media, and daily spiritual tools.
+### Modern Islamic Prayer Times Desktop Application
 
-**Made with love for the Muslim Ummah**
+A beautiful, lightweight **Electron.js** desktop app for accurate prayer times, Quranic guidance, Islamic tools, and spiritual wellness.
+
+**Crafted with ❤️ for the Muslim Ummah**
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Electron-42.x-47848F?logo=electron&logoColor=white" />
-  <img src="https://img.shields.io/badge/Platform-Windows%20·%20macOS%20·%20Linux-blue" />
-  <img src="https://img.shields.io/badge/Version-1.1.1-green" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow" />
+  <img src="https://img.shields.io/badge/Electron-42.x-47848F?logo=electron&logoColor=white" alt="Electron Version"/>
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue" alt="Cross-Platform"/>
+  <img src="https://img.shields.io/badge/Version-1.1.1-green" alt="App Version"/>
+  <img src="https://img.shields.io/badge/License-MIT-yellow" alt="MIT License"/>
 </p>
 
-</div>
+---
+
+## ✨ Key Features
+
+### 🕐 Prayer Times & Notifications
+- ⏱️ Accurate prayer times via **Aladhan API**
+- ⏲️ Live countdown timer to next prayer
+- 🔔 Customizable Adhan alerts with audio
+- ⚠️ Pre-Adhan reminders (adjustable minutes)
+- 📅 Hijri & Gregorian date synchronization
+
+### 📍 Location Management
+- 🗺️ Multi-location support with favorites
+- 🔄 Quick location switching
+- 📡 IP-based auto-detection
+- ✈️ Travel mode support
+- 💾 Save & manage unlimited locations
+
+### 📖 Islamic Knowledge Hub
+- 📕 Complete Quran reader with navigation
+- 🌸 Daily Athkar (remembrances) with counters
+- 🕋️ 99 Names of Allah (Asma ul-Husna)
+- 🧭 Qibla direction finder with map
+- 🌙 Ramadhan tracker & lunar calendar
+- 📿 Digital Tasbih counter
+
+### 🎵 Media & Entertainment
+- 📻 Curated Quran radio stations
+- 🎼 Audio albums & playlists
+- 🎙️ Live religious streams
+- 🎚️ Background player with mini mode
+- 🎨 Station logos & descriptions
+
+### 🖥️ Desktop Excellence
+- 🎯 Frameless custom window design
+- 📌 System tray integration
+- 🔄 Single-instance app lock
+- 🚀 Auto-start with system
+- ⚡ Auto-updater with manual checking
+- 🪟 Dedicated prayer widget window
+
+### 🎨 Customization & Accessibility
+- 🌈 **12 Beautiful Themes**: Navy, Green, Brown, Gold, Pink, Purple, Emerald, Ocean, Royal, Indigo, Classic, Ramadhan
+- 🌍 **3 Languages**: Arabic (عربي), English, French (Français)
+- 🔄 **RTL & LTR Support** for comfortable reading
+- 📱 Responsive design with big-screen mode
 
 ---
 
-## Overview
+## 📸 Gallery
 
-**Salaty Time** is a cross-platform Islamic desktop app built with Electron, HTML, CSS, and JavaScript. It provides accurate prayer times using the Aladhan API and includes a complete Islamic feature suite such as Quran access, Athkar, Qibla finder, Ramadhan tools, Tasbih, Hijri calendar, radio, livestreams, playlists, widgets, and customizable themes.
+### 🕌 Prayer Times Display
+| Navy Theme | Royal Theme | Ramadhan Theme |
+|:---:|:---:|:---:|
+| <img src="https://github.com/user-attachments/assets/21a3f9b8-fe95-4836-9ab7-54056a42fd94" width="250"/> | <img src="https://github.com/user-attachments/assets/493825df-7382-4c4f-990b-99c73557c18d" width="250"/> | <img src="https://github.com/user-attachments/assets/07b645f7-e90b-43b4-92f2-c14cf47c8a21" width="250"/> |
 
-The project has been refactored into a cleaner modular architecture with separated main-process services, IPC handlers, renderer modules, grouped pages, shared utilities, and organized CSS layers.
-
----
-
-## Main Features
-
-### Prayer Times
-
-- Accurate prayer times powered by **Aladhan API**
-- Live countdown to the next prayer
-- Current and next prayer highlighting
-- Hijri and Gregorian date display
-- Adhan notifications with audio support
-- Individual Adhan settings per prayer
-- Pre-Adhan reminder notification support
-- Automatic prayer data reload after location changes
-- Midnight prayer data refresh
-- Offline-friendly behavior after data is loaded
-
-### Location Management
-
-- Default location: **Tunis, Tunisia**
-- Multi-location support
-- Active location switching
-- Favorite location support
-- Add, edit, and delete saved locations
-- IP-based location detection
-- Travel mode setting support
-
-### Islamic Tools
-
-- Holy Quran page
-- Daily Athkar with counters
-- Athkar popup alerts
-- 99 Names of Allah
-- Qibla finder with map integration
-- Ramadhan tracker
-- Hijri calendar
-- Tasbih counter
-
-### Media Features
-
-- Quran radio stations
-- Radio station logos and multilingual descriptions
-- Audio albums
-- Playlist page
-- Background player
-- Mini player
-- Livestreams page
-
-### Desktop App Features
-
-- Frameless custom window
-- System tray support
-- Close-to-tray behavior
-- Single-instance app lock
-- Auto-start with system login
-- Auto-updater integration
-- Manual update checking
-- Prayer widget window
-- Themed Adhan and Athkar popup windows
-- Connection monitoring and recovery events
-
-### Design and Customization
-
-- 12 themes: Navy, Green, Brown, Gold, Pink, Purple, Emerald, Ocean, Royal, Indigo, Classic, Ramadhan
-- Arabic, English, and French support
-- RTL and LTR layout support
-- Responsive layout and big-screen mode
-- Modular CSS structure by settings, base, layout, components, pages, widgets, and utilities
-
----
-
-## 📸 Gallery: Experience the Beauty of Salaty Time
-
-### 🕌 Main Interface - Prayer Times at a Glance
-| Navy Theme (Professional) | Royal Theme (Classic) | Ramadhan Theme (Spiritual) |
-|:-------------------------:|:---------------------:|:--------------------------:|
-| <img src="https://github.com/user-attachments/assets/21a3f9b8-fe95-4836-9ab7-54056a42fd94" width="280"/> | <img src="https://github.com/user-attachments/assets/493825df-7382-4c4f-990b-99c73557c18d" width="280"/> | <img src="https://github.com/user-attachments/assets/40c74763-3811-4a44-bd14-c3f78d2fab92" width="280"/> |
-
-### ⚙️ Customization & Settings
+### ⚙️ Settings & Personalization
 | Settings Panel | Theme Selection | Language Options |
-|:--------------:|:--------------:|:----------------:|
-| <img src="https://github.com/user-attachments/assets/3c14a19d-df48-48b6-b232-437c324aa833" width="280"/> | <img src="https://github.com/user-attachments/assets/9e9b90d5-8008-4aaa-a567-a9f019292d5c" width="280"/> | <img src="https://github.com/user-attachments/assets/c0442e97-9758-4773-bd8e-3f2ffbf6ee1c" width="280"/> |
+|:---:|:---:|:---:|
+| <img src="https://github.com/user-attachments/assets/3c14a19d-df48-48b6-b232-437c324aa833" width="250"/> | <img src="https://github.com/user-attachments/assets/9e9b90d5-8008-4aaa-a567-a9f019292d5c" width="250"/> | <img src="https://github.com/user-attachments/assets/placeholder" width="250"/> |
 
-### 📖 Islamic Features Suite
-| Holy Quran Reader | Athkar Counter | Qibla Finder |
-|:-----------------:|:--------------:|:------------:|
-| <img src="https://github.com/user-attachments/assets/5fa956fa-89c6-456f-911c-f6033ec1a3d2" width="280"/> | <img src="https://github.com/user-attachments/assets/847c1486-b23e-42d1-95a5-de7bee27a610" width="280"/> | <img src="https://github.com/user-attachments/assets/0b24c087-9856-48d4-b7b4-47bd907b1576" width="280"/> |
-
-### 🌙 Ramadhan & Special Features
-| Ramadhan Tracker | 99 Names of Allah | Features Hub |
-|:----------------:|:-----------------:|:------------:|
-| <img src="https://github.com/user-attachments/assets/07b645f7-e90b-43b4-92f2-c14cf47c8a21" width="280"/> | <img src="https://github.com/user-attachments/assets/6d431d97-e9e2-42b9-9b78-e8610bdce132" width="280"/> | <img src="https://github.com/user-attachments/assets/c76807fc-301f-47ce-963a-299fb635b707" width="280"/> |
-
-*🎨 12 Stunning Themes - Each carefully crafted to enhance your spiritual experience*
+### 📚 Islamic Features
+| Quran Reader | Athkar Counter | Qibla Finder |
+|:---:|:---:|:---:|
+| <img src="https://github.com/user-attachments/assets/5fa956fa-89c6-456f-911c-f6033ec1a3d2" width="250"/> | <img src="https://github.com/user-attachments/assets/847c1486-b23e-42d1-95a5-de7bee27a610" width="250"/> | <img src="https://github.com/user-attachments/assets/placeholder" width="250"/> |
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Electron 42.x**
-- **JavaScript CommonJS**
-- **HTML5 / CSS3**
-- **Aladhan API** for prayer times
-- **Leaflet** for map features
-- **salaty-qibla-map** for Qibla direction
-- **Howler.js** for audio playback
-- **Tom Select** for enhanced select inputs
-- **electron-updater** for app updates
-- **ESLint 9** for code quality
+| Technology | Purpose |
+|---|---|
+| ⚡ **Electron 42.x** | Cross-platform desktop framework |
+| 🔵 **JavaScript (CommonJS)** | Application logic |
+| 🎨 **HTML5 / CSS3** | User interface & styling |
+| 🌐 **Aladhan API** | Accurate prayer times data |
+| 🗺️ **Leaflet.js** | Interactive maps |
+| 🧭 **salaty-qibla-map** | Qibla direction visualization |
+| 🔊 **Howler.js** | Audio playback engine |
+| 🎯 **Tom Select** | Enhanced dropdown inputs |
+| 📦 **electron-updater** | Auto-update functionality |
+| ✅ **ESLint 9** | Code quality assurance |
 
 ---
 
-## Installation
+## 🚀 Getting Started
 
-### Prerequisites
+### 📋 Prerequisites
+- **Node.js** (v16 or higher)
+- **npm** (v7 or higher)
 
-- Node.js
-- npm
-
-### Run locally
+### 💻 Installation & Setup
 
 ```bash
+# Clone the repository
 git clone https://github.com/yassindaboussi/Salaty.git
 cd Salaty
+
+# Install dependencies
 npm install
+
+# Run the application
 npm start
 ```
 
-### Development mode
-
+### 🔧 Development Mode
 ```bash
-npm run dev
+npm run dev    # Runs with verbose logging enabled
 ```
 
-### Build
+### 📦 Build & Distribution
 
 ```bash
+# Build for current platform
 npm run build
-npm run dist
-```
 
-### Linux build
-
-```bash
+# Build specifically for Linux
 npm run build:linux
+
+# Create distributable package
+npm run dist
+
+# Clean build artifacts
+npm run clean
 ```
 
----
-
-## Available Scripts
+### 📝 Code Quality
 
 ```bash
-npm start              # Run the Electron app
-npm run dev            # Run with Electron logging enabled
-npm run build          # Build for the current platform
-npm run build:linux    # Build for Linux
-npm run dist           # Create distributable package
-npm run clean          # Remove dist folder
-npm run lint           # Lint all source files
-npm run lint:main      # Lint main process files
-npm run lint:renderer  # Lint renderer files
-npm run format         # Format source files
-npm run format:check   # Check formatting
+# Lint all source files
+npm run lint
+
+# Lint specific areas
+npm run lint:main       # Main process only
+npm run lint:renderer   # Renderer process only
+
+# Format code
+npm run format          # Auto-format files
+npm run format:check    # Check formatting without changes
 ```
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
-```text
-Salaty/
-├── .github/workflows/          # CI and release workflows
-├── docs/                       # GitHub Pages / documentation website
-├── src/
-│   ├── assets/                 # Icons, images, audio, installer resources
-│   ├── main/                   # Electron main process
-│   │   ├── app/                # Application bootstrap
-│   │   ├── config/             # Paths and window options
-│   │   ├── ipc/                # IPC orchestration
-│   │   │   └── handlers/       # Focused IPC handler modules
-│   │   ├── services/           # Main-process services
-│   │   ├── windows/            # Main window, tray, updater
-│   │   └── index.js            # Main entry point
-│   ├── preload/                # Preload entry
-│   ├── renderer/               # Frontend application
-│   │   ├── css/                # Layered CSS architecture
-│   │   ├── data/               # Static JSON data
-│   │   ├── js/                 # Renderer modules
-│   │   │   ├── core/           # Global UI, theme, renderer logic
-│   │   │   ├── features/       # Islamic feature modules
-│   │   │   ├── media/          # Audio, radio, playlist, livestream modules
-│   │   │   ├── services/       # Renderer services
-│   │   │   ├── ui/             # Reusable UI logic
-│   │   │   ├── utils/          # Utility helpers
-│   │   │   └── widgets/        # Widget scripts
-│   │   ├── locales/            # ar, en, fr translations
-│   │   └── pages/              # Grouped HTML pages
-│   │       ├── app/            # Home, features, settings
-│   │       ├── media/          # Albums, playlist, radio, livestreams
-│   │       ├── widgets/        # Prayer widget, popups, offline page
-│   │       └── worship/        # Quran, Athkar, Qibla, Ramadhan, etc.
-│   └── shared/                 # Shared utilities used by main and renderer
-├── settings.json               # Default app settings
-├── package.json                # Dependencies, scripts, and build config
-└── README.md
 ```
+Salaty/
+│
+├── 📋 .github/workflows/          ⚙️  CI/CD & automated release workflows
+├── 📖 docs/                       📚 Documentation website (GitHub Pages)
+│
+├── 📦 src/
+│   │
+│   ├── 🎨 assets/                 🖼️  Icons, images, audio, installer resources
+│   │
+│   ├── ⚙️ main/                    🖥️  Electron main process (backend)
+│   │   ├── 🚀 app/                Bootstrap & application initialization
+│   │   ├── ⚡ config/             Window options & app paths
+│   │   ├── 📡 ipc/                IPC orchestration & handlers
+│   │   │   └── 🔗 handlers/       Modular IPC handler modules
+│   │   ├── 🔧 services/           Business logic & data services
+│   │   ├── 🪟 windows/            Main window, system tray, updater
+│   │   └── 📌 index.js            Entry point
+│   │
+│   ├── 🔐 preload/                🛡️  Secure context bridge setup
+│   │
+│   ├── 🎯 renderer/               💻 Frontend application
+│   │   ├── 🎨 css/                Layered CSS architecture
+│   │   │   ├── 🌍 settings/      User preferences & themes
+│   │   │   ├── 📐 base/          Global styles & reset
+│   │   │   ├── 📏 layout/        Page layouts & structure
+│   │   │   ├── 🧩 components/    Reusable UI components
+│   │   │   ├── 📄 pages/         Page-specific styles
+│   │   │   ├── 🪟 widgets/       Widget-specific styling
+│   │   │   └── 🛠️ utilities/     Helper classes & utilities
+│   │   │
+│   │   ├── 💾 data/               📊 Static JSON data & configurations
+│   │   │
+│   │   ├── 🔨 js/                 ✨ Renderer modules & logic
+│   │   │   ├── 🌐 core/          Global UI state & theme engine
+│   │   │   ├── 🌸 features/      Islamic feature modules
+│   │   │   ├── 🎵 media/         Audio, radio, playlist handlers
+│   │   │   ├── 🔌 services/      Renderer-side services
+│   │   │   ├── 🎮 ui/            Reusable UI interaction logic
+│   │   │   ├── 🧰 utils/         Helper functions & utilities
+│   │   │   └── 🪟 widgets/       Prayer widget & popup scripts
+│   │   │
+│   │   ├── 🌍 locales/            🗣️  Translations
+│   │   │   ├── 🇸🇦 ar/           Arabic translations
+│   │   │   ├── 🇬🇧 en/           English translations
+│   │   │   └── 🇫🇷 fr/           French translations
+│   │   │
+│   │   └── 📄 pages/              📑 HTML templates (grouped by feature)
+│   │       ├── 🏠 app/            Home, features, settings pages
+│   │       ├── 🎵 media/          Albums, playlists, radio, livestreams
+│   │       ├── 🪟 widgets/        Prayer widget, popups, offline page
+│   │       └── 🕌 worship/        Quran, Athkar, Qibla, Ramadhan, etc.
+│   │
+│   └── 🔗 shared/                 🤝 Shared utilities for main & renderer
+│
+├── ⚙️ settings.json               🔧 Default application settings
+├── 📦 package.json                📚 Dependencies & build configuration
+└── 📖 README.md                   📝 Project documentation
+```
+
+---
+
+## 🎯 How It Works
+
+### 🔄 Application Flow
+
+1. **Startup**: Electron main process initializes, reads settings, and creates the main window
+2. **IPC Bridge**: Secure communication between main process (backend) and renderer (frontend)
+3. **Prayer Data**: Fetches prayer times from Aladhan API based on user location
+4. **UI Rendering**: Renderer displays prayer times, countdown, and Islamic features
+5. **Notifications**: Main process handles Adhan alerts, reminders, and system tray updates
+6. **Persistence**: Settings and user data saved locally for offline use
+
+### 🔐 Architecture Highlights
+
+- **Modular Design**: Separated concerns (services, handlers, UI modules)
+- **Secure IPC**: Preload script sandboxes main-renderer communication
+- **Responsive UI**: Adapts to different screen sizes and orientations
+- **Multi-language**: Centralized translation system with RTL support
+- **Theme Engine**: Dynamic theme switching without restart
+- **Offline Support**: Works seamlessly after initial data load
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please feel free to:
+- 🐛 Report bugs via GitHub Issues
+- 💡 Suggest features and improvements
+- 🔀 Submit pull requests
+- 📝 Improve documentation
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 📧 Contact & Support
+
+- 📧 **Email**: salatytime@gmail.com
+- 🐛 **Issues**: [GitHub Issues](https://github.com/yassindaboussi/Salaty/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/yassindaboussi/Salaty/discussions)
+
+---
+
+<p align="center">
+  <strong>Made with ❤️ for the Muslim community</strong><br/>
+  <sub>May Allah (سُبْحَانَهُ وَتَعَالَىٰ) accept from us all</sub>
+</p>
+
+</div>
