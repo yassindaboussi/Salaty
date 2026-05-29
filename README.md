@@ -195,13 +195,13 @@ A beautiful, lightweight **Electron.js** desktop app for accurate prayer times, 
 
 | Settings Panel | Theme Selection | Language Options |
 |:---:|:---:|:---:|
-| <img src="https://github.com/user-attachments/assets/3c14a19d-df48-48b6-b232-437c324aa833" width="280" alt="Settings"/> | <img src="https://github.com/user-attachments/assets/9e9b90d5-8008-4aaa-a567-a9f019292d5c" width="280" alt="Themes"/> | <img src="https://github.com/user-attachments/assets/placeholder" width="280" alt="Languages"/> |
+| <img src="https://github.com/user-attachments/assets/3c14a19d-df48-48b6-b232-437c324aa833" width="280" alt="Settings"/> | <img src="https://github.com/user-attachments/assets/9e9b90d5-8008-4aaa-a567-a9f019292d5c" width="280" alt="Themes"/> | <img src="https://github.com/user-attachments/assets/c0442e97-9758-4773-bd8e-3f2ffbf6ee1c" width="280" alt="Languages"/> |
 
 ### 📚 Islamic Features
 
 | Quran Reader | Athkar Counter | Qibla Finder |
 |:---:|:---:|:---:|
-| <img src="https://github.com/user-attachments/assets/5fa956fa-89c6-456f-911c-f6033ec1a3d2" width="280" alt="Quran"/> | <img src="https://github.com/user-attachments/assets/847c1486-b23e-42d1-95a5-de7bee27a610" width="280" alt="Athkar"/> | <img src="https://github.com/user-attachments/assets/placeholder" width="280" alt="Qibla"/> |
+| <img src="https://github.com/user-attachments/assets/5fa956fa-89c6-456f-911c-f6033ec1a3d2" width="280" alt="Quran"/> | <img src="https://github.com/user-attachments/assets/847c1486-b23e-42d1-95a5-de7bee27a610" width="280" alt="Athkar"/> | <img src="https://github.com/user-attachments/assets/0b24c087-9856-48d4-b7b4-47bd907b1576" width="280" alt="Qibla"/> |
 
 ---
 
