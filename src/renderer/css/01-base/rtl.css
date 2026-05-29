@@ -1,0 +1,664 @@
+/* RTL Support Styles */
+
+/* RTL Text Direction for Text Elements */
+[dir="rtl"] .location,
+[dir="rtl"] .hijri-date {
+  direction: rtl;
+  text-align: center;
+}
+
+/* Date Container RTL Support */
+[dir="rtl"] .date-container {
+  direction: rtl;
+}
+
+[dir="rtl"] .date-info {
+  direction: ltr !important;
+  text-align: center;
+}
+
+[dir="rtl"] .hijri-date {
+  direction: rtl;
+  text-align: center;
+}
+
+[dir="rtl"] .prayer-label,
+[dir="rtl"] .prayer-name,
+[dir="rtl"] .time-remaining,
+[dir="rtl"] .countdown,
+[dir="rtl"] .setting-label,
+[dir="rtl"] .input-hint,
+[dir="rtl"] .footer-text,
+[dir="rtl"] .current-indicator,
+[dir="rtl"] .loading,
+[dir="rtl"] .error-message,
+[dir="rtl"] .toast span {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Quran RTL */
+[dir="rtl"] .quran-title,
+[dir="rtl"] .quran-footer-text {
+  text-align: center;
+  width: 100%;
+}
+[dir="rtl"] .quran-loading span {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Keep numbers LTR in RTL mode */
+[dir="rtl"] .prayer-time,
+[dir="rtl"] .countdown {
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+/* Prayer Item RTL Adjustments - MATCHING LTR SPACING */
+[dir="rtl"] .prayer-item {
+  direction: rtl;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+[dir="rtl"] .prayer-item i {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  margin-left: 10px; /* Changed from margin-right to margin-left for RTL */
+  margin-right: 0; /* Reset right margin */
+  color: #fff;
+  font-size: 14px;
+  order: 1;
+  flex-shrink: 0;
+}
+
+[dir="rtl"] .prayer-item .prayer-name {
+  text-align: right;
+  order: 2;
+  flex-grow: 1;
+  margin-left: 10px; /* Same as LTR but on opposite side */
+  direction: rtl;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+}
+
+[dir="rtl"] .prayer-item .prayer-time {
+  text-align: left;
+  order: 3;
+  direction: ltr;
+  flex-shrink: 0;
+  margin-left: 4px; /* Same as LTR margin-right */
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ADJUSTMENT: Move Adhan toggle button to be right after prayer time */
+[dir="rtl"] .prayer-item .adhan-toggle-btn {
+  order: 4;
+  margin-left: 4px; /* Same spacing as between prayer name and time */
+  margin-right: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Current Prayer Indicator RTL */
+[dir="rtl"] .prayer-item.current-prayer::before {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .current-indicator {
+  margin-left: 0;
+  margin-right: 8px;
+  direction: rtl;
+}
+
+/* Next Prayer */
+.next-prayer {
+  margin: 12px 20px 16px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.next-prayer .highlight {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent-color, #fff);
+}
+
+/* ========================================
+   SETTINGS PANEL RTL - KEEP SAME AS LTR
+   ======================================== */
+
+/* Override RTL for entire settings to keep same layout as English/French */
+[dir="rtl"] .settings-container {
+  direction: ltr !important;
+}
+
+[dir="rtl"] .settings-header {
+  direction: ltr !important;
+}
+
+[dir="rtl"] .back-btn {
+  margin-right: 12px;
+  margin-left: 0;
+}
+
+[dir="rtl"] .back-btn i {
+  transform: none !important;
+}
+
+[dir="rtl"] .back-btn:hover i {
+  transform: translateX(-2px) !important;
+}
+
+[dir="rtl"] .settings-title {
+  margin: 0 12px 0 auto;
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .settings-content {
+  direction: ltr !important;
+}
+
+/* Make only the text content RTL, not the layout */
+[dir="rtl"] .settings-content .setting-label {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .settings-content .footer-text {
+  direction: rtl;
+  text-align: center;
+}
+
+/* ========================================
+   SECTION HEADERS
+   ======================================== */
+
+[dir="rtl"] .section-header {
+  direction: rtl;
+}
+
+[dir="rtl"] .section-icon {
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+[dir="rtl"] .section-title {
+  text-align: right;
+}
+
+/* ========================================
+   FORM FIELDS
+   ======================================== */
+
+[dir="rtl"] .field-label {
+  text-align: right;
+}
+
+[dir="rtl"] .field-input {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Keep Country and City inputs LTR */
+[dir="rtl"] #countryInput,
+[dir="rtl"] #cityInput {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Input with Unit */
+[dir="rtl"] .input-with-unit {
+  flex-direction: row-reverse;
+}
+
+/* Field Hint */
+[dir="rtl"] .field-hint {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ========================================
+   SUBSECTIONS
+   ======================================== */
+
+[dir="rtl"] .subsection-label {
+  text-align: right;
+}
+
+/* ========================================
+   THEME SELECTION
+   ======================================== */
+
+[dir="rtl"] .theme-name {
+  text-align: center;
+  direction: rtl;
+}
+
+/* ========================================
+   LANGUAGE SELECTION
+   ======================================== */
+
+[dir="rtl"] .language-card {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .language-card:hover {
+  transform: translateX(-4px);
+}
+
+[dir="rtl"] .language-info {
+  text-align: right;
+}
+
+[dir="rtl"] .language-card .lang-name {
+  text-align: right;
+}
+
+[dir="rtl"] .language-card .lang-native {
+  text-align: right;
+}
+
+/* ========================================
+   TOGGLE FIELDS
+   ======================================== */
+
+[dir="rtl"] .toggle-field {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .toggle-info {
+  text-align: right;
+}
+
+[dir="rtl"] .toggle-description {
+  text-align: right;
+}
+
+/* ========================================
+   DETECT BUTTON
+   ======================================== */
+
+[dir="rtl"] .detect-btn {
+  direction: rtl;
+}
+
+[dir="rtl"] .detect-btn i {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* ========================================
+   SAVE BUTTON
+   ======================================== */
+
+[dir="rtl"] .save-btn {
+  direction: rtl;
+}
+
+[dir="rtl"] .save-btn i {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* ========================================
+   FOOTER
+   ======================================== */
+
+[dir="rtl"] .footer-text {
+  direction: rtl;
+  text-align: center;
+}
+
+/* ========================================
+   END SETTINGS PANEL FIXES
+   ======================================== */
+
+/* Quran Panel RTL - FIXED VERSION */
+/* Keep Quran header layout consistent in all languages */
+.quran-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* Force LTR layout even in RTL languages for consistent icon placement */
+  direction: ltr !important;
+}
+
+.quran-title {
+  text-align: center;
+  flex-grow: 1;
+  margin: 0 12px;
+}
+
+.quran-controls {
+  display: flex;
+  gap: 8px;
+  /* Ensure controls maintain LTR order */
+  direction: ltr !important;
+}
+
+.control-btn {
+  /* Ensure control buttons maintain LTR order */
+  direction: ltr !important;
+}
+
+/* Remove all RTL transformations for Quran header and controls */
+[dir="rtl"] .quran-header {
+  direction: ltr !important;
+}
+
+[dir="rtl"] .quran-title {
+  margin: 0 12px;
+  text-align: center;
+}
+
+[dir="rtl"] .quran-controls {
+  margin-left: 0;
+  margin-right: 0;
+  direction: ltr !important;
+}
+
+[dir="rtl"] .control-btn {
+  direction: ltr !important;
+}
+
+/* Fix for back button in Quran header - keep it pointing left */
+[dir="rtl"] .quran-header .back-btn {
+  margin-right: 0;
+  margin-left: 0;
+  /* Remove any flip transformations */
+}
+
+[dir="rtl"] .quran-header .back-btn i {
+  transform: none !important;
+}
+
+[dir="rtl"] .quran-header .back-btn:hover i {
+  transform: translateX(-2px) !important;
+}
+
+/* Fix for refresh and expand icons - prevent any RTL transformations */
+[dir="rtl"] .refresh-btn i,
+[dir="rtl"] .fullscreen-btn i,
+[dir="rtl"] .control-btn i {
+  transform: none !important;
+}
+
+[dir="rtl"] .refresh-btn:hover i {
+  animation: spinHover 0.5s ease;
+}
+
+[dir="rtl"] .fullscreen-btn:hover i {
+  transform: scale(1.1) !important;
+}
+
+/* Refresh animation */
+.refresh-btn.refreshing i {
+  animation: spin 1s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinHover {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+/* Input Fields RTL - EXCEPT Country and City inputs */
+[dir="rtl"] .setting-input:not(#countryInput):not(#cityInput) {
+  text-align: right;
+  direction: rtl;
+}
+
+/* SPECIAL FIX: Keep Country and City inputs LTR even in RTL mode */
+[dir="rtl"] #countryInput,
+[dir="rtl"] #cityInput {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Fix for TomSelect dropdowns in RTL mode */
+[dir="rtl"] .ts-wrapper.single .ts-control {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+[dir="rtl"] .ts-dropdown {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+[dir="rtl"] .ts-dropdown .option {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+[dir="rtl"] .ts-control > .item {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+[dir="rtl"] .ts-control input {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Language Options */
+.language-options {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.language-option {
+  flex: 1;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.language-option:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.language-option.selected {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
+}
+
+.language-option .lang-name {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.language-option.selected .lang-name {
+  color: white;
+}
+
+.language-option .lang-native {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.language-option.selected .lang-native {
+  color: white;
+}
+
+/* Toast RTL Support */
+[dir="rtl"] .toast {
+  direction: rtl;
+}
+
+[dir="rtl"] .toast i {
+  margin-right: 0;
+  margin-left: 6px;
+}
+
+/* Prayer Cards RTL Text */
+[dir="rtl"] .prayer-card {
+  direction: rtl;
+}
+
+[dir="rtl"] .prayer-card .prayer-label,
+[dir="rtl"] .prayer-card .prayer-name {
+  text-align: center;
+  direction: rtl;
+}
+
+[dir="rtl"] .prayer-card .prayer-time {
+  direction: ltr;
+  text-align: center;
+}
+
+[dir="rtl"] .prayer-card .time-remaining {
+  direction: rtl;
+  text-align: center;
+}
+
+[dir="rtl"] .prayer-card .countdown {
+  direction: ltr;
+  text-align: center;
+}
+
+/* Ensure time displays remain LTR for readability */
+[dir="rtl"] .time-remaining {
+  direction: rtl;
+}
+
+/* Fix for buttons in RTL */
+[dir="rtl"] .save-btn,
+[dir="rtl"] .retry-button {
+  direction: rtl;
+}
+
+[dir="rtl"] .retry-button i {
+  margin-right: 0;
+  margin-left: 6px;
+}
+
+/* Error message RTL */
+[dir="rtl"] .error-message {
+  direction: rtl;
+  text-align: center;
+}
+
+[dir="rtl"] .error-message div {
+  direction: rtl;
+}
+
+/* Window controls remain LTR */
+[dir="rtl"] .window-controls {
+  direction: ltr;
+}
+
+/* Theme options text RTL */
+[dir="rtl"] .theme-option {
+  direction: rtl;
+}
+
+/* Location row RTL */
+[dir="rtl"] .location-row {
+  direction: rtl;
+}
+
+/* Additional fixes for consistency */
+
+/* Make sure all icons in the Quran section maintain their original direction */
+[dir="rtl"] .quran-content .fas,
+[dir="rtl"] .quran-content .far,
+[dir="rtl"] .quran-content .fab {
+  transform: none !important;
+}
+
+/* Modal Close Button RTL - Position on LEFT in RTL mode */
+[dir="rtl"] .modal-close-btn {
+  right: auto !important;
+  left: 16px !important;
+}
+
+/* Ensure Quran loading spinner maintains direction */
+[dir="rtl"] .quran-loading-content .fa-spin {
+  animation: fa-spin 2s linear infinite !important;
+  transform-origin: center !important;
+}
+/* ── Mini-player: flip prev/next arrows in RTL ───────────────────────────────
+   In Arabic layout the arrows point the wrong way because fa-step-backward
+   and fa-step-forward are designed for LTR.  Flipping the icon (not the
+   button) reverses the arrow without affecting click targets or layout.    */
+[dir="rtl"] #miniPrevBtn i,
+[dir="rtl"] #miniNextBtn i {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
+/* Same fix for the full playlist page player buttons */
+[dir="rtl"] #prevBtn i,
+[dir="rtl"] #nextBtn i {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
+/* Quran Arabic back button size fix */
+[dir="rtl"] .quran-header .back-btn {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  font-size: 14px !important;
+}

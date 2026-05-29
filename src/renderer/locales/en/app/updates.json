@@ -1,0 +1,18 @@
+{
+  "updateAvailable": "Update Available",
+  "newVersionAvailable": "Version {version} is available. Download now?",
+  "download": "Download",
+  "updateReady": "Update Ready",
+  "updateDownloaded": "Update downloaded. Install now?",
+  "install": "Install",
+  "later": "Later",
+  "aboutTitle": "About",
+  "upToDate": "You're up to date",
+  "checkForUpdates": "Check for updates",
+  "checkingForUpdates": "Checking for updates…",
+  "updateCheckFailed": "Check failed — try again later",
+  "isAvailable": "available — click Download",
+  "downloading": "Downloading",
+  "readyToInstall": "Ready to install — restart to apply",
+  "restartAndInstall": "Restart & Install"
+}

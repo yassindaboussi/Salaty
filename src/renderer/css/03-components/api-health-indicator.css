@@ -1,0 +1,114 @@
+/* API Health Status Indicator - Production Grade */
+
+.api-status-indicator {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.api-status-indicator.api-status-healthy {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.api-status-indicator.api-status-unhealthy {
+  opacity: 1;
+  visibility: visible;
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+  border-color: rgba(255, 152, 0, 0.3);
+}
+
+.api-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: status-pulse 2s infinite;
+}
+
+.api-status-unhealthy .api-status-dot {
+  animation: status-pulse-warning 2s infinite;
+}
+
+@keyframes status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes status-pulse-warning {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
+.api-status-text {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* Location-specific positioning */
+#prayerStatusIndicator {
+  top: 12px;
+  right: 12px;
+  z-index: 100;
+}
+
+#quranStatusIndicator {
+  top: 12px;
+  right: 12px;
+  z-index: 100;
+}
+
+#athkarStatusIndicator {
+  top: 12px;
+  right: 12px;
+  z-index: 100;
+}
+
+#radioStatusIndicator {
+  top: 12px;
+  right: 12px;
+  z-index: 100;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .api-status-indicator {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .api-status-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .api-status-text {
+    font-size: 10px;
+  }
+}

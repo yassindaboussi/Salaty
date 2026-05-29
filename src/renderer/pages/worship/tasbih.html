@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tasbih - Salaty Time</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../../css/app.css" />
+    <link rel="stylesheet" href="../../css/04-pages/tasbih.css" />
+    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
+  </head>
+  <body class="page-loading">
+    <div class="app-container theme-dark" id="app">
+      <div class="drag-area"></div>
+
+      <div class="tasbih-container">
+        <div class="tasbih-header">
+          <!-- Back button -->
+          <button
+            class="back-btn"
+            id="backBtn"
+            aria-label="Back to Features"
+            data-tooltip="tooltipBack"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+
+          <!-- Centered title -->
+          <h2 class="tasbih-title" id="tasbihTitle">Tasbih</h2>
+
+          <!-- Controls with minimize, fullscreen, reset, and close -->
+          <div class="tasbih-controls">
+            <!-- Reset all button -->
+            <button
+              class="control-btn reset-all-btn"
+              id="resetAllBtn"
+              aria-label="Reset All Counts"
+              data-tooltip="tooltipResetAll"
+            >
+              <i class="fas fa-redo"></i>
+            </button>
+
+            <!-- Minimize button -->
+            <button
+              class="control-btn minimize-btn"
+              id="minimizeBtn"
+              aria-label="Minimize"
+              data-tooltip="tooltipMinimize"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 13H5v-2h14v2z" />
+              </svg>
+            </button>
+
+            <!-- Fullscreen button -->
+            <button
+              class="control-btn fullscreen-btn"
+              id="fullscreenBtn"
+              aria-label="Toggle Fullscreen"
+              data-tooltip="tooltipExpand"
+            >
+              <i class="fas fa-expand"></i>
+            </button>
+
+            <!-- Close button -->
+            <button
+              class="control-btn close-btn"
+              id="closeBtn"
+              aria-label="Close"
+              data-tooltip="tooltipClose"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Tasbih Content -->
+        <div class="tasbih-content" id="tasbihContent">
+          <!-- Tasbih Counter Display -->
+          <div class="tasbih-counter-container">
+            <div class="tasbih-counter-display" id="tasbihCounter">
+              <span id="counterValue">0</span>
+            </div>
+
+            <div class="tasbih-target-display">
+              <span id="targetValue">33</span>
+              <span id="targetLabel">/ 33</span>
+            </div>
+          </div>
+
+          <!-- Dhikr Selection -->
+          <div class="tasbih-dhikr-section">
+            <div class="section-label" id="dhikrLabel">Select Dhikr</div>
+            <div class="dhikr-grid" id="dhikrGrid">
+              <!-- Dhikr cards will be dynamically loaded -->
+            </div>
+          </div>
+
+          <!-- Control Buttons -->
+          <div class="tasbih-actions">
+            <button
+              class="tasbih-btn increment-btn"
+              id="incrementBtn"
+              data-tooltip="tooltipCount"
+            >
+              <i class="fas fa-plus"></i>
+              <span id="incrementLabel">Count</span>
+            </button>
+
+            <button
+              class="tasbih-btn reset-btn"
+              id="resetBtn"
+              data-tooltip="tooltipResetAll"
+            >
+              <i class="fas fa-undo"></i>
+              <span id="resetLabel">Reset</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Footer with motivational text -->
+        <div class="tasbih-footer">
+          <div class="tasbih-footer-text" id="tasbihFooterText">
+            "So remember Me; I will remember you" [Quran 2:152]
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../../js/core/renderer.js"></script>
+  </body>
+</html>

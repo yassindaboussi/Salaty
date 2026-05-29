@@ -24,9 +24,9 @@
  *  - Param values : string max 100 chars, number max 1,000,000
  */
 
-'use strict';
+"use strict";
 
-const { ipcRenderer } = require('electron');
+const { ipcRenderer } = require("electron");
 
 // ─── CORE SENDERS ────────────────────────────────────────────────────────────
 
@@ -39,10 +39,10 @@ const { ipcRenderer } = require('electron');
  */
 function track(eventName, params = {}) {
   try {
-    ipcRenderer.send('analytics:track', eventName, params);
+    ipcRenderer.send("analytics:track", eventName, params);
   } catch (e) {
     // Never let analytics crash the app
-    console.warn('[Analytics] track() failed:', e.message);
+    console.warn("[Analytics] track() failed:", e.message);
   }
 }
 
@@ -58,9 +58,9 @@ function track(eventName, params = {}) {
  */
 function featureOpen(featureName) {
   try {
-    ipcRenderer.send('analytics:feature-open', featureName);
+    ipcRenderer.send("analytics:feature-open", featureName);
   } catch (e) {
-    console.warn('[Analytics] featureOpen() failed:', e.message);
+    console.warn("[Analytics] featureOpen() failed:", e.message);
   }
 }
 
@@ -76,21 +76,21 @@ function settingsSaved(settings) {
   // send a snapshot of every user preference we care about
   // GA4 custom dimensions will need to be defined for any new keys below
   try {
-    ipcRenderer.send('analytics:settings-saved', {
-      language   : settings.language,
-      theme      : settings.theme,
-      screen_size: settings.bigScreen ? 'big' : 'small',
+    ipcRenderer.send("analytics:settings-saved", {
+      language: settings.language,
+      theme: settings.theme,
+      screen_size: settings.bigScreen ? "big" : "small",
       // location fields added per user request
-      city       : settings.city || '',
-      country    : settings.country || '',
+      city: settings.city || "",
+      country: settings.country || "",
       // notification/alert settings
-      athkar_alert_enabled      : !!settings.athkarAlertEnabled,
-      athkar_alert_interval     : parseInt(settings.athkarAlertInterval) || 0,
-      pre_adhan_enabled         : !!settings.preAdhanNotificationEnabled,
-      pre_adhan_minutes         : parseInt(settings.preAdhanMinutes) || 0,
+      athkar_alert_enabled: !!settings.athkarAlertEnabled,
+      athkar_alert_interval: parseInt(settings.athkarAlertInterval) || 0,
+      pre_adhan_enabled: !!settings.preAdhanNotificationEnabled,
+      pre_adhan_minutes: parseInt(settings.preAdhanMinutes) || 0,
     });
   } catch (e) {
-    console.warn('[Analytics] settingsSaved() failed:', e.message);
+    console.warn("[Analytics] settingsSaved() failed:", e.message);
   }
 }
 
@@ -101,9 +101,9 @@ function settingsSaved(settings) {
  */
 function navigation(fromPage, toPage) {
   try {
-    ipcRenderer.send('analytics:navigation', fromPage, toPage);
+    ipcRenderer.send("analytics:navigation", fromPage, toPage);
   } catch (e) {
-    console.warn('[Analytics] navigation() failed:', e.message);
+    console.warn("[Analytics] navigation() failed:", e.message);
   }
 }
 
@@ -114,9 +114,9 @@ function navigation(fromPage, toPage) {
  */
 function error(context, message) {
   try {
-    ipcRenderer.send('analytics:error', context, message);
+    ipcRenderer.send("analytics:error", context, message);
   } catch (e) {
-    console.warn('[Analytics] error() failed:', e.message);
+    console.warn("[Analytics] error() failed:", e.message);
   }
 }
 
@@ -125,95 +125,97 @@ function error(context, message) {
 
 /** Radio: a station started playing */
 function radioStationPlay(stationId, stationName) {
-  track('radio_station_play', {
-    station_id  : String(stationId || '').substring(0, 50),
-    station_name: String(stationName || '').substring(0, 50),
+  track("radio_station_play", {
+    station_id: String(stationId || "").substring(0, 50),
+    station_name: String(stationName || "").substring(0, 50),
   });
 }
 
 /** Radio: playback stopped */
 function radioStop() {
-  track('radio_stop');
+  track("radio_stop");
 }
 
 /** Quran: user retried after load failure */
 function quranLoadRetry() {
-  track('quran_load_retry');
+  track("quran_load_retry");
 }
 
 /** Quran: toggled fullscreen */
 function quranFullscreen(isFullscreen) {
-  track('quran_fullscreen_toggle', { is_fullscreen: isFullscreen ? 'on' : 'off' });
+  track("quran_fullscreen_toggle", {
+    is_fullscreen: isFullscreen ? "on" : "off",
+  });
 }
 
 /** Tasbih: user completed a dhikr (hit target count) */
 function tasbihCompleted(dhikrName) {
-  track('tasbih_dhikr_completed', {
-    dhikr_name: String(dhikrName || 'custom').substring(0, 50),
+  track("tasbih_dhikr_completed", {
+    dhikr_name: String(dhikrName || "custom").substring(0, 50),
   });
 }
 
 /** Tasbih: user tapped the counter */
 function tasbihTap(dhikrName, newCount, targetCount) {
-  track('tasbih_tap', {
-    dhikr_name  : String(dhikrName || '').substring(0, 50),
-    count       : newCount,
-    target      : targetCount,
+  track("tasbih_tap", {
+    dhikr_name: String(dhikrName || "").substring(0, 50),
+    count: newCount,
+    target: targetCount,
   });
 }
 
 /** Athkar: user viewed a category */
 function athkarCategoryView(categoryName) {
-  track('athkar_category_view', {
-    category_name: String(categoryName || '').substring(0, 50),
+  track("athkar_category_view", {
+    category_name: String(categoryName || "").substring(0, 50),
   });
 }
 
 /** Athkar: user completed all recitations in a category */
 function athkarCategoryCompleted(categoryName) {
-  track('athkar_category_completed', {
-    category_name: String(categoryName || '').substring(0, 50),
+  track("athkar_category_completed", {
+    category_name: String(categoryName || "").substring(0, 50),
   });
 }
 
 /** Livestreams: user switched streams */
 function livestreamSwitch(streamKey) {
-  track('livestream_switch', { stream: streamKey }); // 'makkah' | 'madina'
+  track("livestream_switch", { stream: streamKey }); // 'makkah' | 'madina'
 }
 
 /** Qibla: location was resolved successfully */
 function qiblaLocationResolved(source) {
   // source: 'settings' | 'ip-api' | 'photon' | 'approx'
-  track('qibla_location_resolved', { source });
+  track("qibla_location_resolved", { source });
 }
 
 /** Ramadan: user switched between Tracker and Timetable tabs */
 function ramadanTabSwitch(tabName) {
-  track('ramadan_tab_switch', { tab_name: tabName });
+  track("ramadan_tab_switch", { tab_name: tabName });
 }
 
 /** Ramadan: user marked/unmarked a fasting day */
 function ramadanDayTracked(hijriDay, action) {
-  track('ramadan_day_tracked', {
+  track("ramadan_day_tracked", {
     hijri_day: String(hijriDay),
-    action,             // 'mark' | 'unmark'
+    action, // 'mark' | 'unmark'
   });
 }
 
 /** Hijri Calendar: user navigated to a different month */
 function calendarMonthNavigated(direction) {
-  track('calendar_month_navigated', { direction }); // 'prev' | 'next' | 'today'
+  track("calendar_month_navigated", { direction }); // 'prev' | 'next' | 'today'
 }
 
 /** Asma: user copied a name */
 function asmaCopied() {
-  track('asma_name_copied');
+  track("asma_name_copied");
 }
 
 /** Playlist: user started playing a track */
 function playlistTrackPlay(albumName) {
-  track('playlist_track_play', {
-    album_name: String(albumName || '').substring(0, 50),
+  track("playlist_track_play", {
+    album_name: String(albumName || "").substring(0, 50),
   });
 }
 
@@ -248,22 +250,22 @@ function playlistTrackPlay(albumName) {
  */
 function locationAction(action, loc = {}) {
   const params = {
-    action          : action,
-    location_name   : String(loc.name    || '').substring(0, 50),
-    location_city   : String(loc.city    || '').substring(0, 50),
-    location_country: String(loc.country || '').substring(0, 50),
-    is_favorite     : loc.isFavorite ? 'yes' : 'no',
+    action: action,
+    location_name: String(loc.name || "").substring(0, 50),
+    location_city: String(loc.city || "").substring(0, 50),
+    location_country: String(loc.country || "").substring(0, 50),
+    is_favorite: loc.isFavorite ? "yes" : "no",
   };
 
   // For edits: attach the previous values so you can see exactly what changed
-  if (action === 'edited' && loc.prev) {
-    params.prev_name     = String(loc.prev.name    || '').substring(0, 50);
-    params.prev_city     = String(loc.prev.city    || '').substring(0, 50);
-    params.prev_country  = String(loc.prev.country || '').substring(0, 50);
-    params.prev_favorite = loc.prev.isFavorite ? 'yes' : 'no';
+  if (action === "edited" && loc.prev) {
+    params.prev_name = String(loc.prev.name || "").substring(0, 50);
+    params.prev_city = String(loc.prev.city || "").substring(0, 50);
+    params.prev_country = String(loc.prev.country || "").substring(0, 50);
+    params.prev_favorite = loc.prev.isFavorite ? "yes" : "no";
   }
 
-  track('location_action', params);
+  track("location_action", params);
 }
 
 // ─── EXPORTS ─────────────────────────────────────────────────────────────────

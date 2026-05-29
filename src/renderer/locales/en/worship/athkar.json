@@ -1,0 +1,19 @@
+{
+  "athkar": "Athkar",
+  "loadingAthkar": "Loading Athkar...",
+  "resetAll": "Reset All",
+  "remembrancesFromSunnah": "Remembrances from the Sunnah",
+  "athkarError": "Error loading Athkar",
+  "resetAllConfirmTitle": "Reset All Counts",
+  "resetAllConfirmMessage": "Are you sure you want to reset all athkar counts? This action cannot be undone.",
+  "allCountsReset": "All counts reset",
+  "athkarDesc": "Daily remembrances",
+  "copy": "Copy",
+  "allCategories": "All",
+  "countIncreased": "Count increased",
+  "countReset": "Count reset",
+  "maxCountReached": "Maximum count reached",
+  "copiedToClipboard": "Copied to clipboard",
+  "failedToCopy": "Failed to copy",
+  "resetAllConfirm": "Reset All"
+}

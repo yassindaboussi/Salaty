@@ -1,0 +1,473 @@
+/* Theme Variables and Styles */
+:root {
+  --accent-color: #4a90e2;
+  --accent-rgb: 74, 144, 226;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --bg-primary: #0a1128;
+  --bg-secondary: #1a237e;
+  --bg-surface: rgba(26, 35, 126, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Navy Theme (Default) */
+.theme-navy {
+  background: linear-gradient(145deg, #0a1128, #1a237e);
+  --accent-color: #4a90e2;
+  --accent-rgb: 74, 144, 226;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --bg-primary: #0a1128;
+  --bg-secondary: #1a237e;
+  --bg-surface: rgba(26, 35, 126, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Green Theme */
+.theme-green {
+  background: linear-gradient(145deg, #1b5e20, #2e7d32);
+  --accent-color: #4caf50;
+  --accent-rgb: 76, 175, 80;
+  --text-primary: #ffffff;
+  --text-secondary: #e0f7e0;
+  --bg-primary: #1b5e20;
+  --bg-secondary: #2e7d32;
+  --bg-surface: rgba(27, 94, 32, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Brown Theme */
+.theme-brown {
+  background: linear-gradient(145deg, #4e342e, #6d4c41);
+  --accent-color: #8d6e63;
+  --accent-rgb: 141, 110, 99;
+  --text-primary: #ffffff;
+  --text-secondary: #f5e6d3;
+  --bg-primary: #4e342e;
+  --bg-secondary: #6d4c41;
+  --bg-surface: rgba(78, 52, 46, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Gold Theme */
+.theme-gold {
+  background: linear-gradient(145deg, #6b5b1e, #b5982c);
+  --accent-color: #d4af37;
+  --accent-rgb: 212, 175, 55;
+  --text-primary: #2c2100;
+  --text-secondary: #4a3d00;
+  --bg-primary: #8e6e19;
+  --bg-secondary: #d4af37;
+  --bg-surface: rgba(212, 175, 55, 0.7);
+  --border-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Pink Theme */
+.theme-pink {
+  background: linear-gradient(145deg, #7a1a4a, #b51a5c);
+  --accent-color: #e91e63;
+  --accent-rgb: 233, 30, 99;
+  --text-primary: #ffffff;
+  --text-secondary: #ffd1e0;
+  --bg-primary: #9e1a5c;
+  --bg-secondary: #e91e63;
+  --bg-surface: rgba(158, 26, 92, 0.65);
+  --border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Purple Theme */
+.theme-purple {
+  background: linear-gradient(145deg, #311b92, #4527a0);
+  --accent-color: #7e57c2;
+  --accent-rgb: 126, 87, 194;
+  --text-primary: #ffffff;
+  --text-secondary: #e1bee7;
+  --bg-primary: #311b92;
+  --bg-secondary: #4527a0;
+  --bg-surface: rgba(69, 39, 160, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Emerald Theme */
+.theme-emerald {
+  background: linear-gradient(145deg, #006064, #00838f);
+  --accent-color: #26a69a;
+  --accent-rgb: 38, 166, 154;
+  --text-primary: #ffffff;
+  --text-secondary: #b2ebf2;
+  --bg-primary: #006064;
+  --bg-secondary: #00838f;
+  --bg-surface: rgba(0, 131, 143, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Ocean Theme */
+.theme-ocean {
+  background: linear-gradient(145deg, #01579b, #0277bd);
+  --accent-color: #29b6f6;
+  --accent-rgb: 41, 182, 246;
+  --text-primary: #e1f5fe;
+  --text-secondary: #b3e5fc;
+  --bg-primary: #01579b;
+  --bg-secondary: #0277bd;
+  --bg-surface: rgba(2, 119, 189, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Royal Theme */
+.theme-royal {
+  background: linear-gradient(145deg, #0d47a1, #1565c0);
+  --accent-color: #ffd700;
+  --accent-rgb: 255, 215, 0;
+  --text-primary: #ffffff;
+  --text-secondary: #e3f2fd;
+  --bg-primary: #0d47a1;
+  --bg-secondary: #1565c0;
+  --bg-surface: rgba(21, 101, 192, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Indigo Theme */
+.theme-indigo {
+  background: linear-gradient(145deg, #1a237e, #283593);
+  --accent-color: #5c6bc0;
+  --accent-rgb: 92, 107, 192;
+  --text-primary: #ffffff;
+  --text-secondary: #e8eaf6;
+  --bg-primary: #1a237e;
+  --bg-secondary: #283593;
+  --bg-surface: rgba(40, 53, 147, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Classic Theme */
+.theme-classic {
+  background: linear-gradient(145deg, #212121, #424242);
+  --accent-color: #9e9e9e;
+  --accent-rgb: 158, 158, 158;
+  --text-primary: #ffffff;
+  --text-secondary: #f5f5f5;
+  --bg-primary: #212121;
+  --bg-secondary: #424242;
+  --bg-surface: rgba(66, 66, 66, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Sunset Theme */
+.theme-sunset {
+  background: linear-gradient(145deg, #e65100, #ef6c00);
+  --accent-color: #ff9800;
+  --accent-rgb: 255, 152, 0;
+  --text-primary: #fff3e0;
+  --text-secondary: #ffe0b2;
+  --bg-primary: #e65100;
+  --bg-secondary: #ef6c00;
+  --bg-surface: rgba(239, 108, 0, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Ramadan Theme */
+.theme-ramadan {
+  /* Base verte profonde */
+  background-color: #1b5e20;
+
+  background-image:
+    /* Images SVG : Lanternes et Canon */
+    url("../../../assets/images/fanoos.svg"),
+    url("../../../assets/images/fanoos.svg"),
+    url("../../../assets/images/cannon.svg"),
+    /* Effet de lueur (Lampes) */
+    radial-gradient(
+        circle at 20% 20%,
+        rgba(255, 215, 0, 0.15) 0%,
+        transparent 20%
+      ),
+    radial-gradient(
+      circle at 80% 15%,
+      rgba(255, 215, 0, 0.15) 0%,
+      transparent 20%
+    ),
+    /* Motif géométrique style moucharabieh très subtil */
+    repeating-linear-gradient(
+        45deg,
+        rgba(255, 215, 0, 0.03) 0px,
+        rgba(255, 215, 0, 0.03) 1px,
+        transparent 1px,
+        transparent 20px
+      ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 215, 0, 0.03) 0px,
+      rgba(255, 215, 0, 0.03) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    /* Dégradé de fond Vert Profond */
+    linear-gradient(135deg, #0a3d13 0%, #1b5e20 50%, #2e7d32 100%);
+
+  background-position:
+    top -5px right 40px,
+    /* Lanterne droite */ top -10px left 20px,
+    /* Lanterne gauche (plus petite) */ bottom 10px right 10px,
+    /* Canon */ 0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0; /* Autres calques couvrent tout */
+
+  background-repeat:
+    no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+    no-repeat;
+
+  background-size:
+    80px auto,
+    /* Taille Lanterne droite */ 60px auto,
+    /* Taille Lanterne gauche */ 140px auto,
+    /* Taille Canon */ 100% 100%,
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    100% 100%;
+
+  /* Accents Dorés */
+  --accent-color: #ffd700;
+  --accent-rgb: 255, 215, 0;
+
+  /* Texte sur fond sombre */
+  --text-primary: #ffffff;
+  --text-secondary: #e8f5e9; /* Vert très clair */
+
+  /* Couleurs de fond des composants (Vert Profond) */
+  --bg-primary: #0a3d13;
+  --bg-secondary: #1b5e20;
+  --bg-surface: rgba(10, 61, 19, 0.85);
+
+  /* Bordures dorées subtiles */
+  --border-color: rgba(255, 215, 0, 0.25);
+}
+
+.theme-ramadan-option {
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #ffd700 100%);
+  border: 1px solid rgba(255, 215, 0, 0.5);
+}
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.theme-option {
+  height: 28px;
+  font-size: 9px;
+  padding: 0 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  line-height: 1.1;
+}
+
+.theme-option::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.theme-option:hover::before {
+  opacity: 0.8;
+}
+
+.theme-option.selected {
+  border-color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.theme-option.selected::after {
+  content: "✓";
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  color: #333;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Theme-specific option backgrounds */
+.theme-navy-option {
+  background: linear-gradient(145deg, #0a1128, #1a237e);
+}
+.theme-green-option {
+  background: linear-gradient(145deg, #1b5e20, #2e7d32);
+}
+.theme-brown-option {
+  background: linear-gradient(145deg, #4e342e, #6d4c41);
+}
+.theme-gold-option {
+  background: linear-gradient(145deg, #6b5b1e, #b5982c);
+}
+.theme-pink-option {
+  background: linear-gradient(145deg, #7a1a4a, #b51a5c);
+}
+.theme-purple-option {
+  background: linear-gradient(145deg, #311b92, #4527a0);
+}
+.theme-emerald-option {
+  background: linear-gradient(145deg, #006064, #00838f);
+}
+.theme-ocean-option {
+  background: linear-gradient(145deg, #01579b, #0277bd);
+}
+.theme-royal-option {
+  background: linear-gradient(145deg, #0d47a1, #1565c0);
+}
+.theme-indigo-option {
+  background: linear-gradient(145deg, #1a237e, #283593);
+}
+.theme-classic-option {
+  background: linear-gradient(145deg, #212121, #424242);
+}
+.theme-ramadan-option {
+  background: linear-gradient(145deg, #1a1a2e, #ffd700);
+}
+
+/* Full app theme support
+   Keep the selected theme on the whole Electron page, not only cards/buttons. */
+html,
+body,
+.app-container {
+  min-height: 100%;
+}
+
+body.theme-navy,
+.app-container.theme-navy {
+  background: linear-gradient(145deg, #0a1128, #1a237e);
+}
+body.theme-green,
+.app-container.theme-green {
+  background: linear-gradient(145deg, #1b5e20, #2e7d32);
+}
+body.theme-brown,
+.app-container.theme-brown {
+  background: linear-gradient(145deg, #4e342e, #6d4c41);
+}
+body.theme-gold,
+.app-container.theme-gold {
+  background: linear-gradient(145deg, #6b5b1e, #b5982c);
+}
+body.theme-pink,
+.app-container.theme-pink {
+  background: linear-gradient(145deg, #7a1a4a, #b51a5c);
+}
+body.theme-purple,
+.app-container.theme-purple {
+  background: linear-gradient(145deg, #311b92, #4527a0);
+}
+body.theme-emerald,
+.app-container.theme-emerald {
+  background: linear-gradient(145deg, #006064, #00838f);
+}
+body.theme-ocean,
+.app-container.theme-ocean {
+  background: linear-gradient(145deg, #01579b, #0277bd);
+}
+body.theme-royal,
+.app-container.theme-royal {
+  background: linear-gradient(145deg, #0d47a1, #1565c0);
+}
+body.theme-indigo,
+.app-container.theme-indigo {
+  background: linear-gradient(145deg, #1a237e, #283593);
+}
+body.theme-classic,
+.app-container.theme-classic {
+  background: linear-gradient(145deg, #212121, #424242);
+}
+body.theme-sunset,
+.app-container.theme-sunset {
+  background: linear-gradient(145deg, #e65100, #ef6c00);
+}
+
+body.theme-ramadan,
+.app-container.theme-ramadan {
+  background-color: #1b5e20;
+  background-image:
+    url("../../../assets/images/fanoos.svg"),
+    url("../../../assets/images/fanoos.svg"),
+    url("../../../assets/images/cannon.svg"),
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(255, 215, 0, 0.15) 0%,
+      transparent 20%
+    ),
+    radial-gradient(
+      circle at 80% 15%,
+      rgba(255, 215, 0, 0.15) 0%,
+      transparent 20%
+    ),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 215, 0, 0.03) 0px,
+      rgba(255, 215, 0, 0.03) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 215, 0, 0.03) 0px,
+      rgba(255, 215, 0, 0.03) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    linear-gradient(135deg, #0a3d13 0%, #1b5e20 50%, #2e7d32 100%);
+  background-position:
+    top -5px right 40px,
+    top -10px left 20px,
+    bottom 10px right 10px,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0;
+  background-repeat:
+    no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+    no-repeat;
+  background-size:
+    80px auto,
+    60px auto,
+    140px auto,
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    100% 100%;
+}

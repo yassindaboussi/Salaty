@@ -1,0 +1,243 @@
+/* Offline Banner - Minimal & Professional Design with Dynamic Theme Support */
+
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 10px 20px;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-out;
+
+  /* Default colors */
+  background: linear-gradient(
+    90deg,
+    var(--bg-primary, #0a1128) 0%,
+    var(--bg-primary, #0a1128) 100%
+  );
+  border-bottom: 1px solid var(--accent-color, rgba(255, 152, 0, 0.3));
+  opacity: 0.98;
+}
+
+/* Theme-aware colors */
+.offline-banner.theme-navy {
+  background: linear-gradient(
+    90deg,
+    rgba(10, 17, 40, 0.98) 0%,
+    rgba(10, 17, 40, 0.95) 100%
+  );
+  border-bottom-color: rgba(74, 144, 226, 0.3);
+}
+
+.offline-banner.theme-dark {
+  background: linear-gradient(
+    90deg,
+    rgba(15, 20, 35, 0.98) 0%,
+    rgba(15, 20, 35, 0.95) 100%
+  );
+  border-bottom-color: rgba(100, 150, 255, 0.3);
+}
+
+.offline-banner.theme-purple {
+  background: linear-gradient(
+    90deg,
+    rgba(30, 20, 50, 0.98) 0%,
+    rgba(30, 20, 50, 0.95) 100%
+  );
+  border-bottom-color: rgba(168, 85, 247, 0.3);
+}
+
+.offline-banner.theme-pink {
+  background: linear-gradient(
+    90deg,
+    rgba(50, 20, 40, 0.98) 0%,
+    rgba(50, 20, 40, 0.95) 100%
+  );
+  border-bottom-color: rgba(244, 114, 182, 0.3);
+}
+
+.offline-banner.theme-blue {
+  background: linear-gradient(
+    90deg,
+    rgba(20, 30, 50, 0.98) 0%,
+    rgba(20, 30, 50, 0.95) 100%
+  );
+  border-bottom-color: rgba(59, 130, 246, 0.3);
+}
+
+.offline-banner.theme-green {
+  background: linear-gradient(
+    90deg,
+    rgba(20, 40, 30, 0.98) 0%,
+    rgba(20, 40, 30, 0.95) 100%
+  );
+  border-bottom-color: rgba(34, 197, 94, 0.3);
+}
+
+.offline-banner.theme-orange {
+  background: linear-gradient(
+    90deg,
+    rgba(50, 30, 15, 0.98) 0%,
+    rgba(50, 30, 15, 0.95) 100%
+  );
+  border-bottom-color: rgba(251, 146, 60, 0.3);
+}
+
+.offline-banner.theme-brown {
+  background: linear-gradient(
+    90deg,
+    rgba(40, 25, 15, 0.98) 0%,
+    rgba(40, 25, 15, 0.95) 100%
+  );
+  border-bottom-color: rgba(180, 83, 9, 0.3);
+}
+
+.offline-banner.theme-gold {
+  background: linear-gradient(
+    90deg,
+    rgba(50, 45, 20, 0.98) 0%,
+    rgba(50, 45, 20, 0.95) 100%
+  );
+  border-bottom-color: rgba(217, 119, 6, 0.3);
+}
+
+.offline-banner.theme-ramadan {
+  background: linear-gradient(
+    90deg,
+    rgba(50, 20, 35, 0.98) 0%,
+    rgba(50, 20, 35, 0.95) 100%
+  );
+  border-bottom-color: rgba(168, 85, 247, 0.3);
+}
+
+.offline-banner.offline-banner-visible {
+  transform: translateY(0);
+}
+
+.offline-banner.offline-banner-hidden {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+.offline-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 40px;
+}
+
+.offline-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.offline-banner-icon {
+  font-size: 16px;
+  color: #ff9800;
+  flex-shrink: 0;
+  animation: icon-blink 2s infinite;
+}
+
+@keyframes icon-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.offline-banner-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.offline-banner-retry {
+  padding: 6px 14px;
+  background: rgba(255, 152, 0, 0.15);
+  border: 1px solid rgba(255, 152, 0, 0.4);
+  color: #ff9800;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.offline-banner-retry:hover {
+  background: rgba(255, 152, 0, 0.25);
+  border-color: rgba(255, 152, 0, 0.6);
+}
+
+.offline-banner-retry:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.offline-banner-close {
+  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.offline-banner-close:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.spinner-small {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(255, 152, 0, 0.3);
+  border-top-color: #ff9800;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .offline-banner {
+    padding: 8px 12px;
+  }
+
+  .offline-banner-content {
+    gap: 8px;
+  }
+
+  .offline-banner-text {
+    font-size: 12px;
+  }
+
+  .offline-banner-retry {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}

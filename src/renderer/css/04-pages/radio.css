@@ -1,0 +1,783 @@
+/* ============================================================
+   RADIO PAGE — VINYL STUDIO REDESIGN
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap");
+
+/* ========== HEADER - UNCHANGED (as requested) ========== */
+.radio-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+  position: relative;
+  z-index: 100;
+  font-family: "DM Sans", sans-serif;
+  overflow: hidden;
+}
+
+/* Ambient background glow */
+.radio-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 60% 40% at 50% 20%,
+      rgba(255, 165, 50, 0.07) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 40% 30% at 80% 80%,
+      rgba(255, 100, 30, 0.05) 0%,
+      transparent 60%
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.radio-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  z-index: 101;
+  gap: 8px;
+  direction: ltr !important;
+}
+
+.radio-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  pointer-events: none;
+  z-index: 1;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.radio-controls {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+  z-index: 102;
+  position: relative;
+}
+
+[dir="rtl"] .radio-header,
+[dir="ltr"] .radio-header,
+.radio-header {
+  direction: ltr !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+[dir="rtl"] .back-btn,
+[dir="ltr"] .back-btn,
+.back-btn {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+[dir="rtl"] .radio-title,
+[dir="ltr"] .radio-title,
+.radio-title {
+  flex: 1 !important;
+  text-align: center !important;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  width: auto !important;
+  margin: 0 !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+[dir="rtl"] .radio-controls,
+[dir="ltr"] .radio-controls,
+.radio-controls {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  gap: 6px !important;
+}
+
+[dir="rtl"] .back-btn i,
+[dir="ltr"] .back-btn i,
+.back-btn i {
+  transform: none !important;
+}
+
+[dir="rtl"] .back-btn:hover i,
+[dir="ltr"] .back-btn:hover i,
+.back-btn:hover i {
+  transform: translateX(-2px) !important;
+}
+
+/* ========== MAIN RADIO CONTENT ========== */
+.radio-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  z-index: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 165, 50, 0.3) transparent;
+  -webkit-app-region: no-drag;
+
+  /* Always LTR so scrollbar stays on the RIGHT for all languages */
+  direction: ltr !important;
+}
+
+/* Re-apply LTR to all children so Arabic/RTL text still renders correctly */
+.radio-content > * {
+  direction: inherit;
+}
+
+[dir="rtl"] .radio-content,
+[dir="ltr"] .radio-content {
+  direction: ltr !important;
+}
+
+/* Scrollbar always on right */
+.radio-content::-webkit-scrollbar {
+  width: 3px;
+}
+.radio-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.radio-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 165, 50, 0.3);
+  border-radius: 2px;
+}
+
+[dir="rtl"] .radio-content::-webkit-scrollbar,
+[dir="ltr"] .radio-content::-webkit-scrollbar {
+  /* Prevent browser from flipping scrollbar side in RTL */
+  direction: ltr !important;
+}
+
+/* ========== VINYL DISC - NOW PLAYING ========== */
+.now-playing-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0 12px;
+  position: relative;
+}
+
+/* Vinyl disc wrapper */
+.vinyl-wrapper {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 16px;
+  flex-shrink: 0;
+}
+
+.vinyl-disc {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  position: relative;
+  transition: transform 0.4s ease;
+  will-change: transform;
+}
+
+/* Spinning state */
+.vinyl-disc.spinning {
+  animation: vinylSpin 4s linear infinite;
+}
+
+@keyframes vinylSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Vinyl SVG rings rendered via box-shadow */
+.vinyl-disc-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 0%,
+      transparent 28%,
+      rgba(255, 255, 255, 0.03) 28.5%,
+      rgba(255, 255, 255, 0.03) 29%,
+      transparent 29%,
+      transparent 35%,
+      rgba(255, 255, 255, 0.03) 35.5%,
+      rgba(255, 255, 255, 0.03) 36%,
+      transparent 36%,
+      transparent 42%,
+      rgba(255, 255, 255, 0.03) 42.5%,
+      rgba(255, 255, 255, 0.03) 43%,
+      transparent 43%,
+      transparent 49%
+    ),
+    conic-gradient(
+      from 0deg,
+      #1a1a1a 0deg,
+      #222 30deg,
+      #1a1a1a 60deg,
+      #222 90deg,
+      #1a1a1a 120deg,
+      #222 150deg,
+      #1a1a1a 180deg,
+      #222 210deg,
+      #1a1a1a 240deg,
+      #222 270deg,
+      #1a1a1a 300deg,
+      #222 330deg,
+      #1a1a1a 360deg
+    );
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 2px 8px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Center hole with album art */
+.vinyl-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255, 165, 50, 0.6);
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.8),
+    0 0 16px rgba(255, 165, 50, 0.3);
+  z-index: 2;
+}
+
+.vinyl-center img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Default state — glowing dot */
+.vinyl-center-default {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 165, 50, 0.8) 0%,
+    rgba(255, 100, 30, 0.4) 60%,
+    transparent 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vinyl-center-default i {
+  font-size: 18px;
+  color: rgba(255, 165, 50, 0.9);
+}
+
+/* Tonearm needle */
+.tonearm {
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  width: 60px;
+  height: 60px;
+  pointer-events: none;
+  z-index: 10;
+  transform-origin: 8px 8px;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.tonearm.playing {
+  transform: rotate(-18deg);
+}
+
+.tonearm.idle {
+  transform: rotate(15deg);
+}
+
+.tonearm svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Now playing info text */
+.now-playing-info {
+  text-align: center;
+  width: 100%;
+  padding: 0 12px;
+}
+
+.now-playing-label {
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255, 165, 50, 0.7);
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.station-name {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 26px;
+  color: #ffffff;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+
+.station-description {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Sound bars animation */
+.sound-bars {
+  display: none;
+  align-items: flex-end;
+  gap: 3px;
+  height: 14px;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.sound-bars.active {
+  display: flex;
+}
+
+.sound-bars span {
+  width: 3px;
+  background: rgba(255, 165, 50, 0.8);
+  border-radius: 2px;
+  animation: bar 1s infinite ease-in-out;
+}
+
+.sound-bars span:nth-child(1) {
+  height: 6px;
+  animation-delay: 0s;
+}
+.sound-bars span:nth-child(2) {
+  height: 10px;
+  animation-delay: 0.15s;
+}
+.sound-bars span:nth-child(3) {
+  height: 14px;
+  animation-delay: 0.3s;
+}
+.sound-bars span:nth-child(4) {
+  height: 8px;
+  animation-delay: 0.45s;
+}
+.sound-bars span:nth-child(5) {
+  height: 12px;
+  animation-delay: 0.6s;
+}
+
+@keyframes bar {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* ========== PLAYER CONTROLS (INLINE, ALWAYS VISIBLE) ========== */
+.player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px 14px;
+  direction: ltr;
+}
+
+.player-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.player-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.player-btn:active {
+  transform: scale(0.92);
+}
+
+#playPauseBtn {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #ffaa00, #ff6600);
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  box-shadow: 0 4px 20px rgba(255, 140, 0, 0.35);
+}
+
+#playPauseBtn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 24px rgba(255, 140, 0, 0.5);
+  background: linear-gradient(135deg, #ffbb20, #ff7722);
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+}
+
+.volume-slider {
+  width: 65px;
+  height: 3px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffaa00;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(255, 170, 0, 0.5);
+}
+
+/* ========== DIVIDER ========== */
+.stations-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 10px;
+}
+
+.stations-divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.stations-divider-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+}
+
+/* ========== STATIONS LIST (HORIZONTAL ROWS) ========== */
+.stations-section {
+  padding: 0 4px 8px;
+  direction: ltr;
+}
+
+.stations-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.station-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Active glow bar on left */
+.station-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: #ffaa00;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.station-card.active::before {
+  opacity: 1;
+}
+
+.station-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 165, 50, 0.2);
+  transform: translateX(3px);
+}
+
+.station-card.active {
+  background: rgba(255, 140, 0, 0.08);
+  border-color: rgba(255, 140, 0, 0.25);
+}
+
+.station-card-image {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.station-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.station-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.station-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.station-card.active .station-card-name {
+  color: #ffcc44;
+}
+
+.station-card-location {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mini sound bars on active card */
+.station-card-bars {
+  display: none;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+  margin-right: 4px;
+}
+
+.station-card.active .station-card-bars {
+  display: flex;
+}
+
+.station-card-bars span {
+  width: 2px;
+  background: #ffaa00;
+  border-radius: 1px;
+  animation: bar 0.8s infinite ease-in-out;
+}
+
+.station-card-bars span:nth-child(1) {
+  height: 5px;
+  animation-delay: 0s;
+}
+.station-card-bars span:nth-child(2) {
+  height: 9px;
+  animation-delay: 0.12s;
+}
+.station-card-bars span:nth-child(3) {
+  height: 6px;
+  animation-delay: 0.24s;
+}
+
+.station-play-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-size: 10px;
+}
+
+.station-play-btn:hover {
+  background: rgba(255, 140, 0, 0.2);
+  border-color: rgba(255, 140, 0, 0.4);
+  color: #ffaa00;
+  transform: scale(1.1);
+}
+
+.station-card.active .station-play-btn {
+  background: rgba(255, 100, 50, 0.2);
+  border-color: rgba(255, 100, 50, 0.4);
+  color: #ff6644;
+}
+
+/* ========== LOADING STATE ========== */
+.radio-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+}
+
+.radio-loading i {
+  font-size: 20px;
+  color: #ffaa00;
+}
+
+/* ========== FOOTER ========== */
+.radio-footer {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.radio-footer-text {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.2);
+  font-style: italic;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
+}
+
+/* ========== TOAST ========== */
+.radio-toast {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, #ff4444, #cc2222);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(255, 60, 60, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10000;
+  transform: translateX(110%);
+  opacity: 0;
+  max-width: 240px;
+  pointer-events: none;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.radio-toast.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* ========== RESPONSIVE ========== */
+/* Small Screen Adjustments - Match Asma page sizing */
+.small-screen .vinyl-wrapper {
+  width: 140px;
+  height: 140px;
+}
+.small-screen .vinyl-disc {
+  width: 140px;
+  height: 140px;
+}
+.small-screen .station-name {
+  font-size: 22px;
+}
+.small-screen .station-card {
+  padding: 9px 12px;
+}
+
+/* Match Asma page control button sizes for small screen */
+.small-screen .control-btn {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.small-screen .control-btn i,
+.small-screen .control-btn svg {
+  font-size: 10px !important;
+  width: 10px !important;
+  height: 10px !important;
+}
+
+/* Scale player buttons proportionally */
+.small-screen .player-btn {
+  width: 30px !important;
+  height: 30px !important;
+  font-size: 11px !important;
+}
+
+.small-screen #playPauseBtn {
+  width: 38px !important;
+  height: 38px !important;
+  font-size: 13px !important;
+}

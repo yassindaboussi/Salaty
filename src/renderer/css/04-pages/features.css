@@ -1,0 +1,663 @@
+/* Features Container */
+.features-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+}
+
+/* Features Header - ALWAYS LTR direction regardless of language */
+.features-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  direction: ltr !important; /* Force LTR direction */
+  gap: 8px;
+}
+
+/* Back button - Always on LEFT side regardless of language */
+.features-header .back-btn {
+  margin: 0;
+  z-index: 2;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* Features Title */
+.features-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  pointer-events: none;
+  z-index: 1;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Features Controls */
+.features-controls {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+  z-index: 2;
+  position: relative;
+}
+
+/* Features Content */
+.features-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+  -webkit-app-region: no-drag;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) transparent;
+  direction: ltr !important; /* Force LTR for scrollbar on right */
+}
+
+.features-content::-webkit-scrollbar {
+  width: 5px;
+  right: 0 !important;
+  left: auto !important;
+}
+
+.features-content::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.features-content::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+/* Features Grid - 4 cards per row */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 4px;
+}
+
+/* Feature Card */
+.feature-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  min-height: 120px;
+  cursor: default;
+  -webkit-app-region: no-drag;
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-color), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.feature-card:hover::before {
+  opacity: 0.6;
+}
+
+/* Available Cards */
+.feature-card.available {
+  cursor: pointer;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.feature-card.available:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-color);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Coming Soon Cards */
+.feature-card.coming-soon {
+  opacity: 0.6;
+}
+
+.feature-card.coming-soon:hover {
+  transform: translateY(-2px);
+  opacity: 0.75;
+}
+
+/* Coming Soon Badge */
+.coming-soon-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: linear-gradient(135deg, #ff6b6b, #ff5252);
+  color: white;
+  font-size: 8px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  box-shadow: 0 2px 6px rgba(255, 107, 107, 0.3);
+}
+
+/* Feature Icon */
+.feature-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.feature-icon i {
+  font-size: 22px;
+  color: var(--accent-color);
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.feature-card:hover .feature-icon i {
+  transform: scale(1.1);
+}
+
+/* Specific Icon Colors */
+.quran-icon {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: rgba(76, 175, 80, 0.2);
+}
+
+.quran-icon i {
+  color: #4caf50;
+}
+
+.athkar-icon {
+  background: rgba(156, 39, 176, 0.1);
+  border-color: rgba(156, 39, 176, 0.2);
+}
+
+.athkar-icon i {
+  color: #9c27b0;
+}
+
+.monthly-icon {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.2);
+}
+
+.monthly-icon i {
+  color: #ffc107;
+}
+
+.tasbih-icon {
+  background: rgba(33, 150, 243, 0.1);
+  border-color: rgba(33, 150, 243, 0.2);
+}
+
+.tasbih-icon i {
+  color: #2196f3;
+}
+
+.calendar-icon {
+  background: rgba(255, 152, 0, 0.1);
+  border-color: rgba(255, 152, 0, 0.2);
+}
+
+.calendar-icon i {
+  color: #ff9800;
+}
+
+.ramadhan-icon {
+  background: rgba(63, 81, 181, 0.1);
+  border-color: rgba(63, 81, 181, 0.2);
+}
+
+.ramadhan-icon i {
+  color: #3f51b5;
+}
+
+.asma-icon {
+  background: rgba(233, 30, 99, 0.1);
+  border-color: rgba(233, 30, 99, 0.2);
+}
+
+.asma-icon i {
+  color: #e91e63;
+}
+
+.qibla-icon {
+  background: rgba(0, 150, 136, 0.1);
+  border-color: rgba(0, 150, 136, 0.2);
+}
+
+.qibla-icon i {
+  color: #009688;
+}
+
+.radio-icon {
+  background: rgba(179, 84, 50, 0.1);
+  border-color: rgba(194, 16, 16, 0.2);
+}
+
+.radio-icon i {
+  color: #ff5500;
+}
+
+.livestreams-icon {
+  background: rgba(20, 201, 35, 0.1);
+  border-color: rgba(53, 225, 40, 0.2);
+}
+
+.livestreams-icon i {
+  color: #25981b;
+}
+
+/* Feature Name */
+.feature-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+
+/* Feature Description */
+.feature-description {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin: 0;
+  text-align: center;
+  line-height: 1.3;
+  opacity: 0.8;
+}
+
+/* Feature Action */
+.feature-action {
+  margin-top: auto;
+  width: 100%;
+}
+
+.feature-btn {
+  width: 100%;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(var(--accent-rgb), 0.25);
+}
+
+.feature-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(var(--accent-rgb), 0.35);
+}
+
+.feature-btn:active {
+  transform: translateY(0);
+}
+
+.feature-btn i {
+  font-size: 9px;
+  transition: transform 0.2s ease;
+}
+
+.feature-btn:hover i {
+  transform: translateX(2px);
+}
+
+/* Features Footer */
+.features-footer {
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.features-footer-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+  opacity: 0.8;
+  background: linear-gradient(
+    135deg,
+    var(--text-secondary),
+    rgba(var(--accent-rgb), 0.8)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Style pour le mode plein écran */
+.features-container.fullscreen .features-grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  padding: 10px;
+}
+
+.features-container.fullscreen .feature-card {
+  padding: 16px 12px;
+  min-height: 140px;
+}
+
+.features-container.fullscreen .feature-icon {
+  width: 52px;
+  height: 52px;
+}
+
+.features-container.fullscreen .feature-icon i {
+  font-size: 26px;
+}
+
+.features-container.fullscreen .feature-name {
+  font-size: 14px;
+}
+
+.features-container.fullscreen .feature-description {
+  font-size: 11px;
+}
+
+/* RTL Support */
+[dir="rtl"] .coming-soon-badge {
+  right: 6px;
+  left: auto;
+}
+
+[dir="rtl"] .feature-btn i {
+  transform: none;
+}
+
+[dir="rtl"] .feature-btn:hover i {
+  transform: translateX(2px);
+}
+
+/* Force scrollbar on right side for ALL languages */
+[dir="rtl"] .features-content,
+[dir="ltr"] .features-content {
+  direction: ltr !important;
+}
+
+[dir="rtl"] .features-content::-webkit-scrollbar,
+[dir="ltr"] .features-content::-webkit-scrollbar {
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* Force layout consistency for ALL languages */
+/* Override any RTL behavior for the header */
+[dir="rtl"] .features-header,
+[dir="ltr"] .features-header,
+.features-header {
+  direction: ltr !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+[dir="rtl"] .features-header .back-btn,
+[dir="ltr"] .features-header .back-btn,
+.features-header .back-btn {
+  margin: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+/* Don't flip arrow in any language - always point left */
+[dir="rtl"] .features-header .back-btn i,
+[dir="ltr"] .features-header .back-btn i {
+  transform: none !important;
+}
+
+[dir="rtl"] .features-header .back-btn:hover i,
+[dir="ltr"] .features-header .back-btn:hover i {
+  transform: translateX(-2px) !important;
+}
+
+/* Ensure title stays centered in all languages */
+[dir="rtl"] .features-title,
+[dir="ltr"] .features-title,
+.features-title {
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  width: auto !important;
+  text-align: center !important;
+  flex: 1 !important;
+  margin: 0 !important;
+}
+
+[dir="rtl"] .features-controls,
+[dir="ltr"] .features-controls,
+.features-controls {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  gap: 6px !important;
+}
+
+/* Responsive Grid */
+@media (max-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .feature-card {
+    padding: 10px 6px;
+    min-height: 110px;
+  }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .feature-icon i {
+    font-size: 20px;
+  }
+
+  .feature-name {
+    font-size: 12px;
+  }
+
+  .feature-description {
+    font-size: 9px;
+  }
+}
+
+/* Animations */
+.feature-card {
+  animation: fadeInUp 0.5s ease backwards;
+}
+
+.feature-card:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.feature-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.feature-card:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.feature-card:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.feature-card:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.feature-card:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.feature-card:nth-child(7) {
+  animation-delay: 0.35s;
+}
+.feature-card:nth-child(8) {
+  animation-delay: 0.4s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== RESPONSIVE DESIGN - Updated ========== */
+
+@media (max-width: 768px) {
+  .features-container {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .features-header {
+    padding-bottom: 8px;
+    min-height: 32px;
+  }
+
+  .features-title {
+    font-size: 16px;
+  }
+
+  .features-controls {
+    gap: 4px;
+  }
+
+  .control-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .features-content {
+    padding: 4px 0;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 2px;
+  }
+
+  .feature-card {
+    padding: 10px 6px;
+    min-height: 110px;
+  }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .feature-icon i {
+    font-size: 20px;
+  }
+
+  .feature-name {
+    font-size: 12px;
+  }
+
+  .feature-description {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  .features-container {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .features-title {
+    font-size: 14px;
+  }
+
+  .control-btn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .control-btn i,
+  .control-btn svg {
+    font-size: 10px;
+    width: 10px;
+    height: 10px;
+  }
+
+  .features-grid {
+    gap: 6px;
+  }
+
+  .feature-card {
+    padding: 8px 5px;
+    min-height: 100px;
+  }
+
+  .feature-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .feature-icon i {
+    font-size: 18px;
+  }
+
+  .feature-name {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 320px) {
+  .features-header {
+    gap: 4px;
+  }
+
+  .features-title {
+    font-size: 13px;
+  }
+
+  .features-grid {
+    gap: 4px;
+  }
+
+  .feature-card {
+    min-height: 90px;
+  }
+}

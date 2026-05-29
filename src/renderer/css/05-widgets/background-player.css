@@ -1,0 +1,119 @@
+:root {
+  --bg-navy: rgba(26, 35, 126, 0.95);
+  --glass-white: rgba(255, 255, 255, 0.1);
+  --glass-hover: rgba(255, 255, 255, 0.2);
+  --accent-blue: #4a90e2;
+  --text-dim: rgba(255, 255, 255, 0.7);
+  --transition: all 0.2s ease;
+}
+
+body {
+  margin: 0;
+  padding: 10px 15px;
+  background: var(--bg-primary, var(--bg-navy));
+  color: white;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+/* Groupement des textes */
+.track-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.title,
+.artist {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.artist {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* Gestion des contrôles */
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  -webkit-app-region: no-drag;
+}
+
+/* Base commune pour tous les boutons */
+.btn,
+.mini-btn {
+  background: var(--glass-white);
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--transition);
+  -webkit-app-region: no-drag;
+}
+
+.btn:hover,
+.mini-btn:hover {
+  background: var(--glass-hover);
+}
+
+/* Variantes spécifiques */
+.btn-play {
+  background: var(--accent-color, var(--accent-blue));
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  box-shadow: 0 4px 10px rgba(74, 144, 226, 0.4);
+}
+
+.btn-play:hover {
+  background: var(--accent-color, #5b9eed);
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+.btn-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 10px;
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  z-index: 10;
+}
+
+.btn-close:hover {
+  color: white;
+  background: rgba(255, 60, 60, 0.8);
+}

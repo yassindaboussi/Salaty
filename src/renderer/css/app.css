@@ -1,0 +1,17 @@
+/*
+  Main renderer stylesheet bundle.
+  Order matters: settings -> base -> layout -> reusable components -> utilities -> RTL overrides.
+  Page-specific CSS is linked by each HTML page from css/04-pages/.
+*/
+@import url("./01-base/reset.css");
+@import url("./02-layout/window.css");
+@import url("./00-settings/themes.css");
+@import url("./03-components/buttons.css");
+@import url("./03-components/prayer-cards.css");
+@import url("./03-components/adhan-toggle.css");
+@import url("./03-components/modals.css");
+@import url("./03-components/mini-player.css");
+@import url("./03-components/banners.css");
+@import url("./03-components/tooltips.css");
+@import url("./06-utilities/utilities.css");
+@import url("./01-base/rtl.css");

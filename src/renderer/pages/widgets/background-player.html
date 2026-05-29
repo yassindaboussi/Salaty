@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Salaty Player</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../../css/05-widgets/widget-base.css" />
+    <link rel="stylesheet" href="../../css/05-widgets/background-player.css" />
+  </head>
+  <!-- theme class removed from here. background-player.js applies the saved theme on load. -->
+  <body id="miniPlayerBody">
+    <div class="track-info">
+      <div id="title" class="title">Salaty Player</div>
+      <div id="artist" class="artist">Waiting for track...</div>
+    </div>
+    <div class="controls">
+      <button id="prevBtn" class="btn" data-tooltip="tooltipPrev">
+        <i class="fas fa-step-backward"></i>
+      </button>
+      <button id="playBtn" class="btn btn-play" data-tooltip="tooltipPlayPause">
+        <i class="fas fa-play"></i>
+      </button>
+      <button id="nextBtn" class="btn" data-tooltip="tooltipNext">
+        <i class="fas fa-step-forward"></i>
+      </button>
+      <button
+        id="miniPlaylistBtn"
+        class="mini-btn"
+        title="Open Playlist"
+        data-tooltip="tooltipPlaylist"
+      >
+        <i class="fas fa-list"></i>
+      </button>
+    </div>
+    <button
+      id="closeBtn"
+      class="btn btn-close"
+      title="Close Mini Player"
+      data-tooltip="tooltipClose"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+    <script src="../../js/media/background-player.js"></script>
+    <script src="../../js/core/tooltip-init.js"></script>
+  </body>
+</html>

@@ -1,0 +1,60 @@
+/* Draggable Area */
+.drag-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  pointer-events: none;
+  -webkit-app-region: drag;
+}
+
+/* Window Controls */
+.window-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  left: 16px;
+  display: flex;
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 1100;
+  align-items: center;
+}
+
+.window-controls .right-controls {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+
+/* Fullscreen mode */
+body.fullscreen .app-container {
+  border-radius: 20;
+}
+
+/* Interactive Elements (make them non-draggable) */
+button,
+input,
+select,
+textarea,
+a,
+.prayer-item,
+.settings-content *,
+.quran-content * {
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+}
+
+.draggable-header-space {
+  flex: 1;
+  height: 32px;
+  margin: 0 12px;
+  -webkit-app-region: drag;
+  cursor: move;
+  z-index: 1100;
+  position: relative;
+}

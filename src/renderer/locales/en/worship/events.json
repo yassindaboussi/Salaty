@@ -1,0 +1,19 @@
+{
+  "hijriNewYear": { "event": "Hijri New Year", "date": "1 Muharram", "description": "The beginning of the Hijri year. Fasting is recommended in Muharram." },
+  "ashura": { "event": "Ashura", "date": "10 Muharram", "description": "The day Allah saved Moses. Fasting it erases sins of the previous year." },
+  "mawlid": { "event": "Mawlid Nabawi", "date": "12 Rabi' al-Awwal (Approx)", "description": "Approximate date of Prophet Muhammad's ﷺ birth.", "note": "Exact date is debated." },
+  "israMiraj": { "event": "Isra and Mi'raj", "date": "27 Rajab (Approx)", "description": "Common date for the Night Journey.", "note": "No specific date is confirmed by authentic texts." },
+  "eidAlFitr": { "event": "Eid al-Fitr", "date": "1 Shawwal", "description": "The first day after Ramadan fasting." },
+  "arafat": { "event": "Day of Arafat", "date": "9 Dhul-Hijjah", "description": "The best day of the year. Fasting it erases sins of the past and coming year." },
+  "eidAlAdha": { "event": "Eid al-Adha", "date": "10 Dhul-Hijjah", "description": "The days of sacrifice and the greatest days of Islam." },
+  "ramadanStart": { "event": "Start of Ramadan", "date": "1 Ramadan", "description": "The month of Fasting and Quran." },
+  "laylatAlQadr": { "event": "Laylat al-Qadr", "date": "Last 10 days", "description": "Better than a thousand months." },
+  "tomorrowIs": "Tomorrow: {event}",
+  "tonightIs": "Tonight: {event}",
+  "fastingMonday": { "event": "Monday Fasting", "description": "Deeds are presented to Allah. Highly recommended." },
+  "fastingThursday": { "event": "Thursday Fasting", "description": "Deeds are presented to Allah. Highly recommended." },
+  "whiteDays": { "event": "White Days", "date": "13, 14, 15 Hijri", "description": "Equivalent to fasting the whole year." },
+  "tasua": { "event": "Tasu'a", "date": "9 Muharram", "description": "Recommended to fast with Ashura." },
+  "shabanStart": { "event": "Start of Sha'ban", "date": "1 Sha'ban", "description": "Spiritual preparation before Ramadan." },
+  "muharramStart": { "event": "Start of Muharram", "date": "1 Muharram", "description": "Beginning of the Hijri year. Recommended to fast." }
+}

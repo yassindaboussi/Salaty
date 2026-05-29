@@ -1,0 +1,175 @@
+/* Control Buttons */
+.control-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.control-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.control-btn:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+.control-btn svg {
+  width: 14px;
+  height: 14px;
+  transition: all 0.3s ease;
+  fill: rgba(255, 255, 255, 0.9);
+}
+
+.control-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.control-btn i {
+  font-size: 12px;
+  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.control-btn:hover i {
+  transform: scale(1.1);
+}
+
+/* Specific Control Buttons */
+.minimize-btn:hover {
+  background: rgba(247, 183, 49, 0.2);
+}
+
+.minimize-btn:active {
+  background: rgba(247, 183, 49, 0.3);
+}
+
+.close-btn:hover {
+  background: rgba(255, 59, 48, 0.2);
+}
+
+.close-btn:active {
+  background: rgba(255, 59, 48, 0.3);
+}
+
+/* Settings and Features Buttons (Main Page) */
+.settings-btn,
+.features-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-btn:hover,
+.features-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.settings-btn:active,
+.features-btn:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+.settings-btn i,
+.features-btn i {
+  transition: transform 0.3s ease;
+}
+
+.settings-btn:hover i {
+  transform: scale(1.1) rotate(45deg);
+}
+
+.features-btn:hover i {
+  transform: scale(1.1);
+}
+
+.settings-btn:active i {
+  transform: rotate(45deg);
+}
+
+/* Back Button (for Settings and Features pages) */
+.back-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 2000;
+  margin-right: 12px;
+  -webkit-app-region: no-drag;
+  pointer-events: auto !important;
+}
+
+.back-btn i {
+  transition: transform 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-btn:hover i {
+  transform: translateX(-2px);
+}
+
+.back-btn:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+.back-btn:active i {
+  transform: translateX(0);
+}

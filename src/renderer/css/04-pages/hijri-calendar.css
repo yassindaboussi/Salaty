@@ -1,0 +1,777 @@
+/* Hijri Calendar Styles */
+
+.calendar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+  gap: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ========== HEADER - EXACTLY LIKE FEATURES PAGE ========== */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  gap: 8px;
+  direction: ltr !important;
+}
+
+/* Back button - NO STYLES HERE, use global styles */
+/* The .back-btn styles should come from components.css */
+
+/* Title - Centered with flex EXACTLY like Features */
+.calendar-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  pointer-events: none;
+  z-index: 1;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Control buttons container EXACTLY like Features */
+.calendar-controls {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+  z-index: 2;
+  position: relative;
+}
+
+/* Control buttons - NO STYLES HERE, use global styles */
+/* The .control-btn styles should come from components.css */
+
+/* Force consistent layout for ALL languages - EXACTLY like Features */
+[dir="rtl"] .calendar-header,
+[dir="ltr"] .calendar-header,
+.calendar-header {
+  direction: ltr !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+[dir="rtl"] .back-btn,
+[dir="ltr"] .back-btn,
+.back-btn {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+[dir="rtl"] .calendar-title,
+[dir="ltr"] .calendar-title,
+.calendar-title {
+  flex: 1 !important;
+  text-align: center !important;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  width: auto !important;
+  margin: 0 !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+[dir="rtl"] .calendar-controls,
+[dir="ltr"] .calendar-controls,
+.calendar-controls {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  gap: 6px !important;
+}
+
+/* Don't flip arrow in any language - always point left */
+[dir="rtl"] .back-btn i,
+[dir="ltr"] .back-btn i,
+.back-btn i {
+  transform: none !important;
+}
+
+[dir="rtl"] .back-btn:hover i,
+[dir="ltr"] .back-btn:hover i,
+.back-btn:hover i {
+  transform: translateX(-2px) !important;
+}
+
+/* ========== END OF HEADER - NOW MATCHES FEATURES PAGE ========== */
+
+/* Calendar Content */
+.calendar-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px 0;
+  min-height: 0;
+  -webkit-app-region: no-drag;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) transparent;
+  direction: ltr !important; /* Force LTR for scrollbar on right */
+}
+
+.calendar-content::-webkit-scrollbar {
+  width: 5px;
+  right: 0 !important;
+  left: auto !important;
+}
+
+.calendar-content::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.calendar-content::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+.calendar-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--accent-rgb, 0, 122, 255), 0.8);
+}
+
+/* Month and Year Navigation */
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--card-bg, rgba(255, 255, 255, 0.05));
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+
+.nav-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color, #fff);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--accent-color);
+  transform: scale(1.05);
+}
+
+.calendar-month-year {
+  text-align: center;
+}
+
+.current-month {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color, #fff);
+  margin: 0 0 0.25rem 0;
+}
+
+.current-year {
+  font-size: 0.9rem;
+  color: var(--text-muted, rgba(255, 255, 255, 0.7));
+  margin: 0;
+}
+
+/* Quick Actions */
+.calendar-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color, #fff);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+}
+
+.action-btn i {
+  font-size: 0.9rem;
+}
+
+/* Calendar Grid */
+.calendar-grid-container {
+  background: var(--card-bg, rgba(255, 255, 255, 0.05));
+  border-radius: 12px;
+  padding: 0.75rem;
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.weekday {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted, rgba(255, 255, 255, 0.7));
+  padding: 0.5rem;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  min-height: 45px;
+}
+
+.calendar-day.empty {
+  background: transparent;
+  cursor: default;
+}
+
+.calendar-day:not(.empty):hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-color);
+  transform: scale(1.05);
+}
+
+.calendar-day.today {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  font-weight: 600;
+}
+
+.calendar-day.special-day {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: #ffc107;
+}
+
+.calendar-day.special-day.today {
+  background: linear-gradient(
+    135deg,
+    var(--accent-color),
+    rgba(255, 193, 7, 0.3)
+  );
+  border-color: var(--accent-color);
+}
+
+.day-number {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color, #fff);
+  margin-bottom: 0.125rem;
+}
+
+.day-gregorian {
+  font-size: 0.7rem;
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+}
+
+/* Gregorian Date Display */
+.gregorian-date-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  color: var(--text-color, #fff);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.gregorian-date-display i {
+  color: var(--accent-color);
+}
+
+/* Islamic Events */
+.islamic-events {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+
+.events-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color, #fff);
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.event-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-color);
+  transition: all 0.3s ease;
+}
+
+.event-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(4px);
+}
+
+.event-date {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  min-width: 40px;
+  text-align: center;
+}
+
+.event-name {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text-color, #fff);
+}
+
+.no-events {
+  text-align: center;
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-style: italic;
+  padding: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 16px;
+  }
+
+  .calendar-header {
+    margin-bottom: 0;
+    padding-bottom: 12px;
+  }
+
+  .calendar-title {
+    font-size: 18px;
+  }
+
+  .calendar-content {
+    gap: 12px;
+  }
+
+  .calendar-nav {
+    padding: 12px;
+  }
+
+  .current-month {
+    font-size: 1rem;
+  }
+
+  .current-year {
+    font-size: 0.8rem;
+  }
+
+  .action-btn span {
+    display: none;
+  }
+
+  .calendar-grid-container {
+    padding: 0.5rem;
+  }
+
+  .calendar-weekdays {
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .weekday {
+    font-size: 0.75rem;
+    padding: 0.25rem;
+  }
+
+  .calendar-days {
+    gap: 0.25rem;
+  }
+
+  .calendar-day {
+    min-height: 40px;
+    border-radius: 4px;
+  }
+
+  .day-number {
+    font-size: 0.9rem;
+  }
+
+  .day-gregorian {
+    font-size: 0.6rem;
+  }
+
+  .islamic-events {
+    padding: 0.75rem;
+  }
+
+  .events-title {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .event-item {
+    padding: 0.5rem;
+    gap: 0.75rem;
+  }
+
+  .event-date {
+    font-size: 1.25rem;
+    min-width: 35px;
+  }
+
+  .event-name {
+    font-size: 0.85rem;
+  }
+}
+
+/* Small Screen Mode */
+.small-screen .calendar-container {
+  padding: 16px;
+}
+
+.small-screen .calendar-header {
+  margin-bottom: 0;
+  padding-bottom: 12px;
+}
+
+.small-screen .calendar-title {
+  font-size: 18px;
+}
+
+.small-screen .calendar-content {
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.small-screen .calendar-nav {
+  padding: 12px;
+}
+
+.small-screen .current-month {
+  font-size: 1rem;
+}
+
+.small-screen .current-year {
+  font-size: 0.75rem;
+}
+
+.small-screen .nav-btn {
+  width: 32px;
+  height: 32px;
+  font-size: 0.85rem;
+}
+
+.small-screen .action-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.small-screen .action-btn span {
+  display: none;
+}
+
+.small-screen .calendar-grid-container {
+  padding: 0.5rem;
+}
+
+.small-screen .calendar-weekdays {
+  gap: 0.2rem;
+  margin-bottom: 0.4rem;
+}
+
+.small-screen .weekday {
+  font-size: 0.65rem;
+  padding: 0.25rem 0;
+}
+
+.small-screen .calendar-days {
+  gap: 0.2rem;
+}
+
+.small-screen .calendar-day {
+  min-height: 35px;
+  border-radius: 4px;
+}
+
+.small-screen .day-number {
+  font-size: 0.85rem;
+}
+
+.small-screen .day-gregorian {
+  font-size: 0.55rem;
+}
+
+.small-screen .gregorian-date-display {
+  padding: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.small-screen .islamic-events {
+  padding: 0.75rem;
+}
+
+.small-screen .events-title {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.small-screen .event-item {
+  padding: 0.5rem;
+  gap: 0.5rem;
+}
+
+.small-screen .event-date {
+  font-size: 1.1rem;
+  min-width: 30px;
+}
+
+.small-screen .event-name {
+  font-size: 0.8rem;
+}
+
+/* Big Screen Mode */
+.big-screen .calendar-container {
+  padding: 20px;
+}
+
+.big-screen .calendar-title {
+  font-size: 20px;
+}
+
+.big-screen .current-month {
+  font-size: 1.5rem;
+}
+
+.big-screen .day-number {
+  font-size: 1.3rem;
+}
+
+.big-screen .day-gregorian {
+  font-size: 0.8rem;
+}
+
+.big-screen .event-date {
+  font-size: 1.8rem;
+}
+
+.big-screen .event-name {
+  font-size: 1.1rem;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .calendar-header {
+    padding-bottom: 8px;
+    min-height: 32px;
+  }
+
+  .calendar-title {
+    font-size: 16px;
+  }
+
+  .calendar-controls {
+    gap: 4px;
+  }
+
+  .control-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .calendar-content {
+    padding: 4px 0;
+    gap: 10px;
+  }
+
+  .calendar-nav {
+    padding: 10px;
+  }
+
+  .nav-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .current-month {
+    font-size: 1.1rem;
+  }
+
+  .current-year {
+    font-size: 0.85rem;
+  }
+
+  .action-btn span {
+    display: none;
+  }
+
+  .calendar-day {
+    min-height: 40px;
+  }
+
+  .day-number {
+    font-size: 1rem;
+  }
+
+  .day-gregorian {
+    font-size: 0.65rem;
+  }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+  .calendar-container {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .calendar-title {
+    font-size: 14px;
+  }
+
+  .control-btn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .control-btn i,
+  .control-btn svg {
+    font-size: 10px;
+    width: 10px;
+    height: 10px;
+  }
+
+  .calendar-content {
+    gap: 8px;
+  }
+
+  .calendar-nav {
+    padding: 8px;
+  }
+
+  .nav-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+
+  .current-month {
+    font-size: 1rem;
+  }
+
+  .current-year {
+    font-size: 0.8rem;
+  }
+
+  .calendar-grid-container {
+    padding: 0.4rem;
+  }
+
+  .calendar-weekdays {
+    gap: 0.2rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .weekday {
+    font-size: 0.7rem;
+    padding: 0.2rem 0;
+  }
+
+  .calendar-days {
+    gap: 0.2rem;
+  }
+
+  .calendar-day {
+    min-height: 35px;
+  }
+
+  .day-number {
+    font-size: 0.9rem;
+  }
+
+  .day-gregorian {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .calendar-header {
+    gap: 4px;
+  }
+
+  .calendar-title {
+    font-size: 13px;
+  }
+
+  .calendar-day {
+    min-height: 30px;
+  }
+
+  .day-number {
+    font-size: 0.85rem;
+  }
+}

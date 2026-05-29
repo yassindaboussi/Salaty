@@ -2,7 +2,7 @@
   "name": "salaty",
   "version": "1.1.0",
   "description": "Salaty Time Islamic Prayer Times Desktop App",
-  "main": "src/main/main.js",
+  "main": "src/main/index.js",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --enable-logging",
@@ -11,7 +11,10 @@
     "dist": "electron-builder --publish=never",
     "clean": "rm -rf dist",
     "lint": "eslint src/",
-    "format": "prettier --write \"src/**/*.{js,html,css}\""
+    "format": "prettier --write \"src/**/*.{js,html,css}\"",
+    "lint:main": "eslint src/main/",
+    "lint:renderer": "eslint src/renderer/",
+    "format:check": "prettier --check \"src/**/*.{js,html,css}\""
   },
   "author": {
     "name": "Yassin Daboussi",
@@ -19,9 +22,11 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "electron": "38.2.2",
-    "electron-builder": "24.13.3",
+    "@eslint/js": "^9.39.2",
+    "electron": "^42.3.0",
+    "electron-builder": "^26.8.1",
     "eslint": "^9.39.2",
+	"prettier": "^3.6.2",
     "globals": "^17.3.0"
   },
   "build": {

@@ -1,19 +1,20 @@
 {
   "city": "Tunis",
   "country": "Tunisia",
-  "theme": "ramadan",
+  "theme": "navy",
   "language": "en",
-  "position": {
-    "x": 190,
-    "y": 108
-  },
+  "position": { "x": 100, "y": 100 },
+  "bigScreen": false,
+  "openAtLogin": true,
+  "athkarAlertEnabled": false,
+  "athkarAlertInterval": 30,
+  "preAdhanNotificationEnabled": true,
+  "preAdhanMinutes": 5,
   "adhanEnabledByPrayer": {
     "Fajr": true,
     "Dhuhr": true,
     "Asr": true,
     "Maghrib": true,
     "Isha": true
-  },
-  "athkarAlertEnabled": false,
-  "athkarAlertInterval": 30
+  }
 }
