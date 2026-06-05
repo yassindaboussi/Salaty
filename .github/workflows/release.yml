@@ -34,65 +34,28 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Build and release (Linux)
+    # electron-builder --publish always will:
+    #   1. Build the installer (.exe / .dmg / .tar.gz)
+    #   2. Generate latest.yml / latest-mac.yml / latest-linux.yml
+    #   3. Upload EVERYTHING to the GitHub Release in one step
+    # This is required for electron-updater to work in packaged apps.
+
+    - name: Build and publish (Linux)
       if: matrix.os == 'ubuntu-latest'
-      run: npm run build:linux
+      run: npx electron-builder --linux --publish always
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and release (Windows)
+    - name: Build and publish (Windows)
       if: matrix.os == 'windows-latest'
-      run: npm run build
+      run: npx electron-builder --win --publish always
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and release (macOS)
+    - name: Build and publish (macOS)
       if: matrix.os == 'macos-latest'
-      run: npm run build
+      run: npx electron-builder --mac --publish always
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CSC_IDENTITY_AUTO_DISCOVERY: false
         SKIP_CODE_SIGN: true
-
-    - name: Upload artifacts (Linux)
-      if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-artifact@v4
-      with:
-        name: linux-build
-        path: dist/*.tar.gz
-
-    - name: Upload artifacts (Windows)
-      if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-build
-        path: dist/*.exe
-
-    - name: Upload artifacts (macOS)
-      if: matrix.os == 'macos-latest'
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos-build
-        path: dist/*.dmg
-
-  publish-release:
-    needs: release
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-
-    steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          linux-build/*
-          windows-build/*
-          macos-build/*
-        draft: false
-        prerelease: false
-        generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

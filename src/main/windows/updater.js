@@ -17,13 +17,25 @@ function configureAutoUpdater(getMainWindow, markQuitting) {
   autoUpdater.on("update-available", (info) =>
     getMainWindow()?.webContents.send("update-available", info),
   );
+
+  // Forward "no update" so the renderer doesn't rely on the 8-second timeout
+  autoUpdater.on("update-not-available", () =>
+    getMainWindow()?.webContents.send("update-not-available"),
+  );
+
   autoUpdater.on("download-progress", (progress) =>
     getMainWindow()?.webContents.send("download-progress", progress),
   );
+
   autoUpdater.on("update-downloaded", (info) =>
     getMainWindow()?.webContents.send("update-downloaded", info),
   );
-  autoUpdater.on("error", (err) => console.error("[Updater] Error:", err));
+
+  // Forward errors to the renderer so the UI shows "Check failed" correctly
+  autoUpdater.on("error", (err) => {
+    console.error("[Updater] Error:", err);
+    getMainWindow()?.webContents.send("update-error", err?.message || String(err));
+  });
 }
 
 function startUpdateChecks() {

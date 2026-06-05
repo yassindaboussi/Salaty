@@ -534,14 +534,9 @@ async function initAboutSection() {
     setStatus("checking", t("checkingForUpdates"));
     try {
       await ipcRenderer.invoke("check-for-updates-manual");
-      // Result arrives via IPC events; if nothing after 8s assume up-to-date
-      setTimeout(() => {
-        if (statusText && statusText.textContent === t("checkingForUpdates")) {
-          setStatus("ok", t("upToDate"));
-          checkBtn.disabled = false;
-        }
-      }, 8000);
+      // Result arrives via IPC events (update-available / update-not-available / update-error)
     } catch (_) {
+      // IPC call itself failed (main process threw before autoUpdater ran)
       setStatus("error", t("updateCheckFailed"));
       checkBtn.disabled = false;
     }
@@ -559,6 +554,18 @@ async function initAboutSection() {
       setStatus("downloading", t("downloading") + "…");
       progressWrap?.classList.remove("hidden");
     };
+  });
+
+  // No update found — show "up to date" immediately instead of waiting 8 seconds
+  ipcRenderer.on("update-not-available", () => {
+    setStatus("ok", t("upToDate"));
+    checkBtn.disabled = false;
+  });
+
+  // Updater error forwarded from main process
+  ipcRenderer.on("update-error", (_ev, _msg) => {
+    setStatus("error", t("updateCheckFailed"));
+    checkBtn.disabled = false;
   });
 
   ipcRenderer.on("download-progress", (_ev, prog) => {
