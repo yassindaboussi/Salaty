@@ -1,14 +1,16 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
   workflow_dispatch:
     inputs:
       version:
         description: 'Version to release (e.g., v1.0.0)'
         required: true
+  # Automatic releases are now handled by version-release.yml, which
+  # auto-tags from package.json on every push to main and builds +
+  # publishes the GitHub Release itself. This workflow is kept only
+  # as a manual fallback (Actions tab -> Release -> Run workflow) so
+  # the two pipelines never race to create the same tag/release.
 
 permissions:
   contents: write

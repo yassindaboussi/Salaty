@@ -3,6 +3,9 @@ name: CI
 on:
   push:
     branches: [ main, develop, feature/** ]
+    # Don't run on tag pushes (those are handled by version-release.yml)
+    tags-ignore:
+      - 'v*.*.*'
   pull_request:
     branches: [ main, develop, feature/** ]
 
