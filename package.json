@@ -4,6 +4,7 @@
   "description": "Salaty Time Islamic Prayer Times Desktop App",
   "main": "src/main/index.js",
   "scripts": {
+    "postinstall": "node scripts/fix-noble-hashes-esm.js",
     "start": "electron .",
     "dev": "electron . --enable-logging",
     "build": "electron-builder",
