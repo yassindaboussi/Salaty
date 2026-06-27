@@ -11,8 +11,8 @@ function initFeaturesPage() {
   setupConnectionRecovery(initFeaturesPage, "Features");
 
   document.getElementById("backBtn")?.addEventListener("click", () => {
-    const { width, height } = screenSizeManager.getWindowSize();
-    ipcRenderer.invoke("navigate-to", "index", width, height);
+    // Navigate back without forcing a size — home page remeasures itself via forceApplyScreenSize
+    ipcRenderer.invoke("go-back");
   });
 
   _updateText();
@@ -66,16 +66,16 @@ function _updateText() {
 // ── Card navigation ───────────────────────────────────────────────────────────
 // Keyed by data-feature attribute value (matches the HTML exactly).
 const CARD_ROUTES = {
-  quran: { page: "quran", w: 850, h: 600 },
-  athkar: { page: "athkar", w: null },
-  tasbih: { page: "tasbih", w: null },
-  asma: { page: "asma", w: null },
-  calendar: { page: "hijri-calendar", w: null },
-  playlist: { page: "albums", w: 850, h: 600 },
-  ramadhan: { page: "ramadan", w: null },
-  qibla: { page: "qibla", w: null },
-  radio: { page: "radio", w: null },
-  livestreams: { page: "livestreams", w: null },
+  quran:       { page: "quran",         w: null },
+  athkar:      { page: "athkar",        w: null },
+  tasbih:      { page: "tasbih",        w: null },
+  asma:        { page: "asma",          w: null },
+  calendar:    { page: "hijri-calendar",w: null },
+  playlist:    { page: "albums",        w: null },
+  ramadhan:    { page: "ramadan",       w: null },
+  qibla:       { page: "qibla",         w: null },
+  radio:       { page: "radio",         w: null },
+  livestreams: { page: "livestreams",   w: null },
 };
 
 function _setupCards() {
@@ -92,10 +92,10 @@ function _setupCards() {
     if (!route) return;
 
     analytics.featureOpen(route.page);
-    const size = route.w
-      ? { width: route.w, height: route.h }
-      : screenSizeManager.getWindowSize();
-    ipcRenderer.invoke("navigate-to", route.page, size.width, size.height);
+    // Always navigate without passing size — let the window keep its current size.
+    // This prevents the stale _baseHeight=null fallback (700px) from wrongly
+    // resizing the window when opening a feature page.
+    ipcRenderer.invoke("navigate-to", route.page);
   });
 }
 

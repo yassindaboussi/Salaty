@@ -39,16 +39,39 @@ function setupHandlers(mainWindow) {
   ipcMain.handle("minimize-window", () => mainWindow?.minimize());
   ipcMain.handle("close-window", () => mainWindow?.hide());
 
+  // Flag to distinguish intentional unmaximize (our resize call) from
+  // accidental unmaximize (double-click on title bar).
+  let _intentionalUnmaximize = false;
+
   ipcMain.handle("resize-window", (_e, width, height) => {
-    if (!mainWindow) return { width: 320, height: 575 };
-    mainWindow.setSize(width, height, true);
+    if (!mainWindow) return { width: 850, height: 560 };
+    if (mainWindow.isMaximized()) {
+      _intentionalUnmaximize = true;
+      mainWindow.unmaximize();
+      _intentionalUnmaximize = false;
+    }
+    mainWindow.setSize(Math.round(width), Math.round(height), false);
     return { width, height };
+  });
+
+  ipcMain.handle("maximize-window", () => {
+    if (!mainWindow) return;
+    mainWindow.maximize();
+  });
+
+  ipcMain.handle("unmaximize-window", () => {
+    if (!mainWindow) return;
+    if (mainWindow.isMaximized()) mainWindow.unmaximize();
   });
 
   // navigate-to: optionally resize then load. Renderer passes width/height when needed.
   ipcMain.handle("navigate-to", (_e, page, width, height) => {
     if (!mainWindow) return false;
-    if (width && height) mainWindow.setSize(width, height, true);
+    if (width && height) {
+      // Must unmaximize before setSize, otherwise Windows ignores the resize.
+      if (mainWindow.isMaximized()) mainWindow.unmaximize();
+      mainWindow.setSize(Math.round(width), Math.round(height), false);
+    }
     mainWindow.loadFile(pages.byName(page));
     return true;
   });

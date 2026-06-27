@@ -1,1 +1,10 @@
-{ "islamicFeatures":"المزايا الإسلامية","moreFeaturesComingSoon":"المزيد من المزايا قريباً، إن شاء الله" }
+{
+  "islamicFeatures": "المزايا الإسلامية",
+  "moreFeaturesComingSoon": "المزيد من المزايا قريباً، إن شاء الله",
+  "holyQuranDesc": "قراءة واستماع القرآن الكريم",
+  "hijriCalendarDesc": "التواريخ الهجرية والمناسبات الإسلامية",
+  "asmaDesc": "أسماء الله الحسنى التسعة والتسعون",
+  "qiblaDesc": "تحديد اتجاه القبلة",
+  "ramadhanDesc": "مواقيت الصلاة في رمضان",
+  "prayerTimesMonthlyDesc": "جدول مواقيت الصلاة الشهري"
+}

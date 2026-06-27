@@ -18,8 +18,7 @@ async function initQiblaPage() {
   setupConnectionRecovery(initQiblaPage, "Qibla");
 
   document.getElementById("backBtn")?.addEventListener("click", () => {
-    const { width, height } = screenSizeManager.getWindowSize();
-    ipcRenderer.invoke("navigate-to", "features", width, height);
+    ipcRenderer.invoke("navigate-to", "features");
   });
 
   document

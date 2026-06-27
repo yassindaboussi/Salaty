@@ -79,8 +79,7 @@ function initTasbihPage() {
   const backBtn = document.getElementById("backBtn");
   if (backBtn) {
     backBtn.addEventListener("click", () => {
-      const size = screenSizeManager.getWindowSize();
-      ipcRenderer.invoke("navigate-to", "features", size.width, size.height);
+      ipcRenderer.invoke("navigate-to", "features");
     });
   }
 

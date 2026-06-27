@@ -16,7 +16,7 @@
   "enterBothCityCountry": "Please enter both city and country",
   "screenSizeSettingLabel": "Screen Size",
   "bigScreen": "Big Screen",
-  "smallScreen": "Small Screen",
+  "smallScreen": "Full Screen",
   "notification": "Notification",
   "athkarAlerts": "Athkar Alerts (Tasbih)",
   "enableAthkarAlerts": "Enable Alerts",
@@ -27,5 +27,8 @@
   "enablePreAdhanNotification": "Enable Notification",
   "manageLocationsLabel": "Manage Saved Locations",
   "manageLocationsTitle": "Manage Locations",
-  "openAtLogin": "Launch at startup"
+  "openAtLogin": "Launch at startup",
+  "fullScreen": "Full Screen",
+  "bigScreenDimensions": "Fixed window",
+  "fullScreenDimensions": "Fills your screen"
 }

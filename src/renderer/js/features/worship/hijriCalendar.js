@@ -2,6 +2,7 @@
 const { t } = require("../../core/i18n/translations");
 const screenSizeManager = require("../../core/screenSize");
 const analytics = require("../../utils/analytics");
+const { setupConnectionRecovery } = require("../../services/connection-recovery");
 
 // Hijri month names
 const HIJRI_MONTHS = {

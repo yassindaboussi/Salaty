@@ -118,15 +118,7 @@ class AlbumsManager {
     }
 
     this.backBtn?.addEventListener("click", async () => {
-      const currentSize = screenSizeManager.isBigScreen()
-        ? { width: 850, height: 600 }
-        : { width: 320, height: 575 };
-      ipcRenderer.invoke(
-        "navigate-to",
-        "features",
-        currentSize.width,
-        currentSize.height,
-      );
+      ipcRenderer.invoke("navigate-to", "features");
     });
 
     this.searchInput?.addEventListener("input", () => {
@@ -135,33 +127,7 @@ class AlbumsManager {
   }
 
   toggleScreenSize() {
-    const isCurrentlyBig = document.body.dataset.screenSize === "big";
-    if (isCurrentlyBig) {
-      // Switch FROM big TO small screen
-      ipcRenderer.invoke("resize-window", 320, 575);
-      document.body.dataset.screenSize = "small";
-      document.body.classList.remove("big-screen");
-      document.body.classList.add("small-screen");
-      document
-        .querySelector(".playlist-container")
-        ?.classList.remove("big-screen");
-      document
-        .querySelector(".playlist-container")
-        ?.classList.add("small-screen");
-    } else {
-      // Switch FROM small TO big screen
-      ipcRenderer.invoke("resize-window", 850, 600);
-      document.body.dataset.screenSize = "big";
-      document.body.classList.remove("small-screen");
-      document.body.classList.add("big-screen");
-      document
-        .querySelector(".playlist-container")
-        ?.classList.remove("small-screen");
-      document
-        .querySelector(".playlist-container")
-        ?.classList.add("big-screen");
-    }
-
+    screenSizeManager.toggleScreenSize("albums-container");
     this.updateScreenSizeButton();
   }
 

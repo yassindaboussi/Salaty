@@ -20,6 +20,7 @@ const {
 } = require("../../utils/dateUtils");
 const { state, prayerIcons } = require("../../core/globalStore");
 const { updateRamadanCountdown } = require("./ramadan");
+const screenSizeManager = require("../../core/screenSize");
 
 let prayerData = null;
 let currentActivePrayer = null;
@@ -61,7 +62,6 @@ function updatePrayerUI() {
 }
 
 function _renderPrayerUI() {
-  if (!prayerData) return;
 
   const lang = getLanguage();
   _setText("location", `${state.settings.city}, ${state.settings.country}`);
@@ -96,8 +96,10 @@ function _renderPrayerUI() {
           html += `<div class="event-note"><i class="fas fa-info-circle"></i> ${note}</div>`;
         textEl.innerHTML = html;
         banner.style.display = "flex";
+        screenSizeManager.setBannerVisible(true);
       } else {
         banner.style.display = "none";
+        screenSizeManager.setBannerVisible(false);
       }
     }
   }

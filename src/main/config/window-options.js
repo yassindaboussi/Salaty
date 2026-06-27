@@ -3,16 +3,17 @@
 const { PRELOAD_ENTRY, icons } = require("./paths");
 
 function createMainWindowOptions(settings = {}) {
-  const useBigScreen = settings.bigScreen || false;
+  // bigScreen:true = 850px wide, bigScreen:false = maximized fullscreen
+  const useBigScreen = settings.bigScreen !== false; // default to big
 
   return {
-    width: useBigScreen ? 850 : 320,
-    height: useBigScreen ? 600 : 575,
-    minWidth: 320,
-    minHeight: 575,
+    width: 850,
+    height: 560,
+    minWidth: 400,
+    minHeight: 400,
     frame: false,
     transparent: false,
-    backgroundColor: "#0b1220",
+    backgroundColor: "#060c18",
     resizable: true,
     alwaysOnTop: false,
     x: settings.position?.x ?? 100,

@@ -2,10 +2,19 @@
   "quran": "Quran",
   "holyQuran": "Holy Quran",
   "loadingQuran": "Loading Quran...",
-  "listenReadQuran": "Listen, read and reflect on the Holy Quran",
+  "listenReadQuran": "Read and reflect on the Holy Quran",
   "enterFullscreen": "Enter Fullscreen",
   "exitFullscreen": "Exit Fullscreen",
-  "quranError": "Error loading Quran. Please check your connection.",
+  "quranError": "Failed to load. Please check your internet connection.",
   "refreshQuran": "Refresh Quran",
-  "quranDesc": "Listen, read and reflect"
+  "quranDesc": "Read and reflect",
+  "surah": "Surah",
+  "juz": "Juz",
+  "verses": "verses",
+  "searchSurah": "Search surah...",
+  "fontSize": "Font Size",
+  "translation": "Translation",
+  "retry": "Retry",
+  "noResults": "No surahs found",
+  "startingFrom": "Starting from"
 }

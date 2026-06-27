@@ -167,9 +167,9 @@ async function initHomePage() {
   // Navigation — resize then navigate in a single IPC call via 'navigate-to'
   // which the main process handles. No sequential awaits.
   const navigateTo = (page) => {
-    // Single IPC call — main process handles resize + loadFile atomically.
-    const { width, height } = screenSizeManager.getWindowSize();
-    ipcRenderer.invoke("navigate-to", page, width, height);
+    // Navigate without forcing a size — the destination page will
+    // resize itself (settings/features use current window size).
+    ipcRenderer.invoke("navigate-to", page);
   };
 
   document.getElementById("mainSettingsBtn")?.addEventListener("click", () => {
@@ -202,6 +202,7 @@ async function initHomePage() {
   // Banner close
   document.getElementById("closeEventBanner")?.addEventListener("click", () => {
     document.getElementById("eventsBanner").style.display = "none";
+    screenSizeManager.setBannerVisible(false);
   });
 
   // Set loading text
@@ -215,10 +216,14 @@ async function initHomePage() {
   // Fetch prayer data in the background. The page is already visible.
   await loadPrayerTimes();
 
-  // Start the 1-second tick for the countdown.
+  // Render prayer cards FIRST (updateCurrentAndNextPrayer fills #prayerCards),
+  // THEN measure — otherwise cards=20px (empty placeholder height).
   if (_prayerTick) clearInterval(_prayerTick);
   _prayerTick = setInterval(updateCurrentAndNextPrayer, 1000);
   updateCurrentAndNextPrayer();
+
+  // Now ALL content is rendered. Measure and resize to fit perfectly.
+  await screenSizeManager.forceApplyScreenSize();
 
   // Location-change events (from settings save or location switcher)
   ipcRenderer.removeAllListeners("location-changed");

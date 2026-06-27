@@ -30,8 +30,7 @@ function initRadioPage() {
   if (backBtn) {
     backBtn.addEventListener("click", () => {
       stopPlayback();
-      const size = screenSizeManager.getWindowSize();
-      ipcRenderer.invoke("navigate-to", "features", size.width, size.height);
+      ipcRenderer.invoke("navigate-to", "features");
     });
   }
 

@@ -110,7 +110,9 @@ function updateAllText() {
     themeLabel: "theme",
     languageLabel: "language",
     screenSizeSettingLabel: "screenSizeSettingLabel",
-    smallScreenLabel: "smallScreen",
+    smallScreenLabel: "fullScreen",
+    bigScreenDimensions: "bigScreenDimensions",
+    fullScreenDimensions: "fullScreenDimensions",
     bigScreenLabel: "bigScreen",
 
     // Notifications Section
@@ -288,12 +290,12 @@ function initScreenSizeSetting() {
 
   const sizeCards = sizeContainer.querySelectorAll(".size-card");
 
-  // Set initial selection
+  // Set initial selection: fullscreen = !bigScreen, big = bigScreen
   sizeCards.forEach((card) => {
     const size = card.dataset.size;
     if (
       (size === "big" && state.settings.bigScreen) ||
-      (size === "small" && !state.settings.bigScreen)
+      (size === "fullscreen" && !state.settings.bigScreen)
     ) {
       card.classList.add("selected");
     } else {
@@ -425,7 +427,7 @@ async function saveSettings() {
   const selectedSizeCard = document.querySelector(".size-card.selected");
   const selectedSize = selectedSizeCard
     ? selectedSizeCard.dataset.size
-    : "small";
+    : "big";
 
   const city = cityInput ? cityInput.value.trim() : "";
   const country = countryInput ? countryInput.value.trim() : "";

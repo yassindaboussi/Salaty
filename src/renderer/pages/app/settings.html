@@ -278,25 +278,6 @@
               <div class="screen-size-grid" id="screenSizeOptions">
                 <div
                   class="size-card"
-                  data-size="small"
-                  role="button"
-                  aria-label="Small Screen"
-                >
-                  <div class="size-icon">
-                    <i class="fas fa-mobile-alt"></i>
-                  </div>
-                  <div class="size-info">
-                    <span class="size-name" id="smallScreenLabel"
-                      >Small Screen</span
-                    >
-                    <span class="size-dimensions">320×575</span>
-                  </div>
-                  <div class="size-check">
-                    <i class="fas fa-check"></i>
-                  </div>
-                </div>
-                <div
-                  class="size-card"
                   data-size="big"
                   role="button"
                   aria-label="Big Screen"
@@ -308,7 +289,26 @@
                     <span class="size-name" id="bigScreenLabel"
                       >Big Screen</span
                     >
-                    <span class="size-dimensions">850×600</span>
+                    <span class="size-dimensions" id="bigScreenDimensions">Fixed window</span>
+                  </div>
+                  <div class="size-check">
+                    <i class="fas fa-check"></i>
+                  </div>
+                </div>
+                <div
+                  class="size-card"
+                  data-size="fullscreen"
+                  role="button"
+                  aria-label="Full Screen"
+                >
+                  <div class="size-icon">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                  </div>
+                  <div class="size-info">
+                    <span class="size-name" id="smallScreenLabel"
+                      >Full Screen</span
+                    >
+                    <span class="size-dimensions" id="fullScreenDimensions">Fills your screen</span>
                   </div>
                   <div class="size-check">
                     <i class="fas fa-check"></i>

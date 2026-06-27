@@ -23,13 +23,7 @@ function initLiveStreamsPage() {
   if (backBtn) {
     backBtn.addEventListener("click", () => {
       stopAllStreams();
-      const currentSize = screenSizeManager.getWindowSize();
-      ipcRenderer.invoke(
-        "navigate-to",
-        "features",
-        currentSize.width,
-        currentSize.height,
-      );
+      ipcRenderer.invoke("navigate-to", "features");
     });
   }
 

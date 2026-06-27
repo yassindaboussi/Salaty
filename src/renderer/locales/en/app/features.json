@@ -1,1 +1,10 @@
-{ "islamicFeatures": "Islamic Features", "moreFeaturesComingSoon": "More features coming soon, In Sha Allah" }
+{
+  "islamicFeatures": "Islamic Features",
+  "moreFeaturesComingSoon": "More features coming soon, In Sha Allah",
+  "holyQuranDesc": "Read & listen to the Quran",
+  "hijriCalendarDesc": "Hijri dates & Islamic events",
+  "asmaDesc": "99 Names of Allah",
+  "qiblaDesc": "Find the Qibla direction",
+  "ramadhanDesc": "Ramadan prayer times",
+  "prayerTimesMonthlyDesc": "Monthly prayer schedule"
+}

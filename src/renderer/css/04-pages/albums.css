@@ -1,13 +1,5 @@
 /* Albums Page CSS */
 
-.app-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  color: var(--text-primary);
-  transition: background 0.3s ease;
-}
-
 .albums-container {
   height: 100%;
   display: flex;

@@ -27,8 +27,23 @@ function createMainWindow({ onCloseToTray } = {}) {
   mainWindow.on("minimize", () => {
     if (playerManager.getIsPlayerPlaying()) playerManager.showMiniPlayer();
   });
+
+  // Prevent double-click on title bar from unmaximizing.
+  // save-settings is called BEFORE resize-window in toggleScreenSize(),
+  // so getSettingsData() always reflects the correct intended state here.
+  mainWindow.on("unmaximize", () => {
+    setImmediate(() => {
+      const s = ipcHandlers.getSettingsData();
+      if (!s.bigScreen) {
+        // Still in fullscreen mode → double-click triggered this. Re-maximize.
+        mainWindow.maximize();
+      }
+      // bigScreen=true → triggered by our compress button. Let it stay unmaximized.
+    });
+  });
   mainWindow.on("restore", () => playerManager.getPlayerWindow()?.hide());
   mainWindow.on("show", () => playerManager.getPlayerWindow()?.hide());
+
   mainWindow.on("moved", () => {
     const [x, y] = mainWindow.getPosition();
     ipcHandlers.savePosition(x, y);
@@ -37,6 +52,11 @@ function createMainWindow({ onCloseToTray } = {}) {
   if (onCloseToTray) mainWindow.on("close", onCloseToTray);
 
   mainWindow.loadFile(pages.index);
+
+  // If fullscreen mode, maximize after page loads
+  if (!settings.bigScreen) {
+    mainWindow.once("ready-to-show", () => mainWindow.maximize());
+  }
 
   return mainWindow;
 }

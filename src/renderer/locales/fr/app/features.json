@@ -1,1 +1,10 @@
-{ "islamicFeatures":"Fonctionnalités Islamiques","moreFeaturesComingSoon":"Plus de fonctionnalités bientôt, In Sha Allah" }
+{
+  "islamicFeatures": "Fonctionnalités Islamiques",
+  "moreFeaturesComingSoon": "Plus de fonctionnalités bientôt, In Sha Allah",
+  "holyQuranDesc": "Lire et écouter le Coran",
+  "hijriCalendarDesc": "Dates hijri et événements islamiques",
+  "asmaDesc": "99 noms d'Allah",
+  "qiblaDesc": "Trouver la direction de la Qibla",
+  "ramadhanDesc": "Horaires de prière du Ramadan",
+  "prayerTimesMonthlyDesc": "Horaires mensuels de prière"
+}

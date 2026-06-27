@@ -231,16 +231,15 @@
 .prayer-cards-container {
   display: flex;
   gap: 12px;
-  padding: 12px 16px;
-  margin-bottom: 1px;
+  padding: 10px 16px;
+  margin-bottom: 0;
 }
 
 /* Prayer Times List */
 .prayer-times {
   padding: 0 16px 16px;
-  flex: 1; /* fill remaining vertical space in the flex column */
-  overflow-y: auto; /* scroll internally — no window resize needed */
-  min-height: 0; /* allow flex child to shrink below content size */
+  overflow-y: visible;
+  min-height: 0;
 }
 
 /* Settings Container */
@@ -413,3 +412,69 @@
   display: flex;
   flex-direction: column;
 }
+
+
+
+/* ── Fullscreen mode: fill all vertical space ───────────────────────────────── */
+body.fullscreen-mode #app.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Prayer cards: flexible — takes ~30% of screen height */
+body.fullscreen-mode #prayerCards {
+  flex: 3 1 0;
+  min-height: 0;
+  padding: 12px 24px;
+  gap: 16px;
+}
+
+/* Each card fills its half */
+body.fullscreen-mode .prayer-card {
+  flex: 1;
+  min-height: 0;
+  justify-content: center;
+}
+
+/* Prayer list: takes ~70% of remaining space */
+body.fullscreen-mode #prayerTimes {
+  flex: 7 1 0;
+  min-height: 0;
+  padding: 0 24px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Prayer list fills vertically — items stretch to fill */
+body.fullscreen-mode #prayerList {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 0;
+}
+
+/* Each prayer row grows to fill its share — constrained max height */
+body.fullscreen-mode .prayer-item {
+  flex: 1;
+  max-height: 80px;
+  margin: 3px 0;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+}
+
+body.fullscreen-mode .prayer-item .prayer-name { font-size: 16px; font-weight: 600; }
+body.fullscreen-mode .prayer-item .prayer-time { font-size: 15px; font-weight: 600; }
+body.fullscreen-mode .prayer-item i { width: 32px; height: 32px; font-size: 15px; }
+body.fullscreen-mode .adhan-toggle-btn { width: 32px; height: 32px; }
+body.fullscreen-mode .current-indicator { font-size: 11px; padding: 2px 7px; }
+
+/* Prayer cards text stays readable but compact */
+body.fullscreen-mode .prayer-card .prayer-label { font-size: 13px; }
+body.fullscreen-mode .prayer-card .prayer-name  { font-size: 22px; margin: 4px 0; }
+body.fullscreen-mode .prayer-card .prayer-time  { font-size: 28px; margin-bottom: 4px; }
+body.fullscreen-mode .prayer-card .countdown    { font-size: 18px; }
+body.fullscreen-mode .prayer-card .time-remaining { font-size: 12px; }
+body.fullscreen-mode .location { font-size: 20px; }

@@ -1,1 +1,20 @@
-{ "quran":"القرآن","holyQuran":"القرآن الكريم","loadingQuran":"جاري تحميل القرآن...","listenReadQuran":"استمع، اقرأ وتفكر في القرآن الكريم","enterFullscreen":"شاشة كاملة","exitFullscreen":"خروج من الشاشة الكاملة","quranError":"خطأ في تحميل القرآن. يرجى التحقق من اتصالك بالإنترنت.","refreshQuran":"تحديث القرآن","quranDesc":"استمع، اقرأ وتفكر" }
+{
+  "quran": "القرآن",
+  "holyQuran": "القرآن الكريم",
+  "loadingQuran": "جاري تحميل القرآن...",
+  "listenReadQuran": "اقرأ وتدبّر القرآن الكريم",
+  "enterFullscreen": "شاشة كاملة",
+  "exitFullscreen": "خروج من الشاشة الكاملة",
+  "quranError": "فشل التحميل. يرجى التحقق من اتصالك بالإنترنت.",
+  "refreshQuran": "تحديث",
+  "quranDesc": "اقرأ وتدبّر",
+  "surah": "سورة",
+  "juz": "جزء",
+  "verses": "آية",
+  "searchSurah": "ابحث عن سورة...",
+  "fontSize": "حجم الخط",
+  "translation": "الترجمة",
+  "retry": "إعادة المحاولة",
+  "noResults": "لم يتم العثور على سور",
+  "startingFrom": "تبدأ من"
+}

@@ -22,13 +22,7 @@ function initRamadanPage() {
   const backBtn = document.getElementById("backBtn");
   if (backBtn) {
     backBtn.addEventListener("click", () => {
-      const currentSize = screenSizeManager.getWindowSize();
-      ipcRenderer.invoke(
-        "navigate-to",
-        "features",
-        currentSize.width,
-        currentSize.height,
-      );
+      ipcRenderer.invoke("navigate-to", "features");
     });
   }
 
