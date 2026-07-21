@@ -2,107 +2,140 @@
 
 # 🕌 Salaty Time
 
-### Modern Islamic Prayer Times — Desktop App
+تطبيق سطح مكتب إسلامي شامل — مواقيت الصلاة، القرآن الكريم، الأذكار وأدوات أخرى، في تطبيق واحد خفيف
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Electron-42.x-47848F?logo=electron&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue"/>
-  <img src="https://img.shields.io/badge/Version-1.1.2-green"/>
-  <img src="https://img.shields.io/badge/License-MIT-yellow"/>
-</p>
-
-A lightweight Electron.js app that keeps you connected to your faith — prayer times, Quran, Athkar, and more. **Crafted with ❤️ for the Muslim Ummah.**
+[![Version](https://img.shields.io/badge/version-1.1.4-yellow)](https://github.com/yassindaboussi/Salaty/releases)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational)](#-التشغيل-والتطوير)
 
 </div>
 
 ---
 
-## 📸 Preview
+## 📑 المحتويات
 
-| Navy Theme | Royal Theme | Ramadhan Theme |
-|:---:|:---:|:---:|
-| <img src="https://github.com/user-attachments/assets/21a3f9b8-fe95-4836-9ab7-54056a42fd94" width="260"/> | <img src="https://github.com/user-attachments/assets/493825df-7382-4c4f-990b-99c73557c18d" width="260"/> | <img src="https://github.com/user-attachments/assets/07b645f7-e90b-43b4-92f2-c14cf47c8a21" width="260"/> |
-
-| Settings | Themes | Quran Reader |
-|:---:|:---:|:---:|
-| <img src="https://github.com/user-attachments/assets/3c14a19d-df48-48b6-b232-437c324aa833" width="260"/> | <img src="https://github.com/user-attachments/assets/9e9b90d5-8008-4aaa-a567-a9f019292d5c" width="260"/> | <img src="https://github.com/user-attachments/assets/5fa956fa-89c6-456f-911c-f6033ec1a3d2" width="260"/> |
+- [نظرة عامة](#-نظرة-عامة)
+- [لقطات من التطبيق](#-لقطات-من-التطبيق)
+- [المميزات](#-المميزات)
+- [التقنيات المستخدمة](#️-التقنيات-المستخدمة)
+- [هيكلة المشروع](#-هيكلة-المشروع)
+- [التشغيل والتطوير](#-التشغيل-والتطوير)
+- [المساهمة في المشروع](#-المساهمة-في-المشروع)
+- [الترخيص](#-الترخيص)
 
 ---
 
-## ✨ Features
+## 🌙 نظرة عامة
 
-| Category | What you get |
+تطبيق سطح مكتب يجمع أهم الأشياء اللي يحتاجها المسلم يوميًا في مكان واحد: مواقيت الصلاة، قارئ قرآن، أرشيف صوتي فيه تلاوات وتدبر وتفاسير، أذكار، وأدوات إسلامية متنوعة. يدعم العربية والإنجليزية والفرنسية، وأغلب الميزات المهمة تشتغل حتى بدون إنترنت.
+
+---
+
+## 📸 لقطات من التطبيق
+
+<div align="center">
+<img src="screenshots/quran-surah-list.png" width="45%" />
+<img src="screenshots/quran-reader.png" width="45%" />
+<br/>
+<img src="screenshots/audio-archive.png" width="45%" />
+<img src="screenshots/audio-archive-tafsir.png" width="45%" />
+<br/>
+<img src="screenshots/settings-about.png" width="45%" />
+<img src="screenshots/settings-appearance.png" width="45%" />
+</div>
+
+---
+
+## ✨ المميزات
+
+### 🕌 مواقيت الصلاة
+- كشف تلقائي للموقع عند بدء التشغيل (يمكن تعطيله)، مع دعم حفظ أكثر من موقع
+- تنبيه صوتي (أذان) عند دخول الوقت، وتنبيه اختياري قبل الأذان بعدد دقائق تختاره
+- ودجت صغير على سطح المكتب يعرض الوقت المتبقي للصلاة القادمة
+
+### 📖 القرآن الكريم
+- قارئ يعرض الآيات بشكل متصل بخط المصحف، بدل بطاقة لكل آية
+- ترجمات إنجليزية وفرنسية، مع خيار عرض الترجمة فقط بدون النص العربي
+- نسخة كاملة من القرآن محفوظة داخل التطبيق، تُستخدم تلقائيًا لو ما كان عندك إنترنت
+- تحكم في حجم الخط ووضع ملء الشاشة
+
+### 🎧 أرشيف الصوتيات
+- تلاوة القرآن: أكثر من 200 قارئ، مرتبين أبجديًا مع فهرس للتنقل السريع
+- تدبر: وقفات تدبرية صوتية لكل سورة
+- تفاسير: كتب تفسير صوتية (زي تفسير الطبري) مرتبة حسب السورة
+
+### 🤲 عبادات وأدوات إسلامية
+- أذكار الصباح والمساء مع تنبيهات دورية 📿
+- سبحة إلكترونية 🔢
+- أسماء الله الحسنى 🌟
+- التقويم الهجري 🗓️
+- اتجاه القبلة 🧭
+- أدوات خاصة برمضان 🌙
+- راديو إسلامي وبث مباشر 📻
+
+### ⚙️ إعدادات
+- 12 سمة ألوان
+- 3 لغات (عربي، إنجليزي، فرنسي)
+- حفظ تلقائي لكل التغييرات بدون زر "حفظ"
+- تحقق من التحديثات داخل التطبيق
+
+---
+
+## 🛠️ التقنيات المستخدمة
+
+| الفئة | التقنية |
 |---|---|
-| 🕐 **Prayer Times** | Accurate times via Aladhan API · live countdown · auto-refresh at midnight |
-| 🔔 **Adhan Alerts** | Per-prayer Adhan audio · pre-prayer reminders · mute individual prayers |
-| 📍 **Locations** | Save unlimited locations · quick-switch · IP-based auto-detection |
-| 📖 **Quran** | Full 114 Surahs · adjustable font size · beautiful reading layout |
-| 🌸 **Athkar** | Morning & evening Dhikr · digital counter · pop-up reminders |
-| 🧭 **Qibla** | Interactive map · precise angle calculation |
-| 📿 **Tasbih** | Digital counter with stats and reset |
-| 🕋 **Asma ul-Husna** | All 99 Names with meanings |
-| 🌙 **Ramadhan** | Iftar & Suhoor tracker · special Ramadhan theme |
-| 📻 **Radio & Media** | Quran radio stations · audio albums · live Islamic streams |
-| 🎨 **Themes** | 12 built-in themes (Navy, Gold, Emerald, Ramadhan…) |
-| 🌍 **Languages** | Arabic 🇸🇦 · English 🇬🇧 · French 🇫🇷 — switch without restarting |
-| 🖥️ **Desktop** | System tray · prayer widget · auto-start · auto-updates |
+| تطبيق سطح المكتب | Electron |
+| الواجهة | HTML / CSS / JavaScript (بدون framework) |
+| بيانات القرآن | AlQuran Cloud API + نسخة محلية احتياطية |
+| الصوتيات | mp3quran.net API |
+| البناء والتوزيع | electron-builder |
 
 ---
 
-## 🚀 Getting Started
+## 📂 هيكلة المشروع
 
-**Requirements:** Node.js 18+ · npm 9+
-
-```bash
-# Clone & install
-git clone https://github.com/yassindaboussi/Salaty.git
-cd Salaty
-npm install
-
-# Run
-npm start
-
-# Build installer
-npm run dist
+```
+src/
+├── main/            # عملية Electron الرئيسية (النوافذ، IPC، الإعدادات)
+├── preload/          # سكربتات الجسر بين الواجهة والنظام
+└── renderer/
+    ├── pages/         # صفحات HTML
+    ├── js/            # منطق كل صفحة وميزة
+    ├── css/           # الأنماط
+    ├── data/           # بيانات محلية (القرآن، الأذكار...)
+    ├── locales/        # ملفات الترجمة (ar / en / fr)
+    └── fonts/          # الخطوط المرفقة
 ```
 
-> **Windows:** Download the `.exe` installer from [Releases](https://github.com/yassindaboussi/Salaty/releases)  
-> **Linux:** Download the `.AppImage` or `.deb` package
+---
+
+## 🚀 التشغيل والتطوير
+
+```bash
+npm install            # تثبيت الاعتماديات
+npm run dev              # تشغيل التطبيق في وضع التطوير
+npm run build             # بناء نسخة التثبيت
+npm run build:linux         # بناء نسخة Linux فقط
+npm run lint               # فحص الكود
+npm run format              # تنسيق الكود تلقائيًا
+```
 
 ---
 
-## 🛠️ Tech Stack
+## 🤝 المساهمة في المشروع
 
-| Layer | Tech |
-|---|---|
-| Desktop | Electron 42.x |
-| Prayer Data | Aladhan API |
-| Maps | Leaflet.js |
-| Audio | Howler.js |
-| Updates | electron-updater |
+1. 🍴 Fork → branch جديد → عدّل الكود → Pull Request
+2. 🐛 عندك bug أو فكرة؟ افتح [Issue](https://github.com/yassindaboussi/Salaty/issues) أو ناقشها في [Discussions](https://github.com/yassindaboussi/Salaty/discussions)
 
 ---
 
-## 🤝 Contributing
+## 📄 الترخيص
 
-1. Fork → branch → code → PR
-2. Bugs & ideas → [Issues](https://github.com/yassindaboussi/Salaty/issues) / [Discussions](https://github.com/yassindaboussi/Salaty/discussions)
-3. Translations always welcome 🌍
-
----
-
-## 📬 Contact
-
-📧 salatytime@gmail.com · 🌐 [Website](https://yassindaboussi.github.io/Salaty)
-
----
+مرخّص تحت MIT — راجع ملف [LICENSE](LICENSE).
 
 <div align="center">
 
-*May Allah accept this effort and benefit the Muslim Ummah* 🤲
-
-**⭐ Star the repo if it helps you!**
-
-`v1.1.2` · MIT License · Last updated May 2026
+صُنع بـ ❤️ من طرف [Yassin Daboussi](mailto:salatytime@gmail.com)
 
 </div>
