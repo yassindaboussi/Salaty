@@ -1,5 +1,5 @@
 // src/renderer/js/settings.js
-const { ipcRenderer } = require("electron");
+const { ipcRenderer, shell } = require("electron");
 const {
   setupConnectionRecovery,
 } = require("../../services/connection-recovery");
@@ -59,7 +59,12 @@ function initSettingsPage() {
   setupConnectionRecovery(() => {
     initSettingsPage();
   }, "Settings");
-  initSelectLocation();
+  initSelectLocation((location) => {
+    if (!location?.country || !location?.city) return;
+    state.settings.country = location.country;
+    state.settings.city = location.city;
+    persistSettings();
+  });
   initLocationManagementUI();
   initAboutSection();
 
@@ -71,12 +76,6 @@ function initSettingsPage() {
     });
   }
 
-  // Setup save button
-  const saveBtn = document.getElementById("saveBtn");
-  if (saveBtn) {
-    saveBtn.addEventListener("click", saveSettings);
-  }
-
   // Sync pendingTheme with current theme
   pendingTheme = state.settings.theme || "navy";
 
@@ -86,6 +85,7 @@ function initSettingsPage() {
   initLanguageSelection();
   initAthkarAlerts();
   initPreAdhanNotification();
+  initTravelModeToggle();
   initScreenSizeSetting();
   initTestPopupButtons();
 }
@@ -104,29 +104,25 @@ function updateAllText() {
     cityLabel: "city",
     detectLocationLabel: "detectLocation",
     manageLocationsLabel: "manageLocationsLabel",
+    travelModeLabel: "travelModeLabel",
+    travelModeDescription: "travelModeDescription",
 
     // Appearance Section
-    appearanceSectionTitle: "theme",
+    appearanceSectionTitle: "appearance",
     themeLabel: "theme",
     languageLabel: "language",
     screenSizeSettingLabel: "screenSizeSettingLabel",
     smallScreenLabel: "fullScreen",
-    bigScreenDimensions: "bigScreenDimensions",
-    fullScreenDimensions: "fullScreenDimensions",
     bigScreenLabel: "bigScreen",
 
     // Notifications Section
     notificationsSectionTitle: "notification",
     athkarAlertsLabel: "athkarAlerts",
     enableAthkarAlertsLabel: "enableAthkarAlerts",
-    athkarIntervalLabel: "athkarInterval",
     minutesLabel: "minutes",
     preAdhanNotificationLabel: "preAdhanNotification",
     enablePreAdhanNotificationLabel: "enablePreAdhanNotification",
-    preAdhanMinutesLabel: "minutesBeforeAdhan",
     minutesLabel2: "minutes",
-
-    saveBtn: "save",
 
     // Footer
     footerText: "madeWith",
@@ -146,6 +142,8 @@ function updateAllText() {
     aboutSectionTitle: "aboutTitle",
     aboutCheckLabel: "checkForUpdates",
     aboutInstallLabel: "restartAndInstall",
+    aboutTagline: "aboutTagline",
+    aboutGithubLabel: "viewOnGithub",
   };
 
   for (const [id, key] of Object.entries(textElements)) {
@@ -209,6 +207,7 @@ function initThemeSelection() {
     // Add click handler
     card.addEventListener("click", () => {
       pendingTheme = theme;
+      state.settings.theme = theme;
 
       // Update visual selection
       themeCards.forEach((c) => c.classList.remove("selected"));
@@ -216,6 +215,10 @@ function initThemeSelection() {
 
       // Apply theme preview
       applyTheme(pendingTheme);
+
+      // Persist immediately — theme is a simple preference, not a form
+      // field that needs review before saving.
+      persistSettings();
     });
   });
 }
@@ -277,6 +280,9 @@ function initLanguageSelection() {
       // Apply language direction and update UI
       applyLanguageDirection();
       updateAllText();
+
+      // Persist immediately
+      persistSettings();
     });
   });
 }
@@ -303,13 +309,18 @@ function initScreenSizeSetting() {
     }
 
     // Add click handler
-    card.addEventListener("click", () => {
+    card.addEventListener("click", async () => {
       const newSize = card.dataset.size;
       state.settings.bigScreen = newSize === "big";
 
       // Update visual selection
       sizeCards.forEach((c) => c.classList.remove("selected"));
       card.classList.add("selected");
+
+      // Persist immediately and actually resize the window now, instead of
+      // waiting for a "Save" click.
+      await persistSettings();
+      await screenSizeManager.applyScreenSize();
     });
   });
 }
@@ -343,7 +354,52 @@ function initAthkarAlerts() {
   updateUI();
 
   // Listen for changes
-  toggle.addEventListener("change", updateUI);
+  toggle.addEventListener("change", () => {
+    updateUI();
+    state.settings.athkarAlertEnabled = toggle.checked;
+    persistSettings();
+  });
+
+  intervalInput.addEventListener("change", () => {
+    const v = parseInt(intervalInput.value);
+    state.settings.athkarAlertInterval = isNaN(v) || v < 1 ? 30 : v;
+    // Debounced: the +/- spinner can fire this rapidly while held down.
+    scheduleAutoSave();
+  });
+}
+
+/**
+ * Initialize Auto-Detect Location (travel mode) toggle.
+ * Controls whether the app silently checks the IP-based location on launch
+ * and prompts to switch when it differs from the active saved location.
+ */
+function initTravelModeToggle() {
+  const toggle = document.getElementById("travelModeToggle");
+  if (!toggle) return;
+
+  // Default to enabled (preserves existing behavior for users who haven't
+  // set this yet).
+  toggle.checked = state.settings.travelMode !== false;
+
+  // Persist immediately on change. Unlike city/theme/etc., which are part
+  // of a form that needs an explicit "Save", a simple on/off toggle is
+  // expected to take effect (and be remembered) right away — otherwise
+  // navigating back without pressing "Save" silently discards it, which is
+  // exactly the bug reported: toggle it off, leave the page, come back,
+  // and it looks re-enabled.
+  toggle.addEventListener("change", async () => {
+    state.settings.travelMode = toggle.checked;
+    try {
+      await ipcRenderer.invoke("toggle-travel-mode", toggle.checked);
+      showToast(
+        toggle.checked ? t("travelModeEnabled") : t("travelModeDisabled"),
+        "success",
+      );
+    } catch (err) {
+      console.error("Failed to save travel mode setting:", err);
+      analytics.error("travel_mode_toggle", err.message || String(err));
+    }
+  });
 }
 
 /**
@@ -375,7 +431,18 @@ function initPreAdhanNotification() {
   updateUI();
 
   // Listen for changes
-  toggle.addEventListener("change", updateUI);
+  toggle.addEventListener("change", () => {
+    updateUI();
+    state.settings.preAdhanNotificationEnabled = toggle.checked;
+    persistSettings();
+  });
+
+  minutesInput.addEventListener("change", () => {
+    const v = parseInt(minutesInput.value);
+    state.settings.preAdhanMinutes = isNaN(v) || v < 1 ? 5 : v;
+    // Debounced: the +/- spinner can fire this rapidly while held down.
+    scheduleAutoSave();
+  });
 }
 
 /**
@@ -415,60 +482,29 @@ async function initTestPopupButtons() {
 }
 
 /**
- * Save all settings
+ * Persist the current state.settings to disk immediately. Used by controls
+ * that change infrequently (theme, language, screen size, toggles) so the
+ * change is never lost, unlike the old flow where navigating away without
+ * pressing "Save" silently discarded everything.
  */
-async function saveSettings() {
-  const cityInput = document.getElementById("cityInput");
-  const countryInput = document.getElementById("countryInput");
-  const athkarToggle = document.getElementById("athkarAlertsToggle");
-  const athkarInput = document.getElementById("athkarIntervalInput");
-  const preAdhanToggle = document.getElementById("preAdhanNotificationToggle");
-  const preAdhanInput = document.getElementById("preAdhanMinutesInput");
-  const selectedSizeCard = document.querySelector(".size-card.selected");
-  const selectedSize = selectedSizeCard
-    ? selectedSizeCard.dataset.size
-    : "big";
-
-  const city = cityInput ? cityInput.value.trim() : "";
-  const country = countryInput ? countryInput.value.trim() : "";
-
-  if (!city || !country) {
-    showToast(t("enterBothCityCountry"), "error");
-    return;
-  }
-
+async function persistSettings() {
   try {
-    state.settings.city = city;
-    state.settings.country = country;
-    state.settings.theme = pendingTheme;
-    state.settings.bigScreen = selectedSize === "big";
-
-    if (athkarToggle) state.settings.athkarAlertEnabled = athkarToggle.checked;
-    if (athkarInput) {
-      let v = parseInt(athkarInput.value);
-      state.settings.athkarAlertInterval = isNaN(v) || v < 1 ? 30 : v;
-    }
-    if (preAdhanToggle)
-      state.settings.preAdhanNotificationEnabled = preAdhanToggle.checked;
-    if (preAdhanInput) {
-      let v = parseInt(preAdhanInput.value);
-      state.settings.preAdhanMinutes = isNaN(v) || v < 1 ? 5 : v;
-    }
-
     await ipcRenderer.invoke("save-settings", state.settings);
-
-    // ── Track settings save with preference snapshot ─────────────────────────
     analytics.settingsSaved(state.settings); // ← ANALYTICS
-    // ────────────────────────────────────────────────────────────────────────
-
-    await screenSizeManager.applyScreenSize();
-    showToast(t("settingsSaved"), "success");
-    setTimeout(() => ipcRenderer.invoke("go-back"), 1500);
   } catch (err) {
-    console.error("Error saving settings:", err);
-    analytics.error("settings_save", err.message || String(err)); // ← ANALYTICS
+    console.error("Error auto-saving settings:", err);
+    analytics.error("settings_autosave", err.message || String(err)); // ← ANALYTICS
     showToast(t("errorSaving"), "error");
   }
+}
+
+// Debounced variant for controls that can fire many events in quick
+// succession (e.g. holding a +/- spinner button) — coalesces them into a
+// single write instead of hammering disk I/O on every tick.
+let autoSaveDebounceTimer = null;
+function scheduleAutoSave(delay = 500) {
+  clearTimeout(autoSaveDebounceTimer);
+  autoSaveDebounceTimer = setTimeout(persistSettings, delay);
 }
 
 module.exports = {
@@ -497,12 +533,44 @@ async function initAboutSection() {
   const installBtn = document.getElementById("aboutInstallBtn");
   const installLabel = document.getElementById("aboutInstallLabel");
   const sectionTitle = document.getElementById("aboutSectionTitle");
+  const githubBtn = document.getElementById("aboutGithubBtn");
+  const contactBtn = document.getElementById("aboutContactBtn");
+  const contactIcon = document.getElementById("aboutContactIcon");
 
   // Apply translated static labels immediately
   if (sectionTitle) sectionTitle.textContent = t("aboutTitle");
   if (statusText) statusText.textContent = t("upToDate");
   if (checkLabel) checkLabel.textContent = t("checkForUpdates");
   if (installLabel) installLabel.textContent = t("restartAndInstall");
+
+  // GitHub link opens in the OS default browser.
+  githubBtn?.addEventListener("click", () => {
+    shell.openExternal("https://github.com/yassindaboussi/Salaty");
+  });
+
+  // Contact email: mailto: links are unreliable (many machines have no
+  // default mail client configured), so instead show the address on the
+  // button itself and copy it to the clipboard on click — the address is
+  // always visible, and the action always does something the user can see.
+  if (contactBtn) {
+    const email = contactBtn.dataset.email;
+    contactBtn.addEventListener("click", async () => {
+      try {
+        await ipcRenderer.invoke("clipboard-write-text", email);
+        showToast(t("emailCopied"), "success");
+
+        // Brief "copied" confirmation directly on the button
+        if (contactIcon) contactIcon.className = "fas fa-check";
+        contactBtn.classList.add("copied");
+        setTimeout(() => {
+          if (contactIcon) contactIcon.className = "fas fa-envelope";
+          contactBtn.classList.remove("copied");
+        }, 1500);
+      } catch (err) {
+        console.error("Failed to copy email:", err);
+      }
+    });
+  }
 
   if (!checkBtn) return;
 

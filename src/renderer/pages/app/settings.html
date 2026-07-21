@@ -103,15 +103,36 @@
               </div>
             </div>
 
-            <button id="detectLocationBtn" class="detect-btn">
-              <i class="fas fa-location-crosshairs"></i>
-              <span id="detectLocationLabel">Auto Detect Location</span>
-            </button>
+            <div class="location-actions-row">
+              <button id="detectLocationBtn" class="detect-btn">
+                <i class="fas fa-location-crosshairs"></i>
+                <span id="detectLocationLabel">Auto Detect Location</span>
+              </button>
 
-            <button id="manageLocationsBtn" class="manage-locations-btn">
-              <i class="fas fa-map-marked-alt"></i>
-              <span id="manageLocationsLabel">Manage Saved Locations</span>
-            </button>
+              <button id="manageLocationsBtn" class="manage-locations-btn">
+                <i class="fas fa-map-marked-alt"></i>
+                <span id="manageLocationsLabel">Manage Saved Locations</span>
+              </button>
+            </div>
+
+            <!-- Auto-detect on launch: silently checks IP-based location and
+                 offers to switch if it differs from the active location.
+                 Toggle lets the user opt out of that on-launch prompt. -->
+            <div class="toggle-field location-travel-toggle">
+              <div class="toggle-info">
+                <label class="subsection-label" id="travelModeLabel"
+                  >Auto-Detect Location</label
+                >
+                <span class="toggle-description" id="travelModeDescription"
+                  >Automatically detect and switch location when
+                  traveling</span
+                >
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="travelModeToggle" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
           </div>
 
           <!-- Appearance Section -->
@@ -289,7 +310,6 @@
                     <span class="size-name" id="bigScreenLabel"
                       >Big Screen</span
                     >
-                    <span class="size-dimensions" id="bigScreenDimensions">Fixed window</span>
                   </div>
                   <div class="size-check">
                     <i class="fas fa-check"></i>
@@ -308,7 +328,6 @@
                     <span class="size-name" id="smallScreenLabel"
                       >Full Screen</span
                     >
-                    <span class="size-dimensions" id="fullScreenDimensions">Fills your screen</span>
                   </div>
                   <div class="size-check">
                     <i class="fas fa-check"></i>
@@ -329,9 +348,12 @@
               </h3>
             </div>
 
-            <!-- Athkar Alerts -->
-            <div class="subsection">
-              <div class="toggle-field">
+            <!-- Grouped list: each notification type is a single row
+                 (label + inline stepper + toggle) instead of a toggle row
+                 stacked above a separate full stepper row. -->
+            <div class="notif-list">
+              <!-- Athkar Alerts -->
+              <div class="notif-row">
                 <div class="toggle-info">
                   <label class="subsection-label" id="athkarAlertsLabel"
                     >Athkar Alerts</label
@@ -340,18 +362,12 @@
                     >Enable periodic reminders</span
                   >
                 </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="athkarAlertsToggle" />
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
 
-              <div class="conditional-field" id="athkarIntervalContainer">
-                <div class="form-field">
-                  <label class="field-label" id="athkarIntervalLabel"
-                    >Interval</label
-                  >
-                  <div class="num-spinner-wrap">
+                <div
+                  class="conditional-field notif-inline-stepper"
+                  id="athkarIntervalContainer"
+                >
+                  <div class="num-spinner-wrap compact">
                     <button
                       class="num-spinner-btn"
                       data-target="athkarIntervalInput"
@@ -396,12 +412,15 @@
                     <span class="num-spinner-unit" id="minutesLabel">min</span>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <!-- Pre-Adhan Notification -->
-            <div class="subsection">
-              <div class="toggle-field">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="athkarAlertsToggle" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <!-- Pre-Adhan Notification -->
+              <div class="notif-row">
                 <div class="toggle-info">
                   <label class="subsection-label" id="preAdhanNotificationLabel"
                     >Pre-Adhan Notification</label
@@ -409,21 +428,15 @@
                   <span
                     class="toggle-description"
                     id="enablePreAdhanNotificationLabel"
-                    >Alert before prayer time</span
+                    >Alert before Adhan</span
                   >
                 </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="preAdhanNotificationToggle" />
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
 
-              <div class="conditional-field" id="preAdhanMinutesContainer">
-                <div class="form-field">
-                  <label class="field-label" id="preAdhanMinutesLabel"
-                    >Minutes before Adhan</label
-                  >
-                  <div class="num-spinner-wrap">
+                <div
+                  class="conditional-field notif-inline-stepper"
+                  id="preAdhanMinutesContainer"
+                >
+                  <div class="num-spinner-wrap compact">
                     <button
                       class="num-spinner-btn"
                       data-target="preAdhanMinutesInput"
@@ -468,6 +481,11 @@
                     <span class="num-spinner-unit" id="minutesLabel2">min</span>
                   </div>
                 </div>
+
+                <label class="toggle-switch">
+                  <input type="checkbox" id="preAdhanNotificationToggle" />
+                  <span class="toggle-slider"></span>
+                </label>
               </div>
             </div>
 
@@ -502,7 +520,7 @@
           <div class="settings-section about-section">
             <div class="section-header">
               <div class="section-icon">
-                <i class="fas fa-mosque"></i>
+                <i class="fas fa-circle-info"></i>
               </div>
               <h3 class="section-title" id="aboutSectionTitle"></h3>
             </div>
@@ -514,9 +532,15 @@
                   <i class="fas fa-mosque"></i>
                 </div>
                 <div class="about-app-info">
-                  <span class="about-app-name">Salaty Time</span>
-                  <span class="about-app-version" id="appVersionDisplay"
-                    >v1.1.0</span
+                  <div class="about-name-row">
+                    <span class="about-app-name">Salaty Time</span>
+                    <span class="about-app-version" id="appVersionDisplay"
+                      >v1.1.0</span
+                    >
+                  </div>
+                  <span class="about-app-tagline" id="aboutTagline"
+                    >Prayer times, Quran &amp; Islamic tools in one
+                    place</span
                   >
                 </div>
               </div>
@@ -526,10 +550,12 @@
               <!-- Update row -->
               <div class="about-update-row" id="aboutUpdateRow">
                 <div class="about-update-status" id="aboutUpdateStatus">
-                  <i
-                    class="fas fa-circle-check about-status-icon"
-                    id="aboutStatusIcon"
-                  ></i>
+                  <span class="about-status-badge" id="aboutStatusBadge">
+                    <i
+                      class="fas fa-circle-check about-status-icon"
+                      id="aboutStatusIcon"
+                    ></i>
+                  </span>
                   <span id="aboutStatusText"></span>
                 </div>
                 <button class="about-check-btn" id="aboutCheckUpdateBtn">
@@ -553,15 +579,25 @@
                 <i class="fas fa-bolt"></i>
                 <span id="aboutInstallLabel"></span>
               </button>
-            </div>
-          </div>
 
-          <!-- Save Button -->
-          <div class="settings-actions">
-            <button class="save-btn" id="saveBtn">
-              <i class="fas fa-check"></i>
-              <span>Save Changes</span>
-            </button>
+              <div class="about-divider"></div>
+
+              <!-- Links row -->
+              <div class="about-links-row">
+                <button class="about-link-btn" id="aboutGithubBtn">
+                  <i class="fab fa-github"></i>
+                  <span id="aboutGithubLabel">View on GitHub</span>
+                </button>
+                <button
+                  class="about-link-btn about-email-btn"
+                  id="aboutContactBtn"
+                  data-email="salatytime@gmail.com"
+                >
+                  <i class="fas fa-envelope" id="aboutContactIcon"></i>
+                  <span id="aboutContactLabel">salatytime@gmail.com</span>
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- Footer -->

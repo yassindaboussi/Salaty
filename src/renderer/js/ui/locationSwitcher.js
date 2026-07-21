@@ -4,6 +4,7 @@ let _locationPromptShownThisSession = false;
 const locationManager = require("../services/locationManager");
 const { t } = require("../core/i18n/translations");
 const { showConfirmDialog } = require("./customDialog");
+const { state } = require("../core/globalStore");
 
 let isDropdownOpen = false;
 
@@ -57,6 +58,13 @@ async function initLocationSwitcher() {
  */
 async function checkLocationOnLaunch() {
   try {
+    // Respect the "Auto-Detect Location" setting (Settings > Location).
+    // Defaults to enabled so existing behavior is unchanged for users who
+    // haven't touched this setting yet.
+    if (state.settings.travelMode === false) {
+      return;
+    }
+
     // Check if we've already shown the prompt this session (persists across page reloads)
     if (_locationPromptShownThisSession) {
       return;

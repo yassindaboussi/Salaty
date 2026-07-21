@@ -14,5 +14,8 @@
   "isAvailable": "disponible — cliquez pour télécharger",
   "downloading": "Téléchargement",
   "readyToInstall": "Prêt à installer — redémarrez pour appliquer",
-  "restartAndInstall": "Redémarrer et installer"
+  "restartAndInstall": "Redémarrer et installer",
+  "aboutTagline": "Horaires de prière, Coran et outils islamiques réunis",
+  "viewOnGithub": "Voir sur GitHub",
+  "emailCopied": "E-mail copié dans le presse-papiers"
 }

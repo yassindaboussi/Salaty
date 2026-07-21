@@ -307,27 +307,58 @@
 }
 
 /* ========================================
+   NOTIFICATION LIST (grouped rows)
+   ======================================== */
+
+[dir="rtl"] .notif-row {
+  flex-direction: row-reverse;
+}
+
+/* ========================================
+   ABOUT CARD
+   ======================================== */
+
+[dir="rtl"] .about-identity {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .about-app-info {
+  text-align: right;
+}
+
+[dir="rtl"] .about-name-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .about-app-tagline {
+  text-align: right;
+}
+
+[dir="rtl"] .about-update-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .about-update-status {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .about-links-row {
+  flex-direction: row-reverse;
+}
+
+/* ========================================
    DETECT BUTTON
    ======================================== */
+
+[dir="rtl"] .location-actions-row {
+  flex-direction: row-reverse;
+}
 
 [dir="rtl"] .detect-btn {
   direction: rtl;
 }
 
 [dir="rtl"] .detect-btn i {
-  margin-right: 0;
-  margin-left: 8px;
-}
-
-/* ========================================
-   SAVE BUTTON
-   ======================================== */
-
-[dir="rtl"] .save-btn {
-  direction: rtl;
-}
-
-[dir="rtl"] .save-btn i {
   margin-right: 0;
   margin-left: 8px;
 }
@@ -581,7 +612,6 @@
 }
 
 /* Fix for buttons in RTL */
-[dir="rtl"] .save-btn,
 [dir="rtl"] .retry-button {
   direction: rtl;
 }

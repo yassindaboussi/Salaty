@@ -21,6 +21,11 @@ let settingsData = {
   bigScreen: true,
   locations: [],
   openAtLogin: true,
+  // Whether the app silently checks IP-based location on launch and offers
+  // to switch if it differs from the active saved location (the prompt from
+  // the screenshot in this conversation). Defaults to on to preserve
+  // existing behavior; the user can turn it off in Settings > Location.
+  travelMode: true,
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

@@ -1,12 +1,18 @@
 const { ipcRenderer } = require("electron"); // Import ipcRenderer
 const screenSizeManager = require("../../js/core/screenSize");
-const { getArchiveOrgTracks } = require("../../js/utils/trackUtils");
+const mp3quranApi = require("../../js/services/api/mp3quranApi");
 const {
   setLanguage,
   t,
   getLanguage,
 } = require("../../js/core/i18n/translations");
 const analytics = require("../../js/utils/analytics");
+
+// mp3quran.net expects its own language codes, not our app's ("en"/"ar"/"fr").
+const MP3QURAN_LANG = { en: "eng", ar: "ar", fr: "fr" };
+function mp3quranLang() {
+  return MP3QURAN_LANG[getLanguage()] || "eng";
+}
 
 // Helper to get translated string
 function getLocalized(obj) {
@@ -31,14 +37,20 @@ class PlaylistManager {
     await this.loadSettings();
     await this.initScreenSize();
     await this.initTheme();
+    this.updateTranslations();
 
-    // Load Album
-    await this.loadCurrentAlbum();
+    // Everything needed for the first paint (settings/theme/screen-size) is
+    // ready now. Reveal the page right away instead of waiting on the
+    // network request below, which can take a while on a slow connection
+    // and would otherwise leave the window black for that long.
+    document.body.classList.remove("page-loading");
 
-    // Get player state
+    // Get player state (fire-and-forget, doesn't block paint)
     ipcRenderer.send("player-command", { type: "get-state" });
 
-    this.updateTranslations();
+    // Load Album — network-bound; the track list shows its own spinner
+    // (see loadTracks) while this resolves, instead of blocking the page.
+    await this.loadCurrentAlbum();
 
     return this;
   }
@@ -64,14 +76,30 @@ class PlaylistManager {
   async loadTracks(album) {
     this.resultsList.innerHTML = `<div class="loading"><i class="fas fa-spinner"></i>${t("loadingTracks")}</div>`;
     try {
-      const ARCHIVE_METADATA_URL =
-        album.url || `https://archive.org/metadata/${album.id}`;
-      this.originalTracks = await getArchiveOrgTracks(ARCHIVE_METADATA_URL);
+      if (album.source === "mp3quran") {
+        this.originalTracks = await mp3quranApi.getReciterTracks(
+          album.reciterName,
+          { server: album.server, surah_list: album.surahList },
+          mp3quranLang(),
+        );
+      } else if (album.source === "mp3quran-tracks") {
+        // Tadabor / Tafsir albums: tracks were already fully resolved
+        // (including their audio url) when the card was built, so there's
+        // nothing further to fetch here.
+        this.originalTracks = Array.isArray(album.tracks) ? album.tracks : [];
+      } else {
+        // Legacy albums stored before the switch to mp3quran.net. Kept only
+        // so any old "selectedAlbum" left in localStorage doesn't crash.
+        throw new Error("Unsupported album source");
+      }
       this.tracks = [...this.originalTracks];
       this.displayTracks();
     } catch (error) {
       console.error("Error loading tracks:", error);
-      analytics.error("playlist_load_tracks", err.message || String(err)); // ← ANALYTICS
+      analytics.error(
+        "playlist_load_tracks",
+        error.message || String(error),
+      ); // ← ANALYTICS
       let errorMsg = t("ui.errorLoadingTracks");
       if (errorMsg.includes("{album}")) {
         errorMsg = errorMsg.replace(
@@ -220,6 +248,18 @@ class PlaylistManager {
 
     const backBtn = document.getElementById("backBtn");
     if (backBtn) backBtn.setAttribute("aria-label", t("back"));
+
+    // The "No Track Selected" fallback in the HTML is only replaced once a
+    // real player-state update arrives — but the background player is now
+    // created lazily on first playback, so a fresh visit before anything
+    // has ever played would otherwise show the untranslated English
+    // fallback forever. Set the translated version immediately instead;
+    // updateState() will overwrite it as soon as a real track is playing.
+    if (!this.currentTrackData) {
+      if (this.currentTrackTitle)
+        this.currentTrackTitle.innerText = t("noTrackSelected");
+      if (this.currentTrackArtist) this.currentTrackArtist.innerText = "-";
+    }
   }
 
   async initTheme() {

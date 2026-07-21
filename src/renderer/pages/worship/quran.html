@@ -75,7 +75,7 @@
       <!-- ═══════════════ VIEW: SURAH READER ═══════════════ -->
       <div class="quran-container" id="viewSurahReader" style="display:none;">
         <div class="quran-header">
-          <button class="back-btn" id="readerBackBtn" aria-label="Back to Surah List">
+          <button class="back-btn" id="readerBackBtn" aria-label="Back to Surah List" data-tooltip="tooltipBack">
             <i class="fas fa-arrow-left"></i>
           </button>
           <div class="reader-surah-info">
@@ -83,36 +83,45 @@
             <span class="reader-surah-meta" id="readerSurahMeta"></span>
           </div>
           <div class="quran-controls">
-            <button class="control-btn reader-settings-btn" id="readerSettingsBtn" aria-label="Settings">
+            <button class="control-btn reader-settings-btn" id="readerSettingsBtn" aria-label="Settings" data-tooltip="tooltipSettings">
               <i class="fas fa-sliders-h"></i>
             </button>
-            <button class="control-btn fullscreen-btn" id="readerFullscreenBtn" aria-label="Toggle Fullscreen">
+            <button class="control-btn" id="readerMinimizeBtn" aria-label="Minimize" data-tooltip="tooltipMinimize">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H5v-2h14v2z"/></svg>
+            </button>
+            <button class="control-btn fullscreen-btn" id="readerFullscreenBtn" aria-label="Toggle Fullscreen" data-tooltip="tooltipExpand">
               <i class="fas fa-expand"></i>
             </button>
-            <button class="control-btn close-btn" id="readerCloseBtn" aria-label="Close">
+            <button class="control-btn close-btn" id="readerCloseBtn" aria-label="Close" data-tooltip="tooltipClose">
               <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
             </button>
           </div>
         </div>
 
-        <!-- Reader Settings Panel (slide-down) -->
-        <div class="reader-settings-panel" id="readerSettingsPanel" style="display:none;">
-          <div class="settings-row">
-            <span class="settings-label" id="labelFontSize">Font Size</span>
-            <div class="font-size-controls">
-              <button class="font-btn" id="fontDecBtn"><i class="fas fa-minus"></i></button>
-              <span class="font-size-display" id="fontSizeDisplay">26</span>
-              <button class="font-btn" id="fontIncBtn"><i class="fas fa-plus"></i></button>
+        <!-- Reader Settings Panel (visible by default; close with the X) -->
+        <div class="reader-settings-panel" id="readerSettingsPanel">
+          <button class="settings-panel-close" id="settingsPanelCloseBtn" aria-label="Close" data-tooltip="tooltipClose">
+            <i class="fas fa-times"></i>
+          </button>
+          <div class="settings-toolbar">
+            <div class="settings-group" id="fontSizeGroup">
+              <i class="fas fa-text-height settings-group-icon"></i>
+              <div class="font-size-controls">
+                <button class="font-btn" id="fontDecBtn" aria-label="Decrease font size" data-tooltip="decreaseFontSize"><i class="fas fa-minus"></i></button>
+                <span class="font-size-display" id="fontSizeDisplay">26</span>
+                <button class="font-btn" id="fontIncBtn" aria-label="Increase font size" data-tooltip="increaseFontSize"><i class="fas fa-plus"></i></button>
+              </div>
             </div>
-          </div>
-          <div class="settings-row">
-            <span class="settings-label" id="labelTranslation">Translation</span>
-            <select class="settings-select" id="translationSelect">
-              <option value="none">None (Arabic only)</option>
-              <option value="en.sahih">Sahih International (EN)</option>
-              <option value="en.asad">Muhammad Asad (EN)</option>
-              <option value="fr.hamidullah">Hamidullah (FR)</option>
-            </select>
+            <div class="settings-divider"></div>
+            <div class="settings-group settings-group-translation">
+              <i class="fas fa-language settings-group-icon"></i>
+              <select class="settings-select" id="translationSelect" aria-label="Translation">
+                <option value="none">None (Arabic only)</option>
+                <option value="en.sahih">Sahih International (EN)</option>
+                <option value="en.asad">Muhammad Asad (EN)</option>
+                <option value="fr.hamidullah">Hamidullah (FR)</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -135,7 +144,7 @@
         <!-- Navigation between surahs -->
         <div class="reader-nav">
           <button class="reader-nav-btn" id="prevSurahBtn">
-            <i class="fas fa-chevron-right"></i>
+            <i class="fas fa-chevron-left"></i>
             <span id="prevSurahLabel"></span>
           </button>
           <div class="reader-progress">
@@ -143,7 +152,7 @@
           </div>
           <button class="reader-nav-btn" id="nextSurahBtn">
             <span id="nextSurahLabel"></span>
-            <i class="fas fa-chevron-left"></i>
+            <i class="fas fa-chevron-right"></i>
           </button>
         </div>
       </div>

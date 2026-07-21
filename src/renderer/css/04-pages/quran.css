@@ -3,6 +3,15 @@
    Professional book-style reader for Salaty app
    ============================================================ */
 
+/* KFGQPC Uthman Taha Naskh — the standard Mushaf-style Quran typeface
+   (King Fahd Glorious Quran Printing Complex), freely distributable per
+   its own embedded license (use/copy/distribute permitted). */
+@font-face {
+  font-family: "QuranFont";
+  src: url("../../fonts/QuranUthmanTaha.ttf") format("truetype");
+  font-display: swap;
+}
+
 /* ── Container ─────────────────────────────────────────────── */
 .quran-container {
   height: 100%;
@@ -112,6 +121,12 @@
   -webkit-app-region: no-drag;
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) transparent;
+  /* Chromium places the scrollbar on the left for RTL-direction elements
+     by default — force it to always sit on the physical right (the
+     "start" side in Arabic) regardless of app language. The grid below
+     re-declares its own direction so Arabic text/card order is
+     unaffected; only the scrollbar's side is pinned here. */
+  direction: ltr;
 }
 
 .quran-content::-webkit-scrollbar { width: 4px; }
@@ -149,6 +164,13 @@
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   padding: 2px 2px 8px;
+}
+
+/* Restore natural RTL grid/text order for the actual content — only the
+   scroll container above is pinned to `direction: ltr` (for scrollbar
+   placement), this brings Arabic layout back for everything inside it. */
+[dir="rtl"] .surah-grid {
+  direction: rtl;
 }
 
 .surah-card {
@@ -236,6 +258,10 @@
   padding: 2px 2px 8px;
 }
 
+[dir="rtl"] .juz-list {
+  direction: rtl;
+}
+
 .juz-card {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.07);
@@ -318,10 +344,11 @@
 
 /* ── Reader Settings Panel ─────────────────────────────────── */
 .reader-settings-panel {
+  position: relative;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 10px 36px 10px 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -329,22 +356,76 @@
   animation: slideDown 0.2s ease;
 }
 
+.settings-panel-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  transition: all 0.15s ease;
+}
+
+/* In Arabic, the close X sits on the physical left (the "end" side of a
+   right-to-left layout) instead of the right — mirrors the reader-settings
+   panel itself, which reads right-to-left in Arabic. */
+[dir="rtl"] .settings-panel-close {
+  right: auto;
+  left: 8px;
+}
+
+[dir="rtl"] .reader-settings-panel {
+  padding: 10px 12px 10px 36px;
+}
+
+.settings-panel-close:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text-primary);
+}
+
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.settings-row {
+.settings-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
-.settings-label {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-weight: 500;
+.settings-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-group-icon {
+  font-size: 13px;
+  color: var(--accent-color);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.settings-group-translation {
+  flex: 1;
+  min-width: 160px;
+}
+
+.settings-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .font-size-controls {
@@ -381,13 +462,23 @@
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 8px;
-  padding: 4px 8px;
+  padding: 5px 8px;
   color: var(--text-primary);
   font-size: 11px;
   outline: none;
   cursor: pointer;
   flex: 1;
-  max-width: 180px;
+  min-width: 0;
+  max-width: 220px;
+}
+
+/* The closed <select> box above picks up the app's dark theme fine, but
+   the dropdown's <option> list doesn't inherit it — Chromium renders that
+   popup with its own default (white) background unless the options
+   themselves are styled directly. */
+.settings-select option {
+  background: var(--bg-secondary, #1a237e);
+  color: var(--text-primary, #fff);
 }
 
 /* ── Reader Content ────────────────────────────────────────── */
@@ -399,6 +490,11 @@
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) transparent;
   padding: 4px 0 8px;
+  /* Same fix as .quran-content: pin the scrollbar to the physical right
+     regardless of app language — Chromium otherwise moves it to the left
+     for RTL-direction containers. .ayah-list below restores RTL for the
+     actual content. */
+  direction: ltr;
 }
 
 .reader-content::-webkit-scrollbar { width: 4px; }
@@ -414,90 +510,79 @@
 }
 
 .bismillah-text {
-  font-size: 22px;
+  font-size: 30px;
   color: var(--accent-color);
-  font-weight: 600;
   direction: rtl;
   line-height: 1.8;
   text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.25);
-  font-family: 'Traditional Arabic', 'Scheherazade New', 'Amiri', serif;
+  font-family:
+    "QuranFont",
+    "Traditional Arabic",
+    "Scheherazade New",
+    "Amiri",
+    serif;
 }
 
-/* ── Ayah List ─────────────────────────────────────────────── */
+/* ── Ayah content ──────────────────────────────────────────────
+   Continuous flowing Mushaf-style paragraph (like a printed page)
+   instead of one card per ayah — the whole surah renders as a single
+   centered block, with each ayah's number embedded inline as (N). */
 .ayah-list {
+  display: block;
+}
+
+[dir="rtl"] .ayah-list,
+[dir="rtl"] .bismillah-header {
+  direction: rtl;
+}
+
+.surah-flow-text {
+  direction: rtl;
+  text-align: center;
+  font-family:
+    "QuranFont",
+    "Traditional Arabic",
+    "Scheherazade New",
+    "Amiri",
+    serif;
+  font-size: 26px; /* default, overridden inline by the font-size setting */
+  line-height: 2.3;
+  color: #fff;
+  padding: 8px 18px 20px;
+  cursor: text;
+}
+
+/* Ayah number marker, embedded inline within the flowing text */
+.ayah-number-inline {
+  color: var(--accent-color);
+  font-family: "Inter", sans-serif; /* plain digits read more clearly than the calligraphic Quran font */
+  font-size: 0.65em;
+  font-weight: 700;
+  margin: 0 3px;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* ── Translations (shown separately below the Arabic flow, only when a
+   translation is selected — keeping the Arabic block itself unbroken) ── */
+.ayah-translation-list {
+  padding: 16px 18px 18px;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 14px;
 }
 
-/* ── Ayah Card ─────────────────────────────────────────────── */
-.ayah-card {
-  padding: 12px 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  transition: background 0.15s;
-  position: relative;
-}
-
-.ayah-card:last-child { border-bottom: none; }
-
-.ayah-card:hover {
-  background: rgba(255,255,255,0.02);
-  border-radius: 8px;
-}
-
-/* Ayah Number Pill */
-.ayah-number-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: rgba(var(--accent-rgb), 0.1);
-  border: 1px solid rgba(var(--accent-rgb), 0.18);
-  border-radius: 50%;
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--accent-color);
-  float: left;
-  margin-top: 6px;
-  margin-right: 0;
-  margin-left: 0;
-  flex-shrink: 0;
-}
-
-/* Arabic Text — main star of the show */
-.ayah-arabic {
-  direction: rtl;
-  text-align: right;
-  font-family: 'Traditional Arabic', 'Scheherazade New', 'Amiri', 'KFGQPC Uthmanic Script HAFS', serif;
-  font-size: 26px; /* default, overridden inline */
-  line-height: 2;
-  color: #fff;
-  margin-bottom: 0;
-  display: block;
-  padding: 0 4px;
-  word-spacing: 4px;
-  letter-spacing: 0;
-}
-
-/* Ayah number ornament embedded in text */
-.ayah-end-ornament {
-  color: var(--accent-color);
-  font-size: 0.75em;
-  opacity: 0.85;
-}
-
-/* Translation Text */
-.ayah-translation {
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px dashed rgba(255,255,255,0.06);
+.ayah-translation-row {
+  color: var(--text-primary);
+  line-height: 1.7;
   direction: ltr;
   text-align: left;
-  opacity: 0.85;
+}
+
+.ayah-translation-row .ayah-translation-num {
+  color: var(--accent-color);
+  font-weight: 700;
+  margin-right: 6px;
 }
 
 /* ── Reader Bottom Nav ─────────────────────────────────────── */
@@ -533,6 +618,22 @@
 .reader-nav-btn:hover { background: rgba(var(--accent-rgb), 0.2); }
 .reader-nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
 .reader-nav-btn span { overflow: hidden; text-overflow: ellipsis; max-width: 80px; }
+
+/* In Arabic, reading flows right-to-left, so "next" (moving forward
+   through the Quran) should sit on the left and "previous" on the right —
+   the mirror image of the English/French layout. The row itself stays
+   `direction: ltr` above (so the surah-name text inside each button
+   doesn't get bidi-reordered), only the *order* of the two buttons and
+   their arrow icons flip. */
+[dir="rtl"] .reader-nav {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .reader-nav-btn {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .reader-nav-btn i {
+  transform: scaleX(-1);
+}
 
 .reader-progress { flex: 1; text-align: center; }
 
@@ -575,9 +676,9 @@
 .retry-button:hover { transform: scale(1.04); box-shadow: 0 4px 12px rgba(var(--accent-rgb),0.25); }
 
 /* ── Fullscreen adjustments ────────────────────────────────── */
-body.fullscreen .surah-arabic-name { font-size: 18px; }
-body.fullscreen .surah-card { padding: 12px 14px; }
-body.fullscreen .ayah-arabic { line-height: 2.2; }
+body.fullscreen-mode .surah-arabic-name { font-size: 18px; }
+body.fullscreen-mode .surah-card { padding: 12px 14px; }
+body.fullscreen-mode .surah-flow-text { line-height: 2.5; }
 
 /* ── RTL language support ──────────────────────────────────── */
 [dir="rtl"] .quran-header,

@@ -14,5 +14,8 @@
   "isAvailable": "متوفر — انقر للتحميل",
   "downloading": "جارٍ التحميل",
   "readyToInstall": "جاهز للتثبيت — أعد التشغيل للتطبيق",
-  "restartAndInstall": "إعادة التشغيل والتثبيت"
+  "restartAndInstall": "إعادة التشغيل والتثبيت",
+  "aboutTagline": "مواقيت الصلاة، القرآن والأدوات الإسلامية في مكان واحد",
+  "viewOnGithub": "عرض على GitHub",
+  "emailCopied": "تم نسخ البريد الإلكتروني"
 }

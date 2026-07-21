@@ -1,5 +1,6 @@
 {
   "settings": "Settings",
+  "appearance": "Appearance",
   "city": "City",
   "location": "Location",
   "detectLocation": "Auto Detect Location",
@@ -24,11 +25,12 @@
   "minutes": "min",
   "preAdhanNotification": "Pre-Adhan Notification",
   "minutesBeforeAdhan": "Minutes before Adhan",
-  "enablePreAdhanNotification": "Enable Notification",
+  "enablePreAdhanNotification": "Alert before Adhan",
   "manageLocationsLabel": "Manage Saved Locations",
   "manageLocationsTitle": "Manage Locations",
   "openAtLogin": "Launch at startup",
   "fullScreen": "Full Screen",
   "bigScreenDimensions": "Fixed window",
-  "fullScreenDimensions": "Fills your screen"
+  "fullScreenDimensions": "Fills your screen",
+  "changesSavedAutomatically": "Changes are saved automatically"
 }

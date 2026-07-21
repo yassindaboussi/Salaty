@@ -1,7 +1,16 @@
 "use strict";
 /**
  * quranUI.js — Native Quran Book Reader
- * Uses quran.com API v4 (api.quran.com/api/v4)
+ *
+ * Data sources (in priority order):
+ *  1. AlQuran Cloud API (api.alquran.cloud/v1) — free, no key, still active.
+ *     quran.com's old free v4 endpoint (api.quran.com/api/v4) was migrated
+ *     to an OAuth2-authenticated system in 2025/2026 (apis.quran.foundation)
+ *     that requires a client_id/client_secret which can't be safely embedded
+ *     in a desktop app, so it's no longer used here.
+ *  2. Bundled offline copy (src/renderer/data/Quran.json) — used when the
+ *     device is offline, or if the live API call fails for any reason.
+ *
  * No iframes, no embeds. Full native reader.
  */
 
@@ -11,8 +20,7 @@ const analytics = require("../../utils/analytics");
 const screenSizeManager = require("../../core/screenSize");
 
 // ── Constants ────────────────────────────────────────────────
-const QURAN_API = "https://api.quran.com/api/v4";
-const ALT_API   = "https://alquran.cloud/api/v1"; // fallback
+const ALQURAN_CLOUD_API = "https://api.alquran.cloud/v1";
 
 // ── State ────────────────────────────────────────────────────
 let state = {
@@ -22,9 +30,8 @@ let state = {
   currentAyahs: [],
   fontSize: 26,           // px for arabic text
   translationId: "none",  // "none" | edition key
-  settingsOpen: false,
+  settingsOpen: true,
   activeTab: "surah",     // "surah" | "juz"
-  isFullscreen: false,
 };
 
 // ── Surah metadata cache (offline-first) ────────────────────
@@ -165,7 +172,7 @@ const JUZ_META = [
   {n:29, start:"Al-Mulk 67:1"},   {n:30, start:"An-Naba 78:1"},
 ];
 
-// Translation editions for alquran.cloud fallback API
+// Translation editions (AlQuran Cloud edition identifiers)
 const TRANSLATION_EDITIONS = {
   "en.sahih":      "en.sahih",
   "en.asad":       "en.asad",
@@ -175,68 +182,28 @@ const TRANSLATION_EDITIONS = {
 // ── API helpers ──────────────────────────────────────────────
 
 async function fetchQuranSurah(surahNum, translationEdition) {
-  // Try quran.com API v4 first
-  try {
-    const params = new URLSearchParams({
-      words: "false",
-      translations: translationEdition !== "none" ? getQuranComTranslationId(translationEdition) : "",
-      audio: "",
-      tafsirs: "",
-      word_fields: "",
-      translation_fields: "",
-      fields: "text_uthmani,verse_number",
-      per_page: "300",
-    });
-    // Remove empty params
-    for (const [k, v] of [...params.entries()]) {
-      if (!v) params.delete(k);
-    }
-
-    const url = `${QURAN_API}/verses/by_chapter/${surahNum}?${params.toString()}`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/json" },
-    });
-    if (!res.ok) throw new Error(`quran.com ${res.status}`);
-    const data = await res.json();
-    return normalizeQuranComResponse(data, translationEdition);
-  } catch (e) {
-    console.warn("quran.com failed, trying alquran.cloud:", e.message);
+  // Offline: skip the network attempt entirely and go straight to the
+  // bundled copy instead of waiting on a request that can't succeed.
+  if (!navigator.onLine) {
+    return getLocalQuranSurah(surahNum, translationEdition);
   }
 
-  // Fallback: alquran.cloud
   try {
     const editions = ["quran-uthmani"];
     if (translationEdition !== "none" && TRANSLATION_EDITIONS[translationEdition]) {
       editions.push(TRANSLATION_EDITIONS[translationEdition]);
     }
-    const url = `${ALT_API}/surah/${surahNum}/editions/${editions.join(",")}`;
+    const url = `${ALQURAN_CLOUD_API}/surah/${surahNum}/editions/${editions.join(",")}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`alquran.cloud ${res.status}`);
     const data = await res.json();
     return normalizeAlquranCloudResponse(data, translationEdition);
-  } catch (e2) {
-    throw new Error("Both APIs failed: " + e2.message);
+  } catch (e) {
+    // Online, but the request still failed (server hiccup, blocked host,
+    // etc.) — fall back to the bundled copy rather than showing an error.
+    console.warn("AlQuran Cloud request failed, using offline data:", e.message);
+    return getLocalQuranSurah(surahNum, translationEdition);
   }
-}
-
-function getQuranComTranslationId(edition) {
-  const map = {
-    "en.sahih":      "131", // Saheeh International
-    "en.asad":       "95",  // Muhammad Asad
-    "fr.hamidullah": "136", // Hamidullah
-  };
-  return map[edition] || "";
-}
-
-function normalizeQuranComResponse(data, translationEdition) {
-  const verses = data.verses || [];
-  return verses.map((v) => ({
-    number: v.verse_number,
-    arabic: v.text_uthmani || v.text_imlaei || "",
-    translation: (v.translations && v.translations[0] && translationEdition !== "none")
-      ? stripHtmlTags(v.translations[0].text)
-      : null,
-  }));
 }
 
 function normalizeAlquranCloudResponse(data, translationEdition) {
@@ -254,6 +221,35 @@ function normalizeAlquranCloudResponse(data, translationEdition) {
   }));
 }
 
+// Lazily loaded — this bundled dataset is ~5MB, so it's only actually
+// parsed the first time it's needed (offline, or as a fallback).
+let _localQuranData = null;
+function getLocalQuranData() {
+  if (!_localQuranData) {
+    _localQuranData = require("../../../data/Quran.json");
+  }
+  return _localQuranData;
+}
+
+/**
+ * Builds the same { number, arabic, translation } shape as the API path,
+ * from the bundled offline copy. Only one English translation is bundled
+ * (Saheeh International), so it's used for any non-"none" translation
+ * selection while offline — French (Hamidullah) isn't available offline.
+ */
+function getLocalQuranSurah(surahNum, translationEdition) {
+  const data = getLocalQuranData();
+  const entry = data.find((s) => s.Number === surahNum);
+  if (!entry) throw new Error(`Surah ${surahNum} not found in offline data`);
+
+  const verses = (entry.Array_Verses && entry.Array_Verses[0]) || [];
+  return verses.map((v) => ({
+    number: v.id,
+    arabic: v.ar,
+    translation: translationEdition !== "none" ? v.en || null : null,
+  }));
+}
+
 function stripHtmlTags(str) {
   return str ? str.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim() : "";
 }
@@ -261,6 +257,11 @@ function stripHtmlTags(str) {
 // ── Init ─────────────────────────────────────────────────────
 
 function initQuranPage() {
+  // Match whatever Big Screen/Full Screen the user has set app-wide, and
+  // set the correct icon/tooltip on both fullscreen buttons immediately.
+  screenSizeManager.initPageScreenSize();
+  updateFullscreenButtons();
+
   // Back button (surah list view)
   document.getElementById("backBtn")?.addEventListener("click", () => {
     ipcRenderer.invoke("navigate-to", "features");
@@ -272,6 +273,9 @@ function initQuranPage() {
   });
   document.getElementById("closeBtn")?.addEventListener("click", () => {
     ipcRenderer.invoke("close-window");
+  });
+  document.getElementById("readerMinimizeBtn")?.addEventListener("click", () => {
+    ipcRenderer.invoke("minimize-window");
   });
   document.getElementById("readerCloseBtn")?.addEventListener("click", () => {
     ipcRenderer.invoke("close-window");
@@ -293,6 +297,7 @@ function initQuranPage() {
 
   // Settings panel toggle
   document.getElementById("readerSettingsBtn")?.addEventListener("click", toggleSettings);
+  document.getElementById("settingsPanelCloseBtn")?.addEventListener("click", closeSettings);
 
   // Font size controls
   document.getElementById("fontIncBtn")?.addEventListener("click", () => changeFontSize(2));
@@ -335,8 +340,6 @@ function updateQuranText() {
   if (el("tabSurah"))        el("tabSurah").textContent = t("surah") || "Surah";
   if (el("tabJuz"))          el("tabJuz").textContent = t("juz") || "Juz";
   if (el("surahSearchInput")) el("surahSearchInput").placeholder = t("searchSurah") || "Search surah...";
-  if (el("labelFontSize"))   el("labelFontSize").textContent = t("fontSize") || "Font Size";
-  if (el("labelTranslation")) el("labelTranslation").textContent = t("translation") || "Translation";
   if (el("fontSizeDisplay")) el("fontSizeDisplay").textContent = state.fontSize;
 }
 
@@ -437,6 +440,10 @@ async function openSurah(surahNum) {
   document.getElementById("viewSurahList").style.display = "none";
   document.getElementById("viewSurahReader").style.display = "";
 
+  // Settings panel is visible by default every time the reader opens.
+  state.settingsOpen = true;
+  document.getElementById("readerSettingsPanel").style.display = "";
+
   // Set header
   document.getElementById("readerSurahName").textContent = `${meta.ar}  —  ${meta.en}`;
   document.getElementById("readerSurahMeta").textContent =
@@ -512,16 +519,34 @@ async function loadAyahs(surahNum) {
 
 function renderAyahs(ayahs) {
   const list = document.getElementById("ayahList");
-  list.innerHTML = ayahs.map((a) => `
-    <div class="ayah-card" data-ayah="${a.number}">
-      <div class="ayah-arabic" style="font-size:${state.fontSize}px">${a.arabic} <span class="ayah-end-ornament">﴿${toArabicNum(a.number)}﴾</span></div>
-      ${a.translation ? `<div class="ayah-translation">${a.translation}</div>` : ""}
-    </div>
-  `).join("");
-}
+  const withTranslation = ayahs.filter((a) => a.translation);
+  const showingTranslation = state.translationId !== "none" && withTranslation.length > 0;
 
-function toArabicNum(n) {
-  return String(n).replace(/[0-9]/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+  let html = "";
+
+  // Continuous Mushaf-style flow: one paragraph with each ayah's number
+  // embedded inline as (N). Only shown when no translation is selected —
+  // with a translation active, the reader sees the pure translation only.
+  if (!showingTranslation) {
+    const flowHtml = ayahs
+      .map(
+        (a) =>
+          `${a.arabic} <span class="ayah-number-inline" data-ayah="${a.number}">(${a.number})</span>`,
+      )
+      .join(" ");
+    html += `<div class="surah-flow-text" id="surahFlowText" style="font-size:${state.fontSize}px">${flowHtml}</div>`;
+  }
+
+  if (showingTranslation) {
+    html += `<div class="ayah-translation-list" id="ayahTranslationList" style="font-size:${state.fontSize}px">${withTranslation
+      .map(
+        (a) =>
+          `<div class="ayah-translation-row"><span class="ayah-translation-num">${a.number}.</span>${a.translation}</div>`,
+      )
+      .join("")}</div>`;
+  }
+
+  list.innerHTML = html;
 }
 
 // ── Show Surah List ───────────────────────────────────────────
@@ -543,13 +568,18 @@ function toggleSettings() {
   panel.style.display = state.settingsOpen ? "" : "none";
 }
 
+function closeSettings() {
+  state.settingsOpen = false;
+  document.getElementById("readerSettingsPanel").style.display = "none";
+}
+
 function changeFontSize(delta) {
   state.fontSize = Math.max(18, Math.min(42, state.fontSize + delta));
   document.getElementById("fontSizeDisplay").textContent = state.fontSize;
-  // Update all displayed ayahs
-  document.querySelectorAll(".ayah-arabic").forEach((el) => {
-    el.style.fontSize = `${state.fontSize}px`;
-  });
+  const flowText = document.getElementById("surahFlowText");
+  if (flowText) flowText.style.fontSize = `${state.fontSize}px`;
+  const translationList = document.getElementById("ayahTranslationList");
+  if (translationList) translationList.style.fontSize = `${state.fontSize}px`;
 }
 
 async function onTranslationChange(e) {
@@ -560,21 +590,32 @@ async function onTranslationChange(e) {
 }
 
 // ── Fullscreen ────────────────────────────────────────────────
+// Two fullscreen buttons exist (surah-list header + reader header), so
+// unlike single-button pages we can't hand this fully to
+// screenSizeManager's built-in button updater — it drives the actual
+// resize/maximize + persisted setting, and we mirror the result onto
+// both buttons ourselves.
 
-function toggleFullscreen() {
-  state.isFullscreen = !state.isFullscreen;
-  if (state.isFullscreen) {
-    ipcRenderer.invoke("resize-window", 1024, 768);
-    document.body.classList.add("fullscreen");
-  } else {
-    ipcRenderer.invoke("resize-window", 850, 600);
-    document.body.classList.remove("fullscreen");
-  }
-  const icon1 = document.querySelector("#quranFullscreenBtn i");
-  const icon2 = document.querySelector("#readerFullscreenBtn i");
-  const cls = state.isFullscreen ? "fas fa-compress" : "fas fa-expand";
-  if (icon1) icon1.className = cls;
-  if (icon2) icon2.className = cls;
+function updateFullscreenButtons() {
+  const isBig = screenSizeManager.isBigScreen();
+  const tipKey = isBig ? "tooltipExpand" : "tooltipCompress";
+  const tipText = t(tipKey) || (isBig ? "Expand" : "Compress");
+  const iconCls = isBig ? "fas fa-expand" : "fas fa-compress";
+
+  ["quranFullscreenBtn", "readerFullscreenBtn"].forEach((id) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.setAttribute("aria-label", tipText);
+    btn.setAttribute("data-tooltip", tipKey);
+    btn.setAttribute("data-tip", tipText);
+    const icon = btn.querySelector("i");
+    if (icon) icon.className = iconCls;
+  });
+}
+
+async function toggleFullscreen() {
+  await screenSizeManager.toggleScreenSize();
+  updateFullscreenButtons();
 }
 
 // ── Connection recovery ───────────────────────────────────────

@@ -1,5 +1,6 @@
 {
   "settings": "Paramètres",
+  "appearance": "Apparence",
   "city": "Ville",
   "location": "localisation",
   "detectLocation": "Détecter la localisation",
@@ -24,11 +25,12 @@
   "minutes": "min",
   "preAdhanNotification": "Notification pré-Adhan",
   "minutesBeforeAdhan": "Minutes avant Adhan",
-  "enablePreAdhanNotification": "Activer la notification",
+  "enablePreAdhanNotification": "Alerte avant l'Adhan",
   "manageLocationsLabel": "Gérer les emplacements enregistrés",
   "manageLocationsTitle": "Gérer les emplacements",
   "openAtLogin": "Lancer au démarrage",
   "fullScreen": "Plein Écran",
   "bigScreenDimensions": "Fenêtre fixe",
-  "fullScreenDimensions": "Remplit votre écran"
+  "fullScreenDimensions": "Remplit votre écran",
+  "changesSavedAutomatically": "Les modifications sont enregistrées automatiquement"
 }
