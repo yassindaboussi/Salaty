@@ -9,7 +9,11 @@ const analytics = require("../services/analytics-manager");
 
 function createMainWindow({ onCloseToTray } = {}) {
   ipcHandlers.loadSettings();
-  playerManager.createPlayerWindow();
+  // NOTE: the background-player window is intentionally NOT created here.
+  // It is an extra renderer process (+ its own DevTools window in dev mode)
+  // and is only needed once the user actually starts playing an audio track
+  // from the Audio Archive. player-manager.js creates it lazily on the
+  // first real playback command ("set-playlist") instead.
 
   const settings = ipcHandlers.getSettingsData();
   analytics.init(settings);

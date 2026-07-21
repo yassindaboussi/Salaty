@@ -14,5 +14,8 @@
   "isAvailable": "available — click Download",
   "downloading": "Downloading",
   "readyToInstall": "Ready to install — restart to apply",
-  "restartAndInstall": "Restart & Install"
+  "restartAndInstall": "Restart & Install",
+  "aboutTagline": "Prayer times, Quran & Islamic tools in one place",
+  "viewOnGithub": "View on GitHub",
+  "emailCopied": "Email copied to clipboard"
 }

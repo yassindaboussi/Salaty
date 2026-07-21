@@ -14,6 +14,8 @@
   "searchSurah": "Search surah...",
   "fontSize": "Font Size",
   "translation": "Translation",
+  "increaseFontSize": "Increase font size",
+  "decreaseFontSize": "Decrease font size",
   "retry": "Retry",
   "noResults": "No surahs found",
   "startingFrom": "Starting from"

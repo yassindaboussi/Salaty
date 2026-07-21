@@ -4,7 +4,6 @@ const GITHUB_BASE_URL =
 // Pre-require local files for fallback
 const localAdkar = require("../../../data/adkar.json");
 const localNames = require("../../../data/99_Names_Of_Allah.json");
-const localAlbums = require("../../../data/audio_albums.json");
 
 /**
  * Fetch data from GitHub raw url with local file fallback
@@ -29,5 +28,4 @@ module.exports = {
   getAdkar: () => fetchWithFallback("adkar.json", localAdkar),
   getNamesOfAllah: () =>
     fetchWithFallback("99_Names_Of_Allah.json", localNames),
-  getAudioAlbums: () => fetchWithFallback("audio_albums.json", localAlbums),
 };

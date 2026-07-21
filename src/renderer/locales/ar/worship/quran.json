@@ -14,6 +14,8 @@
   "searchSurah": "ابحث عن سورة...",
   "fontSize": "حجم الخط",
   "translation": "الترجمة",
+  "increaseFontSize": "تكبير حجم الخط",
+  "decreaseFontSize": "تصغير حجم الخط",
   "retry": "إعادة المحاولة",
   "noResults": "لم يتم العثور على سور",
   "startingFrom": "تبدأ من"

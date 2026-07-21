@@ -7,7 +7,7 @@
  * resizes and loads the file atomically. No sequential renderer-side awaits.
  */
 
-const { ipcMain, app } = require("electron");
+const { ipcMain, app, clipboard } = require("electron");
 const { pages } = require("../../config/paths");
 
 // Page size map — pages that need a specific size declare it here.
@@ -100,6 +100,15 @@ function setupHandlers(mainWindow) {
   ipcMain.handle("check-for-updates-manual", () => {
     const { autoUpdater } = require("electron-updater");
     return autoUpdater.checkForUpdates();
+  });
+
+  // Electron deprecates direct `clipboard.*` access from the renderer
+  // process (it warns to use contextBridge instead) — routing it through
+  // the main process here avoids that warning without requiring a full
+  // contextIsolation/contextBridge migration of the app.
+  ipcMain.handle("clipboard-write-text", (_e, text) => {
+    clipboard.writeText(String(text ?? ""));
+    return true;
   });
 
   ipcMain.on(

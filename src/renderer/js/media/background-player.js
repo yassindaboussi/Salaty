@@ -1,5 +1,4 @@
 const { ipcRenderer } = require("electron");
-const { getArchiveOrgTracks } = require("../../js/utils/trackUtils");
 
 class BackgroundPlayer {
   constructor() {
@@ -161,26 +160,16 @@ class BackgroundPlayer {
     }
   }
 
+  /**
+   * Initializes an empty playlist. The real track list always arrives via
+   * the "set-playlist" player-command once the user picks a reciter in the
+   * Audio Archive — this just puts the player in a clean "idle" state
+   * instead of eagerly fetching a hardcoded demo album on every startup.
+   */
   async loadLocalTracks() {
-    try {
-      // Archive.org Configuration
-      const ARCHIVE_ITEM_ID = "Mishary-Alafasy"; // Example ID containing audio
-      const ARCHIVE_METADATA_URL = `https://archive.org/metadata/${ARCHIVE_ITEM_ID}`;
-      this.tracks = await getArchiveOrgTracks(ARCHIVE_METADATA_URL);
-
-      // Notify UI about tracks
-      ipcRenderer.send("player-update", {
-        type: "tracks",
-        tracks: this.tracks,
-      });
-      this.sendState();
-    } catch (error) {
-      console.error("Error fetching tracks from Archive.org:", error);
-      ipcRenderer.send("player-update", {
-        type: "error",
-        message: "Failed to load playlist from Archive.org.",
-      });
-    }
+    this.tracks = [];
+    ipcRenderer.send("player-update", { type: "tracks", tracks: this.tracks });
+    this.sendState();
   }
 
   playTrack(index) {

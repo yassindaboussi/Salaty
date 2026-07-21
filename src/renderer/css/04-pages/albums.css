@@ -83,13 +83,203 @@
   opacity: 0.7;
 }
 
+/* ========================================
+   COLLAPSIBLE GROUPS (Quran Recitation / Tadabor)
+   Both start collapsed; expanding one grows to fill the remaining space
+   while the other (if collapsed) stays a compact header row.
+   ======================================== */
+
+.archive-groups {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.archive-group {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+  transition: background 0.2s ease;
+}
+
+.archive-group.expanded {
+  flex: 1;
+  min-height: 0;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.archive-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 13px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  text-align: left;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+
+.archive-group-header:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.archive-group.expanded .archive-group-header {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.archive-group-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.archive-group-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(var(--accent-rgb), 0.15);
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.archive-group-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.archive-group-chevron {
+  color: var(--text-secondary);
+  font-size: 13px;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.archive-group.expanded .archive-group-chevron {
+  transform: rotate(180deg);
+  color: var(--accent-color);
+}
+
+.archive-group-content {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 10px 10px 12px;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.archive-group.expanded .archive-group-content {
+  display: flex;
+}
+
+/* Trigger the fade on the next frame after display:flex is applied
+   (see albums.js) — animating opacity directly on toggle would otherwise
+   jump straight to 1 since display:none can't be transitioned. */
+.archive-group.expanded.content-visible .archive-group-content {
+  opacity: 1;
+}
+
+.archive-group-content .search-container {
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.archive-back-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 6px 10px;
+  border-radius: 7px;
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.archive-back-link:hover {
+  background: rgba(var(--accent-rgb), 0.1);
+}
+
+.archive-back-link i {
+  font-size: 11px;
+}
+
+/* Reciter list + A-Z index rail sit side by side and share the remaining
+   vertical space below the search box. */
+.archive-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 4px;
+  overflow: hidden;
+}
+
 /* Albums Grid */
 .albums-grid {
   flex: 1;
+  min-width: 0;
   overflow-y: auto;
   padding: 4px;
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) transparent;
+}
+
+/* A-Z quick-jump index (same pattern as iOS Contacts / Spotify artist
+   lists): tap or drag a letter to jump straight to that section instead
+   of scrolling through 200+ reciters one row at a time. */
+.az-index {
+  flex-shrink: 0;
+  width: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.az-index-letter {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  opacity: 0.45;
+  cursor: default;
+  line-height: 1.3;
+}
+
+.az-index-letter.has-entries {
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+.az-index-letter.has-entries:hover,
+.az-index-letter.active {
+  opacity: 1;
+  color: var(--accent-color);
+  transform: scale(1.15);
 }
 
 .albums-grid::-webkit-scrollbar {
@@ -203,3 +393,196 @@
   font-size: 32px;
   opacity: 0.5;
 }
+
+/* ========================================
+   RECITER CARD GRID (Audio Archive — mp3quran.net)
+   Simple profile-style cards (avatar + name + one line of meta) in a
+   responsive grid, grouped under letter headers that span every column
+   so alignment stays consistent across the whole scroll area.
+   ======================================== */
+
+.reciter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.reciter-section-header {
+  grid-column: 1 / -1;
+  padding: 12px 2px 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-color);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.reciter-grid > .reciter-section-header:first-child {
+  padding-top: 2px;
+}
+
+.reciter-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 16px 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.reciter-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(var(--accent-rgb), 0.4);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+
+.reciter-card-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--accent-color),
+    rgba(var(--accent-rgb), 0.55)
+  );
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.35);
+}
+
+.reciter-card-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+}
+
+.reciter-card-meta {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.reciter-card-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--accent-color);
+  color: #06122a;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Recitation-style picker modal (reciters with >1 moshaf) ────────────── */
+
+.moshaf-modal-content {
+  max-width: 380px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 18px;
+}
+
+.moshaf-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.moshaf-modal-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.moshaf-modal-close {
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: var(--text-secondary);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.moshaf-modal-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+.moshaf-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.moshaf-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.moshaf-item:hover {
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--text-primary);
+}
+
+.moshaf-item i {
+  color: var(--accent-color);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+/* Loading / error states reuse the shared .loading/.error utility classes
+   already used elsewhere (see 06-utilities/utilities.css). */

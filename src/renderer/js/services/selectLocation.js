@@ -1,7 +1,14 @@
 const TomSelect = require("tom-select").default;
 const { ipcRenderer } = require("electron");
 
-async function initSelectLocation() {
+/**
+ * @param {(location: {country: string, city: string}) => void} [onChange]
+ *   Called whenever the user's location selection actually changes (manual
+ *   city pick, or auto-detect), so the caller can persist it immediately —
+ *   no separate "Save" step needed. Not called for the initial silent
+ *   restore from saved settings.
+ */
+async function initSelectLocation(onChange) {
   let detectedLocationTarget = null;
   let savedSettings = {};
   try {
@@ -46,7 +53,7 @@ async function initSelectLocation() {
   citySelect.disable();
 
   // Load cities for a given country, then optionally select a default city
-  async function loadCities(countryName, defaultCity = null) {
+  async function loadCities(countryName, defaultCity = null, notify = false) {
     citySelect.clear();
     citySelect.clearOptions();
     citySelect.disable();
@@ -67,6 +74,7 @@ async function initSelectLocation() {
         citySelect.enable();
         if (defaultCity) {
           citySelect.setValue(defaultCity, true); // silent — don't fire city change
+          if (notify) onChange?.({ country: countryName, city: defaultCity });
         }
       }
     } catch (e) {
@@ -87,13 +95,24 @@ async function initSelectLocation() {
     } else if (value === "Tunisia") {
       defaultCity = "Tunis";
     }
-    loadCities(value, defaultCity);
+    // notify=true: a country picked by the user (with a resolved default
+    // city) is a real selection worth persisting, unlike the initial
+    // silent restore below.
+    loadCities(value, defaultCity, true);
   });
 
   // Load cities for the initial country (triggered manually since setValue was silent)
   const initialCity =
     savedSettings.city || (initialCountry === "Tunisia" ? "Tunis" : null);
   loadCities(initialCountry, initialCity);
+
+  // ── City change handler (manual pick from the dropdown) ─────────────────────
+  citySelect.on("change", (value) => {
+    if (!value) return;
+    const country = countrySelect.getValue();
+    if (!country) return;
+    onChange?.({ country, city: value });
+  });
 
   // ── Auto Detect Button ──────────────────────────────────────────────────────
   const detectBtn = document.getElementById("detectLocationBtn");

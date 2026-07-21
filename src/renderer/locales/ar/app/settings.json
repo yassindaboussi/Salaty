@@ -1,5 +1,6 @@
 {
   "settings": "الإعدادات",
+  "appearance": "المظهر",
   "city": "المدينة",
   "location": "الموقع",
   "detectLocation": "تحديد الموقع تلقائيا",
@@ -24,11 +25,12 @@
   "minutes": "دقيقة",
   "preAdhanNotification": "تنبيه قبل الأذان",
   "minutesBeforeAdhan": "دقائق قبل الأذان",
-  "enablePreAdhanNotification": "تفعيل التنبيه",
+  "enablePreAdhanNotification": "تنبيه قبل الأذان",
   "manageLocationsLabel": "إدارة المواقع المحفوظة",
   "manageLocationsTitle": "إدارة المواقع",
   "openAtLogin": "تشغيل عند بدء النظام",
   "fullScreen": "ملء الشاشة",
   "bigScreenDimensions": "نافذة ثابتة",
-  "fullScreenDimensions": "يملأ شاشتك"
+  "fullScreenDimensions": "يملأ شاشتك",
+  "changesSavedAutomatically": "يتم حفظ التغييرات تلقائيًا"
 }

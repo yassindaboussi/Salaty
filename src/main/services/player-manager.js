@@ -6,10 +6,26 @@ const { createBackgroundPlayerOptions } = require("../config/window-options");
 let playerWindow = null;
 let isPlayerPlaying = false;
 let currentTheme = "navy";
+let isPlayerReady = false;
+let pendingCommands = [];
 
+// Commands that genuinely need the background player to exist/start.
+// Everything else (pause/resume/seek/volume/get-state/...) is only
+// meaningful once playback has already begun, so it's safe to no-op
+// when the window hasn't been created yet.
+const PLAYBACK_STARTING_COMMANDS = new Set(["set-playlist"]);
+
+/**
+ * Lazily creates the hidden background-player BrowserWindow the first time
+ * it's actually needed (i.e. when the user starts playing a track from the
+ * Audio Archive), instead of eagerly on every app launch. This avoids
+ * spinning up an extra renderer process (and, in dev mode, an extra
+ * DevTools window) for users who never touch the audio player.
+ */
 function createPlayerWindow() {
   if (playerWindow && !playerWindow.isDestroyed()) return playerWindow;
 
+  isPlayerReady = false;
   playerWindow = new BrowserWindow(createBackgroundPlayerOptions());
   playerWindow.loadFile(pages.backgroundPlayer);
 
@@ -17,14 +33,42 @@ function createPlayerWindow() {
     playerWindow.webContents.openDevTools({ mode: "detach" });
 
   playerWindow.webContents.on("did-finish-load", () => {
+    isPlayerReady = true;
     playerWindow.webContents.send("apply-theme", { theme: currentTheme });
+
+    // Flush any command(s) that arrived while the renderer was still
+    // loading (e.g. the very "set-playlist" that triggered this window's
+    // creation) — without this, that first command is silently dropped
+    // because did-finish-load hasn't fired yet and no IPC listener exists
+    // in the renderer to receive it.
+    const queued = pendingCommands;
+    pendingCommands = [];
+    queued.forEach((cmd) =>
+      playerWindow.webContents.send("player-command", cmd),
+    );
   });
 
   playerWindow.on("closed", () => {
     playerWindow = null;
+    isPlayerReady = false;
+    pendingCommands = [];
   });
   return playerWindow;
 }
+
+/**
+ * Sends a player-command to the background player, queuing it if the
+ * window is still being created/loaded rather than dropping it.
+ */
+function sendPlayerCommand(arg) {
+  if (!playerWindow || playerWindow.isDestroyed()) return;
+  if (isPlayerReady) {
+    playerWindow.webContents.send("player-command", arg);
+  } else {
+    pendingCommands.push(arg);
+  }
+}
+
 function showMiniPlayer() {
   if (!playerWindow) return;
   try {
@@ -54,8 +98,17 @@ function setupPlayerIpc(mainWindow) {
   });
 
   ipcMain.on("player-command", (_e, arg) => {
-    if (playerWindow && !playerWindow.isDestroyed())
-      playerWindow.webContents.send("player-command", arg);
+    // Create the player window on-demand the first time real playback is
+    // requested; ignore other commands (pause/seek/volume/get-state/...)
+    // if playback was never started, instead of spinning the window up.
+    if (
+      (!playerWindow || playerWindow.isDestroyed()) &&
+      PLAYBACK_STARTING_COMMANDS.has(arg?.type)
+    ) {
+      createPlayerWindow();
+    }
+
+    sendPlayerCommand(arg);
   });
 
   ipcMain.on("player-update", (_e, arg) => {
@@ -69,8 +122,7 @@ function setupPlayerIpc(mainWindow) {
   });
 
   ipcMain.on("player-get-state", () => {
-    if (playerWindow && !playerWindow.isDestroyed())
-      playerWindow.webContents.send("player-command", { type: "get-state" });
+    sendPlayerCommand({ type: "get-state" });
   });
   // NOTE: 'show-main-window' is registered once in window-handlers.js — not here.
 }

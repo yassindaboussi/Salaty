@@ -14,6 +14,8 @@
   "searchSurah": "Rechercher une sourate...",
   "fontSize": "Taille de police",
   "translation": "Traduction",
+  "increaseFontSize": "Augmenter la taille de police",
+  "decreaseFontSize": "Réduire la taille de police",
   "retry": "Réessayer",
   "noResults": "Aucune sourate trouvée",
   "startingFrom": "À partir de"
