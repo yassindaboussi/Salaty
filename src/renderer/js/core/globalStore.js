@@ -1,4 +1,3 @@
-// src/renderer/js/globalStore.js
 
 const prayerIcons = {
   Fajr: "cloud-moon",

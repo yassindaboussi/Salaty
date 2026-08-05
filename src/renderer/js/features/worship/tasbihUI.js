@@ -1,44 +1,31 @@
-// tasbihUI.js
+"use strict";
 const { ipcRenderer } = require("electron");
 const {
   setupConnectionRecovery,
 } = require("../../services/connection-recovery");
 const { t, getLanguage } = require("../../core/i18n/translations");
-const screenSizeManager = require("../../core/screenSize");
 const analytics = require("../../utils/analytics");
+const { renderToast } = require("../../core/toast");
 
 const DEFAULT_DHIKR_LIST = [
-  {
-    name: "سُبْحَانَ اللَّهِ",
-    count: 33,
-    translation: "SubhanAllah (Glory be to Allah)",
-  },
-  {
-    name: "الْحَمْدُ لِلَّهِ",
-    count: 33,
-    translation: "Alhamdulillah (Praise be to Allah)",
-  },
-  {
-    name: "اللَّهُ أَكْبَرُ",
-    count: 34,
-    translation: "Allahu Akbar (Allah is the Greatest)",
-  },
-  {
-    name: "لا إله إلا الله",
-    count: 100,
-    translation: "La ilaha illallah (There is no god but Allah)",
-  },
-  {
-    name: "أستغفر الله",
-    count: 100,
-    translation: "Astaghfirullah (I seek forgiveness from Allah)",
-  },
-  {
-    name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
-    count: 100,
-    translation: "SubhanAllahi wa bihamdihi",
-  },
+  { id: "subhanallah", name: "سُبْحَانَ اللَّهِ", count: 33, meaningKey: "dhikrSubhanallahMeaning" },
+  { id: "alhamdulillah", name: "الْحَمْدُ لِلَّهِ", count: 33, meaningKey: "dhikrAlhamdulillahMeaning" },
+  { id: "allahuakbar", name: "اللَّهُ أَكْبَرُ", count: 34, meaningKey: "dhikrAllahuAkbarMeaning" },
+  { id: "laIlahaIllallah", name: "لا إله إلا الله", count: 100, meaningKey: "dhikrLaIlahaMeaning" },
+  { id: "astaghfirullah", name: "أستغفر الله", count: 100, meaningKey: "dhikrAstaghfirullahMeaning" },
+  { id: "subhanallahiWaBihamdihi", name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 100, meaningKey: "dhikrSubhanallahiWaBihamdihiMeaning" },
+  { id: "salawat", name: "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ", count: 100, meaningKey: "dhikrSalawatMeaning" },
+  { id: "hawqala", name: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", count: 100, meaningKey: "dhikrHawqalaMeaning" },
 ];
+
+const LEGACY_NAME_TO_ID = {
+  "سُبْحَانَ اللَّهِ": "subhanallah",
+  "الْحَمْدُ لِلَّهِ": "alhamdulillah",
+  "اللَّهُ أَكْبَرُ": "allahuakbar",
+  "لا إله إلا الله": "laIlahaIllallah",
+  "أستغفر الله": "astaghfirullah",
+  "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ": "subhanallahiWaBihamdihi",
+};
 
 const FOOTER_TEXTS = {
   en: [
@@ -64,54 +51,44 @@ const FOOTER_TEXTS = {
   ],
 };
 
+const RING_RADIUS = 96;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+
 let currentDhikr = {
+  id: DEFAULT_DHIKR_LIST[0].id,
   name: DEFAULT_DHIKR_LIST[0].name,
   count: DEFAULT_DHIKR_LIST[0].count,
   current: 0,
 };
 let tasbihHistory = {};
+let unlimitedMap = {};
 
 function initTasbihPage() {
-  // Setup auto-reload on connection restored
-  setupConnectionRecovery(() => {
-    initTasbihPage();
-  }, "Tasbih");
-  const backBtn = document.getElementById("backBtn");
-  if (backBtn) {
-    backBtn.addEventListener("click", () => {
-      ipcRenderer.invoke("navigate-to", "features");
-    });
-  }
+  setupConnectionRecovery(initTasbihPage, "Tasbih");
 
-  document
-    .getElementById("resetAllBtn")
-    ?.addEventListener("click", showResetAllConfirm);
+  document.getElementById("backBtn")?.addEventListener("click", () => {
+    ipcRenderer.invoke("navigate-to", "features");
+  });
   document
     .getElementById("incrementBtn")
     ?.addEventListener("click", incrementCount);
+  document.getElementById("tbRingTap")?.addEventListener("click", incrementCount);
+  document.getElementById("undoBtn")?.addEventListener("click", undoLastCount);
   document
     .getElementById("resetBtn")
     ?.addEventListener("click", resetCurrentDhikr);
+  document
+    .getElementById("tbLimitChip")
+    ?.addEventListener("click", toggleUnlimited);
 
   loadTasbihState();
-  updateTasbihUI();
+  updateStaticText();
   populateDhikrGrid();
+  updateActiveDhikrPanel();
   updateCounterDisplay();
-  addSpacebarIndicator();
   setupKeyboardListener();
 }
 
-function addSpacebarIndicator() {
-  const container = document.querySelector(".tasbih-counter-container");
-  if (!container || container.querySelector(".spacebar-indicator")) return;
-  const lang = getLanguage();
-  const spaceText =
-    lang === "ar" ? "مسافة" : lang === "fr" ? "Espace" : "Space";
-  const indicator = document.createElement("div");
-  indicator.className = "spacebar-indicator";
-  indicator.innerHTML = `<i class="fas fa-keyboard"></i><kbd>␣</kbd><span>${spaceText}</span>`;
-  container.appendChild(indicator);
-}
 
 function setupKeyboardListener() {
   document.addEventListener("keydown", (event) => {
@@ -120,303 +97,371 @@ function setupKeyboardListener() {
       !event.target.matches("input, textarea, button")
     ) {
       event.preventDefault();
-      const display = document.querySelector(".tasbih-counter-display");
-      if (display) {
-        display.style.transform = "scale(0.95)";
-        setTimeout(() => {
-          display.style.transform = "scale(1)";
-        }, 100);
-      }
+      pulseRing();
       incrementCount();
     }
   });
 }
 
-function updateTasbihUI() {
-  const lang = getLanguage();
-  const tasbihTitle = document.getElementById("tasbihTitle");
-  const tasbihFooter = document.getElementById("tasbihFooterText");
-  const incrementLabel = document.getElementById("incrementLabel");
-  const resetLabel = document.getElementById("resetLabel");
-  const dhikrLabel = document.getElementById("dhikrLabel");
-  const targetLabel = document.getElementById("targetLabel");
-  const resetAllBtn = document.getElementById("resetAllBtn");
+function pulseRing() {
+  const ring = document.getElementById("tbRingTap");
+  if (!ring) return;
+  ring.classList.remove("tb-ring-tap--pulse");
+  void ring.offsetWidth;
+  ring.classList.add("tb-ring-tap--pulse");
+}
 
-  if (tasbihTitle) tasbihTitle.textContent = t("tasbih");
+
+function updateStaticText() {
+  const lang = getLanguage();
+  const map = {
+    tasbihTitle: "tasbih",
+    dhikrLabel: "selectDhikr",
+    incrementLabel: "countBtn",
+    resetLabel: "resetBtn",
+    spacebarText: "spacebarHint",
+  };
+  for (const [id, key] of Object.entries(map)) {
+    const el = document.getElementById(id);
+    const text = t(key);
+    if (el && text) el.textContent = text;
+  }
+
+  const undoBtn = document.getElementById("undoBtn");
+  if (undoBtn) undoBtn.setAttribute("aria-label", t("undoBtn"));
+
+  const tasbihFooter = document.getElementById("tasbihFooterText");
   if (tasbihFooter) {
     const texts = FOOTER_TEXTS[lang] || FOOTER_TEXTS.en;
     tasbihFooter.textContent = texts[Math.floor(Math.random() * texts.length)];
   }
-  if (incrementLabel)
-    incrementLabel.textContent =
-      lang === "ar" ? "تسبيح" : lang === "fr" ? "Compter" : "Count";
-  if (resetLabel)
-    resetLabel.textContent =
-      lang === "ar" ? "إعادة" : lang === "fr" ? "Réinitialiser" : "Reset";
-  if (dhikrLabel)
-    dhikrLabel.textContent =
-      lang === "ar"
-        ? "اختر الذكر"
-        : lang === "fr"
-          ? "Choisir Dhikr"
-          : "Select Dhikr";
-  if (targetLabel) targetLabel.textContent = "/ " + currentDhikr.count;
-  if (resetAllBtn) resetAllBtn.setAttribute("aria-label", t("resetAll"));
 }
+
 
 function loadTasbihState() {
   try {
     const saved = localStorage.getItem("tasbihState");
     if (saved) {
-      tasbihHistory = JSON.parse(saved);
-      const lastDhikr = localStorage.getItem("lastDhikr");
-      if (lastDhikr) {
-        const parsed = JSON.parse(lastDhikr);
-        currentDhikr = {
-          name: parsed.name || DEFAULT_DHIKR_LIST[0].name,
-          count: parsed.count || DEFAULT_DHIKR_LIST[0].count,
-          current: tasbihHistory[parsed.name] || 0,
-        };
-      } else {
-        currentDhikr.current = tasbihHistory[currentDhikr.name] || 0;
-      }
+      const parsed = JSON.parse(saved);
+      tasbihHistory = _migrateLegacyKeys(parsed);
     }
+    const savedUnlimited = localStorage.getItem("tasbihUnlimitedMap");
+    if (savedUnlimited) unlimitedMap = JSON.parse(savedUnlimited) || {};
+
+    const lastDhikrId = localStorage.getItem("lastDhikrId");
+    const found = DEFAULT_DHIKR_LIST.find((d) => d.id === lastDhikrId);
+    const dhikr = found || DEFAULT_DHIKR_LIST[0];
+    currentDhikr = {
+      id: dhikr.id,
+      name: dhikr.name,
+      count: dhikr.count,
+      current: tasbihHistory[dhikr.id] || 0,
+    };
   } catch (err) {
     console.error("Error loading tasbih state:", err);
     tasbihHistory = {};
+    unlimitedMap = {};
   }
+}
+
+function _migrateLegacyKeys(parsed) {
+  const migrated = {};
+  for (const [key, value] of Object.entries(parsed || {})) {
+    const mappedId = LEGACY_NAME_TO_ID[key];
+    migrated[mappedId || key] = value;
+  }
+  return migrated;
 }
 
 function saveTasbihState() {
   try {
-    tasbihHistory[currentDhikr.name] = currentDhikr.current;
+    tasbihHistory[currentDhikr.id] = currentDhikr.current;
     localStorage.setItem("tasbihState", JSON.stringify(tasbihHistory));
-    localStorage.setItem(
-      "lastDhikr",
-      JSON.stringify({ name: currentDhikr.name, count: currentDhikr.count }),
-    );
+    localStorage.setItem("lastDhikrId", currentDhikr.id);
   } catch (err) {
     console.error("Error saving tasbih state:", err);
   }
 }
 
+function saveUnlimitedMap() {
+  try {
+    localStorage.setItem("tasbihUnlimitedMap", JSON.stringify(unlimitedMap));
+  } catch (err) {
+    console.error("Error saving unlimited map:", err);
+  }
+}
+
+function isUnlimited(dhikrId) {
+  return !!unlimitedMap[dhikrId];
+}
+
+
 function populateDhikrGrid() {
   const grid = document.getElementById("dhikrGrid");
   if (!grid) return;
+  const lang = getLanguage();
   grid.innerHTML = "";
-  DEFAULT_DHIKR_LIST.forEach((dhikr, index) => {
-    const card = document.createElement("div");
+
+  DEFAULT_DHIKR_LIST.forEach((dhikr) => {
+    const card = document.createElement("button");
+    card.type = "button";
     card.className = "dhikr-card";
-    if (dhikr.name === currentDhikr.name) card.classList.add("active");
-    card.dataset.index = index;
-    card.dataset.name = dhikr.name;
-    card.dataset.count = dhikr.count;
+    if (dhikr.id === currentDhikr.id) card.classList.add("active");
+    card.dataset.id = dhikr.id;
 
     const nameSpan = document.createElement("span");
     nameSpan.className = "dhikr-name";
     nameSpan.textContent = dhikr.name;
+    card.appendChild(nameSpan);
+
+    if (lang !== "ar") {
+      const meaningSpan = document.createElement("span");
+      meaningSpan.className = "dhikr-meaning";
+      meaningSpan.textContent = t(dhikr.meaningKey) || "";
+      card.appendChild(meaningSpan);
+    }
+
     const countSpan = document.createElement("span");
     countSpan.className = "dhikr-count";
     countSpan.textContent = dhikr.count;
-
-    card.appendChild(nameSpan);
     card.appendChild(countSpan);
-    card.addEventListener("click", () => switchDhikr(dhikr.name, dhikr.count));
+
+    card.addEventListener("click", () => switchDhikr(dhikr));
     grid.appendChild(card);
   });
 }
 
-function switchDhikr(name, count) {
-  if (currentDhikr.name === name) return;
-  tasbihHistory[currentDhikr.name] = currentDhikr.current;
-  currentDhikr = { name, count, current: tasbihHistory[name] || 0 };
+function switchDhikr(dhikr) {
+  if (currentDhikr.id === dhikr.id) return;
+  tasbihHistory[currentDhikr.id] = currentDhikr.current;
+  currentDhikr = {
+    id: dhikr.id,
+    name: dhikr.name,
+    count: dhikr.count,
+    current: tasbihHistory[dhikr.id] || 0,
+  };
 
   document.querySelectorAll(".dhikr-card").forEach((card) => {
-    card.classList.toggle("active", card.dataset.name === name);
+    card.classList.toggle("active", card.dataset.id === dhikr.id);
   });
 
+  updateActiveDhikrPanel();
   updateCounterDisplay();
   saveTasbihState();
 
-  const lang = getLanguage();
-  const msg =
-    lang === "ar"
-      ? `تم التبديل إلى ${name}`
-      : lang === "fr"
-        ? `Passé à ${name}`
-        : `Switched to ${name}`;
-  showSuccessToast(msg);
+  showSuccessToast((t("dhikrSwitched") || "{name}").replace("{name}", dhikr.name));
 }
 
+function updateActiveDhikrPanel() {
+  const nameEl = document.getElementById("activeDhikrName");
+  const meaningEl = document.getElementById("activeDhikrMeaning");
+  const lang = getLanguage();
+  if (nameEl) nameEl.textContent = currentDhikr.name;
+  if (meaningEl) {
+    const dhikr = DEFAULT_DHIKR_LIST.find((d) => d.id === currentDhikr.id);
+    meaningEl.textContent =
+      lang === "ar" ? "" : (dhikr && t(dhikr.meaningKey)) || "";
+    meaningEl.classList.toggle("tb-hidden", lang === "ar");
+  }
+}
+
+
 function incrementCount() {
-  if (currentDhikr.current >= currentDhikr.count) return;
+  const unlimited = isUnlimited(currentDhikr.id);
+  if (!unlimited && currentDhikr.current >= currentDhikr.count) return;
 
   currentDhikr.current++;
-  tasbihHistory[currentDhikr.name] = currentDhikr.current;
   updateCounterDisplay();
   saveTasbihState();
+  pulseRing();
 
-  // ── Track tap ─────────────────────────────────────────────────────────────
-  analytics.tasbihTap(
-    currentDhikr.name,
-    currentDhikr.current,
-    currentDhikr.count,
-  ); // ← ANALYTICS
+  analytics.tasbihTap(currentDhikr.name, currentDhikr.current, currentDhikr.count);
 
-  if (currentDhikr.current === currentDhikr.count) {
-    const lang = getLanguage();
-    const msg =
-      lang === "ar"
-        ? `أكملت! ${currentDhikr.count} تسبيحة`
-        : lang === "fr"
-          ? `Complété! ${currentDhikr.count} fois`
-          : `Completed! ${currentDhikr.count} times`;
-    showSuccessToast(msg, false, 3000);
-
-    // ── Track completion ──────────────────────────────────────────────────
-    analytics.tasbihCompleted(currentDhikr.name); // ← ANALYTICS
-
-    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-  } else {
-    if (navigator.vibrate) navigator.vibrate(50);
+  const isLapComplete = currentDhikr.current % currentDhikr.count === 0;
+  if (isLapComplete) {
+    const lap = currentDhikr.current / currentDhikr.count;
+    if (lap <= 1) {
+      showSuccessToast(
+        (t("dhikrCompleted") || "{count}").replace("{count}", currentDhikr.count),
+        false,
+        3000,
+      );
+      analytics.tasbihCompleted(currentDhikr.name);
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    } else {
+      showSuccessToast(
+        (t("dhikrRoundCompleted") || "{n}").replace("{n}", lap),
+        false,
+        2200,
+      );
+      if (navigator.vibrate) navigator.vibrate([80, 40, 80, 40, 80]);
+    }
+  } else if (navigator.vibrate) {
+    navigator.vibrate(30);
   }
+}
+
+function undoLastCount() {
+  if (currentDhikr.current <= 0) return;
+  currentDhikr.current--;
+  updateCounterDisplay();
+  saveTasbihState();
+  if (navigator.vibrate) navigator.vibrate(20);
+}
+
+function toggleUnlimited() {
+  unlimitedMap[currentDhikr.id] = !unlimitedMap[currentDhikr.id];
+  saveUnlimitedMap();
+  updateCounterDisplay();
 }
 
 function resetCurrentDhikr() {
   if (currentDhikr.current === 0) return;
   showResetConfirm(() => {
     currentDhikr.current = 0;
-    tasbihHistory[currentDhikr.name] = 0;
     updateCounterDisplay();
     saveTasbihState();
-    const lang = getLanguage();
-    const msg =
-      lang === "ar"
-        ? "تم إعادة العداد"
-        : lang === "fr"
-          ? "Compteur réinitialisé"
-          : "Counter reset";
-    showSuccessToast(msg);
+    showSuccessToast(t("counterReset"));
   });
 }
 
-function resetAllCounters() {
-  DEFAULT_DHIKR_LIST.forEach((d) => {
-    tasbihHistory[d.name] = 0;
-  });
-  currentDhikr.current = 0;
-  saveTasbihState();
-  updateCounterDisplay();
-  const lang = getLanguage();
-  const msg =
-    lang === "ar"
-      ? "تم إعادة جميع العدادات"
-      : lang === "fr"
-        ? "Tous les compteurs réinitialisés"
-        : "All counters reset";
-  showSuccessToast(msg);
-}
 
-function showResetConfirm(callback) {
-  const lang = getLanguage();
-  const titles = {
-    en: "Reset Counter",
-    fr: "Réinitialiser le compteur",
-    ar: "إعادة العداد",
-  };
-  const messages = {
-    en: "Are you sure you want to reset this counter?",
-    fr: "Êtes-vous sûr de vouloir réinitialiser ce compteur ?",
-    ar: "هل أنت متأكد أنك تريد إعادة هذا العداد؟",
-  };
-  const cancels = { en: "Cancel", fr: "Annuler", ar: "إلغاء" };
-  const resets = { en: "Reset", fr: "Réinitialiser", ar: "إعادة" };
-  const dialog = document.createElement("div");
-  dialog.className = "tasbih-confirm-dialog";
-  dialog.innerHTML = `<div class="tasbih-confirm-box">
-    <div class="tasbih-confirm-title">${titles[lang] || titles.en}</div>
-    <div class="tasbih-confirm-message">${messages[lang] || messages.en}</div>
-    <div class="tasbih-confirm-buttons">
-      <button class="tasbih-confirm-btn tasbih-confirm-cancel">${cancels[lang] || cancels.en}</button>
-      <button class="tasbih-confirm-btn tasbih-confirm-reset">${resets[lang] || resets.en}</button>
-    </div></div>`;
-  document.body.appendChild(dialog);
-  dialog
-    .querySelector(".tasbih-confirm-cancel")
-    .addEventListener("click", () => dialog.remove());
-  dialog
-    .querySelector(".tasbih-confirm-reset")
-    .addEventListener("click", () => {
-      if (callback) callback();
-      dialog.remove();
-    });
-  dialog.addEventListener("click", (e) => {
-    if (e.target === dialog) dialog.remove();
-  });
-}
+function computeRingState() {
+  const target = currentDhikr.count || 1;
+  const current = currentDhikr.current;
+  const unlimited = isUnlimited(currentDhikr.id);
 
-function showResetAllConfirm() {
-  const lang = getLanguage();
-  const titles = {
-    en: "Reset All Counters",
-    fr: "Réinitialiser tous les compteurs",
-    ar: "إعادة جميع العدادات",
-  };
-  const messages = {
-    en: "Are you sure? This cannot be undone.",
-    fr: "Êtes-vous sûr ? Cette action ne peut pas être annulée.",
-    ar: "هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.",
-  };
-  const cancels = { en: "Cancel", fr: "Annuler", ar: "إلغاء" };
-  const resets = {
-    en: "Reset All",
-    fr: "Tout réinitialiser",
-    ar: "إعادة الكل",
-  };
-  const dialog = document.createElement("div");
-  dialog.className = "tasbih-confirm-dialog";
-  dialog.innerHTML = `<div class="tasbih-confirm-box">
-    <div class="tasbih-confirm-title">${titles[lang] || titles.en}</div>
-    <div class="tasbih-confirm-message">${messages[lang] || messages.en}</div>
-    <div class="tasbih-confirm-buttons">
-      <button class="tasbih-confirm-btn tasbih-confirm-cancel">${cancels[lang] || cancels.en}</button>
-      <button class="tasbih-confirm-btn tasbih-confirm-reset">${resets[lang] || resets.en}</button>
-    </div></div>`;
-  document.body.appendChild(dialog);
-  dialog
-    .querySelector(".tasbih-confirm-cancel")
-    .addEventListener("click", () => dialog.remove());
-  dialog
-    .querySelector(".tasbih-confirm-reset")
-    .addEventListener("click", () => {
-      resetAllCounters();
-      dialog.remove();
-    });
-  dialog.addEventListener("click", (e) => {
-    if (e.target === dialog) dialog.remove();
-  });
+  let fraction;
+  let lapLocalCount;
+  let lapNumber;
+
+  if (unlimited && current > target) {
+    const mod = current % target;
+    lapLocalCount = mod === 0 ? target : mod;
+    fraction = lapLocalCount / target;
+    lapNumber = Math.ceil(current / target);
+  } else {
+    lapLocalCount = current;
+    fraction = target > 0 ? Math.min(current / target, 1) : 0;
+    lapNumber = current > 0 ? 1 : 0;
+  }
+
+  return { target, current, unlimited, fraction, lapLocalCount, lapNumber };
 }
 
 function updateCounterDisplay() {
+  const state = computeRingState();
+
   const cv = document.getElementById("counterValue");
-  const tv = document.getElementById("targetValue");
-  const tl = document.getElementById("targetLabel");
-  if (cv) cv.textContent = currentDhikr.current;
-  if (tv) tv.textContent = currentDhikr.count;
-  if (tl) tl.textContent = `/ ${currentDhikr.count}`;
+  const targetLine = document.getElementById("targetLine");
+  const roundBadge = document.getElementById("tbRoundBadge");
+
+  if (cv) cv.textContent = state.current;
+
+  if (targetLine) {
+    targetLine.textContent =
+      state.unlimited && state.lapNumber >= 2
+        ? `${state.lapLocalCount} / ${state.target}`
+        : `/ ${state.target}`;
+  }
+
+  if (roundBadge) {
+    if (state.unlimited && state.lapNumber >= 2) {
+      roundBadge.textContent = (t("roundLabel") || "{n}").replace(
+        "{n}",
+        state.lapNumber,
+      );
+      roundBadge.classList.remove("tb-hidden");
+    } else {
+      roundBadge.classList.add("tb-hidden");
+    }
+  }
+
+  updateRing(state.fraction);
+  updateLimitChip(state.unlimited);
 }
 
+function updateRing(fraction) {
+  const progressEl = document.getElementById("tbRingProgress");
+  const beadEl = document.getElementById("tbRingBead");
+  if (!progressEl) return;
+
+  const offset = RING_CIRCUMFERENCE * (1 - fraction);
+  progressEl.style.strokeDasharray = `${RING_CIRCUMFERENCE}`;
+  progressEl.style.strokeDashoffset = `${offset}`;
+
+  if (beadEl) {
+    const angleDeg = fraction * 360 - 90;
+    const angleRad = (angleDeg * Math.PI) / 180;
+    const cx = 110 + RING_RADIUS * Math.cos(angleRad);
+    const cy = 110 + RING_RADIUS * Math.sin(angleRad);
+    beadEl.setAttribute("cx", cx.toFixed(2));
+    beadEl.setAttribute("cy", cy.toFixed(2));
+    beadEl.style.opacity = fraction > 0.01 ? "1" : "0";
+  }
+}
+
+function updateLimitChip(unlimited) {
+  const chip = document.getElementById("tbLimitChip");
+  const chipText = document.getElementById("tbLimitChipText");
+  if (!chip || !chipText) return;
+
+  chip.classList.toggle("tb-limit-chip--unlimited", unlimited);
+  chip.setAttribute("aria-pressed", String(unlimited));
+  chipText.textContent = unlimited
+    ? t("noLimit") || "No limit"
+    : (t("stopAtCount") || "{count}").replace("{count}", currentDhikr.count);
+
+  const icon = chip.querySelector("i");
+  if (icon) icon.className = unlimited ? "fas fa-infinity" : "fas fa-flag-checkered";
+}
+
+
+function showResetConfirm(callback) {
+  _showConfirmDialog({
+    title: t("resetConfirmTitle"),
+    message: t("resetConfirmMessage"),
+    cancelLabel: t("cancel"),
+    confirmLabel: t("reset"),
+    onConfirm: callback,
+  });
+}
+
+function _showConfirmDialog({ title, message, cancelLabel, confirmLabel, onConfirm }) {
+  const dialog = document.createElement("div");
+  dialog.className = "tasbih-confirm-dialog";
+  dialog.innerHTML = `<div class="tasbih-confirm-box">
+    <div class="tasbih-confirm-title"></div>
+    <div class="tasbih-confirm-message"></div>
+    <div class="tasbih-confirm-buttons">
+      <button class="tasbih-confirm-btn tasbih-confirm-cancel"></button>
+      <button class="tasbih-confirm-btn tasbih-confirm-reset"></button>
+    </div></div>`;
+  dialog.querySelector(".tasbih-confirm-title").textContent = title || "";
+  dialog.querySelector(".tasbih-confirm-message").textContent = message || "";
+  dialog.querySelector(".tasbih-confirm-cancel").textContent = cancelLabel || "";
+  dialog.querySelector(".tasbih-confirm-reset").textContent = confirmLabel || "";
+
+  document.body.appendChild(dialog);
+  dialog
+    .querySelector(".tasbih-confirm-cancel")
+    .addEventListener("click", () => dialog.remove());
+  dialog.querySelector(".tasbih-confirm-reset").addEventListener("click", () => {
+    onConfirm?.();
+    dialog.remove();
+  });
+  dialog.addEventListener("click", (e) => {
+    if (e.target === dialog) dialog.remove();
+  });
+}
+
+
 function showSuccessToast(message, isError = false, duration = 2000) {
-  document.querySelectorAll(".success-toast").forEach((t) => t.remove());
-  const toast = document.createElement("div");
-  toast.className = `success-toast ${isError ? "error" : ""}`;
-  toast.innerHTML = `<i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}"></i><span>${message}</span>`;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.classList.add("show"), 10);
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 200);
-  }, duration);
+  renderToast(
+    `success-toast ${isError ? "error" : ""}`,
+    `<i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}"></i><span>${message}</span>`,
+    { duration, removeDelay: 200 },
+  );
 }
 
 module.exports = { initTasbihPage };

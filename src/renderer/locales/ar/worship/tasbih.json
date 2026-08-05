@@ -1,1 +1,39 @@
-{ "tasbih":"التسبيح","selectDhikr":"اختر الذكر","recitations":"التكرارات","total":"الإجمالي","completed":"المكتمل","tasbihDesc":"المسبحة الرقمية" }
+{
+  "tasbih": "التسبيح",
+  "selectDhikr": "اختر الذكر",
+  "recitations": "التكرارات",
+  "total": "الإجمالي",
+  "completed": "المكتمل",
+  "tasbihDesc": "المسبحة الرقمية",
+
+  "countBtn": "تسبيح",
+  "undoBtn": "تراجع",
+  "resetBtn": "إعادة",
+  "stopAtCount": "التوقف عند {count}",
+  "noLimit": "بلا حد",
+  "roundLabel": "الجولة {n}",
+  "spacebarHint": "مسافة",
+
+  "dhikrSwitched": "تم التبديل إلى {name}",
+  "dhikrCompleted": "أكملت! {count} تسبيحة",
+  "dhikrRoundCompleted": "اكتملت الجولة {n} — واصل",
+  "counterReset": "تم إعادة العداد",
+  "allCountersReset": "تم إعادة جميع العدادات",
+
+  "resetConfirmTitle": "إعادة العداد",
+  "resetConfirmMessage": "هل أنت متأكد أنك تريد إعادة هذا العداد؟",
+  "resetAllConfirmTitle": "إعادة جميع العدادات",
+  "resetAllConfirmMessage": "هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.",
+  "cancel": "إلغاء",
+  "reset": "إعادة",
+  "resetAllBtn": "إعادة الكل",
+
+  "dhikrSubhanallahMeaning": "تنزيه الله عن كل نقص",
+  "dhikrAlhamdulillahMeaning": "الثناء على الله بصفاته",
+  "dhikrAllahuAkbarMeaning": "تعظيم الله فوق كل شيء",
+  "dhikrLaIlahaMeaning": "كلمة التوحيد",
+  "dhikrAstaghfirullahMeaning": "طلب المغفرة من الله",
+  "dhikrSubhanallahiWaBihamdihiMeaning": "تسبيح مقرون بالحمد",
+  "dhikrSalawatMeaning": "الصلاة على النبي ﷺ",
+  "dhikrHawqalaMeaning": "كنز من كنوز الجنة"
+}

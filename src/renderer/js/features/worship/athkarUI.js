@@ -1,29 +1,24 @@
-// athkarUI.js
 const { ipcRenderer } = require("electron");
 const {
   setupConnectionRecovery,
 } = require("../../services/connection-recovery");
 const { t } = require("../../core/i18n/translations");
-const screenSizeManager = require("../../core/screenSize");
-const { getAdkar } = require("../../services/api/api"); // Added import
+const { getAdkar } = require("../../services/api/api");
 const analytics = require("../../utils/analytics");
+const { renderToast } = require("../../core/toast");
 
 let athkarData = null;
 let currentCategory = null;
 let athkarState = {};
 
-// ==================== ATHKAR PAGE FUNCTIONS ====================
 function initAthkarPage() {
-  // Setup auto-reload on connection restored
   setupConnectionRecovery(() => {
     const athkarContainer = document.getElementById("athkar-container");
     if (athkarContainer) {
-      initAthkarPage(); // Reload page
+      initAthkarPage();
     }
   }, "Athkar");
-  // SCREEN SIZE IS NOW HANDLED IN renderer.js
 
-  // Setup back button
   const backBtn = document.getElementById("backBtn");
   if (backBtn) {
     backBtn.addEventListener("click", () => {
@@ -31,19 +26,15 @@ function initAthkarPage() {
     });
   }
 
-  // Setup reset all button
   const resetAllBtn = document.getElementById("resetAllBtn");
   if (resetAllBtn) {
     resetAllBtn.addEventListener("click", showResetConfirm);
   }
 
-  // Update UI text
   updateAthkarUI();
 
-  // Load athkar data
   loadAthkarData();
 
-  // Load saved state
   loadAthkarState();
 }
 
@@ -65,33 +56,28 @@ function updateAthkarUI() {
 
 async function loadAthkarData() {
   const athkarLoading = document.getElementById("athkarLoading");
-  const athkarList = document.getElementById("athkarList");
 
   if (athkarLoading) {
     athkarLoading.style.display = "flex";
   }
 
   try {
-    // Load the JSON data
-    athkarData = await getAdkar(); // Using new API
+    athkarData = await getAdkar();
 
-    // Populate category navigation
     populateCategoryNav();
 
-    // Auto-select first category
     const categories = Object.keys(athkarData);
     if (categories.length > 0 && !currentCategory) {
       currentCategory = categories[0];
       setActiveCategory(currentCategory);
     }
 
-    // Hide loading
     if (athkarLoading) {
       athkarLoading.style.display = "none";
     }
   } catch (error) {
     console.error("Error loading athkar data:", error);
-    analytics.error("athkar_load", err.message || String(err)); // ← ANALYTICS
+    analytics.error("athkar_load", error.message || String(error));
     if (athkarLoading) {
       athkarLoading.innerHTML = `
         <div class="athkar-loading-content">
@@ -136,14 +122,12 @@ function populateCategoryNav() {
   if (!categoryNav || !athkarData) return;
   categoryNav.innerHTML = "";
 
-  // Create category cards for each category
   const categories = Object.keys(athkarData);
-  categories.forEach((category, index) => {
+  categories.forEach((category) => {
     const count = athkarData[category].length;
     const categoryCard = createCategoryCard(category, category, count);
     categoryNav.appendChild(categoryCard);
 
-    // Add click listener immediately
     categoryCard.addEventListener("click", (e) => {
       e.stopPropagation();
       e.preventDefault();
@@ -180,7 +164,6 @@ function setActiveCategory(category) {
 
   currentCategory = category;
 
-  // Update active state in navigation
   document.querySelectorAll(".category-card").forEach((card) => {
     if (card.dataset.category === category) {
       card.classList.add("active");
@@ -189,10 +172,8 @@ function setActiveCategory(category) {
     }
   });
 
-  // ── Track category view ──────────────────────────────────────────────────
-  analytics.athkarCategoryView(category); // ← ANALYTICS
+  analytics.athkarCategoryView(category);
 
-  // Render athkar list for the selected category
   renderAthkarList();
 }
 
@@ -204,7 +185,6 @@ function renderAthkarList() {
   }
   athkarList.innerHTML = "";
 
-  // Get athkar items for selected category
   const athkarItems = athkarData[currentCategory] || [];
   if (athkarItems.length === 0) {
     athkarList.innerHTML = `
@@ -216,7 +196,6 @@ function renderAthkarList() {
     return;
   }
 
-  // Render each athkar item as a card
   athkarItems.forEach((item, index) => {
     const athkarCard = createAthkarCard(item, index);
     athkarList.appendChild(athkarCard);
@@ -228,11 +207,9 @@ function createAthkarCard(item, index) {
   card.className = "athkar-card";
   card.dataset.index = index;
 
-  // Generate unique ID for this athkar
   const athkarId = `${currentCategory}-${index}`;
   card.id = `athkar-${athkarId}`;
 
-  // Get current count from state
   const currentCount = athkarState[athkarId] || 0;
   const targetCount = parseInt(item.count) || 1;
   const progress = Math.min((currentCount / targetCount) * 100, 100);
@@ -242,7 +219,6 @@ function createAthkarCard(item, index) {
     card.classList.add("completed");
   }
 
-  // Create card HTML with language-based positioning
   card.innerHTML = `
     <div class="athkar-card-header">
       <div class="athkar-category">
@@ -302,7 +278,6 @@ function createAthkarCard(item, index) {
     }
   `;
 
-  // Add event listeners
   const incrementBtn = card.querySelector(".increment-btn");
   const resetBtn = card.querySelector(".reset-btn");
   const copyBtn = card.querySelector(".copy-btn");
@@ -340,14 +315,13 @@ function incrementCount(athkarId, targetCount) {
     updateAthkarCard(athkarId, targetCount);
     showSuccessToast(t("countIncreased"));
 
-    // ── Check if entire category is now completed ─────────────────────────
     if (athkarState[athkarId] >= targetCount) {
       const items = athkarData[currentCategory] || [];
       const allDone = items.every((item, idx) => {
         const id = `${currentCategory}-${idx}`;
         return (athkarState[id] || 0) >= (parseInt(item.count) || 1);
       });
-      if (allDone) analytics.athkarCategoryCompleted(currentCategory); // ← ANALYTICS
+      if (allDone) analytics.athkarCategoryCompleted(currentCategory);
     }
   } else {
     showSuccessToast(t("maxCountReached"), true);
@@ -362,7 +336,6 @@ function resetCount(athkarId) {
 }
 
 function showResetConfirm() {
-  // Create custom confirm dialog with translations
   const dialog = document.createElement("div");
   dialog.className = "athkar-confirm-dialog";
   dialog.innerHTML = `
@@ -378,7 +351,6 @@ function showResetConfirm() {
 
   document.body.appendChild(dialog);
 
-  // Add event listeners
   const cancelBtn = dialog.querySelector(".athkar-confirm-cancel");
   const resetBtn = dialog.querySelector(".athkar-confirm-reset");
 
@@ -400,7 +372,6 @@ function showResetConfirm() {
     });
   }
 
-  // Close on backdrop click
   dialog.addEventListener("click", (e) => {
     if (e.target === dialog) {
       dialog.remove();
@@ -456,28 +427,11 @@ function copyAthkar(text) {
 }
 
 function showSuccessToast(message, isError = false) {
-  // Remove existing toasts
-  document
-    .querySelectorAll(".success-toast")
-    .forEach((toast) => toast.remove());
-
-  const toast = document.createElement("div");
-  toast.className = `success-toast ${isError ? "error" : ""}`;
-  toast.innerHTML = `
-    <i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}"></i>
-    <span>${message}</span>
-  `;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.classList.add("show");
-  }, 10);
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 200);
-  }, 2000);
+  renderToast(
+    `success-toast ${isError ? "error" : ""}`,
+    `<i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}"></i><span>${message}</span>`,
+    { duration: 2000, removeDelay: 200 },
+  );
 }
 
 module.exports = { initAthkarPage };

@@ -1,6 +1,6 @@
 "use strict";
 
-const { app } = require("electron");
+const { app, Menu } = require("electron");
 const {
   configureAutoUpdater,
   startUpdateChecks,
@@ -11,15 +11,19 @@ const {
 } = require("../windows/main-window");
 const { createTray, destroyTray, hasTray } = require("../windows/tray");
 const ipcHandlers = require("../ipc");
-const playerManager = require("../services/player-manager");
 const prayerTimerManager = require("../services/prayer-timer-manager");
+const fastingCalendarManager = require("../services/fasting-calendar-manager");
 const connectionManager = require("../services/connection-manager");
+const athkarAlertManager = require("../services/athkar-alert-manager");
 
 let mainWindow = null;
 let isQuitting = false;
 
 function startApplication() {
   configureApplication();
+
+  Menu.setApplicationMenu(null);
+
   configureAutoUpdater(
     () => mainWindow,
     () => {
@@ -58,6 +62,8 @@ function startApplication() {
 
       connectionManager.initializeConnectionManager(mainWindow);
       prayerTimerManager.init(mainWindow, ipcHandlers.getSettingsData);
+      fastingCalendarManager.init(mainWindow, ipcHandlers.getSettingsData);
+      athkarAlertManager.init(ipcHandlers.getSettingsData);
 
       const settings = ipcHandlers.getSettingsData();
       app.setLoginItemSettings({ openAtLogin: settings.openAtLogin !== false });
@@ -83,6 +89,8 @@ function startApplication() {
   app.on("will-quit", () => {
     connectionManager.cleanup();
     prayerTimerManager.cleanup();
+    fastingCalendarManager.cleanup();
+    athkarAlertManager.cleanup();
   });
 }
 

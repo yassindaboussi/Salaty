@@ -4,7 +4,6 @@ const { state } = require("../../core/globalStore");
 const { t } = require("../../core/i18n/translations");
 const { showToast } = require("../../core/toast");
 const QiblaMap = require("salaty-qibla-map");
-const screenSizeManager = require("../../core/screenSize");
 const analytics = require("../../utils/analytics");
 const {
   setupConnectionRecovery,
@@ -15,8 +14,6 @@ let _lat = null;
 let _lng = null;
 
 async function initQiblaPage() {
-  setupConnectionRecovery(initQiblaPage, "Qibla");
-
   document.getElementById("backBtn")?.addEventListener("click", () => {
     ipcRenderer.invoke("navigate-to", "features");
   });
@@ -27,9 +24,14 @@ async function initQiblaPage() {
 
   _setText("qiblaTitle", t("qiblaFinder"));
   _setText("qiblaDirectionLabel", t("fromNorth"));
-  _setText("locationText", t("loading"));
   _setText("instructionText", t("dragToAdjustInfo"));
 
+  setupConnectionRecovery(_detectAndRenderLocation, "Qibla");
+  await _detectAndRenderLocation();
+}
+
+async function _detectAndRenderLocation() {
+  _setText("locationText", t("loading"));
   try {
     const { city, country, latitude, longitude, lat, lng } =
       state.settings ?? {};
@@ -55,6 +57,10 @@ async function initQiblaPage() {
 }
 
 function _initMap(lat, lng) {
+  if (_map) {
+    _map.init(lat, lng);
+    return;
+  }
   _map = new QiblaMap("qiblaMap", {
     onAngleUpdate: (angle) => _setText("qiblaDegree", `${Math.round(angle)}°`),
     onDragEnd: (la, lo) => {

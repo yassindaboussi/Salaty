@@ -45,5 +45,7 @@
   "tooltipPrev": "Précédent",
   "tooltipNext": "Suivant",
   "tooltipPlaylist": "Ouvrir la playlist",
-  "tooltipCount": "Compter"
+  "tooltipCount": "Compter",
+  "tooltipUndo": "Annuler le dernier compte",
+  "tooltipReset": "Réinitialiser ce compteur"
 }

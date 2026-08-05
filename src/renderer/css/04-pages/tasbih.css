@@ -9,7 +9,7 @@
   z-index: 100;
 }
 
-/* ========== HEADER - MATCHES FEATURES PAGE STYLE ========== */
+/* ========== HEADER — matches Features/Ramadan page style ========== */
 .tasbih-header {
   display: flex;
   align-items: center;
@@ -22,7 +22,6 @@
   direction: ltr !important;
 }
 
-/* Title - Centered */
 .tasbih-title {
   font-size: 18px;
   font-weight: 700;
@@ -37,7 +36,6 @@
   text-overflow: ellipsis;
 }
 
-/* Control buttons container */
 .tasbih-controls {
   display: flex;
   gap: 6px;
@@ -46,32 +44,7 @@
   position: relative;
 }
 
-/* Reset All Button */
-.reset-all-btn {
-  background: rgba(255, 107, 107, 0.15);
-  border: 1px solid rgba(255, 107, 107, 0.2);
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.reset-all-btn:hover {
-  background: rgba(255, 107, 107, 0.25);
-  border-color: #ff6b6b;
-}
-
-.reset-all-btn i {
-  color: #ff6b6b;
-  font-size: 12px;
-}
-
-/* Force consistent layout for ALL languages */
+/* Force consistent header layout for ALL languages */
 [dir="rtl"] .tasbih-header,
 [dir="ltr"] .tasbih-header,
 .tasbih-header {
@@ -110,7 +83,6 @@
   gap: 6px !important;
 }
 
-/* Don't flip arrow in any language - always point left */
 [dir="rtl"] .back-btn i,
 [dir="ltr"] .back-btn i,
 .back-btn i {
@@ -123,118 +95,386 @@
   transform: translateX(-2px) !important;
 }
 
-/* ========== MAIN TASBIH CONTENT ========== */
+/* ========== MAIN CONTENT ========== */
 .tasbih-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 14px;
   overflow-y: auto;
   padding: 8px 4px;
   -webkit-app-region: no-drag;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) transparent;
+  direction: ltr !important; /* keep the scrollbar on the right (start side in RTL) */
 }
 
-/* Counter Display */
-.tasbih-counter-container {
+.tasbih-content::-webkit-scrollbar {
+  width: 5px;
+  right: 0 !important;
+  left: auto !important;
+}
+.tasbih-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tasbih-content::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+/* Re-apply RTL to the actual content so Arabic still reads correctly —
+   only the scroll container itself is forced LTR, for the scrollbar. */
+[dir="rtl"] .tasbih-content > *,
+[lang="ar"] .tasbih-content > *,
+[lang="fa"] .tasbih-content > *,
+[lang="ur"] .tasbih-content > *,
+[lang="he"] .tasbih-content > * {
+  direction: rtl !important;
+}
+
+/* ========== Active dhikr panel ========== */
+.tb-active-dhikr {
+  text-align: center;
+  padding: 2px 12px 0;
+}
+
+.tb-active-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.tb-active-meaning {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 2px;
+  opacity: 0.85;
+}
+
+.tb-hidden {
+  display: none !important;
+}
+
+/* ========== Ring row — dial centered, actions flanking it left/right ==========
+   Same layout idea as a timer dial: the counter sits in the middle, a
+   secondary action sits to one side, the primary action to the other.
+   Deliberately NOT mirrored for RTL — like the header controls, this row
+   stays physically LTR so the Count button is always on the same side,
+   building spatial muscle memory regardless of language. */
+.tb-ring-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 3vw, 28px);
+  width: 100%;
+  direction: ltr;
+}
+
+.tb-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  width: 92px;
+  order: 1;
+}
+
+.tb-side-right {
+  order: 3;
+}
+
+.tb-ring-wrap {
+  position: relative;
+  width: min(200px, 46vw);
+  aspect-ratio: 1 / 1;
+  flex: 0 0 auto;
+  order: 2;
+}
+
+.tb-ring-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tb-ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 10;
+}
+
+.tb-ring-progress {
+  fill: none;
+  stroke: var(--accent-color);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 110px 110px;
+  filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.5));
+  transition:
+    stroke-dashoffset 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    stroke 0.2s ease;
+}
+
+/* The "bead" — a small glowing marker riding the tip of the progress arc,
+   echoing the single bead you'd move along a physical tasbih string. */
+.tb-ring-bead {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.9));
+  transition:
+    cx 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    cy 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.2s ease;
+}
+
+.tb-ring-tap {
+  position: absolute;
+  inset: 14px;
+  border-radius: 50%;
+  border: none;
+  background: radial-gradient(
+    circle at 50% 40%,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.01)
+  );
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 25px 10px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.05),
-    rgba(255, 255, 255, 0.01)
-  );
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  margin-bottom: 0;
-  position: relative;
-  overflow: hidden;
-  min-height: 140px;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  transition: transform 0.08s ease;
 }
 
-/* Spacebar indicator */
-.spacebar-indicator {
+.tb-ring-tap:active {
+  transform: scale(0.96);
+}
+
+@keyframes tbRingPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 18px rgba(var(--accent-rgb), 0);
+  }
+}
+
+.tb-ring-tap--pulse {
+  animation: tbRingPulse 0.5s ease-out;
+}
+
+.tb-round-badge {
   position: absolute;
-  bottom: 8px;
-  right: 12px;
-  font-size: 10px;
+  top: 14%;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  background: var(--accent-color);
+  padding: 3px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.tb-count-value {
+  font-size: 3.6rem;
+  font-weight: 800;
+  color: var(--accent-color);
+  line-height: 1.1;
+  font-feature-settings:
+    "tnum" on,
+    "lnum" on;
+  text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.3);
+}
+
+.tb-count-target {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-top: 2px;
+  font-feature-settings:
+    "tnum" on,
+    "lnum" on;
+}
+
+/* ── Side columns ─────────────────────────────────────────────────────────── */
+
+/* The two round "dial flank" buttons — Reset (secondary, muted) on the
+   left, Count (primary, accent) on the right. Same visual weight as a
+   timer's Cancel/Start pair, just vertical instead of side-by-side. */
+.tb-side-btn {
+  width: 100%;
+  padding: 14px 6px;
+  border-radius: 16px;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  -webkit-app-region: no-drag;
+}
+
+.tb-side-btn i {
+  font-size: 16px;
+}
+
+.tb-side-btn--primary {
+  background: linear-gradient(
+    160deg,
+    var(--accent-color),
+    rgba(var(--accent-rgb), 0.8)
+  );
+  color: white;
+  box-shadow: 0 4px 14px rgba(var(--accent-rgb), 0.35);
+}
+
+.tb-side-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(var(--accent-rgb), 0.45);
+}
+
+.tb-side-btn--primary:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.tb-side-btn--secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.tb-side-btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.tb-side-btn--secondary:active {
+  transform: translateY(0);
+}
+
+/* Small square icon-only button for Undo — deliberately lighter-weight
+   than Reset since it's a quick, reversible correction, not a destructive
+   action, so it shouldn't visually compete with the labeled buttons. */
+.tb-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  -webkit-app-region: no-drag;
+}
+
+.tb-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-color: rgba(var(--accent-rgb), 0.4);
+}
+
+.tb-icon-btn:active {
+  transform: scale(0.95);
+}
+
+/* No-limit chip — sits under the Count button in the right column.
+   Stacked (icon above text) with wrapping text, not a single-line pill —
+   a 92px-wide column is too narrow for "Stop at 100" / "التوقف عند 100"
+   on one line, and truncating a setting's own label defeats the point of
+   showing it. */
+.tb-limit-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 6px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-app-region: no-drag;
+  text-align: center;
+}
+
+.tb-limit-chip:hover {
+  border-color: rgba(var(--accent-rgb), 0.5);
+  color: var(--text-primary);
+}
+
+.tb-limit-chip i {
+  font-size: 13px;
+  flex: 0 0 auto;
+}
+
+.tb-limit-chip-text {
+  white-space: normal;
+  overflow: visible;
+  word-break: break-word;
+}
+
+.tb-limit-chip--unlimited {
+  background: rgba(var(--accent-rgb), 0.18);
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
+.tb-limit-chip--unlimited i {
+  color: var(--accent-color);
+}
+
+/* Spacebar indicator — small hint tucked under the limit chip */
+.spacebar-indicator {
+  font-size: 9.5px;
   color: var(--text-secondary);
   opacity: 0.7;
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 3px 8px;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   pointer-events: none;
-  z-index: 5;
 }
 
 .spacebar-indicator i {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--accent-color);
 }
 
 .spacebar-indicator kbd {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 4px;
-  padding: 2px 6px;
+  padding: 1px 5px;
   font-family: monospace;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Pulse animation for the counter */
-@keyframes gentlePulse {
-  0% {
-    text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.2);
-  }
-  50% {
-    text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5);
-  }
-  100% {
-    text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.2);
-  }
-}
-
-.tasbih-counter-display {
-  font-size: 4.5rem;
-  font-weight: 800;
-  color: var(--accent-color);
-  line-height: 1.2;
-  text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.3);
-  font-feature-settings:
-    "tnum" on,
-    "lnum" on;
-  animation: gentlePulse 2s infinite ease-in-out;
-  transition: transform 0.1s ease;
-  margin-bottom: 5px;
-}
-
-.tasbih-counter-display:active {
-  transform: scale(0.95);
-}
-
-.tasbih-target-display {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  margin-top: 5px;
-  font-weight: 500;
-}
-
-.tasbih-target-display span {
-  font-feature-settings:
-    "tnum" on,
-    "lnum" on;
-}
-
-/* Dhikr Selection Section */
+/* ========== Dhikr Selection ========== */
 .tasbih-dhikr-section {
+  width: 100%;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 16px;
   padding: 14px 12px;
@@ -261,14 +501,16 @@
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 12px 6px; /* Restored original padding */
+  padding: 12px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px; /* Restored original gap */
+  gap: 5px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
+  font-family: inherit;
+  position: relative;
 }
 
 .dhikr-card:hover {
@@ -282,90 +524,52 @@
   border-color: var(--accent-color);
 }
 
+.dhikr-card.active::after {
+  content: "\f00c";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .dhikr-card.active .dhikr-name,
+.dhikr-card.active .dhikr-meaning,
 .dhikr-card.active .dhikr-count {
   color: white;
 }
 
 .dhikr-name {
-  font-size: 12px; /* Restored original size */
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
   line-height: 1.4;
 }
 
+.dhikr-meaning {
+  font-size: 9.5px;
+  color: var(--text-secondary);
+  opacity: 0.8;
+  line-height: 1.3;
+}
+
 .dhikr-count {
-  font-size: 10px; /* Restored original size */
+  font-size: 10px;
   color: var(--text-secondary);
   background: rgba(255, 255, 255, 0.1);
   padding: 2px 6px;
   border-radius: 12px;
   font-weight: 600;
+  margin-top: 2px;
 }
 
-/* Action Buttons */
-.tasbih-actions {
-  display: flex;
-  gap: 10px;
-  padding: 5px 0;
-  margin-top: 0;
+.dhikr-card.active .dhikr-count {
+  background: rgba(255, 255, 255, 0.25);
 }
 
-.tasbih-btn {
-  flex: 1;
-  padding: 12px 8px;
-  border-radius: 12px;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-  -webkit-app-region: no-drag;
-}
-
-.tasbih-btn i {
-  font-size: 14px;
-}
-
-.increment-btn {
-  background: linear-gradient(
-    135deg,
-    var(--accent-color),
-    rgba(var(--accent-rgb), 0.8)
-  );
-  color: white;
-  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
-}
-
-.increment-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.4);
-}
-
-.increment-btn:active {
-  transform: translateY(0);
-}
-
-.reset-btn {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-}
-
-.reset-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateY(-2px);
-}
-
-.reset-btn:active {
-  transform: translateY(0);
-}
-
-/* Footer */
+/* ========== Footer ========== */
 .tasbih-footer {
   padding-top: 8px;
   border-top: 1px solid var(--border-color);
@@ -380,22 +584,7 @@
   line-height: 1.4;
 }
 
-/* Loading State */
-.tasbih-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 30px;
-  color: var(--text-secondary);
-}
-
-.tasbih-loading i {
-  font-size: 24px;
-  margin-right: 10px;
-  color: var(--accent-color);
-}
-
-/* Success Toast - Reuse from Athkar */
+/* ========== Success Toast ========== */
 .success-toast {
   position: fixed;
   bottom: 16px;
@@ -452,7 +641,7 @@
   }
 }
 
-/* Confirm Dialog */
+/* ========== Confirm Dialog ========== */
 .tasbih-confirm-dialog {
   position: fixed;
   top: 0;
@@ -544,9 +733,69 @@
   box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
 }
 
-/* ========== RESPONSIVE DESIGN ========== */
+/* ========== Reduced motion ========== */
+@media (prefers-reduced-motion: reduce) {
+  .tb-ring-progress,
+  .tb-ring-bead,
+  .tb-ring-tap,
+  .dhikr-card {
+    transition: none !important;
+    animation: none !important;
+  }
+}
 
-/* Tablet (768px and below) */
+/* ========== RESPONSIVE ========== */
+
+/* Below this width there isn't enough room for two 92px side columns plus
+   the ring — collapse the flanking layout into the previous stacked one
+   (ring first, then the two side columns as a row each) rather than
+   letting things get cramped or overflow. */
+@media (max-width: 560px) {
+  .tb-ring-row {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .tb-ring-wrap {
+    order: 1;
+    width: min(200px, 62vw);
+  }
+
+  .tb-side {
+    order: 2;
+    flex-direction: row;
+    width: auto;
+    max-width: 340px;
+  }
+
+  .tb-side-left {
+    order: 2;
+  }
+
+  .tb-side-right {
+    order: 3;
+  }
+
+  .tb-side-btn {
+    flex: 1;
+    flex-direction: row;
+    padding: 12px 10px;
+  }
+
+  .tb-limit-chip,
+  .spacebar-indicator {
+    display: none; /* shown for the currently-selected dhikr only; avoid clutter once stacked */
+  }
+
+  .tb-side-right .tb-limit-chip {
+    display: flex;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 120px;
+    padding: 8px 10px;
+  }
+}
+
 @media (max-width: 768px) {
   .tasbih-container {
     padding: 12px;
@@ -571,56 +820,28 @@
     height: 28px;
   }
 
-  .reset-all-btn {
-    width: 28px;
-    height: 28px;
+  .tb-active-name {
+    font-size: 1.3rem;
   }
 
-  .reset-all-btn i {
-    font-size: 10px;
-  }
-
-  .tasbih-counter-container {
-    min-height: 120px;
-    padding: 20px 8px;
-  }
-
-  .tasbih-counter-display {
-    font-size: 4rem;
-  }
-
-  .spacebar-indicator {
-    font-size: 9px;
-    padding: 3px 8px;
-    bottom: 6px;
-    right: 10px;
-  }
-
-  .spacebar-indicator kbd {
-    font-size: 9px;
-    padding: 1px 5px;
-  }
-
-  /* Keep dhikr cards at original size */
-  .dhikr-card {
-    padding: 12px 6px;
+  .tb-count-value {
+    font-size: 3.2rem;
   }
 
   .dhikr-name {
     font-size: 12px;
   }
 
-  .dhikr-count {
-    font-size: 10px;
+  .dhikr-meaning {
+    font-size: 9px;
   }
 
-  .tasbih-btn {
-    padding: 10px 6px;
-    font-size: 13px;
+  .tb-side-btn {
+    padding: 11px 6px;
+    font-size: 12px;
   }
 }
 
-/* Mobile (480px and below) */
 @media (max-width: 480px) {
   .tasbih-container {
     padding: 8px;
@@ -643,51 +864,25 @@
     height: 10px;
   }
 
-  .reset-all-btn {
-    width: 24px;
-    height: 24px;
+  .tb-active-name {
+    font-size: 1.15rem;
   }
 
-  .reset-all-btn i {
-    font-size: 9px;
+  .tb-active-meaning {
+    font-size: 11px;
   }
 
-  .tasbih-counter-container {
-    padding: 18px 8px;
-    min-height: 110px;
+  .tb-count-value {
+    font-size: 2.7rem;
   }
 
-  .tasbih-counter-display {
-    font-size: 3.5rem;
+  .tb-count-target {
+    font-size: 0.85rem;
   }
 
-  .tasbih-target-display {
-    font-size: 1rem;
-  }
-
-  .spacebar-indicator {
-    font-size: 8px;
-    padding: 2px 6px;
-    bottom: 5px;
-    right: 8px;
-  }
-
-  .spacebar-indicator kbd {
-    padding: 1px 4px;
-    font-size: 8px;
-  }
-
-  /* Keep dhikr cards at original size for 480px */
-  .dhikr-card {
-    padding: 12px 6px;
-  }
-
-  .dhikr-name {
-    font-size: 12px;
-  }
-
-  .dhikr-count {
-    font-size: 10px;
+  .tb-side-right .tb-limit-chip {
+    font-size: 11px;
+    padding: 8px 10px;
   }
 
   .section-label {
@@ -695,13 +890,27 @@
     margin-bottom: 8px;
   }
 
-  .tasbih-btn {
-    padding: 8px 5px;
-    font-size: 12px;
+  .dhikr-name {
+    font-size: 11.5px;
   }
 
-  .tasbih-btn i {
-    font-size: 12px;
+  .dhikr-meaning {
+    display: none; /* keep cards compact on very narrow screens */
+  }
+
+  .tb-side-btn {
+    padding: 10px 5px;
+    font-size: 11.5px;
+  }
+
+  .tb-side-btn i {
+    font-size: 14px;
+  }
+
+  .tb-icon-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
   }
 
   .tasbih-footer-text {
@@ -709,7 +918,6 @@
   }
 }
 
-/* Very Small Mobile (320px and below) - ONLY counter changes here */
 @media (max-width: 320px) {
   .tasbih-header {
     gap: 4px;
@@ -719,56 +927,32 @@
     font-size: 13px;
   }
 
-  /* ONLY reduce counter container height and text size */
-  .tasbih-counter-container {
-    padding: 12px 5px; /* Reduced padding */
-    min-height: 90px; /* Reduced min-height */
+  .tb-ring-wrap {
+    width: 150px;
   }
 
-  .tasbih-counter-display {
-    font-size: 2.8rem; /* Reduced text size */
-    margin-bottom: 2px;
+  .tb-count-value {
+    font-size: 2.3rem;
   }
 
-  .tasbih-target-display {
-    font-size: 0.85rem; /* Slightly reduced */
-    margin-top: 2px;
+  .tb-active-name {
+    font-size: 1rem;
   }
 
   .spacebar-indicator {
-    display: none; /* Hide on very small screens */
-  }
-
-  /* Keep dhikr cards at original size - NO CHANGES */
-  .dhikr-card {
-    padding: 12px 6px;
-  }
-
-  .dhikr-name {
-    font-size: 12px;
-  }
-
-  .dhikr-count {
-    font-size: 10px;
+    display: none;
   }
 
   .dhikr-grid {
-    grid-template-columns: repeat(3, 1fr); /* Keep 3 columns */
-    gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
   }
 
-  .section-label {
-    font-size: 13px;
+  .dhikr-name {
+    font-size: 11px;
   }
 
-  /* Keep buttons at original size */
-  .tasbih-btn {
-    padding: 12px 8px;
-    font-size: 14px;
-  }
-
-  .tasbih-actions {
-    flex-direction: row; /* Keep row layout */
-    gap: 10px;
+  .tb-side {
+    gap: 6px;
   }
 }

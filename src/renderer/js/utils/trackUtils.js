@@ -1,11 +1,4 @@
-// src/renderer/js/trackUtils.js
 
-/**
- * Récupère la liste des pistes MP3 depuis une URL Archive.org (format Salaty)
- * @param {string} archiveUrl - L'URL de métadonnées Archive.org
- * @returns {Promise<Array<{title: string, artist: string, url: string, filename: string}>>}
- * @throws {Error} si la récupération échoue ou si le format est invalide
- */
 const FETCH_TIMEOUT_MS = 15000;
 
 async function getArchiveOrgTracks(archiveUrl) {

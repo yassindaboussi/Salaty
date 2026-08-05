@@ -1,8 +1,3 @@
-/**
- * settings-handlers.js
- * All settings & location IPC handlers.
- * Accepts mainWindow so it can notify the renderer on changes.
- */
 "use strict";
 
 const { ipcMain, app } = require("electron");
@@ -10,7 +5,6 @@ const fs = require("fs");
 const path = require("path");
 const { ROOT_DIR } = require("../../config/paths");
 
-// ── State ─────────────────────────────────────────────────────────────────────
 
 let settingsData = {
   city: "Tunis",
@@ -21,14 +15,10 @@ let settingsData = {
   bigScreen: true,
   locations: [],
   openAtLogin: true,
-  // Whether the app silently checks IP-based location on launch and offers
-  // to switch if it differs from the active saved location (the prompt from
-  // the screenshot in this conversation). Defaults to on to preserve
-  // existing behavior; the user can turn it off in Settings > Location.
-  travelMode: true,
+  travelMode: false,
+  fastingReminders: { occasions: [], weeklyMonThu: false, leadDays: 1 },
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function getSettingsPath() {
   return path.join(app.getPath("userData"), "settings.json");
@@ -50,7 +40,6 @@ function syncActiveLocation() {
   }
 }
 
-// ── Persist ───────────────────────────────────────────────────────────────────
 
 function saveSettings() {
   try {
@@ -75,7 +64,7 @@ function loadSettings() {
         ...settingsData,
         ...JSON.parse(fs.readFileSync(bundledPath, "utf8")),
       };
-      saveSettings(); // persist to userData on first run
+      saveSettings();
     }
 
     _migrateToMultiLocation();
@@ -119,12 +108,10 @@ function savePosition(x, y) {
   saveSettings();
 }
 
-// ── IPC setup ─────────────────────────────────────────────────────────────────
 
 let _handlersRegistered = false;
 
 function setupHandlers(mainWindow, { onLocationChange, onThemeChange }) {
-  // Guard against double-registration (e.g. macOS re-activate)
   if (_handlersRegistered) return;
   _handlersRegistered = true;
 
@@ -139,7 +126,6 @@ function setupHandlers(mainWindow, { onLocationChange, onThemeChange }) {
     syncActiveLocation();
     saveSettings();
 
-    // Apply openAtLogin immediately
     app.setLoginItemSettings({
       openAtLogin: settingsData.openAtLogin !== false,
     });
@@ -153,7 +139,6 @@ function setupHandlers(mainWindow, { onLocationChange, onThemeChange }) {
     return settingsData;
   });
 
-  // ── Location CRUD ─────────────────────────────────────────────────────────
 
   ipcMain.handle("get-locations", () => settingsData.locations || []);
 
@@ -194,7 +179,7 @@ function setupHandlers(mainWindow, { onLocationChange, onThemeChange }) {
     if (!locs) return false;
     const idx = locs.findIndex((l) => l.id === locationId);
     if (idx === -1) return false;
-    if (locs[idx].isActive && locs.length === 1) return false; // keep at least one
+    if (locs[idx].isActive && locs.length === 1) return false;
     if (locs[idx].isActive) {
       const next = locs.find((_, i) => i !== idx);
       if (next) next.isActive = true;
@@ -219,7 +204,6 @@ function setupHandlers(mainWindow, { onLocationChange, onThemeChange }) {
     return true;
   });
 
-  // ── Auto-detect location (IP-based) ───────────────────────────────────────
 
   ipcMain.handle("detect-location", async () => {
     const http = require("http");
@@ -252,7 +236,6 @@ function setupHandlers(mainWindow, { onLocationChange, onThemeChange }) {
     });
   });
 
-  // ── Travel mode toggle ────────────────────────────────────────────────────
 
   ipcMain.handle("toggle-travel-mode", (_e, enabled) => {
     settingsData.travelMode = enabled;

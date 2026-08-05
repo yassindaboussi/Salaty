@@ -1,20 +1,19 @@
-const { ipcRenderer } = require("electron"); // Import ipcRenderer
+const { ipcRenderer } = require("electron");
 const screenSizeManager = require("../../js/core/screenSize");
 const mp3quranApi = require("../../js/services/api/mp3quranApi");
 const {
   setLanguage,
   t,
   getLanguage,
+  whenReady,
 } = require("../../js/core/i18n/translations");
 const analytics = require("../../js/utils/analytics");
 
-// mp3quran.net expects its own language codes, not our app's ("en"/"ar"/"fr").
 const MP3QURAN_LANG = { en: "eng", ar: "ar", fr: "fr" };
 function mp3quranLang() {
   return MP3QURAN_LANG[getLanguage()] || "eng";
 }
 
-// Helper to get translated string
 function getLocalized(obj) {
   if (typeof obj === "string") return obj;
   if (!obj) return "";
@@ -32,24 +31,16 @@ class PlaylistManager {
     this.initIPC();
   }
 
-  // New initialization method
   async init() {
     await this.loadSettings();
     await this.initScreenSize();
     await this.initTheme();
     this.updateTranslations();
 
-    // Everything needed for the first paint (settings/theme/screen-size) is
-    // ready now. Reveal the page right away instead of waiting on the
-    // network request below, which can take a while on a slow connection
-    // and would otherwise leave the window black for that long.
     document.body.classList.remove("page-loading");
 
-    // Get player state (fire-and-forget, doesn't block paint)
     ipcRenderer.send("player-command", { type: "get-state" });
 
-    // Load Album — network-bound; the track list shows its own spinner
-    // (see loadTracks) while this resolves, instead of blocking the page.
     await this.loadCurrentAlbum();
 
     return this;
@@ -83,13 +74,8 @@ class PlaylistManager {
           mp3quranLang(),
         );
       } else if (album.source === "mp3quran-tracks") {
-        // Tadabor / Tafsir albums: tracks were already fully resolved
-        // (including their audio url) when the card was built, so there's
-        // nothing further to fetch here.
         this.originalTracks = Array.isArray(album.tracks) ? album.tracks : [];
       } else {
-        // Legacy albums stored before the switch to mp3quran.net. Kept only
-        // so any old "selectedAlbum" left in localStorage doesn't crash.
         throw new Error("Unsupported album source");
       }
       this.tracks = [...this.originalTracks];
@@ -99,8 +85,8 @@ class PlaylistManager {
       analytics.error(
         "playlist_load_tracks",
         error.message || String(error),
-      ); // ← ANALYTICS
-      let errorMsg = t("ui.errorLoadingTracks");
+      );
+      let errorMsg = t("errorLoadingTracks");
       if (errorMsg.includes("{album}")) {
         errorMsg = errorMsg.replace(
           "{album}",
@@ -162,13 +148,11 @@ class PlaylistManager {
     try {
       const settings = await ipcRenderer.invoke("get-settings");
       if (settings) {
-        // Make settings available to screenSizeManager
         const { state } = require("../../js/core/globalStore");
         state.settings = { ...state.settings, ...settings };
 
         if (settings.language) {
           setLanguage(settings.language);
-          // applyLanguageDirection(); // Disabled by request: keep LTR
         }
       }
     } catch (err) {
@@ -209,7 +193,6 @@ class PlaylistManager {
     this.currentTrackData = state.currentTrack;
 
     this.updatePlayBtn();
-    // Highlight logic
     const items = document.querySelectorAll(".track-item");
     items.forEach((item) => {
       if (
@@ -232,11 +215,9 @@ class PlaylistManager {
     if (state.volume !== undefined) {
       const volPercent = Math.round(state.volume * 100);
       if (Math.abs(this.volumeSlider.value - volPercent) > 1) {
-        // Avoid fighting with user drag if close
         this.volumeSlider.value = volPercent;
         this.updateVolumeFill();
       } else if (this.volumeSlider.style.background === "") {
-        // Initial render
         this.updateVolumeFill();
       }
     }
@@ -249,12 +230,6 @@ class PlaylistManager {
     const backBtn = document.getElementById("backBtn");
     if (backBtn) backBtn.setAttribute("aria-label", t("back"));
 
-    // The "No Track Selected" fallback in the HTML is only replaced once a
-    // real player-state update arrives — but the background player is now
-    // created lazily on first playback, so a fresh visit before anything
-    // has ever played would otherwise show the untranslated English
-    // fallback forever. Set the translated version immediately instead;
-    // updateState() will overwrite it as soon as a real track is playing.
     if (!this.currentTrackData) {
       if (this.currentTrackTitle)
         this.currentTrackTitle.innerText = t("noTrackSelected");
@@ -267,7 +242,6 @@ class PlaylistManager {
       const settings = await ipcRenderer.invoke("get-settings");
       if (settings?.theme) {
         const app = document.getElementById("app");
-        // Remove existing theme classes (rough list or regex)
         const classes = app.className
           .split(" ")
           .filter((c) => !c.startsWith("theme-"));
@@ -275,7 +249,6 @@ class PlaylistManager {
       }
     } catch (err) {
       console.error("Failed to load theme:", err);
-      // Fallback to navy if fails
       document.getElementById("app").classList.add("theme-navy");
     }
   }
@@ -287,7 +260,7 @@ class PlaylistManager {
 
     this.searchInput = document.getElementById("searchInput");
 
-    this.resultsList = document.getElementById("resultsList"); // Initialize resultsList
+    this.resultsList = document.getElementById("resultsList");
 
     this.playPauseBtn = document.getElementById("playPauseBtn");
     this.prevBtn = document.getElementById("prevBtn");
@@ -303,7 +276,6 @@ class PlaylistManager {
 
     this.backBtn = document.getElementById("backBtn");
 
-    // Update fullscreen button initial state
     this.updateScreenSizeButton();
   }
 
@@ -318,7 +290,6 @@ class PlaylistManager {
       });
     }
 
-    // Add fullscreen button listener
     if (this.fullscreenBtn) {
       this.fullscreenBtn.addEventListener("click", () =>
         this.toggleScreenSize(),
@@ -350,8 +321,6 @@ class PlaylistManager {
       const clickX = e.offsetX;
       const ratio = clickX / width;
 
-      // We need duration.
-      // Let's fetch it from stored state or DOM
       if (this.lastDuration) {
         const seekTime = this.lastDuration * ratio;
         ipcRenderer.send("player-command", { type: "seek", value: seekTime });
@@ -361,7 +330,7 @@ class PlaylistManager {
     this.volumeSlider.addEventListener("input", (e) => {
       const vol = e.target.value / 100;
       ipcRenderer.send("player-command", { type: "volume", value: vol });
-      this.updateVolumeFill(); // Update fill on input
+      this.updateVolumeFill();
     });
 
     this.backBtn.addEventListener("click", () => {
@@ -375,13 +344,11 @@ class PlaylistManager {
     const isBigScreen = document.body.dataset.screenSize === "big";
     const icon = this.fullscreenBtn.querySelector("i");
     if (isBigScreen) {
-      // Currently big → button should say "Small Screen"
       this.fullscreenBtn.setAttribute("aria-label", "Switch to Small Screen");
       if (icon) {
         icon.className = "fas fa-compress";
       }
     } else {
-      // Currently small → button should say "Big Screen"
       this.fullscreenBtn.setAttribute("aria-label", "Switch to Big Screen");
       if (icon) {
         icon.className = "fas fa-expand";
@@ -392,7 +359,6 @@ class PlaylistManager {
   toggleScreenSize() {
     const isCurrentlyBig = document.body.dataset.screenSize === "big";
     if (isCurrentlyBig) {
-      // Switch FROM big TO small screen
       ipcRenderer.invoke("resize-window", 320, 575);
       document.body.dataset.screenSize = "small";
       document.body.classList.remove("big-screen");
@@ -404,7 +370,6 @@ class PlaylistManager {
         .querySelector(".playlist-container")
         ?.classList.add("small-screen");
     } else {
-      // Switch FROM small TO big screen
       ipcRenderer.invoke("resize-window", 850, 600);
       document.body.dataset.screenSize = "big";
       document.body.classList.remove("small-screen");
@@ -420,7 +385,6 @@ class PlaylistManager {
     this.updateScreenSizeButton();
   }
 
-  // Helper to store duration
   updateTime(currentTime, duration) {
     this.lastDuration = duration;
     this.currentTimeEl.innerText = this.formatTime(Math.round(currentTime));
@@ -450,15 +414,15 @@ class PlaylistManager {
         startIndex: globalIndex,
       });
 
-      // ── Track which album/track the user is playing ─────────────────────
       const storedAlbum = localStorage.getItem("selectedAlbum");
       let albumName = "";
       try {
         albumName = storedAlbum
           ? getLocalized(JSON.parse(storedAlbum).title)
           : "";
-      } catch {}
-      analytics.playlistTrackPlay(albumName); // ← ANALYTICS
+      } catch {
+      }
+      analytics.playlistTrackPlay(albumName);
     }
   }
 
@@ -470,7 +434,7 @@ class PlaylistManager {
 
   updateVolumeFill() {
     const val = this.volumeSlider.value;
-    const percentage = (val / 100) * 100; // Assuming 0-100 min-max
+    const percentage = (val / 100) * 100;
     const isRtl = document.documentElement.dir === "rtl";
 
     if (isRtl) {
@@ -482,6 +446,7 @@ class PlaylistManager {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  await whenReady();
   const playlistManager = new PlaylistManager();
   try {
     await playlistManager.init();

@@ -1,16 +1,9 @@
 const GITHUB_BASE_URL =
   "https://raw.githubusercontent.com/yassindaboussi/Salaty/main/src/renderer/data";
 
-// Pre-require local files for fallback
 const localAdkar = require("../../../data/adkar.json");
 const localNames = require("../../../data/99_Names_Of_Allah.json");
 
-/**
- * Fetch data from GitHub raw url with local file fallback
- * @param {string} filename
- * @param {object} fallbackData
- * @returns {Promise<object>}
- */
 async function fetchWithFallback(filename, fallbackData) {
   try {
     const response = await fetch(`${GITHUB_BASE_URL}/${filename}`);
@@ -19,7 +12,7 @@ async function fetchWithFallback(filename, fallbackData) {
     }
     const data = await response.json();
     return data;
-  } catch (err) {
+  } catch {
     return fallbackData;
   }
 }

@@ -45,5 +45,7 @@
   "tooltipPrev": "السابق",
   "tooltipNext": "التالي",
   "tooltipPlaylist": "فتح قائمة التشغيل",
-  "tooltipCount": "عدّ"
+  "tooltipCount": "عدّ",
+  "tooltipUndo": "تراجع عن آخر عدة",
+  "tooltipReset": "إعادة هذا العداد"
 }

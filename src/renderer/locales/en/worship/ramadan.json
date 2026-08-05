@@ -10,5 +10,6 @@
   "fastingCompleted": "Fasting Completed",
   "todayFasting": "Today's Fasting",
   "fastingTracker": "Fasting Tracker",
-  "ramadhanDesc": "Fasting times & tracker"
+  "ramadhanDesc": "Fasting times & tracker",
+  "ramadanError": "Failed to load. Please check your internet connection."
 }

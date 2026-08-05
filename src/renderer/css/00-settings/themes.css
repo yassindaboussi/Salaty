@@ -153,19 +153,6 @@
   --border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Sunset Theme */
-.theme-sunset {
-  background: linear-gradient(145deg, #e65100, #ef6c00);
-  --accent-color: #ff9800;
-  --accent-rgb: 255, 152, 0;
-  --text-primary: #fff3e0;
-  --text-secondary: #ffe0b2;
-  --bg-primary: #e65100;
-  --bg-secondary: #ef6c00;
-  --bg-surface: rgba(239, 108, 0, 0.7);
-  --border-color: rgba(255, 255, 255, 0.1);
-}
-
 /* Ramadan Theme */
 .theme-ramadan {
   /* Base verte profonde */
@@ -246,120 +233,6 @@
   --border-color: rgba(255, 215, 0, 0.25);
 }
 
-.theme-ramadan-option {
-  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #ffd700 100%);
-  border: 1px solid rgba(255, 215, 0, 0.5);
-}
-.theme-options {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.theme-option {
-  height: 28px;
-  font-size: 9px;
-  padding: 0 1px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-  font-weight: 500;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  line-height: 1.1;
-}
-
-.theme-option::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.15),
-    transparent
-  );
-  opacity: 0.5;
-  transition: opacity 0.2s ease;
-}
-
-.theme-option:hover::before {
-  opacity: 0.8;
-}
-
-.theme-option.selected {
-  border-color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-}
-
-.theme-option.selected::after {
-  content: "✓";
-  position: absolute;
-  top: 1px;
-  right: 1px;
-  width: 10px;
-  height: 10px;
-  background: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 7px;
-  color: #333;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-/* Theme-specific option backgrounds */
-.theme-navy-option {
-  background: linear-gradient(145deg, #0a1128, #1a237e);
-}
-.theme-green-option {
-  background: linear-gradient(145deg, #1b5e20, #2e7d32);
-}
-.theme-brown-option {
-  background: linear-gradient(145deg, #4e342e, #6d4c41);
-}
-.theme-gold-option {
-  background: linear-gradient(145deg, #6b5b1e, #b5982c);
-}
-.theme-pink-option {
-  background: linear-gradient(145deg, #7a1a4a, #b51a5c);
-}
-.theme-purple-option {
-  background: linear-gradient(145deg, #311b92, #4527a0);
-}
-.theme-emerald-option {
-  background: linear-gradient(145deg, #006064, #00838f);
-}
-.theme-ocean-option {
-  background: linear-gradient(145deg, #01579b, #0277bd);
-}
-.theme-royal-option {
-  background: linear-gradient(145deg, #0d47a1, #1565c0);
-}
-.theme-indigo-option {
-  background: linear-gradient(145deg, #1a237e, #283593);
-}
-.theme-classic-option {
-  background: linear-gradient(145deg, #212121, #424242);
-}
-.theme-ramadan-option {
-  background: linear-gradient(145deg, #1a1a2e, #ffd700);
-}
-
 /* Full app theme support
    Keep the selected theme on the whole Electron page, not only cards/buttons. */
 html,
@@ -411,10 +284,6 @@ body.theme-indigo,
 body.theme-classic,
 .app-container.theme-classic {
   background: linear-gradient(145deg, #212121, #424242);
-}
-body.theme-sunset,
-.app-container.theme-sunset {
-  background: linear-gradient(145deg, #e65100, #ef6c00);
 }
 
 body.theme-ramadan,

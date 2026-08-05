@@ -17,11 +17,13 @@ const PAGE_GROUPS = Object.freeze({
     "asma",
     "tasbih",
     "ramadan",
+    "fasting",
     "qibla",
     "hijri-calendar",
+    "monthly-prayer-times",
   ],
   media: ["albums", "playlist", "radio", "livestreams"],
-  widgets: ["prayer-widget", "athkar-popup", "background-player", "offline"],
+  widgets: ["prayer-widget", "athkar-popup", "background-player"],
 });
 
 const PAGE_ROUTE_MAP = Object.freeze(
@@ -58,6 +60,26 @@ const icons = {
       : path.join(ASSETS_DIR, "icons", "app_icon.ico"),
 };
 
+const fs = require("fs");
+const { pathToFileURL } = require("url");
+
+function getAdhanAudioSrc() {
+  const candidates = [];
+
+  if (process.resourcesPath) {
+    candidates.push(
+      path.join(process.resourcesPath, "src", "assets", "adhan.mp3"),
+      path.join(process.resourcesPath, "assets", "adhan.mp3"),
+    );
+  }
+
+  candidates.push(path.join(ASSETS_DIR, "adhan.mp3"));
+
+  const foundPath =
+    candidates.find((candidate) => fs.existsSync(candidate)) || candidates[0];
+  return pathToFileURL(foundPath).href;
+}
+
 module.exports = {
   ROOT_DIR,
   SRC_DIR,
@@ -69,4 +91,5 @@ module.exports = {
   PAGE_ROUTE_MAP,
   pages,
   icons,
+  getAdhanAudioSrc,
 };

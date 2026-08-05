@@ -8,33 +8,32 @@ function configureAutoUpdater(getMainWindow, markQuitting) {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
 
+  const send = (channel, ...args) => {
+    const win = getMainWindow();
+    if (win && !win.isDestroyed()) {
+      win.webContents.send(channel, ...args);
+    }
+  };
+
   ipcMain.on("start-download", () => autoUpdater.downloadUpdate());
   ipcMain.on("install-update", () => {
     markQuitting?.();
     autoUpdater.quitAndInstall(false, true);
   });
 
-  autoUpdater.on("update-available", (info) =>
-    getMainWindow()?.webContents.send("update-available", info),
-  );
+  autoUpdater.on("update-available", (info) => send("update-available", info));
 
-  // Forward "no update" so the renderer doesn't rely on the 8-second timeout
-  autoUpdater.on("update-not-available", () =>
-    getMainWindow()?.webContents.send("update-not-available"),
-  );
+  autoUpdater.on("update-not-available", () => send("update-not-available"));
 
   autoUpdater.on("download-progress", (progress) =>
-    getMainWindow()?.webContents.send("download-progress", progress),
+    send("download-progress", progress),
   );
 
-  autoUpdater.on("update-downloaded", (info) =>
-    getMainWindow()?.webContents.send("update-downloaded", info),
-  );
+  autoUpdater.on("update-downloaded", (info) => send("update-downloaded", info));
 
-  // Forward errors to the renderer so the UI shows "Check failed" correctly
   autoUpdater.on("error", (err) => {
     console.error("[Updater] Error:", err);
-    getMainWindow()?.webContents.send("update-error", err?.message || String(err));
+    send("update-error", err?.message || String(err));
   });
 }
 

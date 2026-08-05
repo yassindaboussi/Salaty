@@ -4,5 +4,36 @@
   "recitations": "Recitations",
   "total": "Total",
   "completed": "Completed",
-  "tasbihDesc": "Digital prayer beads"
+  "tasbihDesc": "Digital prayer beads",
+
+  "countBtn": "Count",
+  "undoBtn": "Undo",
+  "resetBtn": "Reset",
+  "stopAtCount": "Stop at {count}",
+  "noLimit": "No limit",
+  "roundLabel": "Round {n}",
+  "spacebarHint": "Space",
+
+  "dhikrSwitched": "Switched to {name}",
+  "dhikrCompleted": "Completed! {count} times",
+  "dhikrRoundCompleted": "Round {n} complete — keep going",
+  "counterReset": "Counter reset",
+  "allCountersReset": "All counters reset",
+
+  "resetConfirmTitle": "Reset Counter",
+  "resetConfirmMessage": "Are you sure you want to reset this counter?",
+  "resetAllConfirmTitle": "Reset All Counters",
+  "resetAllConfirmMessage": "Are you sure? This cannot be undone.",
+  "cancel": "Cancel",
+  "reset": "Reset",
+  "resetAllBtn": "Reset All",
+
+  "dhikrSubhanallahMeaning": "Glory be to Allah",
+  "dhikrAlhamdulillahMeaning": "Praise be to Allah",
+  "dhikrAllahuAkbarMeaning": "Allah is the Greatest",
+  "dhikrLaIlahaMeaning": "There is no god but Allah",
+  "dhikrAstaghfirullahMeaning": "I seek forgiveness from Allah",
+  "dhikrSubhanallahiWaBihamdihiMeaning": "Glory be to Allah, and praise Him",
+  "dhikrSalawatMeaning": "O Allah, send blessings upon Muhammad",
+  "dhikrHawqalaMeaning": "There is no power nor might except with Allah"
 }

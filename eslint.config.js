@@ -4,6 +4,9 @@ const js      = require('@eslint/js');
 const globals = require('globals');
 
 module.exports = [
+  {
+    ignores: ['src/renderer/vendor/**', 'src/renderer/js-bundled/**'],
+  },
   js.configs.recommended,
 
   // ── Main process: Node.js only ───────────────────────────────────────────
@@ -20,6 +23,7 @@ module.exports = [
     rules: {
       'no-unused-vars': 'warn',
       'no-console': 'off',
+      'no-empty': ['error', { allowEmptyCatch: true }],
     },
   },
 
@@ -38,6 +42,19 @@ module.exports = [
     rules: {
       'no-unused-vars': 'warn',
       'no-console': 'off',
+      'no-empty': ['error', { allowEmptyCatch: true }],
+    },
+  },
+  // ── background-player.js: Howler/Howl are loaded globally via a
+  //    <script> tag (src/renderer/vendor/howler/howler.min.js), not a
+  //    module import — declare them so lint doesn't flag them as undefined.
+  {
+    files: ['src/renderer/js/media/background-player.js'],
+    languageOptions: {
+      globals: {
+        Howler: 'readonly',
+        Howl: 'readonly',
+      },
     },
   },
 ];

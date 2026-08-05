@@ -1,9 +1,9 @@
 const { ipcRenderer } = require("electron");
 const { setupConnectionRecovery } = require("../services/connection-recovery");
 const { t, getLanguage } = require("../core/i18n/translations");
-const screenSizeManager = require("../core/screenSize");
 const radioStationsData = require("../../data/radioStations.json");
 const analytics = require("../utils/analytics");
+const { renderToast } = require("../core/toast");
 
 const radioStations = radioStationsData.stations;
 
@@ -18,11 +18,9 @@ let isPlaying = false;
 let isMuted = false;
 let volume = 80;
 
-// ==================== INIT ====================
 function initRadioPage() {
-  // Setup auto-reload on connection restored
   setupConnectionRecovery(() => {
-    loadRadios();
+    loadStations();
   }, "Radio");
   updateRadioUI();
 
@@ -41,7 +39,6 @@ function initRadioPage() {
   window.addEventListener("beforeunload", () => stopPlayback());
 }
 
-// ==================== UI TEXT ====================
 function updateRadioUI() {
   const els = {
     radioTitle: t("muslimRadio"),
@@ -63,7 +60,6 @@ function setDefaultNowPlaying() {
   if (descEl) descEl.textContent = t("chooseFromStations");
 }
 
-// ==================== STATIONS ====================
 function loadStations() {
   const grid = document.getElementById("stationsGrid");
   if (!grid) return;
@@ -109,7 +105,8 @@ function setupStationCards() {
   });
 }
 
-// ==================== PLAYBACK ====================
+let playRequestId = 0;
+
 function playStation(stationId) {
   const station = radioStations.find((s) => s.id === stationId);
   if (!station) return;
@@ -127,22 +124,28 @@ function playStation(stationId) {
     setupAudioEvents();
   }
 
+  const myRequestId = ++playRequestId;
   audioPlayer.src = station.url;
   audioPlayer.volume = volume / 100;
 
   audioPlayer
     .play()
     .then(() => {
+      if (myRequestId !== playRequestId) return;
       currentStation = station;
       isPlaying = true;
       updateUIForPlayingStation(station);
       showLoading(false);
-      // ── Track which station is being played ───────────────────────────────
-      analytics.radioStationPlay(station.id, station.name.en); // ← ANALYTICS
+      analytics.radioStationPlay(station.id, station.name.en);
     })
     .catch((err) => {
+      if (myRequestId !== playRequestId) return;
+      if (err?.name === "AbortError") {
+        showLoading(false);
+        return;
+      }
       console.error("Playback error:", err);
-      analytics.error("radio_playback", err.message || String(err)); // ← ANALYTICS
+      analytics.error("radio_playback", err.message || String(err));
       showToast(t("playbackError"), "error");
       showLoading(false);
     });
@@ -180,7 +183,7 @@ function resumePlayback() {
       updateCardPlayBtns();
     })
     .catch((err) => {
-      analytics.error("radio_resume", err.message || String(err)); // ← ANALYTICS
+      analytics.error("radio_resume", err.message || String(err));
       showToast(t("playbackError"), "error");
     });
 }
@@ -197,7 +200,7 @@ function stopPlayback() {
   setSoundBars(false);
   updateUIForStopped();
   resetAllCards();
-  analytics.radioStop(); // ← ANALYTICS
+  analytics.radioStop();
 }
 
 function setupAudioEvents() {
@@ -218,7 +221,6 @@ function setupAudioEvents() {
   });
 }
 
-// ==================== VOLUME ====================
 function setVolume(value) {
   volume = Math.min(100, Math.max(0, value));
   if (audioPlayer) audioPlayer.volume = volume / 100;
@@ -254,7 +256,6 @@ function updateVolumeIcon() {
         : "fas fa-volume-up";
 }
 
-// ==================== CONTROLS SETUP ====================
 function setupPlayerControls() {
   const pp = document.getElementById("playPauseBtn");
   const st = document.getElementById("stopBtn");
@@ -267,7 +268,6 @@ function setupPlayerControls() {
     vol.addEventListener("input", (e) => setVolume(parseInt(e.target.value)));
 }
 
-// ==================== UI UPDATES ====================
 function updatePlayPauseButton(playing) {
   const icon = document.getElementById("playPauseIcon");
   if (icon) icon.className = playing ? "fas fa-pause" : "fas fa-play";
@@ -361,23 +361,17 @@ function updateCardPlayBtns() {
   });
 }
 
-// ==================== LOADING / TOAST ====================
 function showLoading(show) {
   const el = document.getElementById("radioLoading");
   if (el) el.style.display = show ? "flex" : "none";
 }
 
 function showToast(message, type = "info") {
-  document.querySelector(".radio-toast")?.remove();
-  const toast = document.createElement("div");
-  toast.className = `radio-toast ${type}`;
-  toast.innerHTML = `<i class="fas fa-${type === "error" ? "exclamation-circle" : "info-circle"}"></i> ${message}`;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.classList.add("show"), 10);
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
+  renderToast(
+    `radio-toast ${type}`,
+    `<i class="fas fa-${type === "error" ? "exclamation-circle" : "info-circle"}"></i> ${message}`,
+    { duration: 3000, removeDelay: 300 },
+  );
 }
 
 window.addEventListener("languageChanged", () => {

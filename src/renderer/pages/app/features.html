@@ -6,7 +6,7 @@
     <title>Features - Salaty Time</title>
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      href="../../vendor/fontawesome/css/all.min.css"
     />
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/features.css" />
@@ -140,6 +140,18 @@
               </p>
             </div>
 
+            <!-- Sunnah Fasting Card -->
+            <div class="feature-card available" data-feature="fasting">
+              <div class="feature-icon fasting-icon">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <h3 class="feature-name" id="featureFasting">Sunnah Fasting</h3>
+              <p class="feature-description" id="featureFastingDesc">
+                Voluntary fasting days & reminders
+              </p>
+            </div>
+
+
             <!-- Qibla Card -->
             <div class="feature-card available" data-feature="qibla">
               <div class="feature-icon qibla-icon">
@@ -152,13 +164,7 @@
             </div>
 
             <!-- Monthly Prayer Times Card -->
-            <div
-              class="feature-card coming-soon"
-              data-feature="monthly-prayer-times"
-            >
-              <div class="coming-soon-badge" id="comingSoonBadge6">
-                Coming Soon
-              </div>
+            <div class="feature-card available" data-feature="monthly-prayer-times">
               <div class="feature-icon monthly-icon">
                 <i class="fas fa-calendar-days"></i>
               </div>
@@ -204,6 +210,6 @@
       </div>
     </div>
 
-    <script src="../../js/core/renderer.js"></script>
+    <script src="../../js-bundled/renderer.bundle.js"></script>
   </body>
 </html>

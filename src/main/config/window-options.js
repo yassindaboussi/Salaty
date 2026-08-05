@@ -3,9 +3,6 @@
 const { PRELOAD_ENTRY, icons } = require("./paths");
 
 function createMainWindowOptions(settings = {}) {
-  // bigScreen:true = 850px wide, bigScreen:false = maximized fullscreen
-  const useBigScreen = settings.bigScreen !== false; // default to big
-
   return {
     width: 850,
     height: 560,
@@ -21,12 +18,16 @@ function createMainWindowOptions(settings = {}) {
     icon: icons.app,
     show: false,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
       preload: PRELOAD_ENTRY,
-      webviewTag: true,
-      webSecurity: false,
+      webviewTag: false,
+      webSecurity: true,
       backgroundThrottling: false,
+      spellcheck: false,
+      enableWebSQL: false,
+      v8CacheOptions: "bypassHeatCheck",
     },
   };
 }
@@ -42,10 +43,14 @@ function createBackgroundPlayerOptions() {
     skipTaskbar: true,
     alwaysOnTop: true,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      webSecurity: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      preload: PRELOAD_ENTRY,
+      webSecurity: true,
       backgroundThrottling: false,
+      spellcheck: false,
+      enableWebSQL: false,
     },
   };
 }

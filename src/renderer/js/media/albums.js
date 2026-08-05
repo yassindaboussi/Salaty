@@ -5,16 +5,14 @@ const {
   setLanguage,
   t,
   getLanguage,
+  whenReady,
 } = require("../../js/core/i18n/translations");
 
-// mp3quran.net expects its own language codes, not our app's ("en"/"ar"/"fr").
 const MP3QURAN_LANG = { en: "eng", ar: "ar", fr: "fr" };
 function mp3quranLang() {
   return MP3QURAN_LANG[getLanguage()] || "eng";
 }
 
-// Standard Arabic alphabetical order (ﺃ-ﻱ), used instead of A-Z when the
-// reciter names themselves come back in Arabic script.
 const ARABIC_ALPHABET = [
   "ا",
   "ب",
@@ -47,14 +45,12 @@ const ARABIC_ALPHABET = [
 ];
 const LATIN_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-/** First "grouping" character of a name: normalizes Arabic Alef variants
- *  (أ/إ/آ) to plain ا, strips tashkeel, and uppercases Latin script. */
 function groupingLetter(name) {
   const raw = (name || "#").trim();
   if (!raw) return "#";
   const first = raw
     .normalize("NFKD")
-    .replace(/[\u0617-\u061A\u064B-\u0652]/g, "") // strip Arabic diacritics
+    .replace(/[\u0617-\u061A\u064B-\u0652]/g, "")
     .charAt(0);
   if (/[\u0621-\u064A]/.test(first)) {
     return first.replace(/[إأآ]/, "ا");
@@ -66,26 +62,21 @@ function groupingLetter(name) {
 class AlbumsManager {
   constructor() {
     this.reciters = [];
-    this.tadaborBySura = null; // { suraId: [entries] }, fetched lazily
-    this.surahNames = null; // [{id, name}], fetched lazily
-    this.tafsirBooks = null; // [{id, url, name}], fetched lazily
-    this.currentTafsirBook = null; // { id, name, bySura } once a book is opened
+    this.tadaborBySura = null;
+    this.surahNames = null;
+    this.tafsirBooks = null;
+    this.currentTafsirBook = null;
     this.initElements();
     this.initListeners();
   }
 
   async init() {
-    await this.loadSettings(); // applies settings, theme, and language
+    await this.loadSettings();
     await this.initScreenSize();
     this.updateTranslations();
 
-    // Reveal the page immediately — both groups start collapsed with
-    // nothing to fetch yet, so there's nothing to block on.
     document.body.classList.remove("page-loading");
 
-    // If the user came back from the playlist page, reopen the same
-    // section (and Tafsir book, if applicable) instead of resetting to
-    // the fully-collapsed default.
     await this.restoreArchiveState();
     return this;
   }
@@ -160,20 +151,17 @@ class AlbumsManager {
     this.closeBtn = document.getElementById("closeBtn");
     this.backBtn = document.getElementById("backBtn");
 
-    // Quran Recitation group
     this.reciteGroup = document.getElementById("reciteGroup");
     this.reciteGroupHeader = document.getElementById("reciteGroupHeader");
     this.searchInput = document.getElementById("searchInput");
     this.albumsGrid = document.getElementById("albumsGrid");
     this.azIndex = document.getElementById("azIndex");
 
-    // Tadabor group
     this.tadaborGroup = document.getElementById("tadaborGroup");
     this.tadaborGroupHeader = document.getElementById("tadaborGroupHeader");
     this.tadaborSearchInput = document.getElementById("tadaborSearchInput");
     this.tadaborGrid = document.getElementById("tadaborGrid");
 
-    // Tafasir group
     this.tafsirGroup = document.getElementById("tafsirGroup");
     this.tafsirGroupHeader = document.getElementById("tafsirGroupHeader");
     this.tafsirSearchInput = document.getElementById("tafsirSearchInput");
@@ -181,7 +169,6 @@ class AlbumsManager {
     this.tafsirBackBtn = document.getElementById("tafsirBackBtn");
     this.tafsirBackBtnLabel = document.getElementById("tafsirBackBtnLabel");
 
-    // Moshaf picker modal
     this.moshafModal = document.getElementById("moshafModal");
     this.moshafModalTitle = document.getElementById("moshafModalTitle");
     this.moshafModalList = document.getElementById("moshafModalList");
@@ -267,12 +254,7 @@ class AlbumsManager {
     }
   }
 
-  // ── Collapsible groups (accordion: only one open at a time — with two
-  //    sections that each hold a large scrollable grid, letting both stay
-  //    open at once left too little room for either to be usable) ────────
 
-  /** Collapses every group, then expands the given one. Used both by
-   *  clicking a header and by restoreArchiveState() below. */
   activateGroup(groupEl, headerEl) {
     [this.reciteGroup, this.tafsirGroup, this.tadaborGroup].forEach((g) => {
       g?.classList.remove("expanded", "content-visible");
@@ -287,8 +269,6 @@ class AlbumsManager {
 
     groupEl.classList.add("expanded");
     headerEl.setAttribute("aria-expanded", "true");
-    // Two rAFs: display:none→flex must actually apply before the
-    // opacity transition can be observed by the browser.
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         groupEl.classList.add("content-visible");
@@ -307,15 +287,11 @@ class AlbumsManager {
     onFirstExpand();
   }
 
-  // ── Remember which section (and, for Tafsir, which book) the user was
-  //    browsing, so the back button from the playlist page returns them
-  //    to the same place instead of the fully-collapsed default. ────────
 
   saveArchiveState(state) {
     try {
       localStorage.setItem("archiveState", JSON.stringify(state));
     } catch {
-      // Non-fatal — worst case the back button just lands on the default.
     }
   }
 
@@ -326,7 +302,14 @@ class AlbumsManager {
     } catch {
       saved = null;
     }
-    if (!saved || !saved.group) return;
+
+    if (!saved || !saved.group) {
+      if (this.reciteGroup) {
+        this.activateGroup(this.reciteGroup, this.reciteGroupHeader);
+        await this.ensureRecitersLoaded();
+      }
+      return;
+    }
 
     if (saved.group === "recite" && this.reciteGroup) {
       this.activateGroup(this.reciteGroup, this.reciteGroupHeader);
@@ -346,10 +329,9 @@ class AlbumsManager {
     }
   }
 
-  // ── Reciter data (Quran Recitation group) ───────────────────────────────
 
   async ensureRecitersLoaded() {
-    if (this.reciters.length > 0) return; // already loaded
+    if (this.reciters.length > 0) return;
     this.albumsGrid.innerHTML = `<div class="loading"><i class="fas fa-spinner"></i>${t("loadingReciters")}</div>`;
     try {
       const reciters = await mp3quranApi.getReciters(mp3quranLang());
@@ -410,9 +392,6 @@ class AlbumsManager {
       return ai - bi;
     });
 
-    // Section headers are grid items that span every column, so card
-    // columns stay perfectly aligned across letter boundaries instead of
-    // each letter group having its own independently-wrapping grid.
     sortedLetters.forEach((letter) => {
       const header = document.createElement("div");
       header.className = "reciter-section-header";
@@ -427,8 +406,6 @@ class AlbumsManager {
 
     this.albumsGrid.appendChild(grid);
 
-    // Only skip building the index rail while actively searching — jumping
-    // to a letter doesn't make sense against a filtered subset.
     this.azIndex.style.display = query ? "none" : "flex";
     if (!query) this.buildAzIndex(sortedLetters);
   }
@@ -487,7 +464,6 @@ class AlbumsManager {
     return card;
   }
 
-  // ── Moshaf picker modal (reciters with more than one recitation style) ──
 
   openMoshafPicker(reciter) {
     this.moshafModalTitle.textContent = reciter.name;
@@ -527,10 +503,9 @@ class AlbumsManager {
     await ipcRenderer.invoke("navigate-to", "playlist");
   }
 
-  // ── Tadabor data ─────────────────────────────────────────────────────────
 
   async ensureTadaborLoaded() {
-    if (this.tadaborBySura) return; // already loaded
+    if (this.tadaborBySura) return;
     this.tadaborGrid.innerHTML = `<div class="loading"><i class="fas fa-spinner"></i>${t("loadingTadabor")}</div>`;
     try {
       const [bySura, surahs] = await Promise.all([
@@ -622,7 +597,6 @@ class AlbumsManager {
     await ipcRenderer.invoke("navigate-to", "playlist");
   }
 
-  // ── Tafasir data (book → surah drill-down) ──────────────────────────────
 
   async ensureTafsirBooksLoaded() {
     if (this.tafsirBooks) {
@@ -793,6 +767,7 @@ class AlbumsManager {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  await whenReady();
   const manager = new AlbumsManager();
   try {
     await manager.init();

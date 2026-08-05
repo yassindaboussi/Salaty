@@ -1,10 +1,6 @@
-/**
- * popup-handlers.js
- * Manages athkar/adhan popup windows and the prayer widget window.
- */
 "use strict";
 const { BrowserWindow, ipcMain, screen } = require("electron");
-const { pages } = require("../../config/paths");
+const { pages, PRELOAD_ENTRY } = require("../../config/paths");
 const prayerTimerManager = require("../../services/prayer-timer-manager");
 
 let athkarPopupWindow = null;
@@ -16,7 +12,6 @@ const WIDGET_HEIGHT = 36;
 const POPUP_WIDTH = 340;
 const POPUP_MARGIN = 16;
 
-// ── Prayer Widget ─────────────────────────────────────────────────────────────
 
 function createPrayerWidget() {
   if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()) {
@@ -38,10 +33,14 @@ function createPrayerWidget() {
     focusable: true,
     show: false,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      webSecurity: false,
-      backgroundThrottling: false, // FIX: prevent timer drift when window not focused
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      preload: PRELOAD_ENTRY,
+      webSecurity: true,
+      backgroundThrottling: false,
+      spellcheck: false,
+      enableWebSQL: false,
     },
   });
   prayerWidgetWindow.setAlwaysOnTop(true, "pop-up-menu");
@@ -74,12 +73,10 @@ ipcMain.on("widget-set-always-on-top", (_e, value) => {
     prayerWidgetWindow.setAlwaysOnTop(value, "pop-up-menu");
 });
 
-// FIX: Expose already-fetched prayer data to widget — avoids duplicate HTTP fetch
 ipcMain.handle("get-prayer-data", () => {
   return prayerTimerManager.getPrayerData() || null;
 });
 
-// ── Themed popups (athkar / adhan) ───────────────────────────────────────────
 
 function showThemedPopup(data, type) {
   const existing = type === "adhan" ? adhanPopupWindow : athkarPopupWindow;
@@ -100,9 +97,13 @@ function showThemedPopup(data, type) {
     focusable: true,
     show: false,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      webSecurity: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      preload: PRELOAD_ENTRY,
+      webSecurity: true,
+      spellcheck: false,
+      enableWebSQL: false,
     },
   });
   win.setAlwaysOnTop(true, "pop-up-menu");
@@ -144,7 +145,6 @@ ipcMain.on("close-themed-popup", (event) => {
   if (win && !win.isDestroyed()) win.destroy();
 });
 
-// ── Broadcast theme changes to popup/widget windows ──────────────────────────
 
 function broadcastThemeToPopups(theme) {
   if (prayerWidgetWindow && !prayerWidgetWindow.isDestroyed())
@@ -155,4 +155,8 @@ function getPrayerWidgetWindow() {
   return prayerWidgetWindow;
 }
 
-module.exports = { broadcastThemeToPopups, getPrayerWidgetWindow };
+module.exports = {
+  broadcastThemeToPopups,
+  getPrayerWidgetWindow,
+  showThemedPopup,
+};

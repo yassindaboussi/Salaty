@@ -339,24 +339,6 @@
   color: rgba(255, 255, 255, 0.3);
 }
 
-/* Input with Unit */
-.input-with-unit {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.input-with-unit .field-input {
-  flex: 1;
-}
-
-.input-unit {
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-weight: 500;
-  white-space: nowrap;
-}
-
 /* ── Custom Number Spinner ───────────────────────────────────────────────────*/
 .num-spinner-wrap {
   display: flex;
@@ -884,18 +866,6 @@
 
 .size-card.selected .size-name {
   color: var(--accent-color);
-}
-
-.size-dimensions {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  letter-spacing: 0.3px;
-  font-family: "Courier New", monospace;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1px 5px;
-  border-radius: 4px;
-  display: inline-block;
 }
 
 .size-check {
@@ -1565,10 +1535,6 @@
     font-size: 14px;
   }
 
-  .location-details {
-    font-size: 12px;
-  }
-
   .action-btn {
     width: 28px;
     height: 28px;
@@ -1684,18 +1650,6 @@
   border-color: var(--accent-color);
 }
 
-.location-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.location-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
 .location-name {
   font-size: 15px;
   font-weight: 600;
@@ -1704,37 +1658,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.active-badge {
-  display: inline-block;
-  background: var(--accent-color);
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.favorite-star {
-  color: #ffd700;
-  font-size: 12px;
-}
-
-.location-details {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.location-details i {
-  font-size: 11px;
-  opacity: 0.7;
 }
 
 .location-actions {
@@ -1821,15 +1744,6 @@
 .add-location-btn:hover {
   background: rgba(var(--accent-rgb), 0.2);
   transform: translateY(-1px);
-}
-
-/* Modal Actions */
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .btn-primary,

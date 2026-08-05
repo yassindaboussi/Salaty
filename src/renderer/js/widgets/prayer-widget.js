@@ -1,9 +1,8 @@
-// src/renderer/js/prayer-widget.js
 "use strict";
 
 const { ipcRenderer } = require("electron");
 const { secondsFromTime } = require("../../../shared/prayerUtils");
-const { t, setLanguage } = require("../../js/core/i18n/translations");
+const { t, setLanguage, whenReady } = require("../../js/core/i18n/translations");
 
 const PRAYER_KEYS = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
@@ -32,7 +31,6 @@ const THEME_CLASSES = [
   "theme-ramadan",
 ];
 
-/* ── State ── */
 let settings = null;
 let prayerData = null;
 let lang = "en";
@@ -40,14 +38,12 @@ let tickTimer = null;
 let fetchTimer = null;
 let isPinned = true;
 
-/* ── DOM refs ── */
 const appEl = document.getElementById("app");
 const timerEl = document.getElementById("timerDisplay");
 const prayerListEl = document.getElementById("prayerList");
 const closeBtnEl = document.getElementById("closeBtn");
 const pinBtnEl = document.getElementById("pinBtn");
 
-/* ── Utils ── */
 function formatCountdown(s) {
   if (s <= 0) return "00:00:00";
   return [Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60]
@@ -60,7 +56,6 @@ function nowSeconds() {
   return d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
 }
 
-/* ── Theme ── */
 function applyTheme(theme) {
   if (!theme) return;
   appEl.classList.remove(...THEME_CLASSES);
@@ -69,7 +64,6 @@ function applyTheme(theme) {
   document.documentElement.lang = lang;
 }
 
-/* ── Compute ── */
 function computePrayers() {
   if (!prayerData?.timings) return null;
   const now = nowSeconds();
@@ -99,7 +93,6 @@ function computePrayers() {
   };
 }
 
-/* ── Render ── */
 function renderList() {
   const result = computePrayers();
   if (!result) {
@@ -125,7 +118,6 @@ function renderList() {
     .join("");
 }
 
-/* ── Tick ── */
 function tick() {
   const result = computePrayers();
   if (!result) return;
@@ -133,23 +125,19 @@ function tick() {
   if (result.timeRemaining % 60 === 0) renderList();
 }
 
-/* ── Data loading — main process first, HTTP fallback ── */
 async function loadPrayerData() {
-  // FIX: First try to get already-fetched data from the main process.
-  // This avoids a duplicate HTTP request and fixes the spinner-forever bug
-  // when the widget opens before its own fetch completes or when the API
-  // is slow / unreachable.
   try {
     const cached = await ipcRenderer.invoke("get-prayer-data");
     if (cached?.timings) {
       prayerData = cached;
       renderList();
       tick();
-      return; // got data — no need for HTTP fetch
+      return;
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error("Error reading cached prayer data:", e);
+  }
 
-  // Fallback: fetch directly if main process has no data yet (cold start)
   await fetchPrayerData();
 }
 
@@ -168,7 +156,6 @@ async function fetchPrayerData() {
   }
 }
 
-/* ── Controls ── */
 pinBtnEl.addEventListener("click", () => {
   isPinned = !isPinned;
   ipcRenderer.send("widget-set-always-on-top", isPinned);
@@ -180,11 +167,8 @@ closeBtnEl.addEventListener("click", () => {
   setTimeout(() => ipcRenderer.send("close-prayer-widget"), 230);
 });
 
-/* ── IPC ── */
 ipcRenderer.on("theme-changed", (_e, theme) => applyTheme(theme));
 
-// FIX: Listen for prayer data pushed from main process (updated every hour
-// or on location change) so the widget stays in sync without re-fetching.
 ipcRenderer.on("prayer-data-from-main", (_e, data) => {
   if (data?.timings) {
     prayerData = data;
@@ -193,15 +177,12 @@ ipcRenderer.on("prayer-data-from-main", (_e, data) => {
   }
 });
 
-/* ── Tooltips ── */
 function initWidgetTooltips() {
-  // Resolve data-tooltip keys using the already-set language
   document.querySelectorAll("[data-tooltip]").forEach((el) => {
     const key = el.getAttribute("data-tooltip");
     el.setAttribute("data-tip", t(key) || key);
   });
 
-  // Single floating tooltip div appended to body (avoids overflow:hidden clipping)
   let tip = document.getElementById("appTooltip");
   if (!tip) {
     tip = document.createElement("div");
@@ -233,14 +214,12 @@ function initWidgetTooltips() {
     const text = el.getAttribute("data-tip");
     if (!text) return;
     tip.textContent = text;
-    // Measure width while invisible
     tip.style.visibility = "hidden";
     tip.style.opacity = "1";
     const tipW = tip.offsetWidth;
     const r = el.getBoundingClientRect();
     tip.style.visibility = "";
     const isRTL = document.documentElement.dir === "rtl";
-    // LTR → left of button | RTL → right of button (always inside the bar)
     tip.style.left = isRTL ? r.right + 8 + "px" : r.left - tipW - 8 + "px";
     tip.style.top = r.top + r.height / 2 + "px";
     tip.style.transform = "translateY(-50%) scale(1)";
@@ -258,21 +237,19 @@ function initWidgetTooltips() {
   });
 }
 
-/* ── Init ── */
 async function init() {
   try {
+    await whenReady();
     settings = await ipcRenderer.invoke("get-settings");
     if (settings) {
       lang = settings.language || "en";
       setLanguage(lang);
       applyTheme(settings.theme || "navy");
     }
-    initWidgetTooltips(); // language is now set — tooltips resolve correctly
+    initWidgetTooltips();
 
-    // Load prayer data (from main process cache first, HTTP fallback)
     await loadPrayerData();
 
-    // Start 1-second tick and hourly refresh
     if (tickTimer) clearInterval(tickTimer);
     if (fetchTimer) clearInterval(fetchTimer);
     tickTimer = setInterval(tick, 1000);

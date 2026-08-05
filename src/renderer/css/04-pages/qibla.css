@@ -107,8 +107,8 @@
 
 /* Instruction Bar */
 .qibla-instruction-bar {
-  background: rgba(var(--accent-color-rgb), 0.15);
-  border: 1px solid rgba(var(--accent-color-rgb), 0.3);
+  background: rgba(var(--accent-rgb), 0.15);
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
   color: white !important; /* Force white text */
   padding: 8px 12px;
   border-radius: 8px;
@@ -132,7 +132,7 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  background: var(--card-bg);
+  background: var(--bg-surface);
 }
 
 #qiblaMap {
@@ -149,7 +149,7 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
-  background: rgba(var(--card-bg-rgb), 0.95);
+  background: var(--bg-surface);
   backdrop-filter: blur(8px);
   padding: 6px 16px;
   border-radius: 20px;
@@ -166,7 +166,7 @@
   bottom: 20px;
   left: 20px;
   z-index: 1000;
-  background: rgba(var(--card-bg-rgb), 0.95);
+  background: var(--bg-surface);
   padding: 12px 20px;
   border-radius: 16px;
   backdrop-filter: blur(8px);
@@ -179,7 +179,7 @@
 .qibla-info h1 {
   font-size: 1.8rem;
   margin: 0;
-  color: var(--primary-color);
+  color: var(--accent-color);
   font-weight: 700;
   line-height: 1.2;
 }
@@ -203,7 +203,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--primary-color);
+  background: var(--accent-color);
   color: #fff;
   border: none;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);

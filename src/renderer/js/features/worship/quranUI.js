@@ -1,41 +1,23 @@
 "use strict";
-/**
- * quranUI.js — Native Quran Book Reader
- *
- * Data sources (in priority order):
- *  1. AlQuran Cloud API (api.alquran.cloud/v1) — free, no key, still active.
- *     quran.com's old free v4 endpoint (api.quran.com/api/v4) was migrated
- *     to an OAuth2-authenticated system in 2025/2026 (apis.quran.foundation)
- *     that requires a client_id/client_secret which can't be safely embedded
- *     in a desktop app, so it's no longer used here.
- *  2. Bundled offline copy (src/renderer/data/Quran.json) — used when the
- *     device is offline, or if the live API call fails for any reason.
- *
- * No iframes, no embeds. Full native reader.
- */
 
 const { ipcRenderer } = require("electron");
 const { t } = require("../../core/i18n/translations");
 const analytics = require("../../utils/analytics");
 const screenSizeManager = require("../../core/screenSize");
 
-// ── Constants ────────────────────────────────────────────────
 const ALQURAN_CLOUD_API = "https://api.alquran.cloud/v1";
 
-// ── State ────────────────────────────────────────────────────
 let state = {
-  surahs: [],             // all 114 chapters
+  surahs: [],
   filteredSurahs: [],
-  currentSurah: null,     // { number, name, ... }
+  currentSurah: null,
   currentAyahs: [],
-  fontSize: 26,           // px for arabic text
-  translationId: "none",  // "none" | edition key
+  fontSize: 26,
+  translationId: "none",
   settingsOpen: true,
-  activeTab: "surah",     // "surah" | "juz"
+  activeTab: "surah",
 };
 
-// ── Surah metadata cache (offline-first) ────────────────────
-// 114 surahs with Arabic name, transliteration, ayah count, revelation type
 const SURAH_META = [
   {n:1,  ar:"الفاتحة",       en:"Al-Faatiha",        count:7,   type:"Meccan"},
   {n:2,  ar:"البقرة",        en:"Al-Baqara",          count:286, type:"Medinan"},
@@ -153,7 +135,6 @@ const SURAH_META = [
   {n:114,ar:"الناس",         en:"An-Naas",             count:6,   type:"Meccan"},
 ];
 
-// JUZ start info
 const JUZ_META = [
   {n:1,  start:"Al-Faatiha 1:1"},  {n:2,  start:"Al-Baqara 2:142"},
   {n:3,  start:"Al-Baqara 2:253"},{n:4,  start:"Aal-i-Imraan 3:92"},
@@ -172,18 +153,14 @@ const JUZ_META = [
   {n:29, start:"Al-Mulk 67:1"},   {n:30, start:"An-Naba 78:1"},
 ];
 
-// Translation editions (AlQuran Cloud edition identifiers)
 const TRANSLATION_EDITIONS = {
   "en.sahih":      "en.sahih",
   "en.asad":       "en.asad",
   "fr.hamidullah": "fr.hamidullah",
 };
 
-// ── API helpers ──────────────────────────────────────────────
 
 async function fetchQuranSurah(surahNum, translationEdition) {
-  // Offline: skip the network attempt entirely and go straight to the
-  // bundled copy instead of waiting on a request that can't succeed.
   if (!navigator.onLine) {
     return getLocalQuranSurah(surahNum, translationEdition);
   }
@@ -199,8 +176,6 @@ async function fetchQuranSurah(surahNum, translationEdition) {
     const data = await res.json();
     return normalizeAlquranCloudResponse(data, translationEdition);
   } catch (e) {
-    // Online, but the request still failed (server hiccup, blocked host,
-    // etc.) — fall back to the bundled copy rather than showing an error.
     console.warn("AlQuran Cloud request failed, using offline data:", e.message);
     return getLocalQuranSurah(surahNum, translationEdition);
   }
@@ -208,7 +183,6 @@ async function fetchQuranSurah(surahNum, translationEdition) {
 
 function normalizeAlquranCloudResponse(data, translationEdition) {
   const editions = data.data || [];
-  // editions[0] = arabic, editions[1] = translation (if requested)
   const arabicEdition = Array.isArray(editions) ? editions[0] : editions;
   const transEdition  = Array.isArray(editions) && editions.length > 1 ? editions[1] : null;
   const ayahs = arabicEdition.ayahs || [];
@@ -221,24 +195,19 @@ function normalizeAlquranCloudResponse(data, translationEdition) {
   }));
 }
 
-// Lazily loaded — this bundled dataset is ~5MB, so it's only actually
-// parsed the first time it's needed (offline, or as a fallback).
-let _localQuranData = null;
+let _localQuranDataPromise = null;
 function getLocalQuranData() {
-  if (!_localQuranData) {
-    _localQuranData = require("../../../data/Quran.json");
+  if (!_localQuranDataPromise) {
+    _localQuranDataPromise = fetch("../../data/Quran.json").then((res) => {
+      if (!res.ok) throw new Error(`Failed to load offline Quran data (${res.status})`);
+      return res.json();
+    });
   }
-  return _localQuranData;
+  return _localQuranDataPromise;
 }
 
-/**
- * Builds the same { number, arabic, translation } shape as the API path,
- * from the bundled offline copy. Only one English translation is bundled
- * (Saheeh International), so it's used for any non-"none" translation
- * selection while offline — French (Hamidullah) isn't available offline.
- */
-function getLocalQuranSurah(surahNum, translationEdition) {
-  const data = getLocalQuranData();
+async function getLocalQuranSurah(surahNum, translationEdition) {
+  const data = await getLocalQuranData();
   const entry = data.find((s) => s.Number === surahNum);
   if (!entry) throw new Error(`Surah ${surahNum} not found in offline data`);
 
@@ -254,20 +223,15 @@ function stripHtmlTags(str) {
   return str ? str.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim() : "";
 }
 
-// ── Init ─────────────────────────────────────────────────────
 
 function initQuranPage() {
-  // Match whatever Big Screen/Full Screen the user has set app-wide, and
-  // set the correct icon/tooltip on both fullscreen buttons immediately.
   screenSizeManager.initPageScreenSize();
   updateFullscreenButtons();
 
-  // Back button (surah list view)
   document.getElementById("backBtn")?.addEventListener("click", () => {
     ipcRenderer.invoke("navigate-to", "features");
   });
 
-  // Window controls
   document.getElementById("minimizeBtn")?.addEventListener("click", () => {
     ipcRenderer.invoke("minimize-window");
   });
@@ -281,32 +245,24 @@ function initQuranPage() {
     ipcRenderer.invoke("close-window");
   });
 
-  // Fullscreen buttons
   document.getElementById("quranFullscreenBtn")?.addEventListener("click", toggleFullscreen);
   document.getElementById("readerFullscreenBtn")?.addEventListener("click", toggleFullscreen);
 
-  // Reader back button → go back to surah list
   document.getElementById("readerBackBtn")?.addEventListener("click", showSurahList);
 
-  // Tab toggle
   document.getElementById("tabSurah")?.addEventListener("click", () => switchTab("surah"));
   document.getElementById("tabJuz")?.addEventListener("click",   () => switchTab("juz"));
 
-  // Search
   document.getElementById("surahSearchInput")?.addEventListener("input", onSearch);
 
-  // Settings panel toggle
   document.getElementById("readerSettingsBtn")?.addEventListener("click", toggleSettings);
   document.getElementById("settingsPanelCloseBtn")?.addEventListener("click", closeSettings);
 
-  // Font size controls
   document.getElementById("fontIncBtn")?.addEventListener("click", () => changeFontSize(2));
   document.getElementById("fontDecBtn")?.addEventListener("click", () => changeFontSize(-2));
 
-  // Translation selector
   document.getElementById("translationSelect")?.addEventListener("change", onTranslationChange);
 
-  // Prev/Next surah
   document.getElementById("prevSurahBtn")?.addEventListener("click", () => {
     if (state.currentSurah && state.currentSurah.n > 1) {
       openSurah(state.currentSurah.n - 1);
@@ -318,10 +274,8 @@ function initQuranPage() {
     }
   });
 
-  // Apply translations
   updateQuranText();
 
-  // Load surah grid
   state.surahs = SURAH_META;
   state.filteredSurahs = [...SURAH_META];
   renderSurahGrid(state.filteredSurahs);
@@ -330,7 +284,6 @@ function initQuranPage() {
   analytics.featureOpen("quran");
 }
 
-// ── UI text ──────────────────────────────────────────────────
 
 function updateQuranText() {
   const el = (id) => document.getElementById(id);
@@ -343,7 +296,6 @@ function updateQuranText() {
   if (el("fontSizeDisplay")) el("fontSizeDisplay").textContent = state.fontSize;
 }
 
-// ── Tab toggle ───────────────────────────────────────────────
 
 function switchTab(tab) {
   state.activeTab = tab;
@@ -354,7 +306,6 @@ function switchTab(tab) {
   document.getElementById("surahSearchInput").style.display = tab === "surah" ? "" : "none";
 }
 
-// ── Search ───────────────────────────────────────────────────
 
 function onSearch(e) {
   const q = e.target.value.trim().toLowerCase();
@@ -371,7 +322,6 @@ function onSearch(e) {
   renderSurahGrid(state.filteredSurahs);
 }
 
-// ── Surah Grid ───────────────────────────────────────────────
 
 function renderSurahGrid(surahs) {
   const grid = document.getElementById("surahGrid");
@@ -403,7 +353,6 @@ function renderSurahGrid(surahs) {
   });
 }
 
-// ── Juz List ─────────────────────────────────────────────────
 
 function renderJuzList() {
   const list = document.getElementById("juzList");
@@ -418,7 +367,6 @@ function renderJuzList() {
     </div>
   `).join("");
 
-  // Map juz to first surah of that juz for simple navigation
   const JUZ_TO_SURAH = [1,2,2,3,4,4,5,6,7,8,9,11,12,15,17,18,21,23,25,27,29,33,36,39,41,46,51,58,67,78];
   list.querySelectorAll(".juz-card").forEach((card) => {
     card.addEventListener("click", () => {
@@ -429,27 +377,22 @@ function renderJuzList() {
   });
 }
 
-// ── Open Surah Reader ─────────────────────────────────────────
 
 async function openSurah(surahNum) {
   const meta = SURAH_META.find((s) => s.n === surahNum);
   if (!meta) return;
   state.currentSurah = meta;
 
-  // Switch to reader view
   document.getElementById("viewSurahList").style.display = "none";
   document.getElementById("viewSurahReader").style.display = "";
 
-  // Settings panel is visible by default every time the reader opens.
   state.settingsOpen = true;
   document.getElementById("readerSettingsPanel").style.display = "";
 
-  // Set header
   document.getElementById("readerSurahName").textContent = `${meta.ar}  —  ${meta.en}`;
   document.getElementById("readerSurahMeta").textContent =
     `${t("surah") || "Surah"} ${meta.n} · ${meta.count} ${t("verses") || "verses"} · ${meta.type}`;
 
-  // Navigation labels
   const prevMeta = SURAH_META.find((s) => s.n === surahNum - 1);
   const nextMeta = SURAH_META.find((s) => s.n === surahNum + 1);
   const prevBtn = document.getElementById("prevSurahBtn");
@@ -473,22 +416,21 @@ async function openSurah(surahNum) {
   document.getElementById("readerPageInfo").textContent =
     `${surahNum} / 114`;
 
-  // Bismillah (not for Surah 1 Al-Fatiha and 9 At-Tawba)
   const bismillah = document.getElementById("bismillahHeader");
   bismillah.style.display = (surahNum !== 1 && surahNum !== 9) ? "" : "none";
 
-  // Load ayahs
   await loadAyahs(surahNum);
 
-  // Scroll to top
   document.getElementById("readerContent").scrollTop = 0;
 
   analytics.featureOpen("quran-surah");
 }
 
-// ── Load Ayahs ────────────────────────────────────────────────
+
+let loadAyahsRequestId = 0;
 
 async function loadAyahs(surahNum) {
+  const myRequestId = ++loadAyahsRequestId;
   const loading  = document.getElementById("readerLoading");
   const ayahList = document.getElementById("ayahList");
 
@@ -497,10 +439,13 @@ async function loadAyahs(surahNum) {
 
   try {
     const ayahs = await fetchQuranSurah(surahNum, state.translationId);
+    if (myRequestId !== loadAyahsRequestId) return;
     state.currentAyahs = ayahs;
     loading.style.display = "none";
     renderAyahs(ayahs);
   } catch (err) {
+    if (myRequestId !== loadAyahsRequestId) return;
+    console.error("Error loading Quran surah:", err);
     loading.style.display = "none";
     ayahList.innerHTML = `
       <div class="quran-error">
@@ -515,7 +460,6 @@ async function loadAyahs(surahNum) {
   }
 }
 
-// ── Render Ayahs ─────────────────────────────────────────────
 
 function renderAyahs(ayahs) {
   const list = document.getElementById("ayahList");
@@ -524,9 +468,6 @@ function renderAyahs(ayahs) {
 
   let html = "";
 
-  // Continuous Mushaf-style flow: one paragraph with each ayah's number
-  // embedded inline as (N). Only shown when no translation is selected —
-  // with a translation active, the reader sees the pure translation only.
   if (!showingTranslation) {
     const flowHtml = ayahs
       .map(
@@ -549,7 +490,6 @@ function renderAyahs(ayahs) {
   list.innerHTML = html;
 }
 
-// ── Show Surah List ───────────────────────────────────────────
 
 function showSurahList() {
   document.getElementById("viewSurahReader").style.display = "none";
@@ -560,7 +500,6 @@ function showSurahList() {
   }
 }
 
-// ── Settings Panel ────────────────────────────────────────────
 
 function toggleSettings() {
   state.settingsOpen = !state.settingsOpen;
@@ -589,12 +528,6 @@ async function onTranslationChange(e) {
   }
 }
 
-// ── Fullscreen ────────────────────────────────────────────────
-// Two fullscreen buttons exist (surah-list header + reader header), so
-// unlike single-button pages we can't hand this fully to
-// screenSizeManager's built-in button updater — it drives the actual
-// resize/maximize + persisted setting, and we mirror the result onto
-// both buttons ourselves.
 
 function updateFullscreenButtons() {
   const isBig = screenSizeManager.isBigScreen();
@@ -618,7 +551,6 @@ async function toggleFullscreen() {
   updateFullscreenButtons();
 }
 
-// ── Connection recovery ───────────────────────────────────────
 
 window.addEventListener("connection-restored", () => {
   if (state.currentSurah) loadAyahs(state.currentSurah.n);

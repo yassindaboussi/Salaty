@@ -63,6 +63,9 @@ jobs:
 
       - run: npm install
 
+      - name: Bundle renderer scripts
+        run: npm run build:renderer
+
       - name: Build Windows
         run: npx electron-builder --win --publish never
         env:
@@ -92,6 +95,9 @@ jobs:
           node-version: '20'
 
       - run: npm install
+
+      - name: Bundle renderer scripts
+        run: npm run build:renderer
 
       - name: Build macOS
         run: npx electron-builder --mac --publish never
@@ -123,6 +129,9 @@ jobs:
           node-version: '20'
 
       - run: npm install
+
+      - name: Bundle renderer scripts
+        run: npm run build:renderer
 
       - name: Build Linux
         run: npx electron-builder --linux --publish never

@@ -1,64 +1,33 @@
-/**
- * adhan-player.js
- * ─────────────────────────────────────────────────────────────────────────────
- * Global adhan player that works on EVERY page.
- *
- * Contract with main process:
- *   IN  ← 'trigger-adhan'         { prayer, mode, theme }
- *   IN  ← 'force-stop-adhan'      {}
- *   IN  ← 'show-pre-adhan-notification' { prayer, minutes }
- *   OUT → 'stop-adhan'            (user clicked stop)
- *   OUT → 'prayer-data-updated'   (after renderer fetches prayer data)
- *
- * The overlay is injected into document.body dynamically so it works
- * on every page without touching any HTML template.
- * ─────────────────────────────────────────────────────────────────────────────
- */
 
 const { ipcRenderer } = require("electron");
-const path = require("path");
-const fs = require("fs");
-const { pathToFileURL } = require("url");
 
-// Try to import translations safely (may not be available on all pages)
-let _t = (key, ns) => key;
+let _t = (key) => key;
 try {
   const { t } = require("../core/i18n/translations");
   _t = t;
-} catch (_) {}
+} catch {
+}
 
-// ── State ─────────────────────────────────────────────────────────────────────
 let adhanAudio = null;
 let fadeTimer = null;
 let overlayEl = null;
-let isRegistered = false; // guard: register IPC listeners only once per process
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Public API
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Call once per page from renderer.js initializeApp().
- * Safe to call multiple times – idempotent per page load.
- */
 function initAdhanPlayer() {
   _injectOverlay();
   _registerIpcListeners();
 
-  // If adhan was playing before page navigation → fully resume: audio + UI
   ipcRenderer
     .invoke("get-adhan-state")
     .then(({ isPlaying, session }) => {
       if (!isPlaying || !session) return;
 
       const elapsedSec = (Date.now() - session.startedAt) / 1000;
-      const audioDurSec = 300; // adhan mp3 is ~5 min; skip resume if already finished
+      const audioDurSec = 300;
 
       if (session.mode !== "silent" && elapsedSec < audioDurSec) {
-        // Resume audio from the correct position
         _playAdhan(session.prayer, session.mode, elapsedSec);
       } else {
-        // Silent mode or audio already ended — just show the bar
         const nameEl = document.getElementById("__adhan-prayer-name__");
         const timeEl = document.getElementById("__adhan-prayer-time__");
         const labelEl = document.getElementById("__adhan-stop-label__");
@@ -73,20 +42,13 @@ function initAdhanPlayer() {
     .catch(() => {});
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Overlay injection
-// ─────────────────────────────────────────────────────────────────────────────
 
 function _injectOverlay() {
-  // Remove stale overlay from previous navigation
   document.getElementById("__adhan-overlay__")?.remove();
 
   overlayEl = document.createElement("div");
   overlayEl.id = "__adhan-overlay__";
   overlayEl.className = "adhan-player-overlay adhan-player-overlay--hidden";
-  // NOTE: do NOT put theme-X class on the overlay — it would inherit the full
-  // theme background (gradients, SVG lanterns, etc.) and create a solid rectangle.
-  // Instead we copy only the CSS variable values from #app via _syncThemeVars().
   overlayEl.innerHTML = `
     <div class="adhan-player-bar">
       <div class="adhan-player-bar__icon-wrap">
@@ -109,7 +71,6 @@ function _injectOverlay() {
 
   document.body.appendChild(overlayEl);
 
-  // Copy CSS variable values (not the background) from the themed #app element
   _syncThemeVars();
 
   document
@@ -119,80 +80,43 @@ function _injectOverlay() {
     });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// IPC
-// ─────────────────────────────────────────────────────────────────────────────
 
 function _registerIpcListeners() {
-  // Remove previous listeners to avoid accumulation across hot-reloads
   ipcRenderer.removeAllListeners("trigger-adhan");
   ipcRenderer.removeAllListeners("force-stop-adhan");
   ipcRenderer.removeAllListeners("show-pre-adhan-notification");
 
-  ipcRenderer.on("trigger-adhan", (_ev, { prayer, mode, theme }) => {
+  ipcRenderer.on("trigger-adhan", (_ev, { prayer, mode }) => {
+    if (mode === false) return;
     _playAdhan(prayer, mode);
   });
 
   ipcRenderer.on("force-stop-adhan", () => {
-    _stopAdhan(false); // false → don't echo back to main (avoid loop)
+    _stopAdhan(false);
   });
 
   ipcRenderer.on("show-pre-adhan-notification", (_ev, { prayer, minutes }) => {
     _showPreAdhanNotification(prayer, minutes);
   });
 
-  // Keep overlay CSS vars in sync when user changes theme in settings.
-  // Use requestAnimationFrame so theme.js has already updated #app's class.
   ipcRenderer.on("theme-changed", () => {
     requestAnimationFrame(_syncThemeVars);
   });
 }
 
-/**
- * Resolve adhan.mp3 from the real project asset folder.
- *
- * In development, this file is stored in:
- *   src/assets/adhan.mp3
- * not in:
- *   src/renderer/assets/adhan.mp3
- *
- * In packaged builds, electron-builder may expose extraResources under
- * process.resourcesPath, so we check those locations too.
- */
+let _adhanAudioSrcPromise = null;
 function _getAdhanAudioSrc() {
-  const candidates = [];
-
-  if (process.resourcesPath) {
-    candidates.push(
-      path.join(process.resourcesPath, "src", "assets", "adhan.mp3"),
-      path.join(process.resourcesPath, "assets", "adhan.mp3"),
-    );
+  if (!_adhanAudioSrcPromise) {
+    _adhanAudioSrcPromise = ipcRenderer.invoke("get-adhan-audio-src");
   }
-
-  candidates.push(
-    path.join(__dirname, "../../../assets/adhan.mp3"), // dev path: src/assets/adhan.mp3
-    path.join(__dirname, "../../assets/adhan.mp3"), // old fallback path
-  );
-
-  const foundPath =
-    candidates.find((candidate) => fs.existsSync(candidate)) || candidates[0];
-  return pathToFileURL(foundPath).href;
+  return _adhanAudioSrcPromise;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Playback
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * @param {object} prayer       - { key, time, ... }
- * @param {string|boolean} mode - true | 'silent'
- * @param {number} [seekSec=0]  - seconds into the audio to start from (page-navigation resume)
- */
-function _playAdhan(prayer, mode, seekSec = 0) {
+async function _playAdhan(prayer, mode, seekSec = 0) {
   const prayerName = _t(prayer.key, "prayerNames") || prayer.key;
   const prayerTime = prayer.time || "";
 
-  // Always update overlay text (including on navigation resume)
   const nameEl = document.getElementById("__adhan-prayer-name__");
   const timeEl = document.getElementById("__adhan-prayer-time__");
   const labelEl = document.getElementById("__adhan-stop-label__");
@@ -204,22 +128,17 @@ function _playAdhan(prayer, mode, seekSec = 0) {
   _showOverlay(true);
 
   if (mode === "silent") {
-    // Notification only — no audio
     return;
   }
 
-  // ── Audio ──────────────────────────────────────────────────────────────────
   _cleanupAudio();
 
-  const soundSrc = _getAdhanAudioSrc();
+  const soundSrc = await _getAdhanAudioSrc();
   adhanAudio = new Audio(soundSrc);
 
-  // When resuming after navigation, jump to the correct position.
-  // Start volume at 0 to avoid a click on seek, then fade in.
   adhanAudio.volume = 0.01;
 
   if (seekSec > 0) {
-    // Set currentTime once the audio is ready to avoid a NotSupportedError
     adhanAudio.addEventListener(
       "loadedmetadata",
       () => {
@@ -234,7 +153,7 @@ function _playAdhan(prayer, mode, seekSec = 0) {
     .play()
     .then(() => {
       const targetVol = 1.0;
-      const fadeDurMs = seekSec > 0 ? 3000 : 12000; // quick re-fade when resuming
+      const fadeDurMs = seekSec > 0 ? 3000 : 12000;
       const stepPerTick = targetVol / (fadeDurMs / 80);
 
       fadeTimer = setInterval(() => {
@@ -251,7 +170,9 @@ function _playAdhan(prayer, mode, seekSec = 0) {
         }
       }, 80);
     })
-    .catch((err) => {});
+    .catch((err) => {
+      console.error("Error playing adhan audio:", err);
+    });
 
   adhanAudio.addEventListener(
     "ended",
@@ -264,7 +185,6 @@ function _playAdhan(prayer, mode, seekSec = 0) {
 }
 
 function _stopAdhan(notifyMain = true) {
-  // Quick fade-out then stop
   if (adhanAudio && !adhanAudio.paused) {
     const audio = adhanAudio;
     const fadeOut = setInterval(() => {
@@ -297,22 +217,13 @@ function _cleanupAudio() {
     try {
       adhanAudio.pause();
       adhanAudio.currentTime = 0;
-    } catch (_) {}
+    } catch {
+    }
     adhanAudio = null;
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Theme variable sync
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Read the resolved CSS variable values from #app (which carries the theme class)
- * and set them as inline custom properties on the overlay element.
- *
- * This gives the overlay the correct theme colours WITHOUT inheriting the theme's
- * background-image/gradient, which would make it look like a solid rectangle.
- */
 function _syncThemeVars() {
   if (!overlayEl) return;
   const appEl = document.getElementById("app");
@@ -335,9 +246,6 @@ function _syncThemeVars() {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Overlay visibility
-// ─────────────────────────────────────────────────────────────────────────────
 
 function _showOverlay(visible) {
   if (!overlayEl) return;
@@ -350,9 +258,6 @@ function _showOverlay(visible) {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Pre-adhan notification (rendered via the popup system)
-// ─────────────────────────────────────────────────────────────────────────────
 
 function _showPreAdhanNotification(prayer, minutes) {
   const prayerName = _t(prayer.key, "prayerNames") || prayer.key;
@@ -374,5 +279,4 @@ function _showPreAdhanNotification(prayer, minutes) {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 module.exports = { initAdhanPlayer };

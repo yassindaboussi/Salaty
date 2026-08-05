@@ -36,6 +36,9 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Bundle renderer scripts
+      run: npm run build:renderer
+
     # electron-builder --publish always will:
     #   1. Build the installer (.exe / .dmg / .tar.gz)
     #   2. Generate latest.yml / latest-mac.yml / latest-linux.yml

@@ -1,17 +1,15 @@
-// asmaUI.js
 const { ipcRenderer } = require("electron");
 const {
   setupConnectionRecovery,
 } = require("../../services/connection-recovery");
 const { t } = require("../../core/i18n/translations");
-const screenSizeManager = require("../../core/screenSize");
 const { getNamesOfAllah } = require("../../services/api/api");
 const analytics = require("../../utils/analytics");
+const { renderToast } = require("../../core/toast");
 
 let asmaData = null;
 let currentLanguage = "en";
 
-// Function to decode Unicode escape sequences
 function decodeUnicode(str) {
   if (!str) return "";
   return str
@@ -23,17 +21,12 @@ function decodeUnicode(str) {
     .replace(/\\\\/g, "\\");
 }
 
-// ==================== ASMA PAGE FUNCTIONS ====================
 function initAsmaPage() {
-  // Setup auto-reload on connection restored
   setupConnectionRecovery(() => {
     initAsmaPage();
   }, "Asma");
-  // Get current language from HTML
   currentLanguage = document.documentElement.lang || "en";
-  // SCREEN SIZE IS NOW HANDLED IN renderer.js
 
-  // Setup back button
   const backBtn = document.getElementById("backBtn");
   if (backBtn) {
     backBtn.addEventListener("click", () => {
@@ -41,10 +34,8 @@ function initAsmaPage() {
     });
   }
 
-  // Update UI text
   updateAsmaUI();
 
-  // Load asma data
   loadAsmaData();
 }
 
@@ -129,7 +120,7 @@ function copyAsma(item, meaning, desc) {
   navigator.clipboard
     .writeText(text)
     .then(() => {
-      analytics.asmaCopied(); // ← ANALYTICS
+      analytics.asmaCopied();
       showSuccessToast(t("copiedToClipboard"));
     })
     .catch(() => showSuccessToast(t("failedToCopy"), true));
@@ -139,31 +130,18 @@ function copyAsmaArabic(name) {
   navigator.clipboard
     .writeText(name)
     .then(() => {
-      analytics.asmaCopied(); // ← ANALYTICS
+      analytics.asmaCopied();
       showSuccessToast(t("copiedToClipboard"));
     })
     .catch(() => showSuccessToast(t("failedToCopy"), true));
 }
 
 function showSuccessToast(message, isError = false) {
-  document
-    .querySelectorAll(".success-toast")
-    .forEach((toast) => toast.remove());
-
-  const toast = document.createElement("div");
-  toast.className = `success-toast ${isError ? "error" : ""}`;
-  toast.innerHTML = `
-    <i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}"></i>
-    <span>${message}</span>
-  `;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => toast.classList.add("show"), 10);
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 500);
-  }, 3000);
+  renderToast(
+    `success-toast ${isError ? "error" : ""}`,
+    `<i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}"></i><span>${message}</span>`,
+    { duration: 3000, removeDelay: 500 },
+  );
 }
 
 function showError() {
@@ -184,7 +162,6 @@ function showError() {
   }
 }
 
-// Listen for language changes only
 document.addEventListener("DOMContentLoaded", () => {
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {

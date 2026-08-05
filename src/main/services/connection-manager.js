@@ -5,7 +5,6 @@ let isOnline = true;
 let mainWindow = null;
 let checkInterval = null;
 
-// Ping the actual API endpoint, not google.com (which is blocked in some regions)
 const CHECK_URL = "https://api.aladhan.com";
 const CHECK_MS = 10_000;
 const TIMEOUT_MS = 5_000;
@@ -31,7 +30,8 @@ async function checkConnection() {
 function initializeConnectionManager(mainWin) {
   mainWindow = mainWin;
 
-  // Initial check
+  if (checkInterval) clearInterval(checkInterval);
+
   checkConnection().then((online) => {
     isOnline = online;
   });
@@ -39,7 +39,7 @@ function initializeConnectionManager(mainWin) {
   checkInterval = setInterval(async () => {
     const wasOnline = isOnline;
     isOnline = await checkConnection();
-    if (wasOnline !== isOnline && mainWindow) {
+    if (wasOnline !== isOnline && mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send(
         isOnline ? "connection-restored" : "connection-lost",
       );

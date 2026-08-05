@@ -3,7 +3,6 @@
   position: fixed;
   top: 60px; /* Under Header */
   left: 50%;
-  transform: translateX(-50%);
   width: 60%;
   max-width: 500px;
   background: var(--bg-surface);
@@ -11,20 +10,36 @@
   border: 1px solid rgba(var(--accent-rgb), 0.2); /* Fix variable */
   border-radius: 0 0 12px 12px;
   padding: 8px 16px;
-  display: flex;
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 1000;
+  /* Fully removed from the render tree by default — not just invisible.
+     Electron's own docs note that draggable regions "ignore all pointer
+     events," meaning drag-region hit-testing operates independently of
+     pointer-events/opacity/visibility. display:none is the only thing
+     that guarantees this element can never contribute a phantom drag
+     region or swallow clicks/hover when it's supposed to be inert,
+     since there's simply no box there at all for any hit-testing system
+     to find. -webkit-app-region: no-drag also applies even while
+     visible, so this widget's own background never doubles as an
+     accidental window-drag handle. */
+  display: none;
+  opacity: 0;
+  transform: translateX(-50%) translateY(-100%);
   transition:
     transform 0.3s ease,
     opacity 0.3s ease;
+  -webkit-app-region: no-drag;
 }
 
-.mini-player.hidden {
-  transform: translateX(-50%) translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
+.mini-player.visible {
+  display: flex;
+}
+
+.mini-player.visible.active {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .mini-track-info {
@@ -80,4 +95,15 @@
 .mini-play-btn:hover {
   background: var(--accent-color);
   filter: brightness(1.1);
+}
+
+.mini-close-btn {
+  margin-left: 4px;
+  opacity: 0.6;
+  font-size: 12px;
+}
+.mini-close-btn:hover {
+  opacity: 1;
+  background: rgba(244, 67, 54, 0.15);
+  color: #f44336;
 }

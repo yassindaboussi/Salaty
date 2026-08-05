@@ -1,6 +1,4 @@
 "use strict";
-// prayer.js — Home page prayer time display.
-// Adhan firing is owned by the main process (prayer-timer-manager.js).
 
 const { ipcRenderer } = require("electron");
 const {
@@ -26,11 +24,9 @@ let prayerData = null;
 let currentActivePrayer = null;
 let adhanByPrayer = {};
 
-// ── Load ──────────────────────────────────────────────────────────────────────
 
 async function loadPrayerTimes() {
   const locationEl = document.getElementById("location");
-  const loadingEl = document.getElementById("loadingText");
 
   if (!state.settings.city || !state.settings.country) {
     if (locationEl) locationEl.textContent = t("locationNotSet");
@@ -55,7 +51,6 @@ async function loadPrayerTimes() {
   }
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
 
 function updatePrayerUI() {
   _renderPrayerUI();
@@ -68,7 +63,6 @@ function _renderPrayerUI() {
   _setText("gregorianDate", getGregorianDate(prayerData));
   _setText("hijriDate", getHijriDate(prayerData, lang, t));
 
-  // Events banner
   const {
     day,
     month: { number: monthNum },
@@ -107,7 +101,6 @@ function _renderPrayerUI() {
   const loadingEl = document.getElementById("loadingText");
   if (loadingEl) loadingEl.style.display = "none";
 
-  // Sync adhan state
   adhanByPrayer = { ...(state.settings.adhanEnabledByPrayer ?? {}) };
   const prayerKeys = Object.keys(translations[lang]?.prayerNames ?? {});
   prayerKeys.forEach((k) => {
@@ -141,14 +134,12 @@ function _renderPrayerUI() {
     })
     .join("");
 
-  // Single delegated listener — replace each render to avoid stacking
   listEl.onclick = (e) => {
     const btn = e.target.closest(".adhan-toggle-btn");
     if (btn) _toggleAdhan(btn.dataset.prayer);
   };
 }
 
-// ── Countdown (called every second) ──────────────────────────────────────────
 
 function updateCurrentAndNextPrayer() {
   if (!prayerData?.timings) return;
@@ -170,7 +161,6 @@ function updateCurrentAndNextPrayer() {
     const cardsEl = document.getElementById("prayerCards");
     if (cardsEl) {
       if (currentActivePrayer !== currentPrayer.key) {
-        // Prayer changed — rebuild the cards
         cardsEl.innerHTML = `
           <div class="prayer-card current">
             <div class="prayer-label">${t("currentPrayer")}</div>
@@ -185,7 +175,6 @@ function updateCurrentAndNextPrayer() {
             <div class="countdown" id="countdown">${formatTime(timeRemaining)}</div>
           </div>`;
       } else {
-        // Only the countdown changes — single textContent update, no DOM churn
         const el = document.getElementById("countdown");
         if (el) el.textContent = formatTime(timeRemaining);
       }
@@ -200,7 +189,6 @@ function updateCurrentAndNextPrayer() {
   }
 }
 
-// ── Adhan toggle ──────────────────────────────────────────────────────────────
 
 function _toggleAdhan(key) {
   const cur = adhanByPrayer[key];
@@ -215,14 +203,12 @@ function _toggleAdhan(key) {
   _renderPrayerUI();
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function _setText(id, text) {
   const el = document.getElementById(id);
   if (el) el.textContent = text;
 }
 
-// Connection recovery — re-fetch on restore.
 ipcRenderer.on("connection-restored", () => loadPrayerTimes());
 
 module.exports = {

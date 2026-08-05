@@ -1,10 +1,7 @@
-// hijriCalendar.js
-const { t } = require("../../core/i18n/translations");
-const screenSizeManager = require("../../core/screenSize");
+const { t, getLanguage } = require("../../core/i18n/translations");
 const analytics = require("../../utils/analytics");
 const { setupConnectionRecovery } = require("../../services/connection-recovery");
 
-// Hijri month names
 const HIJRI_MONTHS = {
   en: [
     "Muharram",
@@ -50,7 +47,6 @@ const HIJRI_MONTHS = {
   ],
 };
 
-// Important Islamic dates (month-day)
 const ISLAMIC_EVENTS = {
   "1-1": {
     en: "Islamic New Year",
@@ -80,19 +76,15 @@ let currentHijriMonth = 1;
 let currentHijriYear = 1446;
 let monthCache = {};
 
-/**
- * Initialize the Hijri calendar
- */
 async function initHijriCalendar() {
-  // Setup auto-reload on connection restored
-  setupConnectionRecovery(() => {
-    initHijriCalendar();
-  }, "HijriCalendar");
-  try {
-    // Update title with translation
-    updateCalendarTitle();
+  updateCalendarTitle();
+  setupEventListeners();
+  setupConnectionRecovery(_loadTodayAndRender, "HijriCalendar");
+  await _loadTodayAndRender();
+}
 
-    // Get current Hijri date
+async function _loadTodayAndRender() {
+  try {
     const today = new Date();
     const response = await fetch(
       `https://api.aladhan.com/v1/gToH/${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`,
@@ -104,20 +96,13 @@ async function initHijriCalendar() {
       currentHijriYear = parseInt(data.data.hijri.year);
     }
 
-    // SCREEN SIZE IS NOW HANDLED IN renderer.js
-
-    setupEventListeners();
     await renderCalendar();
   } catch (error) {
     console.error("Error initializing Hijri calendar:", error);
   }
 }
 
-/**
- * Setup event listeners
- */
 function setupEventListeners() {
-  // Navigation
   document
     .getElementById("prevMonthBtn")
     ?.addEventListener("click", () => navigateMonth(-1));
@@ -126,15 +111,11 @@ function setupEventListeners() {
     ?.addEventListener("click", () => navigateMonth(1));
   document.getElementById("todayBtn")?.addEventListener("click", goToToday);
 
-  // Back button
   document.getElementById("backBtn")?.addEventListener("click", () => {
     window.location.href = "../app/features.html";
   });
 }
 
-/**
- * Navigate to previous/next month
- */
 async function navigateMonth(direction) {
   currentHijriMonth += direction;
 
@@ -146,15 +127,11 @@ async function navigateMonth(direction) {
     currentHijriYear--;
   }
 
-  // ── Track navigation direction ─────────────────────────────────────────
-  analytics.calendarMonthNavigated(direction === -1 ? "prev" : "next"); // ← ANALYTICS
+  analytics.calendarMonthNavigated(direction === -1 ? "prev" : "next");
 
   await renderCalendar();
 }
 
-/**
- * Go to today's date
- */
 async function goToToday() {
   try {
     const today = new Date();
@@ -166,7 +143,7 @@ async function goToToday() {
     if (data.code === 200 && data.data.hijri) {
       currentHijriMonth = parseInt(data.data.hijri.month.number);
       currentHijriYear = parseInt(data.data.hijri.year);
-      analytics.calendarMonthNavigated("today"); // ← ANALYTICS
+      analytics.calendarMonthNavigated("today");
       await renderCalendar();
     }
   } catch (error) {
@@ -174,14 +151,13 @@ async function goToToday() {
   }
 }
 
-/**
- * Render the calendar
- */
-async function renderCalendar() {
-  const lang = localStorage.getItem("language") || "en";
+let renderCalendarRequestId = 0;
 
-  // Update month and year display - support all languages
-  let monthName = HIJRI_MONTHS.en[currentHijriMonth - 1]; // Default to English
+async function renderCalendar() {
+  const myRequestId = ++renderCalendarRequestId;
+  const lang = getLanguage() || "en";
+
+  let monthName = HIJRI_MONTHS.en[currentHijriMonth - 1];
   if (HIJRI_MONTHS[lang]) {
     monthName = HIJRI_MONTHS[lang][currentHijriMonth - 1];
   }
@@ -189,23 +165,17 @@ async function renderCalendar() {
   document.getElementById("currentYear").textContent =
     `${currentHijriYear} ${t("ah")}`;
 
-  // Get month data
   const monthData = await getHijriMonthData();
+  if (myRequestId !== renderCalendarRequestId) return;
   if (!monthData) return;
 
-  // Render calendar days
   renderCalendarDays(monthData, lang);
 
-  // Update Gregorian date display
   updateGregorianDisplay(monthData);
 
-  // Render Islamic events
   renderIslamicEvents(lang);
 }
 
-/**
- * Get Hijri month data from API
- */
 async function getHijriMonthData() {
   const cacheKey = `${currentHijriMonth}-${currentHijriYear}`;
 
@@ -214,7 +184,6 @@ async function getHijriMonthData() {
   }
 
   try {
-    // Get the first day of the month in Gregorian to calculate the calendar
     const firstDayResponse = await fetch(
       `https://api.aladhan.com/v1/hToG/01-${currentHijriMonth}-${currentHijriYear}`,
     );
@@ -229,14 +198,11 @@ async function getHijriMonthData() {
       firstDay.day,
     );
 
-    // Generate days locally to avoid API rate limiting
     const monthData = {
       firstDayWeekday: firstDayDate.getDay(),
       days: [],
     };
 
-    // Hijri months are either 29 or 30 days
-    // We'll generate 30 days and calculate the Gregorian dates locally
     for (let day = 1; day <= 30; day++) {
       const gregorianDate = new Date(firstDayDate);
       gregorianDate.setDate(firstDayDate.getDate() + (day - 1));
@@ -262,26 +228,20 @@ async function getHijriMonthData() {
   }
 }
 
-/**
- * Render calendar days
- */
-function renderCalendarDays(monthData, lang) {
+function renderCalendarDays(monthData) {
   const daysContainer = document.getElementById("calendarDays");
   if (!daysContainer) return;
 
   daysContainer.innerHTML = "";
 
-  // Add empty cells for days before the month starts
   for (let i = 0; i < monthData.firstDayWeekday; i++) {
     const emptyDay = document.createElement("div");
     emptyDay.className = "calendar-day empty";
     daysContainer.appendChild(emptyDay);
   }
 
-  // Get today's date for highlighting
   const today = new Date();
 
-  // Add days of the month
   monthData.days.forEach((dayInfo) => {
     const dayEl = document.createElement("div");
     dayEl.className = "calendar-day";
@@ -292,12 +252,10 @@ function renderCalendarDays(monthData, lang) {
       dayInfo.gregorian.day,
     );
 
-    // Check if this is today
     if (gregorianDate.toDateString() === today.toDateString()) {
       dayEl.classList.add("today");
     }
 
-    // Check if this is a special Islamic date
     const eventKey = `${currentHijriMonth}-${dayInfo.hijriDay}`;
     if (ISLAMIC_EVENTS[eventKey]) {
       dayEl.classList.add("special-day");
@@ -312,9 +270,6 @@ function renderCalendarDays(monthData, lang) {
   });
 }
 
-/**
- * Update Gregorian date display
- */
 function updateGregorianDisplay(monthData) {
   const gregorianDisplay = document.getElementById("gregorianDateText");
   if (!gregorianDisplay || monthData.days.length === 0) return;
@@ -325,9 +280,6 @@ function updateGregorianDisplay(monthData) {
   gregorianDisplay.textContent = `${firstDay.month.en} ${firstDay.day} - ${lastDay.month.en} ${lastDay.day}, ${firstDay.year}`;
 }
 
-/**
- * Render Islamic events for the current month
- */
 function renderIslamicEvents(lang) {
   const eventsList = document.getElementById("eventsList");
   if (!eventsList) return;
@@ -352,8 +304,7 @@ function renderIslamicEvents(lang) {
     const eventEl = document.createElement("div");
     eventEl.className = "event-item";
 
-    // Get the event name based on the current language
-    let eventName = event.en; // Default to English
+    let eventName = event.en;
     if (lang === "ar" && event.ar) {
       eventName = event.ar;
     } else if (lang === "fr" && event.fr) {
@@ -370,9 +321,6 @@ function renderIslamicEvents(lang) {
   });
 }
 
-/**
- * Update calendar title based on current language
- */
 function updateCalendarTitle() {
   const calendarTitle = document.getElementById("calendarTitle");
   if (calendarTitle) {

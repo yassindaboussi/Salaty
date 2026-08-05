@@ -7,5 +7,7 @@
   "noEventsThisMonth": "No special events this month",
   "calendarDesc": "Islamic calendar & events",
   "prayerTimesMonthly": "Monthly Prayer Times",
-  "prayerTimesMonthlyDesc": "All prayer times for the month"
+  "prayerTimesMonthlyDesc": "All prayer times for the month",
+  "loadingMonthlyPrayerTimes": "Loading prayer times...",
+  "monthlyPrayerTimesFooter": "Times are calculated for your saved location and may differ slightly from your local mosque."
 }

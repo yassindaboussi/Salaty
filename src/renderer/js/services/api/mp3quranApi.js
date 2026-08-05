@@ -2,29 +2,13 @@
 
 const { t, getLanguage } = require("../../core/i18n/translations");
 
-/**
- * Client for the free, key-less mp3quran.net API (v3).
- * Docs: https://mp3quran.net/eng/api
- *
- * Used by the Audio Archive to browse and stream Quran recitations from
- * 200+ reciters, replacing the previous small hand-picked archive.org list.
- */
 
 const BASE_URL = "https://mp3quran.net/api/v3";
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24h — this catalog barely changes
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 15000;
 
-// Bumping this prefix invalidates every previously-cached entry at once —
-// needed here because an earlier bug could have cached *empty* results
-// (see isMeaningful below), and those would otherwise keep being served
-// for up to 24h even after the parsing bug that caused them was fixed.
 const CACHE_PREFIX = "mp3quranv3";
 
-/** An empty object/array is truthy in JS, so a plain `!data` check treats
- *  a broken "found nothing" result as valid cached data — this is what
- *  silently kept serving stale empty Tafsir/Tadabor results even after
- *  the underlying parsing bug was fixed. Only cache (and accept from
- *  cache) results that actually contain something. */
 function isMeaningful(data) {
   if (data == null) return false;
   if (Array.isArray(data)) return data.length > 0;
@@ -45,14 +29,13 @@ function cacheGet(key) {
 }
 
 function cacheSet(key, data) {
-  if (!isMeaningful(data)) return; // never persist an empty/broken result
+  if (!isMeaningful(data)) return;
   try {
     localStorage.setItem(
       `${CACHE_PREFIX}:${key}`,
       JSON.stringify({ data, ts: Date.now() }),
     );
   } catch {
-    // Storage full/unavailable — caching is an optimization, not required.
   }
 }
 
@@ -71,11 +54,6 @@ async function fetchJson(url) {
   }
 }
 
-/**
- * All reciters for a language. Each reciter has one or more `moshaf`
- * entries (a specific recitation — e.g. "Hafs A'n Assem - Murattal") with
- * its own audio server and list of covered surahs.
- */
 async function getReciters(language = "eng") {
   const key = `mp3quran:reciters:${language}`;
   const cached = cacheGet(key);
@@ -87,7 +65,6 @@ async function getReciters(language = "eng") {
   return reciters;
 }
 
-/** All 114 surah names, used to label a reciter's tracks. */
 async function getSurahNames(language = "eng") {
   const key = `mp3quran:suwar:${language}`;
   const cached = cacheGet(key);
@@ -99,11 +76,6 @@ async function getSurahNames(language = "eng") {
   return list;
 }
 
-/**
- * Build a playable track list for one reciter's moshaf (a specific
- * recitation), in the shape the player already expects:
- * { title, artist, url, filename }.
- */
 async function getReciterTracks(reciterName, moshaf, language = "eng") {
   const surahs = await getSurahNames(language);
   const surahMap = {};
@@ -131,18 +103,6 @@ async function getReciterTracks(reciterName, moshaf, language = "eng") {
   });
 }
 
-/**
- * All "Tadabor" (reflective pause) audio clips, grouped by surah.
- * Docs: https://mp3quran.net/eng/api — GET /tadabor?language=xx
- * Response shape: { tadabor: { "<suraId>": [ { id, audio_url, image_url,
- * text, sora_name, rewaya_name, reciter_name }, ... ], ... } }
- * Fetched once (no `sura` filter) and cached — the whole catalog is small.
- *
- * This commentary only has Arabic metadata on mp3quran.net — requesting
- * language=eng/fr comes back empty even though the feature itself works,
- * so a non-Arabic request that returns nothing falls back to Arabic
- * instead of leaving the page blank.
- */
 async function getTadabor(language = "eng") {
   const key = `mp3quran:tadabor:${language}`;
   const cached = cacheGet(key);
@@ -158,9 +118,6 @@ async function getTadabor(language = "eng") {
     raw = await fetchRaw("ar");
   }
 
-  // Normalize into { suraId: [entries] } regardless of whether the API
-  // handed back an object keyed by sura id or (for a single-sura request)
-  // a flat array — the docs' own example was inconsistent about this.
   const bySura = {};
   if (Array.isArray(raw)) {
     raw.forEach((entry) => {
@@ -178,15 +135,6 @@ async function getTadabor(language = "eng") {
   return bySura;
 }
 
-/**
- * Build a playable track list for one surah's Tadabor clips, in the shape
- * the player already expects: { title, artist, url, filename }.
- *
- * Many entries have `audio_url: null` and only provide `video_url` (an
- * .mp4) — Chromium's <audio> element can still play the audio track out
- * of an mp4 container fine, so we fall back to that instead of silently
- * dropping the clip.
- */
 function getTadaborTracksForSura(entries, suraName) {
   return entries
     .filter((e) => e.audio_url || e.video_url)
@@ -205,23 +153,7 @@ function getTadaborTracksForSura(entries, suraName) {
     });
 }
 
-/**
- * List of available Tafsir "books" (e.g. "الخلاصة من تفسير الطبري") for a
- * language. Docs: https://mp3quran.net/eng/api — GET /tafasir?language=xx
- * Response shape: { tafasir: [ { id, url, name }, ... ] }
- *
- * Like Tadabor, this only has Arabic metadata — falls back to Arabic when
- * the requested language comes back empty. The book *title* itself is a
- * proper name the API never translates even then, so a small manual
- * translation table below covers the ones we know about; anything not in
- * the table just keeps its Arabic name.
- */
 
-// mp3quran.net doesn't provide translated Tafsir book titles even when
-// falling back to Arabic content for other languages — these are proper
-// names, not derivable from any other field, so a short manual table is
-// the only real option. Falls back to the Arabic name for any book id
-// not listed here.
 const TAFSIR_BOOK_NAMES = {
   1: {
     en: "Summary of Al-Tabari's Tafsir",
@@ -248,9 +180,6 @@ async function getTafasirBooks(language = "eng") {
     list = await fetchList("ar");
   }
 
-  // Attach a localized display name (see TAFSIR_BOOK_NAMES) without
-  // discarding the original Arabic `name` field — still needed as the
-  // fallback and as the audio track "artist" elsewhere.
   const appLang = getLanguage();
   list = list.map((book) => ({
     ...book,
@@ -261,18 +190,13 @@ async function getTafasirBooks(language = "eng") {
   return list;
 }
 
-/**
- * Per-surah audio tracks for one Tafsir book.
- * GET /tafsir?tafsir=<id>&language=xx
- * Real response shape: { tafasir: { name, soar: [ { id, tafsir_id, name,
- * url, sura_id }, ... ] } } — a flat array (despite the docs page's own
- * example showing something different), so we group it by sura_id here.
- *
- * Same Arabic-only-metadata situation as the book list above: fall back
- * to language=ar if the requested language's response has no entries.
- */
 async function getTafsirSurahs(tafsirId, language = "eng") {
-  const key = `mp3quran:tafsir:${tafsirId}:${language}`;
+  // Cache key includes a version tag (v2) so this fix — grouping tafsir
+  // entries by their real sura_id instead of raw array position — takes
+  // effect immediately for everyone, rather than leaving anyone stuck
+  // with a stale pre-fix cached result (e.g. if a particular language
+  // was tested before this fix shipped) for up to the full 24h TTL.
+  const key = `mp3quran:tafsir:v2:${tafsirId}:${language}`;
   const cached = cacheGet(key);
   if (cached) return cached;
 
@@ -281,36 +205,30 @@ async function getTafsirSurahs(tafsirId, language = "eng") {
       `${BASE_URL}/tafsir?tafsir=${tafsirId}&language=${lang}`,
     );
     const raw = data.tafasir || {};
-    const entries = Array.isArray(raw.soar)
-      ? raw.soar
-      : Array.isArray(raw.sora)
-        ? raw.sora
-        : [];
-    return { bookName: raw.name || "", entries, rawSora: raw.sora };
+    return { bookName: raw.name || "", soar: raw.soar || {} };
   };
 
   let result = await fetchFor(language);
-  if (result.entries.length === 0 && language !== "ar") {
+  if (Object.keys(result.soar).length === 0 && language !== "ar") {
     result = await fetchFor("ar");
   }
 
   const bySura = {};
-  result.entries.forEach((entry) => {
-    const sid = String(entry.sura_id ?? entry.sora_id ?? "0");
-    if (!bySura[sid]) bySura[sid] = [];
-    bySura[sid].push(entry);
-  });
-
-  // Defensive fallback: some responses might nest by sura id directly
-  // instead of a flat array (e.g. { sora: { "1": [...] } }) — merge those
-  // in too if present, without overwriting what we already parsed above.
-  if (result.rawSora && !Array.isArray(result.rawSora)) {
-    Object.entries(result.rawSora).forEach(([sid, entries]) => {
-      if (!bySura[sid]) {
-        bySura[sid] = Array.isArray(entries)
-          ? entries
-          : [entries].filter(Boolean);
-      }
+  const soarData = result.soar;
+  if (Array.isArray(soarData)) {
+    // Real API shape: a flat array of entries, each tagged with its own
+    // sura_id — group them by that field rather than by array position.
+    soarData.forEach((entry) => {
+      if (!entry || entry.sura_id == null) return;
+      const sid = String(entry.sura_id);
+      if (!bySura[sid]) bySura[sid] = [];
+      bySura[sid].push(entry);
+    });
+  } else if (soarData && typeof soarData === "object") {
+    // Defensive fallback in case some other tafsir/language combination
+    // ever returns an already-grouped-by-sura-id object instead.
+    Object.entries(soarData).forEach(([sid, entries]) => {
+      bySura[sid] = Array.isArray(entries) ? entries : [entries].filter(Boolean);
     });
   }
 
@@ -319,13 +237,6 @@ async function getTafsirSurahs(tafsirId, language = "eng") {
   return final;
 }
 
-/**
- * Build a playable track list for one surah's Tafsir entries, in the shape
- * the player already expects: { title, artist, url, filename }.
- */
-/** Parses "002-1-25.mp3" → {start:1, end:25}, or "055.mp3" → null (whole
- *  surah, no range suffix) — the file naming convention itself is just
- *  digits, so it works regardless of app language. */
 function parseAyahRangeFromUrl(url) {
   const match = /\d{2,3}-(\d+)-(\d+)\.mp3(?:$|\?)/i.exec(url || "");
   if (!match) return null;

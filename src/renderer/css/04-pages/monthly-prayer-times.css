@@ -1,0 +1,445 @@
+/* Monthly Prayer Times Page */
+.mpt-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+  position: relative;
+}
+
+/* ========== HEADER ========== */
+.mpt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  gap: 8px;
+  direction: ltr !important;
+  -webkit-app-region: drag;
+}
+
+.mpt-header button {
+  -webkit-app-region: no-drag;
+}
+
+.mpt-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  pointer-events: none;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mpt-controls {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+/* ========== CONTENT ========== */
+.mpt-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding: 6px 2px;
+  -webkit-app-region: no-drag;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) transparent;
+  direction: ltr !important; /* keep the scrollbar on the right (start side in RTL) */
+}
+
+.mpt-content::-webkit-scrollbar {
+  width: 5px;
+  right: 0 !important;
+  left: auto !important;
+}
+.mpt-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.mpt-content::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+[dir="rtl"] .mpt-content > *,
+[lang="ar"] .mpt-content > *,
+[lang="fa"] .mpt-content > *,
+[lang="ur"] .mpt-content > *,
+[lang="he"] .mpt-content > * {
+  direction: rtl !important;
+}
+
+/* Exceptions to the blanket rule above — these two need to stay physically
+   LTR even in RTL languages (nav row for correct arrow meaning, table
+   wrapper for a right-side scrollbar), so they need to win over it. */
+[dir="rtl"] .mpt-content > .mpt-nav,
+[lang="ar"] .mpt-content > .mpt-nav,
+[lang="fa"] .mpt-content > .mpt-nav,
+[lang="ur"] .mpt-content > .mpt-nav,
+[lang="he"] .mpt-content > .mpt-nav,
+[dir="rtl"] .mpt-content > .mpt-table-wrap,
+[lang="ar"] .mpt-content > .mpt-table-wrap,
+[lang="fa"] .mpt-content > .mpt-table-wrap,
+[lang="ur"] .mpt-content > .mpt-table-wrap,
+[lang="he"] .mpt-content > .mpt-table-wrap {
+  direction: ltr !important;
+}
+
+.mpt-hidden {
+  display: none !important;
+}
+
+/* ========== Month navigator ========== */
+/* Deliberately NOT mirrored in RTL — same convention as the header controls
+   and the Tasbih ring row. A "previous" chevron pointing left and a "next"
+   chevron pointing right is a time-direction metaphor, not a text-direction
+   one; mirroring the row would flip the buttons' positions but not their
+   icons, so a left-pointing arrow would end up meaning "next" — confusing
+   regardless of language. Keeping the row LTR keeps arrow direction and
+   arrow meaning in sync. */
+.mpt-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px 10px;
+  direction: ltr !important;
+}
+
+.mpt-nav-label {
+  direction: inherit;
+}
+
+[dir="rtl"] .mpt-nav-label,
+[lang="ar"] .mpt-nav-label {
+  direction: rtl;
+  unicode-bidi: plaintext;
+}
+
+.mpt-nav-btn {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border-radius: 9px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mpt-nav-btn:hover {
+  background: rgba(var(--accent-rgb), 0.18);
+  border-color: var(--accent-color);
+}
+
+.mpt-nav-label {
+  flex: 1;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.mpt-today-btn {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  background: rgba(var(--accent-rgb), 0.12);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mpt-today-btn:hover {
+  background: rgba(var(--accent-rgb), 0.22);
+}
+
+.mpt-today-btn i {
+  color: var(--accent-color);
+  font-size: 12px;
+}
+
+/* ========== Today snapshot card ========== */
+.mpt-today-card {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--accent-rgb), 0.18),
+    rgba(var(--accent-rgb), 0.05)
+  );
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
+  border-radius: 14px;
+  padding: 14px 12px;
+}
+
+.mpt-today-date {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-align: center;
+  margin-bottom: 10px;
+  text-transform: capitalize;
+}
+
+.mpt-today-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.mpt-today-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mpt-today-cell i {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.mpt-today-cell-name {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.mpt-today-cell-time {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-feature-settings:
+    "tnum" on,
+    "lnum" on;
+}
+
+.mpt-today-cell--next {
+  background: rgba(var(--accent-rgb), 0.22);
+}
+
+.mpt-today-cell--next i,
+.mpt-today-cell--next .mpt-today-cell-name {
+  color: var(--accent-color);
+}
+
+.mpt-today-cell--next .mpt-today-cell-time {
+  color: #ffffff;
+}
+
+/* ========== Table ========== */
+/* The scrollbar belongs to whichever element actually has overflow:auto —
+   that's this wrapper, not .mpt-content above it, so the earlier
+   content-level LTR fix never reached it. Force LTR here for the scrollbar
+   position, then force the table itself back to RTL explicitly (not just
+   inherited) so the column order — date on the right, Isha on the left —
+   stays exactly as it was. */
+.mpt-table-wrap {
+  flex: 1;
+  min-height: 200px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 4px;
+  position: relative;
+  overflow-y: auto;
+  direction: ltr !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) transparent;
+}
+
+.mpt-table-wrap::-webkit-scrollbar {
+  width: 5px;
+  right: 0 !important;
+  left: auto !important;
+}
+.mpt-table-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+.mpt-table-wrap::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+.mpt-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 30px;
+  direction: rtl;
+}
+
+[dir="ltr"] .mpt-loading,
+[lang="en"] .mpt-loading,
+[lang="fr"] .mpt-loading {
+  direction: ltr;
+}
+
+.mpt-loading i {
+  color: var(--accent-color);
+}
+
+.mpt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  direction: rtl !important;
+}
+
+[dir="ltr"] .mpt-table,
+[lang="en"] .mpt-table,
+[lang="fr"] .mpt-table {
+  direction: ltr !important;
+}
+
+.mpt-table thead,
+.mpt-table tbody {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.mpt-table th {
+  position: sticky;
+  top: 0;
+  background: #0d1b3d;
+  color: var(--text-primary);
+  font-weight: 700;
+  padding: 10px 4px;
+  text-align: center;
+  font-size: 11.5px;
+  z-index: 1;
+}
+
+.mpt-table td {
+  padding: 8px 4px;
+  text-align: center;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-feature-settings:
+    "tnum" on,
+    "lnum" on;
+}
+
+.mpt-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mpt-date-cell {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 5px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.mpt-date-weekday {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.mpt-today-row-highlight td {
+  background: rgba(var(--accent-rgb), 0.16);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.mpt-today-row-highlight .mpt-date-cell {
+  color: var(--accent-color);
+}
+
+/* ========== Footer ========== */
+.mpt-footer {
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.mpt-footer-text {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  opacity: 0.75;
+  line-height: 1.4;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 640px) {
+  .mpt-today-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .mpt-table {
+    font-size: 11px;
+  }
+
+  .mpt-table th {
+    font-size: 10px;
+    padding: 8px 2px;
+  }
+
+  .mpt-table td {
+    padding: 6px 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mpt-container {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .mpt-title {
+    font-size: 15px;
+  }
+
+  .mpt-nav-label {
+    font-size: 13px;
+  }
+
+  .mpt-today-btn span {
+    display: none; /* icon-only on very narrow widths */
+  }
+
+  .mpt-today-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .mpt-today-cell-name {
+    font-size: 9.5px;
+  }
+
+  .mpt-today-cell-time {
+    font-size: 12px;
+  }
+}

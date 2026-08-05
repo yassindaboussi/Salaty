@@ -1,15 +1,3 @@
-/**
- * prayer-timer-manager.js
- * Runs entirely in the main process — immune to page navigation.
- * Uses shared prayerUtils for calculations (no duplication with renderer).
- *
- * Data flow:
- *   1. On init/location-change → fetches prayer data from aladhan.com.
- *   2. Renderer may also push fresh data via 'prayer-data-updated' IPC —
- *      this is accepted and replaces stale data without re-triggering a full reload.
- *   3. The 1-second tick fires adhan events and pre-adhan notifications only.
- *      The renderer does its own countdown calculation locally (no IPC spam).
- */
 "use strict";
 
 const { ipcMain } = require("electron");
@@ -34,9 +22,8 @@ let activeAdhanSession = null;
 let lastAdhanPrayer = null;
 let lastPreAdhanKey = null;
 
-const ADHAN_TOLERANCE_SEC = 900; // 15 min
+const ADHAN_TOLERANCE_SEC = 900;
 
-// ── Public API ────────────────────────────────────────────────────────────────
 
 function init(window, settingsFn) {
   mainWindow = window;
@@ -66,15 +53,12 @@ function cleanup() {
   }
 }
 
-// ── IPC ───────────────────────────────────────────────────────────────────────
 
 function _registerIpcHandlers() {
-  // Renderer pushed fresh data — accept it without resetting lastAdhanPrayer
   ipcMain.on("prayer-data-updated", (_ev, data) => {
     if (data) {
       prayerData = data;
       currentPrayerKey = null;
-      lastPreAdhanKey = null;
     }
   });
 
@@ -92,10 +76,10 @@ function _registerIpcHandlers() {
 function _clearAdhanSession() {
   adhanIsPlaying = false;
   activeAdhanSession = null;
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.flashFrame(false);
   _sendToMain("force-stop-adhan", {});
 }
 
-// ── Data loading ──────────────────────────────────────────────────────────────
 
 async function _loadPrayerData() {
   const settings = getSettingsData?.();
@@ -115,12 +99,10 @@ async function _loadPrayerData() {
     } else {
       throw new Error("Invalid API response");
     }
-  } catch (_err) {
-    /* silent — caller handles missing data gracefully */
+  } catch {
   }
 }
 
-// ── Tick loop — adhan + pre-adhan only, NO clock IPC ─────────────────────────
 
 function _startTickLoop() {
   if (tickInterval) clearInterval(tickInterval);
@@ -138,7 +120,6 @@ function _startTickLoop() {
 
       if (!currentPrayer || !nextPrayer) return;
 
-      // 1. Detect prayer change → maybe fire adhan
       if (currentPrayerKey !== currentPrayer.key) {
         currentPrayerKey = currentPrayer.key;
         if (isFirstTick) {
@@ -148,26 +129,24 @@ function _startTickLoop() {
         _maybeFireAdhan(currentPrayer, nowSec);
       }
 
-      // 2. Pre-adhan notification
       const settings = getSettingsData?.() || {};
       const preEnabled = settings.preAdhanNotificationEnabled !== false;
       const preMinutes = settings.preAdhanMinutes || 5;
       if (preEnabled && timeRemaining > 0 && timeRemaining <= preMinutes * 60) {
         if (lastPreAdhanKey !== nextPrayer.key) {
           lastPreAdhanKey = nextPrayer.key;
+          const actualMinutesRemaining = Math.max(1, Math.round(timeRemaining / 60));
           _sendToMain("show-pre-adhan-notification", {
             prayer: nextPrayer,
-            minutes: preMinutes,
+            minutes: actualMinutesRemaining,
           });
         }
       }
-    } catch (_err) {
-      /* silent tick error */
+    } catch {
     }
   }, 1000);
 }
 
-// ── Adhan firing ──────────────────────────────────────────────────────────────
 
 function _maybeFireAdhan(prayer, nowSec) {
   if (lastAdhanPrayer === prayer.key) return;
@@ -186,6 +165,11 @@ function _maybeFireAdhan(prayer, nowSec) {
   if (adhanState === undefined) adhanState = true;
 
   lastAdhanPrayer = prayer.key;
+
+  if (adhanState === false) {
+    return;
+  }
+
   adhanIsPlaying = adhanState !== "silent";
   activeAdhanSession = {
     prayer,
@@ -194,10 +178,14 @@ function _maybeFireAdhan(prayer, nowSec) {
     startedAt: Date.now(),
   };
 
+  if (adhanIsPlaying) {
+    const { bringToFrontForAdhan } = require("../windows/main-window");
+    bringToFrontForAdhan(mainWindow);
+  }
+
   _sendToMain("trigger-adhan", activeAdhanSession);
 }
 
-// ── Midnight reload ───────────────────────────────────────────────────────────
 
 function _scheduleMidnightReload() {
   if (midnightTimer) clearTimeout(midnightTimer);
@@ -210,7 +198,6 @@ function _scheduleMidnightReload() {
   }, msLeft);
 }
 
-// ── Utility ───────────────────────────────────────────────────────────────────
 
 function _sendToMain(channel, payload) {
   if (mainWindow && !mainWindow.isDestroyed())

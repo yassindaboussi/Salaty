@@ -45,5 +45,7 @@
   "tooltipPrev": "Previous",
   "tooltipNext": "Next",
   "tooltipPlaylist": "Open playlist",
-  "tooltipCount": "Count"
+  "tooltipCount": "Count",
+  "tooltipUndo": "Undo last count",
+  "tooltipReset": "Reset this counter"
 }

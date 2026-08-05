@@ -1,19 +1,14 @@
 const TomSelect = require("tom-select").default;
 const { ipcRenderer } = require("electron");
 
-/**
- * @param {(location: {country: string, city: string}) => void} [onChange]
- *   Called whenever the user's location selection actually changes (manual
- *   city pick, or auto-detect), so the caller can persist it immediately —
- *   no separate "Save" step needed. Not called for the initial silent
- *   restore from saved settings.
- */
 async function initSelectLocation(onChange) {
   let detectedLocationTarget = null;
   let savedSettings = {};
   try {
     savedSettings = (await ipcRenderer.invoke("get-settings")) || {};
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error loading saved settings for location selector:", error);
+  }
 
   const commonConfig = {
     valueField: "name",
@@ -22,9 +17,6 @@ async function initSelectLocation(onChange) {
     maxOptions: 500,
   };
 
-  // ── Country Select ──────────────────────────────────────────────────────────
-  // We pre-fetch countries BEFORE creating TomSelect so the load callback
-  // never fires again while the user is typing (which was causing the reset).
   let countriesData = [];
   try {
     const res = await fetch(
@@ -32,28 +24,28 @@ async function initSelectLocation(onChange) {
     );
     const json = await res.json();
     countriesData = json.data || [];
-  } catch (e) {}
+  } catch (e) {
+    console.error("Error fetching countries list:", e);
+  }
 
   const countrySelect = new TomSelect("#countryInput", {
     ...commonConfig,
     placeholder: "Select a country",
-    // No `load` callback — options are supplied directly via `options`
     options: countriesData,
   });
 
-  // Set initial country value ONCE after creation, not inside a load callback
   const initialCountry = savedSettings.country || "Tunisia";
-  countrySelect.setValue(initialCountry, true); // true = silent (no change event)
+  countrySelect.setValue(initialCountry, true);
 
-  // ── City Select ─────────────────────────────────────────────────────────────
   const citySelect = new TomSelect("#cityInput", {
     ...commonConfig,
     placeholder: "Select a city",
   });
   citySelect.disable();
 
-  // Load cities for a given country, then optionally select a default city
+  let citiesRequestId = 0;
   async function loadCities(countryName, defaultCity = null, notify = false) {
+    const myRequestId = ++citiesRequestId;
     citySelect.clear();
     citySelect.clearOptions();
     citySelect.disable();
@@ -69,11 +61,13 @@ async function initSelectLocation(onChange) {
       );
       const json = await res.json();
 
+      if (myRequestId !== citiesRequestId) return;
+
       if (json.data && json.data.length) {
         citySelect.addOptions(json.data.map((city) => ({ name: city })));
         citySelect.enable();
         if (defaultCity) {
-          citySelect.setValue(defaultCity, true); // silent — don't fire city change
+          citySelect.setValue(defaultCity, true);
           if (notify) onChange?.({ country: countryName, city: defaultCity });
         }
       }
@@ -82,7 +76,6 @@ async function initSelectLocation(onChange) {
     }
   }
 
-  // ── Country change handler ──────────────────────────────────────────────────
   countrySelect.on("change", (value) => {
     if (!value) return;
 
@@ -95,18 +88,13 @@ async function initSelectLocation(onChange) {
     } else if (value === "Tunisia") {
       defaultCity = "Tunis";
     }
-    // notify=true: a country picked by the user (with a resolved default
-    // city) is a real selection worth persisting, unlike the initial
-    // silent restore below.
     loadCities(value, defaultCity, true);
   });
 
-  // Load cities for the initial country (triggered manually since setValue was silent)
   const initialCity =
     savedSettings.city || (initialCountry === "Tunisia" ? "Tunis" : null);
   loadCities(initialCountry, initialCity);
 
-  // ── City change handler (manual pick from the dropdown) ─────────────────────
   citySelect.on("change", (value) => {
     if (!value) return;
     const country = countrySelect.getValue();
@@ -114,10 +102,10 @@ async function initSelectLocation(onChange) {
     onChange?.({ country, city: value });
   });
 
-  // ── Auto Detect Button ──────────────────────────────────────────────────────
   const detectBtn = document.getElementById("detectLocationBtn");
   if (detectBtn) {
     detectBtn.addEventListener("click", async () => {
+      detectBtn.disabled = true;
       detectBtn.classList.add("loading");
       try {
         const res = await fetch("http://ip-api.com/json");
@@ -128,11 +116,12 @@ async function initSelectLocation(onChange) {
             country: data.country,
             city: data.city,
           };
-          countrySelect.setValue(data.country); // this WILL fire change → loadCities
+          countrySelect.setValue(data.country);
         }
       } catch (error) {
         console.error("Location detection error:", error);
       } finally {
+        detectBtn.disabled = false;
         detectBtn.classList.remove("loading");
       }
     });

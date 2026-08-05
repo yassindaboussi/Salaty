@@ -2,27 +2,26 @@ const { ipcRenderer } = require("electron");
 
 class BackgroundPlayer {
   constructor() {
-    this.tracks = []; // { title, artist, url, filename }
+    this.tracks = [];
     this.currentTrackIndex = -1;
+    this.currentTrackUrl = null;
     this.sound = null;
     this.isPlaying = false;
     this.stepInterval = null;
-    this.listeners = []; // Track event listeners for cleanup
+    this.listeners = [];
 
     this.initIPC();
     this.initUI();
     this.initThemeListener();
   }
 
-  // Static method to handle the async creation
   static async create() {
     const instance = new BackgroundPlayer();
-    await instance.loadLocalTracks(); // Wait for tracks to load
+    await instance.loadLocalTracks();
     return instance;
   }
 
   initThemeListener() {
-    // Listen for theme changes from main process
     const themeListener = (event, data) => {
       const { theme } = data;
       this.applyTheme(theme);
@@ -32,7 +31,6 @@ class BackgroundPlayer {
   }
 
   applyTheme(theme) {
-    // Apply theme CSS class to player UI body
     const body = document.body;
     if (body) {
       body.className = `theme-${theme}`;
@@ -102,13 +100,11 @@ class BackgroundPlayer {
       this.ui.prevBtn.addEventListener("click", () => this.playPrevious());
       this.ui.nextBtn.addEventListener("click", () => this.playNext());
 
-      // Logic for close button to hide mini player
       if (this.ui.closeBtn) {
         this.ui.closeBtn.addEventListener("click", () => {
           ipcRenderer.send("close-mini-player");
         });
       }
-      // Ajout du gestionnaire pour le bouton miniPlaylistBtn
       if (this.ui.playlistBtn) {
         this.ui.playlistBtn.addEventListener("click", () => {
           ipcRenderer.send("show-main-window");
@@ -127,7 +123,7 @@ class BackgroundPlayer {
       volume: Howler.volume(),
     };
     ipcRenderer.send("player-update", { type: "state", state: state });
-    this.updateLocalUI(); // Update UI
+    this.updateLocalUI();
   }
 
   sendTimeUpdate() {
@@ -160,12 +156,6 @@ class BackgroundPlayer {
     }
   }
 
-  /**
-   * Initializes an empty playlist. The real track list always arrives via
-   * the "set-playlist" player-command once the user picks a reciter in the
-   * Audio Archive — this just puts the player in a clean "idle" state
-   * instead of eagerly fetching a hardcoded demo album on every startup.
-   */
   async loadLocalTracks() {
     this.tracks = [];
     ipcRenderer.send("player-update", { type: "tracks", tracks: this.tracks });
@@ -175,11 +165,21 @@ class BackgroundPlayer {
   playTrack(index) {
     if (index < 0 || index >= this.tracks.length) return;
 
-    // Check if we are already playing this exact track
     const track = this.tracks[index];
 
-    // If it's the current track, just resume/toggle instead of re-loading
-    if (this.currentTrackIndex === index && this.sound) {
+    // Only treat this as "the same track is already loaded" if the index
+    // AND the actual track URL match. Comparing index alone is unsafe:
+    // setPlaylist() replaces the whole tracks array before calling this,
+    // so a brand new track can coincidentally share the same start index
+    // as whatever was already playing (e.g. picking a different reciter —
+    // both naturally start at index 0), which was being wrongly treated
+    // as "nothing to do," silently ignoring the request to switch tracks
+    // until the original track finished on its own.
+    if (
+      this.currentTrackIndex === index &&
+      this.sound &&
+      this.currentTrackUrl === track.url
+    ) {
       if (!this.isPlaying) {
         this.togglePlay(true);
       }
@@ -191,9 +191,9 @@ class BackgroundPlayer {
     }
 
     this.currentTrackIndex = index;
-    this.isPlaying = true; // Optimistic
+    this.currentTrackUrl = track.url;
+    this.isPlaying = true;
 
-    // Notify UI immediately
     this.sendState();
 
     this.sound = new Howl({
@@ -214,6 +214,19 @@ class BackgroundPlayer {
       },
       onloaderror: (id, err) => {
         console.error("Load error", err);
+        // Without this, a track that fails to load left isPlaying stuck
+        // at true (set optimistically above, before we knew whether the
+        // load would succeed) — the UI would show "playing" forever with
+        // nothing actually happening. Reset state and move on instead of
+        // getting stuck.
+        this.isPlaying = false;
+        this.sendState();
+        this.playNext();
+      },
+      onplayerror: (id, err) => {
+        console.error("Play error", err);
+        this.isPlaying = false;
+        this.sendState();
       },
     });
 
@@ -223,7 +236,6 @@ class BackgroundPlayer {
   togglePlay(shouldPlay) {
     if (!this.sound) return;
 
-    // If shouldPlay is undefined, toggle
     if (shouldPlay === undefined) {
       shouldPlay = !this.isPlaying;
     }
@@ -239,7 +251,6 @@ class BackgroundPlayer {
     if (this.currentTrackIndex < this.tracks.length - 1) {
       this.playTrack(this.currentTrackIndex + 1);
     } else {
-      // Loop or stop? Stop for now
       this.isPlaying = false;
       this.sendState();
     }
@@ -249,16 +260,11 @@ class BackgroundPlayer {
     if (this.currentTrackIndex > 0) {
       this.playTrack(this.currentTrackIndex - 1);
     } else {
-      // Replay current if at start
       this.seek(0);
     }
   }
 
   seek(value) {
-    // 0 to 1 position or seconds? Actually UI sends seconds?
-    // Let's assume input is 0-100 percentage.
-    // Or usually it is simpler to send seconds or percentage.
-    // Let's assume the UI logic calculates seconds.
     if (this.sound) {
       this.sound.seek(value);
     }
@@ -268,7 +274,7 @@ class BackgroundPlayer {
     if (this.stepInterval) clearInterval(this.stepInterval);
     this.stepInterval = setInterval(() => {
       this.sendTimeUpdate();
-    }, 1000); // 1Hz update is enough for IPC
+    }, 1000);
   }
 
   stopStepLoop() {
@@ -277,15 +283,12 @@ class BackgroundPlayer {
   }
 
   cleanup() {
-    // Stop playing
     if (this.sound) {
       this.sound.stop();
     }
 
-    // Clear intervals
     this.stopStepLoop();
 
-    // Remove all event listeners
     for (const { event, handler } of this.listeners) {
       ipcRenderer.removeListener(event, handler);
     }
@@ -293,13 +296,8 @@ class BackgroundPlayer {
   }
 }
 
-/**
- * Initialisation du lecteur
- */
 const player = new BackgroundPlayer();
 
-// On lance l'initialisation asynchrone (chargement des pistes)
-// sans bloquer l'export de l'objet lui-même.
 player.loadLocalTracks().catch((err) => {
   console.error("Erreur lors du chargement initial des pistes:", err);
 });

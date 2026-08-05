@@ -97,7 +97,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  gap: 0;
+  gap: 4px;
   direction: ltr; /* ordre chronologique fixe, indépendant du RTL */
   -webkit-app-region: no-drag;
 }

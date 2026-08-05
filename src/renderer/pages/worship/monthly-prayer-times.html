@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Prayer Times - Salaty Time</title>
+    <link
+      rel="stylesheet"
+      href="../../vendor/fontawesome/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../../css/app.css" />
+    <link rel="stylesheet" href="../../css/04-pages/monthly-prayer-times.css" />
+    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
+  </head>
+  <body class="page-loading">
+    <div class="app-container theme-dark" id="app">
+      <div class="drag-area"></div>
+
+      <div class="mpt-container">
+        <div class="mpt-header">
+          <button
+            class="back-btn"
+            id="backBtn"
+            aria-label="Back to Features"
+            data-tooltip="tooltipBack"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+
+          <h2 class="mpt-title" id="mptTitle">Monthly Prayer Times</h2>
+
+          <div class="mpt-controls">
+            <button
+              class="control-btn minimize-btn"
+              id="minimizeBtn"
+              aria-label="Minimize"
+              data-tooltip="tooltipMinimize"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 13H5v-2h14v2z" />
+              </svg>
+            </button>
+            <button
+              class="control-btn fullscreen-btn"
+              id="fullscreenBtn"
+              aria-label="Toggle Fullscreen"
+              data-tooltip="tooltipExpand"
+            >
+              <i class="fas fa-expand"></i>
+            </button>
+            <button
+              class="control-btn close-btn"
+              id="closeBtn"
+              aria-label="Close"
+              data-tooltip="tooltipClose"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="mpt-content" id="mptContent">
+          <!-- Month navigator -->
+          <div class="mpt-nav">
+            <button
+              type="button"
+              class="mpt-nav-btn"
+              id="mptPrevBtn"
+              aria-label="Previous month"
+            >
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="mpt-nav-label" id="mptMonthLabel">—</div>
+            <button
+              type="button"
+              class="mpt-nav-btn"
+              id="mptNextBtn"
+              aria-label="Next month"
+            >
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <button type="button" class="mpt-today-btn" id="mptTodayBtn">
+              <i class="fas fa-calendar-day"></i>
+              <span id="mptTodayLabel">Today</span>
+            </button>
+          </div>
+
+          <!-- Today snapshot -->
+          <div class="mpt-today-card" id="mptTodayCard">
+            <div class="mpt-today-date" id="mptTodayDate">—</div>
+            <div class="mpt-today-row" id="mptTodayRow">
+              <!-- 5 prayer cells injected via JS -->
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="mpt-table-wrap" id="mptTableWrap">
+            <div class="mpt-loading" id="mptLoading">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span id="mptLoadingText">Loading prayer times...</span>
+            </div>
+            <table class="mpt-table mpt-hidden" id="mptTable">
+              <thead>
+                <tr id="mptTableHead"></tr>
+              </thead>
+              <tbody id="mptTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="mpt-footer">
+          <div class="mpt-footer-text" id="mptFooterText">
+            Times are calculated for your saved location and may differ slightly from your local mosque.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../../js-bundled/renderer.bundle.js"></script>
+  </body>
+</html>

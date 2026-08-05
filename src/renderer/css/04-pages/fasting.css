@@ -1,0 +1,496 @@
+/* Sunnah Fasting Page Styles */
+.fasting-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ========== HEADER — matches Features/Ramadan pages ========== */
+.fasting-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  gap: 8px;
+  direction: ltr !important;
+  -webkit-app-region: drag;
+}
+
+.fasting-header button {
+  -webkit-app-region: no-drag;
+}
+
+.fasting-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  pointer-events: none;
+  z-index: 1;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fasting-controls {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+  z-index: 102;
+  position: relative;
+}
+
+.fasting-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  -webkit-app-region: no-drag;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) transparent;
+  direction: ltr !important; /* Force LTR so the scrollbar stays on the right (start side in RTL) */
+}
+
+.fasting-content::-webkit-scrollbar {
+  width: 5px;
+  right: 0 !important;
+  left: auto !important;
+}
+.fasting-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.fasting-content::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+/* The container above is forced LTR only to pin the scrollbar — re-apply
+   RTL to the actual cards so Arabic (and other RTL languages) text/layout
+   still reads correctly. Same convention used on the Ramadan page. */
+[dir="rtl"] .fasting-content > *,
+[lang="ar"] .fasting-content > *,
+[lang="fa"] .fasting-content > *,
+[lang="ur"] .fasting-content > *,
+[lang="he"] .fasting-content > * {
+  direction: rtl !important;
+}
+
+/* ========== Reminder lead-time selector ========== */
+.vf-lead-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.vf-lead-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.vf-lead-label i {
+  color: var(--accent-color);
+  font-size: 13px;
+}
+
+.vf-lead-select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vf-lead-select:hover {
+  border-color: rgba(var(--accent-rgb), 0.5);
+}
+
+.vf-lead-select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
+}
+
+.vf-lead-select option {
+  background: #14213d;
+  color: #ffffff;
+}
+
+/* ========== Hero card — next upcoming occasion ========== */
+.vf-hero {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--accent-rgb), 0.22),
+    rgba(var(--accent-rgb), 0.06)
+  );
+  border: 1px solid rgba(var(--accent-rgb), 0.35);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.vf-hidden {
+  display: none;
+}
+
+.vf-hero-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
+
+.vf-hero-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vf-hero-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(var(--accent-rgb), 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--accent-color);
+  flex: 0 0 auto;
+}
+
+.vf-hero-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.vf-hero-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vf-hero-date {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.vf-hero-countdown {
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-color);
+  background: rgba(var(--accent-rgb), 0.15);
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.vf-hero-desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.vf-toggle-btn {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  background: rgba(var(--accent-rgb), 0.12);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vf-toggle-btn:hover {
+  background: rgba(var(--accent-rgb), 0.22);
+}
+
+.vf-toggle-btn.vf-active {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: #ffffff;
+}
+
+.vf-toggle-btn i {
+  font-size: 14px;
+}
+
+/* ========== Sections ========== */
+.vf-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vf-section-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ========== Weekly Sunnah card ========== */
+.vf-weekly-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.vf-weekly-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(var(--accent-rgb), 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-color);
+  font-size: 16px;
+  flex: 0 0 auto;
+}
+
+.vf-weekly-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.vf-weekly-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.vf-weekly-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ========== List of upcoming occasions ========== */
+.vf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vf-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 14px;
+  transition: border-color 0.2s ease;
+}
+
+.vf-item:hover {
+  border-color: rgba(var(--accent-rgb), 0.4);
+}
+
+.vf-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(var(--accent-rgb), 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-color);
+  font-size: 14px;
+  flex: 0 0 auto;
+}
+
+.vf-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.vf-item-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vf-item-meta {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.vf-item-date-chip {
+  white-space: nowrap;
+}
+
+.vf-item-desc {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  opacity: 0.85;
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+/* Bell toggle used per list item */
+.vf-bell-btn {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.vf-bell-btn:hover {
+  border-color: rgba(var(--accent-rgb), 0.5);
+  color: var(--text-primary);
+}
+
+.vf-bell-btn.vf-active {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: #ffffff;
+}
+
+/* ========== iOS-style switch (weekly toggle) ========== */
+.vf-switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex: 0 0 auto;
+}
+
+.vf-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.vf-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+.vf-switch-slider::before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+.vf-switch input:checked + .vf-switch-slider {
+  background: var(--accent-color);
+}
+
+.vf-switch input:checked + .vf-switch-slider::before {
+  transform: translateX(18px);
+}
+
+/* ========== Loading / empty states ========== */
+.vf-loading,
+.vf-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* ========== Footer note ========== */
+.vf-ramadan-note {
+  margin: 4px 2px 8px;
+  font-size: 11.5px;
+  text-align: center;
+  color: var(--text-secondary);
+  opacity: 0.75;
+  font-style: italic;
+}
+
+[dir="rtl"] .vf-hero-title,
+[dir="rtl"] .vf-hero-desc,
+[dir="rtl"] .vf-item-title,
+[dir="rtl"] .vf-item-desc,
+[dir="rtl"] .vf-section-title,
+[dir="rtl"] .vf-weekly-title,
+[dir="rtl"] .vf-weekly-desc {
+  text-align: right;
+}
+
+/* RTL: keep bell/switch on the correct visual side automatically via flex */
+[dir="rtl"] .fasting-header {
+  direction: ltr !important;
+}

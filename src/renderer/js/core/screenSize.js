@@ -2,7 +2,7 @@
 const { ipcRenderer } = require("electron");
 const { state } = require("./globalStore");
 
-const WIDTHS = { big: 850, fullscreen: null }; // fullscreen = maximize
+const WIDTHS = { big: 850, fullscreen: null };
 const BANNER_EXTRA_HEIGHT = 72;
 
 class ScreenSizeManager {
@@ -13,7 +13,6 @@ class ScreenSizeManager {
   }
 
   syncFromSettings() {
-    // bigScreen:true → big (850px), bigScreen:false → fullscreen (maximized)
     this._size = state.settings?.bigScreen ? "big" : "fullscreen";
   }
 
@@ -38,8 +37,6 @@ class ScreenSizeManager {
     this._size = next;
     this._baseHeight = null;
     state.settings.bigScreen = next === "big";
-    // Persist BEFORE resize so main process reads correct bigScreen value
-    // when the "unmaximize" event fires inside our resize-window handler.
     await ipcRenderer.invoke("save-settings", { bigScreen: state.settings.bigScreen });
     await this._sendResize();
     this._applyBodyClasses(containerClass);
@@ -55,16 +52,11 @@ class ScreenSizeManager {
   async setBannerVisible(visible) {
     if (this._bannerVisible === visible) return;
     this._bannerVisible = visible;
-    // In fullscreen mode window manages its own size; only resize in big mode
     if (this._size === "big" && this._baseHeight) {
       await this._sendResize();
     }
   }
 
-  /**
-   * Fit the OS window to the actual rendered content.
-   * Uses a setTimeout so the browser has completed layout before we measure.
-   */
   async forceApplyScreenSize() {
     if (this._size === "fullscreen") {
       await ipcRenderer.invoke("maximize-window");
@@ -74,11 +66,6 @@ class ScreenSizeManager {
     await this._fitToContent();
   }
 
-  /**
-   * Core measurement: reads prayerList's real layout height.
-   * prayerList is the innermost element — its offsetHeight after layout
-   * is the ground truth for how tall the prayer rows are.
-   */
   async _fitToContent() {
     const prayerList = document.getElementById("prayerList");
     const header     = document.querySelector(".header");
@@ -90,27 +77,18 @@ class ScreenSizeManager {
       return;
     }
 
-    // Each of these uses offsetHeight — the CSS layout height, 
-    // not clipped by parent overflow. Always reflects real rendered size.
     let h = 0;
 
-    // 1. Header
     h += header.offsetHeight;
 
-    // 2. Banner (if showing) — offsetHeight + 10px CSS margin-top
     if (banner && banner.style.display !== "none") {
       h += 10 + banner.offsetHeight;
     }
 
-    // 3. Prayer cards container
     h += cards.offsetHeight;
 
-    // 4. Prayer list wrapper padding-top (0) + prayerList content
-    //    prayerList is inside .prayer-times which has padding 0 16px 16px
-    //    prayerList.offsetHeight = sum of all prayer-item rows + their margins
     const prayerTimes = document.getElementById("prayerTimes");
     if (prayerTimes) {
-      // Get computed padding of the wrapper
       const cs = window.getComputedStyle(prayerTimes);
       const padTop    = parseFloat(cs.paddingTop)    || 0;
       const padBottom = parseFloat(cs.paddingBottom) || 16;
@@ -119,7 +97,6 @@ class ScreenSizeManager {
       h += prayerList.offsetHeight + 16;
     }
 
-    // 5. Small safety margin
     h += 4;
 
     const height = Math.ceil(h);

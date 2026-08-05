@@ -1,175 +1,127 @@
-// src/renderer/js/customDialog.js
 const { t } = require("../core/i18n/translations");
 
-/**
- * Show a custom confirmation dialog
- * @param {string} message - The message to display
- * @param {Object} options - Dialog options
- * @param {string} options.confirmText - Text for confirm button (default: "Confirm")
- * @param {string} options.cancelText - Text for cancel button (default: "Cancel")
- * @param {string} options.confirmClass - CSS class for confirm button (default: "btn-primary")
- * @returns {Promise<boolean>} - Resolves to true if confirmed, false if cancelled
- */
-function showConfirmDialog(message, options = {}) {
+function _showDialog(message, { icon, iconClass = "", buttons }) {
   return new Promise((resolve) => {
-    // Default options
-    const {
-      confirmText = t("confirm") || "Confirm",
-      cancelText = t("cancel") || "Cancel",
-      confirmClass = "btn-primary",
-    } = options;
+    const previouslyFocused = document.activeElement;
 
-    // Create dialog overlay
     const overlay = document.createElement("div");
     overlay.className = "custom-dialog-overlay";
 
-    // Create dialog container
     const dialog = document.createElement("div");
     dialog.className = "custom-dialog-container";
+    dialog.setAttribute("role", "alertdialog");
+    dialog.setAttribute("aria-modal", "true");
+    dialog.setAttribute("aria-describedby", "customDialogMessage");
+    dialog.setAttribute("tabindex", "-1");
 
-    // Create dialog content
+    const buttonsHtml = buttons
+      .map(
+        (b) =>
+          `<button class="custom-dialog-btn ${b.className}" data-action="${b.action}">${b.text}</button>`,
+      )
+      .join("\n");
+
     dialog.innerHTML = `
-      <div class="custom-dialog-icon">
-        <i class="fas fa-question-circle"></i>
+      <div class="custom-dialog-icon ${iconClass}">
+        <i class="fas ${icon}"></i>
       </div>
-      <div class="custom-dialog-message">${message}</div>
+      <div class="custom-dialog-message" id="customDialogMessage">${message}</div>
       <div class="custom-dialog-actions">
-        <button class="custom-dialog-btn btn-secondary" data-action="cancel">
-          ${cancelText}
-        </button>
-        <button class="custom-dialog-btn ${confirmClass}" data-action="confirm">
-          ${confirmText}
-        </button>
+        ${buttonsHtml}
       </div>
     `;
 
     overlay.appendChild(dialog);
-    // add overlay inside the main app wrapper so theme variables propagate
     const parent = document.getElementById("app") || document.body;
     parent.appendChild(overlay);
 
-    // Animate in
     requestAnimationFrame(() => {
       overlay.classList.add("active");
     });
 
-    // Handle button clicks
-    const handleAction = (action) => {
-      // Animate out
-      overlay.classList.remove("active");
+    const primaryBtn = dialog.querySelector(
+      '[data-action]:last-of-type',
+    );
+    (primaryBtn || dialog).focus();
 
-      // Remove from DOM after animation
+    const getFocusable = () =>
+      Array.from(
+        dialog.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => !el.disabled);
+
+    const handleAction = (action) => {
+      overlay.classList.remove("active");
+      document.removeEventListener("keydown", handleKeydown);
+
       setTimeout(() => {
-        const parent = document.getElementById("app") || document.body;
-        if (parent.contains(overlay)) {
-          parent.removeChild(overlay);
-        }
+        const p = document.getElementById("app") || document.body;
+        if (p.contains(overlay)) p.removeChild(overlay);
       }, 300);
 
-      resolve(action === "confirm");
+      if (previouslyFocused && document.contains(previouslyFocused)) {
+        previouslyFocused.focus();
+      }
+
+      resolve(action);
     };
 
-    // Add event listeners
-    const cancelBtn = dialog.querySelector('[data-action="cancel"]');
-    const confirmBtn = dialog.querySelector('[data-action="confirm"]');
-
-    cancelBtn.addEventListener("click", () => handleAction("cancel"));
-    confirmBtn.addEventListener("click", () => handleAction("confirm"));
-
-    // Close on overlay click
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) {
-        handleAction("cancel");
-      }
-    });
-
-    // Close on Escape key
-    const handleEscape = (e) => {
+    const handleKeydown = (e) => {
       if (e.key === "Escape") {
         handleAction("cancel");
-        document.removeEventListener("keydown", handleEscape);
+        return;
+      }
+      if (e.key === "Tab") {
+        const focusable = getFocusable();
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
-    document.addEventListener("keydown", handleEscape);
+    document.addEventListener("keydown", handleKeydown);
+
+    dialog.querySelectorAll("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", () => handleAction(btn.dataset.action));
+    });
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) handleAction("cancel");
+    });
   });
 }
 
-/**
- * Show a custom alert dialog
- * @param {string} message - The message to display
- * @param {Object} options - Dialog options
- * @param {string} options.okText - Text for OK button (default: "OK")
- * @returns {Promise<void>}
- */
-function showAlertDialog(message, options = {}) {
-  return new Promise((resolve) => {
-    const { okText = t("ok") || "OK" } = options;
+async function showConfirmDialog(message, options = {}) {
+  const {
+    confirmText = t("confirm") || "Confirm",
+    cancelText = t("cancel") || "Cancel",
+    confirmClass = "btn-primary",
+  } = options;
 
-    // Create dialog overlay
-    const overlay = document.createElement("div");
-    overlay.className = "custom-dialog-overlay";
+  const action = await _showDialog(message, {
+    icon: "fa-question-circle",
+    buttons: [
+      { action: "cancel", text: cancelText, className: "btn-secondary" },
+      { action: "confirm", text: confirmText, className: confirmClass },
+    ],
+  });
+  return action === "confirm";
+}
 
-    // Create dialog container
-    const dialog = document.createElement("div");
-    dialog.className = "custom-dialog-container";
+async function showAlertDialog(message, options = {}) {
+  const { okText = t("ok") || "OK" } = options;
 
-    // Create dialog content
-    dialog.innerHTML = `
-      <div class="custom-dialog-icon alert-icon">
-        <i class="fas fa-info-circle"></i>
-      </div>
-      <div class="custom-dialog-message">${message}</div>
-      <div class="custom-dialog-actions">
-        <button class="custom-dialog-btn btn-primary" data-action="ok">
-          ${okText}
-        </button>
-      </div>
-    `;
-
-    overlay.appendChild(dialog);
-    const parent = document.getElementById("app") || document.body;
-    parent.appendChild(overlay);
-
-    // Animate in
-    requestAnimationFrame(() => {
-      overlay.classList.add("active");
-    });
-
-    // Handle button click
-    const handleClose = () => {
-      // Animate out
-      overlay.classList.remove("active");
-
-      // Remove from DOM after animation
-      setTimeout(() => {
-        const parent = document.getElementById("app") || document.body;
-        if (parent.contains(overlay)) {
-          parent.removeChild(overlay);
-        }
-      }, 300);
-
-      resolve();
-    };
-
-    // Add event listener
-    const okBtn = dialog.querySelector('[data-action="ok"]');
-    okBtn.addEventListener("click", handleClose);
-
-    // Close on overlay click
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) {
-        handleClose();
-      }
-    });
-
-    // Close on Escape key
-    const handleEscape = (e) => {
-      if (e.key === "Escape") {
-        handleClose();
-        document.removeEventListener("keydown", handleEscape);
-      }
-    };
-    document.addEventListener("keydown", handleEscape);
+  await _showDialog(message, {
+    icon: "fa-info-circle",
+    iconClass: "alert-icon",
+    buttons: [{ action: "ok", text: okText, className: "btn-primary" }],
   });
 }
 

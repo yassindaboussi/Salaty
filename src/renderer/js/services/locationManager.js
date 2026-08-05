@@ -3,7 +3,6 @@ const { ipcRenderer } = require("electron");
 const { t } = require("../core/i18n/translations");
 const { showToast } = require("../core/toast");
 
-// Generic IPC wrapper — centralises error handling and toast for every operation.
 async function _invoke(channel, ...args) {
   try {
     return await ipcRenderer.invoke(channel, ...args);

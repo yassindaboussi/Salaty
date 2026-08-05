@@ -1,14 +1,20 @@
 {
   "name": "salaty",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Salaty Time Islamic Prayer Times Desktop App",
   "main": "src/main/index.js",
   "scripts": {
     "postinstall": "node scripts/fix-noble-hashes-esm.js",
+    "build:renderer": "node scripts/build-renderer.js",
+    "prestart": "npm run build:renderer",
     "start": "electron .",
+    "predev": "npm run build:renderer",
     "dev": "electron . --enable-logging",
+    "prebuild": "npm run build:renderer",
     "build": "electron-builder",
+    "prebuild:linux": "npm run build:renderer",
     "build:linux": "electron-builder --linux",
+    "predist": "npm run build:renderer",
     "dist": "electron-builder --publish=never",
     "clean": "rm -rf dist",
     "lint": "eslint src/",
@@ -24,11 +30,17 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@fortawesome/fontawesome-free": "^6.4.0",
     "electron": "^42.3.0",
     "electron-builder": "^26.8.1",
+    "esbuild": "^0.28.1",
     "eslint": "^9.39.2",
+    "globals": "^17.3.0",
+    "howler": "^2.2.4",
+    "leaflet": "^1.9.4",
     "prettier": "^3.6.2",
-    "globals": "^17.3.0"
+    "salaty-qibla-map": "^1.0.2",
+    "tom-select": "^2.4.3"
   },
   "build": {
     "appId": "com.yassindaboussi.salaty",
@@ -49,9 +61,6 @@
         "repo": "Salaty"
       }
     ],
-    "extraResources": [
-      "src/assets/**"
-    ],
     "win": {
       "target": "nsis",
       "icon": "src/assets/icons/app_icon.ico",
@@ -68,10 +77,7 @@
       "icon": "src/assets/icons/app_icon_512.png",
       "identity": null,
       "hardenedRuntime": false,
-      "gatekeeperAssess": false,
-      "asarUnpack": [
-        "src/main/**/*"
-      ]
+      "gatekeeperAssess": false
     },
     "linux": {
       "target": [
@@ -86,13 +92,13 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "include": "src/assets/installer.nsh"
-    }
+    },
+    "compression": "maximum"
   },
   "dependencies": {
-    "electron-updater": "^6.7.3",
-    "howler": "^2.2.4",
-    "leaflet": "^1.9.4",
-    "salaty-qibla-map": "^1.0.2",
-    "tom-select": "^2.4.3"
+    "electron-updater": "^6.7.3"
+  },
+  "overrides": {
+    "brace-expansion": "^5.0.8"
   }
 }

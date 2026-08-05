@@ -1,7 +1,3 @@
-// src/renderer/js/offline-banner.js
-/**
- * Offline Banner - Minimal, working version
- */
 
 let bannerInstance = null;
 
@@ -14,12 +10,15 @@ class OfflineBanner {
     this.lastLanguage = null;
   }
 
-  init() {
+  async init() {
     this.createBannerHTML();
     this.listenForConnectionChanges();
     this.checkConnectionPeriodically();
     this.setupEventListeners();
     this.setupThemeLanguageListener();
+    const { whenReady } = require("../../js/core/i18n/translations");
+    await whenReady();
+    this.updateBannerText();
   }
 
   createBannerHTML() {
@@ -65,7 +64,9 @@ class OfflineBanner {
       }
 
       this.lastLanguage = lang;
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error updating offline banner text:", error);
+    }
   }
 
   applyThemeColors() {
@@ -78,7 +79,6 @@ class OfflineBanner {
       );
       if (!themeClass) return;
 
-      // Remove all themes
       [
         "theme-navy",
         "theme-dark",
@@ -97,21 +97,18 @@ class OfflineBanner {
         "theme-classic",
       ].forEach((t) => this.bannerElement.classList.remove(t));
 
-      // Add current theme
       this.bannerElement.classList.add(themeClass);
-    } catch (error) {
-      // Ignore
+    } catch {
     }
   }
 
   setupThemeLanguageListener() {
     try {
       const { ipcRenderer } = require("electron");
-      ipcRenderer.on("theme-changed", (event, theme) => {
+      ipcRenderer.on("theme-changed", () => {
         this.applyThemeColors();
       });
-    } catch (error) {
-      // Ignore
+    } catch {
     }
 
     const app = document.getElementById("app");
@@ -137,8 +134,7 @@ class OfflineBanner {
           this.lastLanguage = lang;
           this.updateBannerText();
         }
-      } catch (error) {
-        // Ignore
+      } catch {
       }
     }, 1000);
   }
@@ -224,8 +220,7 @@ class OfflineBanner {
         this.updateBannerStatus();
         window.dispatchEvent(new CustomEvent("connection-restored"));
       });
-    } catch (error) {
-      // Ignore
+    } catch {
     }
   }
 

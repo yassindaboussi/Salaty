@@ -26,8 +26,6 @@
 [dir="rtl"] .prayer-name,
 [dir="rtl"] .time-remaining,
 [dir="rtl"] .countdown,
-[dir="rtl"] .setting-label,
-[dir="rtl"] .input-hint,
 [dir="rtl"] .footer-text,
 [dir="rtl"] .current-indicator,
 [dir="rtl"] .loading,
@@ -136,24 +134,6 @@
   direction: rtl;
 }
 
-/* Next Prayer */
-.next-prayer {
-  margin: 12px 20px 16px;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
-  text-align: center;
-  font-size: 13px;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.next-prayer .highlight {
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--accent-color, #fff);
-}
-
 /* ========================================
    SETTINGS PANEL RTL - KEEP SAME AS LTR
    ======================================== */
@@ -188,12 +168,6 @@
 
 [dir="rtl"] .settings-content {
   direction: ltr !important;
-}
-
-/* Make only the text content RTL, not the layout */
-[dir="rtl"] .settings-content .setting-label {
-  direction: rtl;
-  text-align: right;
 }
 
 [dir="rtl"] .settings-content .footer-text {
@@ -236,17 +210,6 @@
 [dir="rtl"] #cityInput {
   direction: ltr !important;
   text-align: left !important;
-}
-
-/* Input with Unit */
-[dir="rtl"] .input-with-unit {
-  flex-direction: row-reverse;
-}
-
-/* Field Hint */
-[dir="rtl"] .field-hint {
-  direction: rtl;
-  text-align: right;
 }
 
 /* ========================================
@@ -440,24 +403,13 @@
 }
 
 /* Fix for refresh and expand icons - prevent any RTL transformations */
-[dir="rtl"] .refresh-btn i,
 [dir="rtl"] .fullscreen-btn i,
 [dir="rtl"] .control-btn i {
   transform: none !important;
 }
 
-[dir="rtl"] .refresh-btn:hover i {
-  animation: spinHover 0.5s ease;
-}
-
 [dir="rtl"] .fullscreen-btn:hover i {
   transform: scale(1.1) !important;
-}
-
-/* Refresh animation */
-.refresh-btn.refreshing i {
-  animation: spin 1s linear infinite;
-  transform-origin: center;
 }
 
 @keyframes spin {
@@ -476,12 +428,6 @@
   100% {
     transform: rotate(180deg);
   }
-}
-
-/* Input Fields RTL - EXCEPT Country and City inputs */
-[dir="rtl"] .setting-input:not(#countryInput):not(#cityInput) {
-  text-align: right;
-  direction: rtl;
 }
 
 /* SPECIAL FIX: Keep Country and City inputs LTR even in RTL mode */
@@ -515,59 +461,6 @@
 [dir="rtl"] .ts-control input {
   direction: ltr !important;
   text-align: left !important;
-}
-
-/* Language Options */
-.language-options {
-  display: flex;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.language-option {
-  flex: 1;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.language-option:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.language-option.selected {
-  background: var(--accent-color);
-  border-color: var(--accent-color);
-  box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
-}
-
-.language-option .lang-name {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.language-option.selected .lang-name {
-  color: white;
-}
-
-.language-option .lang-native {
-  font-size: 14px;
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.language-option.selected .lang-native {
-  color: white;
 }
 
 /* Toast RTL Support */
@@ -634,16 +527,6 @@
 /* Window controls remain LTR */
 [dir="rtl"] .window-controls {
   direction: ltr;
-}
-
-/* Theme options text RTL */
-[dir="rtl"] .theme-option {
-  direction: rtl;
-}
-
-/* Location row RTL */
-[dir="rtl"] .location-row {
-  direction: rtl;
 }
 
 /* Additional fixes for consistency */

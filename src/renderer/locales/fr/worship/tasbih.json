@@ -1,1 +1,39 @@
-{ "tasbih":"Tasbih","selectDhikr":"Choisir Dhikr","recitations":"Récitations","total":"Total","completed":"Terminé","tasbihDesc":"Chapelet numérique" }
+{
+  "tasbih": "Tasbih",
+  "selectDhikr": "Choisir Dhikr",
+  "recitations": "Récitations",
+  "total": "Total",
+  "completed": "Terminé",
+  "tasbihDesc": "Chapelet numérique",
+
+  "countBtn": "Compter",
+  "undoBtn": "Annuler",
+  "resetBtn": "Réinitialiser",
+  "stopAtCount": "S'arrêter à {count}",
+  "noLimit": "Sans limite",
+  "roundLabel": "Tour {n}",
+  "spacebarHint": "Espace",
+
+  "dhikrSwitched": "Passé à {name}",
+  "dhikrCompleted": "Terminé ! {count} fois",
+  "dhikrRoundCompleted": "Tour {n} terminé — continuez",
+  "counterReset": "Compteur réinitialisé",
+  "allCountersReset": "Tous les compteurs réinitialisés",
+
+  "resetConfirmTitle": "Réinitialiser le compteur",
+  "resetConfirmMessage": "Êtes-vous sûr de vouloir réinitialiser ce compteur ?",
+  "resetAllConfirmTitle": "Réinitialiser tous les compteurs",
+  "resetAllConfirmMessage": "Êtes-vous sûr ? Cette action ne peut pas être annulée.",
+  "cancel": "Annuler",
+  "reset": "Réinitialiser",
+  "resetAllBtn": "Tout réinitialiser",
+
+  "dhikrSubhanallahMeaning": "Gloire à Allah",
+  "dhikrAlhamdulillahMeaning": "Louange à Allah",
+  "dhikrAllahuAkbarMeaning": "Allah est le plus Grand",
+  "dhikrLaIlahaMeaning": "Il n'y a de divinité qu'Allah",
+  "dhikrAstaghfirullahMeaning": "Je demande pardon à Allah",
+  "dhikrSubhanallahiWaBihamdihiMeaning": "Gloire et louange à Allah",
+  "dhikrSalawatMeaning": "Ô Allah, bénis Muhammad",
+  "dhikrHawqalaMeaning": "Nulle force ni puissance sauf par Allah"
+}
