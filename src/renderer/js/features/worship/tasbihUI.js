@@ -7,22 +7,33 @@ const { t, getLanguage } = require("../../core/i18n/translations");
 const analytics = require("../../utils/analytics");
 const { renderToast } = require("../../core/toast");
 
+// Counts are set to match what's actually established in authentic hadith
+// (Sahih al-Bukhari / Sahih Muslim), not arbitrary round numbers. Where no
+// hadith specifies a fixed count, the dhikr defaults to "no limit" rather
+// than presenting an invented number as if it were prescribed.
+// Each entry's `sourceKey` points to the translated citation shown to the
+// user (dhikr card tooltip + active dhikr panel).
 const DEFAULT_DHIKR_LIST = [
-  { id: "subhanallah", name: "سُبْحَانَ اللَّهِ", count: 33, meaningKey: "dhikrSubhanallahMeaning" },
-  { id: "alhamdulillah", name: "الْحَمْدُ لِلَّهِ", count: 33, meaningKey: "dhikrAlhamdulillahMeaning" },
-  { id: "allahuakbar", name: "اللَّهُ أَكْبَرُ", count: 34, meaningKey: "dhikrAllahuAkbarMeaning" },
-  { id: "laIlahaIllallah", name: "لا إله إلا الله", count: 100, meaningKey: "dhikrLaIlahaMeaning" },
-  { id: "astaghfirullah", name: "أستغفر الله", count: 100, meaningKey: "dhikrAstaghfirullahMeaning" },
-  { id: "subhanallahiWaBihamdihi", name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 100, meaningKey: "dhikrSubhanallahiWaBihamdihiMeaning" },
-  { id: "salawat", name: "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ", count: 100, meaningKey: "dhikrSalawatMeaning" },
-  { id: "hawqala", name: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", count: 100, meaningKey: "dhikrHawqalaMeaning" },
+  { id: "subhanallah", name: "سُبْحَانَ اللَّهِ", count: 33, meaningKey: "dhikrSubhanallahMeaning", sourceKey: "dhikrSubhanallahSource" },
+  { id: "alhamdulillah", name: "الْحَمْدُ لِلَّهِ", count: 33, meaningKey: "dhikrAlhamdulillahMeaning", sourceKey: "dhikrAlhamdulillahSource" },
+  { id: "allahuakbar", name: "اللَّهُ أَكْبَرُ", count: 34, meaningKey: "dhikrAllahuAkbarMeaning", sourceKey: "dhikrAllahuAkbarSource" },
+  { id: "laIlahaIllallah", name: "لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير", count: 100, meaningKey: "dhikrLaIlahaMeaning", sourceKey: "dhikrLaIlahaSource" },
+  { id: "astaghfirullah", name: "أستغفر الله", count: 100, meaningKey: "dhikrAstaghfirullahMeaning", sourceKey: "dhikrAstaghfirullahSource" },
+  { id: "subhanallahiWaBihamdihi", name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 100, meaningKey: "dhikrSubhanallahiWaBihamdihiMeaning", sourceKey: "dhikrSubhanallahiWaBihamdihiSource" },
+  { id: "salawat", name: "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ", count: 10, meaningKey: "dhikrSalawatMeaning", sourceKey: "dhikrSalawatSource", noFixedCount: true },
+  { id: "hawqala", name: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", count: 10, meaningKey: "dhikrHawqalaMeaning", sourceKey: "dhikrHawqalaSource", noFixedCount: true },
 ];
+
+// Dhikr with no authentic hadith specifying a fixed number default to
+// "no limit" so the app doesn't imply a made-up count is religiously required.
+const DEFAULT_UNLIMITED_IDS = ["salawat", "hawqala"];
 
 const LEGACY_NAME_TO_ID = {
   "سُبْحَانَ اللَّهِ": "subhanallah",
   "الْحَمْدُ لِلَّهِ": "alhamdulillah",
   "اللَّهُ أَكْبَرُ": "allahuakbar",
   "لا إله إلا الله": "laIlahaIllallah",
+  "لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير": "laIlahaIllallah",
   "أستغفر الله": "astaghfirullah",
   "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ": "subhanallahiWaBihamdihi",
 };
@@ -146,7 +157,15 @@ function loadTasbihState() {
       tasbihHistory = _migrateLegacyKeys(parsed);
     }
     const savedUnlimited = localStorage.getItem("tasbihUnlimitedMap");
-    if (savedUnlimited) unlimitedMap = JSON.parse(savedUnlimited) || {};
+    if (savedUnlimited) {
+      unlimitedMap = JSON.parse(savedUnlimited) || {};
+    } else {
+      // First run: default the dhikr with no fixed hadith count to "no limit"
+      DEFAULT_UNLIMITED_IDS.forEach((id) => {
+        unlimitedMap[id] = true;
+      });
+      saveUnlimitedMap();
+    }
 
     const lastDhikrId = localStorage.getItem("lastDhikrId");
     const found = DEFAULT_DHIKR_LIST.find((d) => d.id === lastDhikrId);
@@ -208,6 +227,7 @@ function populateDhikrGrid() {
     card.className = "dhikr-card";
     if (dhikr.id === currentDhikr.id) card.classList.add("active");
     card.dataset.id = dhikr.id;
+    if (dhikr.sourceKey) card.title = t(dhikr.sourceKey) || "";
 
     const nameSpan = document.createElement("span");
     nameSpan.className = "dhikr-name";
@@ -223,7 +243,7 @@ function populateDhikrGrid() {
 
     const countSpan = document.createElement("span");
     countSpan.className = "dhikr-count";
-    countSpan.textContent = dhikr.count;
+    countSpan.textContent = isUnlimited(dhikr.id) ? "∞" : dhikr.count;
     card.appendChild(countSpan);
 
     card.addEventListener("click", () => switchDhikr(dhikr));
@@ -255,13 +275,17 @@ function switchDhikr(dhikr) {
 function updateActiveDhikrPanel() {
   const nameEl = document.getElementById("activeDhikrName");
   const meaningEl = document.getElementById("activeDhikrMeaning");
+  const sourceEl = document.getElementById("activeDhikrSource");
   const lang = getLanguage();
+  const dhikr = DEFAULT_DHIKR_LIST.find((d) => d.id === currentDhikr.id);
   if (nameEl) nameEl.textContent = currentDhikr.name;
   if (meaningEl) {
-    const dhikr = DEFAULT_DHIKR_LIST.find((d) => d.id === currentDhikr.id);
     meaningEl.textContent =
       lang === "ar" ? "" : (dhikr && t(dhikr.meaningKey)) || "";
     meaningEl.classList.toggle("tb-hidden", lang === "ar");
+  }
+  if (sourceEl) {
+    sourceEl.textContent = (dhikr && dhikr.sourceKey && t(dhikr.sourceKey)) || "";
   }
 }
 

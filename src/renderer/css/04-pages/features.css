@@ -173,10 +173,16 @@
   transition: all 0.3s ease;
 }
 
-.feature-icon i {
+.feature-icon i,
+.feature-icon svg {
   font-size: 22px;
   color: var(--accent-color);
   transition: transform 0.3s ease;
+}
+
+.feature-icon svg {
+  width: 22px;
+  height: 22px;
 }
 
 .feature-card:hover .feature-icon {
@@ -184,7 +190,8 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-.feature-card:hover .feature-icon i {
+.feature-card:hover .feature-icon i,
+.feature-card:hover .feature-icon svg {
   transform: scale(1.1);
 }
 
@@ -221,7 +228,8 @@
   border-color: rgba(33, 150, 243, 0.2);
 }
 
-.tasbih-icon i {
+.tasbih-icon i,
+.tasbih-icon svg {
   color: #2196f3;
 }
 
@@ -351,6 +359,11 @@
   font-size: 26px;
 }
 
+.features-container.fullscreen .feature-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
 .features-container.fullscreen .feature-name {
   font-size: 14px;
 }
@@ -447,6 +460,11 @@
 
   .feature-icon i {
     font-size: 20px;
+  }
+
+  .feature-icon svg {
+    width: 20px;
+    height: 20px;
   }
 
   .feature-name {
@@ -549,6 +567,11 @@
     font-size: 20px;
   }
 
+  .feature-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
   .feature-name {
     font-size: 12px;
   }
@@ -596,6 +619,11 @@
 
   .feature-icon i {
     font-size: 18px;
+  }
+
+  .feature-icon svg {
+    width: 18px;
+    height: 18px;
   }
 
   .feature-name {

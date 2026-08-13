@@ -211,9 +211,12 @@ function createAthkarCard(item, index) {
   card.id = `athkar-${athkarId}`;
 
   const currentCount = athkarState[athkarId] || 0;
-  const targetCount = parseInt(item.count) || 1;
-  const progress = Math.min((currentCount / targetCount) * 100, 100);
-  const isCompleted = currentCount >= targetCount;
+  const isUnlimited = item.count === null || item.count === undefined;
+  const targetCount = isUnlimited ? null : parseInt(item.count) || 1;
+  const progress = isUnlimited
+    ? 0
+    : Math.min((currentCount / targetCount) * 100, 100);
+  const isCompleted = !isUnlimited && currentCount >= targetCount;
 
   if (isCompleted) {
     card.classList.add("completed");
@@ -249,17 +252,20 @@ function createAthkarCard(item, index) {
         <div class="count-label">${t("recitations")}</div>
         <div class="count-display">
           <div class="count-value">${currentCount}</div>
-          <div class="count-target">/${targetCount}</div>
+          <div class="count-target">/${isUnlimited ? "∞" : targetCount}</div>
         </div>
       </div>
       
-      <div class="count-progress">
+      <div class="count-progress ${isUnlimited ? "athkar-count-hidden" : ""}">
         <div class="progress-bar" style="width: ${progress}%"></div>
       </div>
       
       <div class="count-buttons">
         <button class="count-btn increment-btn" data-id="${athkarId}" ${isCompleted ? "disabled" : ""}>
           +
+        </button>
+        <button class="count-btn decrement-btn" data-id="${athkarId}" ${currentCount <= 0 ? "disabled" : ""}>
+          −
         </button>
         <button class="count-btn reset-btn" data-id="${athkarId}">
           <i class="fas fa-redo"></i>
@@ -278,9 +284,17 @@ function createAthkarCard(item, index) {
     }
   `;
 
+  const decrementBtn = card.querySelector(".decrement-btn");
   const incrementBtn = card.querySelector(".increment-btn");
   const resetBtn = card.querySelector(".reset-btn");
   const copyBtn = card.querySelector(".copy-btn");
+
+  if (decrementBtn) {
+    decrementBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      decrementCount(athkarId, targetCount);
+    });
+  }
 
   if (incrementBtn) {
     incrementBtn.addEventListener("click", (e) => {
@@ -309,22 +323,35 @@ function createAthkarCard(item, index) {
 function incrementCount(athkarId, targetCount) {
   if (!athkarState[athkarId]) athkarState[athkarId] = 0;
 
-  if (athkarState[athkarId] < targetCount) {
+  const isUnlimited = targetCount === null || targetCount === undefined;
+
+  if (isUnlimited || athkarState[athkarId] < targetCount) {
     athkarState[athkarId]++;
     saveAthkarState();
     updateAthkarCard(athkarId, targetCount);
     showSuccessToast(t("countIncreased"));
 
-    if (athkarState[athkarId] >= targetCount) {
+    if (!isUnlimited && athkarState[athkarId] >= targetCount) {
       const items = athkarData[currentCategory] || [];
       const allDone = items.every((item, idx) => {
         const id = `${currentCategory}-${idx}`;
+        if (item.count === null || item.count === undefined) return true;
         return (athkarState[id] || 0) >= (parseInt(item.count) || 1);
       });
       if (allDone) analytics.athkarCategoryCompleted(currentCategory);
     }
   } else {
     showSuccessToast(t("maxCountReached"), true);
+  }
+}
+
+function decrementCount(athkarId, targetCount) {
+  if (!athkarState[athkarId]) athkarState[athkarId] = 0;
+
+  if (athkarState[athkarId] > 0) {
+    athkarState[athkarId]--;
+    saveAthkarState();
+    updateAthkarCard(athkarId, targetCount);
   }
 }
 
@@ -388,17 +415,25 @@ function updateAthkarCard(athkarId, targetCount = null) {
 
   if (!athkarItem) return;
 
+  const isUnlimited = athkarItem.count === null || athkarItem.count === undefined;
   const currentCount = athkarState[athkarId] || 0;
-  const itemTargetCount = targetCount || parseInt(athkarItem.count) || 1;
-  const progress = Math.min((currentCount / itemTargetCount) * 100, 100);
-  const isCompleted = currentCount >= itemTargetCount;
+  const itemTargetCount = isUnlimited
+    ? null
+    : targetCount || parseInt(athkarItem.count) || 1;
+  const progress = isUnlimited
+    ? 0
+    : Math.min((currentCount / itemTargetCount) * 100, 100);
+  const isCompleted = !isUnlimited && currentCount >= itemTargetCount;
 
   const countValue = card.querySelector(".count-value");
   const countTarget = card.querySelector(".count-target");
+  const decrementBtn = card.querySelector(".decrement-btn");
   const incrementBtn = card.querySelector(".increment-btn");
 
   if (countValue) countValue.textContent = currentCount;
-  if (countTarget) countTarget.textContent = `/${itemTargetCount}`;
+  if (countTarget)
+    countTarget.textContent = `/${isUnlimited ? "∞" : itemTargetCount}`;
+  if (decrementBtn) decrementBtn.disabled = currentCount <= 0;
 
   const progressBar = card.querySelector(".progress-bar");
   if (progressBar) {

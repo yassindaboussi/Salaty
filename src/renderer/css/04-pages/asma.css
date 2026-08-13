@@ -162,26 +162,18 @@
   direction: ltr !important;
 }
 
-/* ========== ARABIC MODE - 2 COLUMN GRID WITH RTL ORDER ========== */
+/* ========== ARABIC MODE - SINGLE COLUMN, FULL EXPLANATIONS ========== */
 [lang="ar"] .asma-list {
   display: flex;
-  flex-wrap: wrap;
-  flex-direction: row-reverse; /* RTL flow */
-  justify-content: flex-start;
+  flex-direction: column;
   gap: 8px;
-  padding: 0 2px;
+  padding: 0 4px;
 }
 
 [lang="ar"] .asma-card {
-  width: calc(50% - 4px); /* 2 cards per row */
-  padding: 10px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80px;
-  height: 100%;
-  text-align: center;
   position: relative;
   direction: rtl; /* RTL inside cards */
   box-sizing: border-box;
@@ -240,45 +232,77 @@
   padding-right: 4px;
 }
 
-/* ========== ARABIC CARD STYLES ========== */
-[lang="ar"] .asma-card .asma-translit,
-[lang="ar"] .asma-card .asma-meaning,
-[lang="ar"] .asma-card .asma-desc {
-  display: none !important;
+/* ========== ARABIC CARD STYLES — full name, meaning & explanation ========== */
+[lang="ar"] .asma-card .asma-translit {
+  display: none !important; /* redundant transliteration for native Arabic readers */
+}
+
+/* Header row: number + name grouped at the start (right), copy button alone at the end (left) */
+[lang="ar"] .asma-card .asma-header-row {
+  display: flex;
+  direction: rtl;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+[lang="ar"] .asma-card .asma-name-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 [lang="ar"] .asma-card .asma-name {
-  font-size: 18px;
+  font-family: "Scheherazade New", "Traditional Arabic", "Segoe UI", Tahoma, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
   margin: 0;
-  text-align: center;
-  justify-content: center;
-  flex: none;
-  padding: 4px 0;
+  text-align: right;
+  justify-content: flex-end;
   min-height: auto;
-  width: 100%;
-  line-height: 1.4;
+  line-height: 1.5;
+  padding-right: 0;
 }
 
-/* For Arabic RTL: number on right, copy button on left */
+[lang="ar"] .asma-card .asma-meaning {
+  display: block !important;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent-color);
+  text-align: right;
+  direction: rtl;
+  line-height: 1.6;
+  margin: 0 0 6px;
+}
+
+[lang="ar"] .asma-card .asma-desc {
+  display: block !important;
+  font-size: 14.5px;
+  color: var(--text-secondary);
+  text-align: right;
+  direction: rtl;
+  line-height: 1.75;
+  opacity: 0.9;
+  overflow: visible;
+  margin: 0;
+}
+
+/* Number + copy button now sit inline in the header row, not floating corners */
 [lang="ar"] .asma-card .asma-number {
-  position: absolute;
-  top: 6px;
-  right: 6px; /* RTL: number on right side */
-  left: auto;
-  width: 24px;
-  height: 24px;
-  font-size: 10px;
+  position: static;
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
   margin: 0;
 }
 
 [lang="ar"] .asma-card .asma-copy-btn {
-  position: absolute;
-  top: 6px;
-  left: 6px; /* RTL: copy button on left side */
-  right: auto;
+  position: static;
   margin: 0;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
 }
 /* ========== END ARABIC MODE ========== */
 
@@ -439,29 +463,33 @@
   gap: 12px;
 }
 
-/* Fullscreen mode for Arabic - KEEP 2 COLUMNS */
+/* Fullscreen mode for Arabic — single column so the full explanation stays readable */
 .asma-container.fullscreen[lang="ar"] .asma-list,
 [lang="ar"] .asma-container.fullscreen .asma-list {
   display: flex;
-  flex-wrap: wrap;
-  flex-direction: row-reverse; /* Keep RTL flow */
-  justify-content: flex-start;
+  flex-direction: column;
   gap: 12px;
   padding: 0 8px;
 }
 
 .asma-container.fullscreen[lang="ar"] .asma-card,
 [lang="ar"] .asma-container.fullscreen .asma-card {
-  width: calc(50% - 6px); /* Keep 2 columns in fullscreen */
-  padding: 16px;
-  min-height: 100px;
+  padding: 18px 20px;
 }
 
 .asma-container.fullscreen[lang="ar"] .asma-name,
 [lang="ar"] .asma-container.fullscreen .asma-name {
-  font-size: 22px;
-  padding: 8px 0;
-  margin-left: 0;
+  font-size: 30px;
+}
+
+.asma-container.fullscreen[lang="ar"] .asma-meaning,
+[lang="ar"] .asma-container.fullscreen .asma-meaning {
+  font-size: 17px;
+}
+
+.asma-container.fullscreen[lang="ar"] .asma-desc,
+[lang="ar"] .asma-container.fullscreen .asma-desc {
+  font-size: 16px;
 }
 
 .asma-container.fullscreen[lang="ar"] .asma-number,
@@ -469,16 +497,12 @@
   width: 28px;
   height: 28px;
   font-size: 12px;
-  top: 10px;
-  right: 10px;
 }
 
 .asma-container.fullscreen[lang="ar"] .asma-copy-btn,
 [lang="ar"] .asma-container.fullscreen .asma-copy-btn {
   width: 28px;
   height: 28px;
-  top: 10px;
-  left: 10px;
 }
 /* ========== END FULLSCREEN MODE ========== */
 
@@ -586,30 +610,31 @@
     font-size: 17px;
   }
 
-  /* Arabic grid responsive */
+  /* Arabic single-column responsive */
   [lang="ar"] .asma-list {
     gap: 6px;
     padding: 0 2px;
   }
 
   [lang="ar"] .asma-card {
-    width: calc(50% - 3px);
-    padding: 8px;
-    min-height: 70px;
+    padding: 10px 12px;
   }
 
   [lang="ar"] .asma-card .asma-name {
-    font-size: 16px;
-    padding: 3px 0;
+    font-size: 20px;
+  }
+
+  [lang="ar"] .asma-card .asma-meaning {
+    font-size: 13px;
+  }
+
+  [lang="ar"] .asma-card .asma-desc {
+    font-size: 12.5px;
   }
 
   .asma-name {
     font-size: 18px;
     margin-left: 28px;
-  }
-
-  [lang="ar"] .asma-name {
-    font-size: 16px;
   }
 
   .asma-card {
@@ -624,15 +649,11 @@
     width: 22px;
     height: 22px;
     font-size: 9px;
-    top: 4px;
-    right: 4px;
   }
 
   [lang="ar"] .asma-card .asma-copy-btn {
     width: 22px;
     height: 22px;
-    top: 4px;
-    left: 4px;
   }
 
   [lang="ar"] .asma-card .asma-copy-btn i {
@@ -648,8 +669,7 @@
 
   .asma-container.fullscreen[lang="ar"] .asma-card,
   [lang="ar"] .asma-container.fullscreen .asma-card {
-    width: calc(50% - 4px); /* 2 columns on mobile even in fullscreen */
-    padding: 12px;
+    padding: 12px 14px;
   }
 }
 
@@ -708,20 +728,26 @@
     height: 10px;
   }
 
-  /* Arabic grid mobile adjustment */
+  /* Arabic mobile adjustment */
   [lang="ar"] .asma-list {
     gap: 4px;
     padding: 0 1px;
   }
 
   [lang="ar"] .asma-card {
-    width: calc(50% - 2px);
-    padding: 6px;
-    min-height: 60px;
+    padding: 8px 10px;
   }
 
   [lang="ar"] .asma-card .asma-name {
-    font-size: 14px;
+    font-size: 17px;
+  }
+
+  [lang="ar"] .asma-card .asma-meaning {
+    font-size: 12px;
+  }
+
+  [lang="ar"] .asma-card .asma-desc {
+    font-size: 11.5px;
   }
 }
 
@@ -736,12 +762,11 @@
   }
 
   [lang="ar"] .asma-card {
-    padding: 5px;
-    min-height: 55px;
+    padding: 7px 9px;
   }
 
   [lang="ar"] .asma-card .asma-name {
-    font-size: 13px;
+    font-size: 15px;
   }
 }
 

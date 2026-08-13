@@ -5,6 +5,7 @@
       "transliteration": "SubhanAllah",
       "translation": "Glory be to Allah",
       "count": 33,
+      "source": "Sahih Muslim 596 — 33x after each obligatory prayer",
       "category": "tasbih"
     },
     {
@@ -12,6 +13,7 @@
       "transliteration": "Alhamdulillah",
       "translation": "Praise be to Allah",
       "count": 33,
+      "source": "Sahih Muslim 596 — 33x after each obligatory prayer",
       "category": "tasbih"
     },
     {
@@ -19,13 +21,15 @@
       "transliteration": "Allahu Akbar",
       "translation": "Allah is the Greatest",
       "count": 34,
+      "source": "Sahih Muslim 596 — 34x after each obligatory prayer, completing the 100",
       "category": "tasbih"
     },
     {
-      "name": "لا إله إلا الله",
-      "transliteration": "La ilaha illallah",
-      "translation": "There is no god but Allah",
+      "name": "لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير",
+      "transliteration": "La ilaha illallah wahdahu la sharika lah, lahul mulku wa lahul hamd, wa huwa ala kulli shay'in qadir",
+      "translation": "None has the right to be worshipped but Allah alone, with no partner. His is the dominion and praise, and He is over all things Omnipotent",
       "count": 100,
+      "source": "Sahih al-Bukhari 6403, Sahih Muslim 2691 — 100x a day",
       "category": "tasbih"
     },
     {
@@ -33,27 +37,31 @@
       "transliteration": "Astaghfirullah",
       "translation": "I seek forgiveness from Allah",
       "count": 100,
+      "source": "Sahih Muslim 2702 — the Prophet ﷺ sought forgiveness 100x a day",
       "category": "tasbih"
     },
     {
       "name": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
       "transliteration": "SubhanAllahi wa bihamdihi",
-      "translation": "Glory be to Allah and praise Him",
+      "translation": "Glory be to Allah, and praise Him",
       "count": 100,
+      "source": "Sahih al-Bukhari 6405 — 100x a day",
       "category": "tasbih"
     },
     {
-      "name": "سُبْحَانَ اللَّهِ الْعَظِيمِ",
-      "transliteration": "SubhanAllah al-Azeem",
-      "translation": "Glory be to Allah, the Great",
-      "count": 100,
+      "name": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ",
+      "transliteration": "Allahumma salli 'ala Muhammadin wa 'ala aali Muhammad",
+      "translation": "O Allah, send blessings upon Muhammad and upon the family of Muhammad",
+      "count": null,
+      "source": "No authentic hadith fixes a specific number — recite it as often as possible",
       "category": "tasbih"
     },
     {
-      "name": "لا حَوْلَ وَلا قُوَّةَ إِلا بِاللَّهِ",
+      "name": "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
       "transliteration": "La hawla wa la quwwata illa billah",
-      "translation": "There is no power nor strength except with Allah",
-      "count": 100,
+      "translation": "There is no power nor might except with Allah",
+      "count": null,
+      "source": "No authentic hadith fixes a specific number — described as a \"treasure of Paradise\" (Sahih al-Bukhari 4205, Sahih Muslim 2704); recite it often",
       "category": "tasbih"
     }
   ]
