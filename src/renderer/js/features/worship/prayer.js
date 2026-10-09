@@ -1,16 +1,16 @@
 "use strict";
 
 const { ipcRenderer } = require("electron");
-const {
-  translations,
-  getLanguage,
-  t,
-} = require("../../core/i18n/translations");
+const { getLanguage, t } = require("../../core/i18n/translations");
 const { showToast } = require("../../core/toast");
 const {
+  PRAYER_KEYS,
   formatTime,
   getCurrentAndNext,
+  isFridayIn,
+  displayPrayerKey,
 } = require("../../../../shared/prayerUtils");
+const { ALADHAN_API, locationQuery } = require("../../../../shared/aladhan");
 const {
   getGregorianDate,
   getHijriDate,
@@ -34,7 +34,7 @@ async function loadPrayerTimes() {
   }
 
   try {
-    const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(state.settings.city)}&country=${encodeURIComponent(state.settings.country)}`;
+    const url = `${ALADHAN_API}/timingsByCity?${locationQuery(state.settings)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
@@ -54,6 +54,16 @@ async function loadPrayerTimes() {
 
 function updatePrayerUI() {
   _renderPrayerUI();
+}
+
+// Name shown for a prayer. On Fridays (in the prayer location's own time zone) Dhuhr reads
+// "Jumu'ah". Only the label changes: timings and the per-prayer adhan settings stay keyed by
+// the original key ("Dhuhr").
+function prayerDisplayName(key) {
+  const shownKey = displayPrayerKey(key, {
+    isFriday: isFridayIn(prayerData?.meta?.timezone),
+  });
+  return t(shownKey, "prayerNames");
 }
 
 function _renderPrayerUI() {
@@ -102,7 +112,9 @@ function _renderPrayerUI() {
   if (loadingEl) loadingEl.style.display = "none";
 
   adhanByPrayer = { ...(state.settings.adhanEnabledByPrayer ?? {}) };
-  const prayerKeys = Object.keys(translations[lang]?.prayerNames ?? {});
+  // The five daily prayers. (Not the translation keys: prayerNames also holds the
+  // "Jumuah" label, which is a name for Friday's Dhuhr, not a sixth prayer.)
+  const prayerKeys = PRAYER_KEYS;
   prayerKeys.forEach((k) => {
     if (adhanByPrayer[k] === undefined) adhanByPrayer[k] = true;
   });
@@ -112,7 +124,7 @@ function _renderPrayerUI() {
 
   listEl.innerHTML = prayerKeys
     .map((key) => {
-      const name = t(key, "prayerNames");
+      const name = prayerDisplayName(key);
       const time = prayerData.timings[key];
       const icon = prayerIcons[key] ?? "clock";
       const cur = key === currentActivePrayer;
@@ -144,16 +156,14 @@ function _renderPrayerUI() {
 function updateCurrentAndNextPrayer() {
   if (!prayerData?.timings) return;
   try {
-    const lang = getLanguage();
     const now = new Date();
     const nowSec =
       now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-    const keys = Object.keys(translations[lang]?.prayerNames ?? {});
     const { currentPrayer, nextPrayer, timeRemaining } = getCurrentAndNext(
       nowSec,
       prayerData.timings,
-      keys,
-      (k) => t(k, "prayerNames"),
+      PRAYER_KEYS,
+      prayerDisplayName,
     );
 
     if (!currentPrayer || !nextPrayer) return;

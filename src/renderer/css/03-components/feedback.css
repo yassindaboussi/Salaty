@@ -1,0 +1,96 @@
+/*
+  Feedback messages shared by several pages: toast, loading text, error box with a retry button.
+*/
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--black-a85);
+  color: var(--text-bright);
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: var(--z-above-chrome);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 3px 16px var(--black-a20);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast i {
+  font-size: 14px;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.error-message {
+  text-align: center;
+  padding: 20px;
+  color: var(--color-danger);
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 10px;
+  margin: 10px;
+  border: 1px solid rgba(255, 107, 107, 0.2);
+}
+
+.error-message i {
+  font-size: 24px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.error-message div {
+  margin-bottom: 15px;
+  color: var(--text-bright);
+}
+
+.retry-button {
+  background: var(--accent-color, #4a6bff);
+  color: var(--text-bright);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.retry-button:active {
+  transform: translateY(0);
+}
+
+.retry-button i {
+  font-size: 12px;
+}
+
+/* ── Arabic ──
+   Error boxes and retry buttons can sit inside a container that is forced LTR
+   (to keep its scrollbar on the right), so they set RTL themselves. */
+[dir="rtl"] .error-message,
+[dir="rtl"] .retry-button {
+  direction: rtl;
+}

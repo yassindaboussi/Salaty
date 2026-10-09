@@ -1,11 +1,8 @@
 /* Draggable Area */
 .drag-area {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000;
+  inset: 0;
+  z-index: var(--z-drag-area);
   pointer-events: none;
   -webkit-app-region: drag;
 }
@@ -21,19 +18,15 @@
   pointer-events: auto;
   justify-content: space-between;
   gap: 12px;
-  z-index: 1100;
+  z-index: var(--z-window-controls);
   align-items: center;
+  direction: ltr; /* same button order as the OS title bar, in every language */
 }
 
 .window-controls .right-controls {
   display: flex;
   gap: 12px;
   margin-left: auto;
-}
-
-/* Fullscreen mode */
-body.fullscreen .app-container {
-  border-radius: 20;
 }
 
 /* Interactive Elements (make them non-draggable) */
@@ -55,6 +48,6 @@ a,
   margin: 0 12px;
   -webkit-app-region: drag;
   cursor: move;
-  z-index: 1100;
+  z-index: var(--z-window-controls);
   position: relative;
 }

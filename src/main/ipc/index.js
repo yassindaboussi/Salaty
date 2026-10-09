@@ -15,6 +15,13 @@ function setupHandlers(mainWindow) {
           if (mainWindow && !mainWindow.isDestroyed()) {
             mainWindow.webContents.send("location-changed");
           }
+          // The desktop widget already listens for fresh data; without this it kept the
+          // old city/method's times until its own hourly refresh.
+          const widget = popupHandlers.getPrayerWidgetWindow();
+          const data = prayerTimerManager.getPrayerData();
+          if (widget && !widget.isDestroyed() && data) {
+            widget.webContents.send("prayer-data-from-main", data);
+          }
         })
         .catch((err) => {
           console.error("[IPC] reloadPrayerData failed:", err);

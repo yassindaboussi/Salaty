@@ -6,8 +6,12 @@ const {
   setupConnectionRecovery,
 } = require("../../services/connection-recovery");
 const analytics = require("../../utils/analytics");
-
-const PRAYER_KEYS = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+const {
+  PRAYER_KEYS,
+  JUMUAH_KEY,
+  displayPrayerKey,
+} = require("../../../../shared/prayerUtils");
+const { ALADHAN_API, locationQuery } = require("../../../../shared/aladhan");
 
 let viewYear = 0;
 let viewMonth = 0;
@@ -80,18 +84,17 @@ async function _loadMonth(scrollToToday = false, instant = false) {
     return;
   }
 
-  const cacheKey = `${viewYear}-${viewMonth}`;
+  // Same location/method query as the home page, so both show the same times. It is also
+  // part of the cache key, so a different city or method never reuses another month's data.
+  const query = locationQuery(state.settings);
+  const cacheKey = `${viewYear}-${viewMonth}|${query}`;
   let days = monthCache[cacheKey];
 
   if (!days) {
     _showLoading(true);
     _showTable(false);
     try {
-      const method = state.settings.method || 2;
-      const url =
-        `https://api.aladhan.com/v1/calendarByCity?city=${encodeURIComponent(city)}` +
-        `&country=${encodeURIComponent(country)}&method=${method}` +
-        `&month=${viewMonth}&year=${viewYear}`;
+      const url = `${ALADHAN_API}/calendarByCity?${query}&month=${viewMonth}&year=${viewYear}`;
       const res = await fetch(url);
       const json = await res.json();
       if (json?.code !== 200 || !Array.isArray(json.data)) {
@@ -141,11 +144,11 @@ function _renderTodayCard(days) {
   if (!todayEntry) {
     dateEl.textContent = "";
     rowEl.innerHTML = "";
-    document.getElementById("mptTodayCard")?.classList.add("mpt-hidden");
+    document.getElementById("mptTodayCard")?.classList.add("hidden");
     return;
   }
 
-  document.getElementById("mptTodayCard")?.classList.remove("mpt-hidden");
+  document.getElementById("mptTodayCard")?.classList.remove("hidden");
 
   const lang = getLanguage();
   const langTag = lang === "ar" ? "ar" : lang === "fr" ? "fr" : "en";
@@ -168,14 +171,18 @@ function _renderTodayCard(days) {
     }
   }
 
+  const nameOpts = {
+    isFriday: _isFridayEntry(todayEntry, gDate),
+  };
   rowEl.innerHTML = PRAYER_KEYS.map((key) => {
     const time = _cleanTime(todayEntry.timings[key]);
     const isNext = key === nextKey;
+    const nameKey = displayPrayerKey(key, nameOpts);
     return `
-      <div class="mpt-today-cell${isNext ? " mpt-today-cell--next" : ""}">
+      <div class="monthly-today-cell${isNext ? " monthly-today-cell--next" : ""}">
         <i class="fas fa-${prayerIcons[key] || "clock"}"></i>
-        <div class="mpt-today-cell-name">${t(key, "prayerNames") || key}</div>
-        <div class="mpt-today-cell-time">${time}</div>
+        <div class="monthly-today-cell-name">${t(nameKey, "prayerNames") || nameKey}</div>
+        <div class="monthly-today-cell-time">${time}</div>
       </div>
     `;
   }).join("");
@@ -194,6 +201,10 @@ function _renderTable(days) {
     `<th>${t("date", "common") || "Date"}</th>` +
     PRAYER_KEYS.map((k) => `<th>${t(k, "prayerNames") || k}</th>`).join("");
 
+  // The header has one Dhuhr column for the whole month, so Friday rows get a small
+  // "Jumu'ah" badge in their Dhuhr cell instead (same time, only the name differs).
+  const jumuahLabel = t(JUMUAH_KEY, "prayerNames") || JUMUAH_KEY;
+
   body.innerHTML = days
     .map((entry) => {
       const day = parseInt(entry.date.gregorian.day, 10);
@@ -201,16 +212,21 @@ function _renderTable(days) {
       const weekday = gDate.toLocaleDateString(langTag, { weekday: "short" });
       const iso = _entryIso(entry);
       const isToday = iso === todayIso;
+      const jumuah = _isFridayEntry(entry, gDate);
 
-      const cells = PRAYER_KEYS.map(
-        (key) => `<td>${_cleanTime(entry.timings[key])}</td>`,
-      ).join("");
+      const cells = PRAYER_KEYS.map((key) => {
+        const time = _cleanTime(entry.timings[key]);
+        if (jumuah && displayPrayerKey(key, { isFriday: true }) === JUMUAH_KEY) {
+          return `<td class="monthly-jumuah">${time}<span class="monthly-jumuah-badge">${jumuahLabel}</span></td>`;
+        }
+        return `<td>${time}</td>`;
+      }).join("");
 
       return `
-        <tr class="${isToday ? "mpt-today-row-highlight" : ""}">
-          <td class="mpt-date-cell">
-            <span class="mpt-date-day">${day}</span>
-            <span class="mpt-date-weekday">${weekday}</span>
+        <tr class="${isToday ? "monthly-today-row-highlight" : ""}">
+          <td class="monthly-date-cell">
+            <span class="monthly-date-day">${day}</span>
+            <span class="monthly-date-weekday">${weekday}</span>
           </td>
           ${cells}
         </tr>
@@ -221,20 +237,27 @@ function _renderTable(days) {
 
 function _scrollToTodayRow(instant = false) {
   requestAnimationFrame(() => {
-    const row = document.querySelector(".mpt-today-row-highlight");
+    const row = document.querySelector(".monthly-today-row-highlight");
     row?.scrollIntoView({ behavior: instant ? "auto" : "smooth", block: "center" });
   });
 }
 
 
 function _showLoading(visible) {
-  document.getElementById("mptLoading")?.classList.toggle("mpt-hidden", !visible);
+  document.getElementById("mptLoading")?.classList.toggle("hidden", !visible);
 }
 
 function _showTable(visible) {
-  document.getElementById("mptTable")?.classList.toggle("mpt-hidden", !visible);
+  document.getElementById("mptTable")?.classList.toggle("hidden", !visible);
 }
 
+
+// Whether a calendar day is a Friday. Uses the weekday Aladhan gives for that date (a
+// calendar date, so there is no time-zone question); falls back to the local Date.
+function _isFridayEntry(entry, gDate) {
+  const weekday = entry?.date?.gregorian?.weekday?.en;
+  return weekday ? weekday === "Friday" : gDate.getDay() === 5;
+}
 
 function _entryIso(entry) {
   const [d, m, y] = String(entry.date.gregorian.date).split("-");

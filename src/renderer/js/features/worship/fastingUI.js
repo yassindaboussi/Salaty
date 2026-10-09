@@ -140,10 +140,10 @@ function _renderHero() {
 
   const next = occasionsCache[0];
   if (!next) {
-    hero.classList.add("vf-hidden");
+    hero.classList.add("hidden");
     return;
   }
-  hero.classList.remove("vf-hidden");
+  hero.classList.remove("hidden");
 
   const meta = OCCASION_META[next.type] || {};
   document.getElementById("vfHeroIcon").innerHTML =
@@ -160,13 +160,13 @@ function _renderHero() {
   const btn = document.getElementById("vfHeroToggle");
   const label = document.getElementById("vfHeroToggleLabel");
   const isOn = _isReminderOn(next.id);
-  btn.classList.toggle("vf-active", isOn);
+  btn.classList.toggle("fasting-active", isOn);
   btn.title = _currentLeadLabel();
   label.textContent = t(isOn ? "reminderOn" : "remindMe");
   btn.onclick = () => {
     _toggleReminder(next.id);
     const nowOn = _isReminderOn(next.id);
-    btn.classList.toggle("vf-active", nowOn);
+    btn.classList.toggle("fasting-active", nowOn);
     label.textContent = t(nowOn ? "reminderOn" : "remindMe");
     _renderList();
   };
@@ -179,7 +179,7 @@ function _renderList() {
   const rest = occasionsCache.slice(1);
 
   if (rest.length === 0 && occasionsCache.length === 0) {
-    listEl.innerHTML = `<div class="vf-empty">${_escape(t("noUpcomingFastingDays") || "")}</div>`;
+    listEl.innerHTML = `<div class="fasting-empty">${_escape(t("noUpcomingFastingDays") || "")}</div>`;
     return;
   }
   if (rest.length === 0) {
@@ -194,7 +194,7 @@ function _renderList() {
       const id = el.dataset.occasionId;
       _toggleReminder(id);
       const nowOn = _isReminderOn(id);
-      el.classList.toggle("vf-active", nowOn);
+      el.classList.toggle("fasting-active", nowOn);
     });
   });
 }
@@ -206,20 +206,20 @@ function _renderItem(o) {
   const isOn = _isReminderOn(o.id);
 
   return `
-    <div class="vf-item">
-      <div class="vf-item-icon"><i class="fas ${meta.icon || "fa-utensils"}"></i></div>
-      <div class="vf-item-info">
-        <div class="vf-item-title">${_escape(title)}</div>
-        <div class="vf-item-meta">
-          <span class="vf-item-date-chip">${_escape(_relativeLabel(o.gregorianDate))}</span>
+    <div class="fasting-item">
+      <div class="fasting-item-icon"><i class="fas ${meta.icon || "fa-utensils"}"></i></div>
+      <div class="fasting-item-info">
+        <div class="fasting-item-title">${_escape(title)}</div>
+        <div class="fasting-item-meta">
+          <span class="fasting-item-date-chip">${_escape(_relativeLabel(o.gregorianDate))}</span>
           <span>•</span>
           <span>${_escape(_formatDateLine(o))}</span>
         </div>
-        <div class="vf-item-desc">${_escape(desc)}</div>
+        <div class="fasting-item-desc">${_escape(desc)}</div>
       </div>
       <button
         type="button"
-        class="vf-bell-btn${isOn ? " vf-active" : ""}"
+        class="fasting-bell-btn${isOn ? " fasting-active" : ""}"
         data-occasion-id="${_escape(o.id)}"
         aria-label="${_escape(t("remindMe") || "Remind me")}"
         title="${_escape(_currentLeadLabel())}"

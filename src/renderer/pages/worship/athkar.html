@@ -4,12 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Athkar - Salaty Time</title>
-    <link
-      rel="stylesheet"
-      href="../../vendor/fontawesome/css/all.min.css"
-    />
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/athkar.css" />
+    <link rel="stylesheet" href="../../css/03-components/success-toast.css" />
     <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
   </head>
   <body class="page-loading">
@@ -17,7 +14,7 @@
       <div class="drag-area"></div>
 
       <div class="athkar-container">
-        <div class="athkar-header">
+        <div class="page-header athkar-header">
           <!-- Back button -->
           <button
             class="back-btn"
@@ -29,10 +26,10 @@
           </button>
 
           <!-- Centered title -->
-          <h2 class="athkar-title" id="athkarTitle">Athkar</h2>
+          <h2 class="page-header__title athkar-title" id="athkarTitle">Athkar</h2>
 
           <!-- Controls with minimize, fullscreen, reset, and close -->
-          <div class="athkar-controls">
+          <div class="page-header__controls athkar-controls">
             <!-- Reset all button -->
             <button
               class="control-btn reset-all-btn"
@@ -81,28 +78,58 @@
           </div>
         </div>
 
-        <!-- Category Navigation -->
-        <div class="category-nav" id="categoryNav">
-          <!-- Categories will be dynamically loaded -->
+        <!-- Search -->
+        <div class="athkar-search">
+          <button
+            class="athkar-sidebar-toggle"
+            id="sidebarToggleBtn"
+            type="button"
+            aria-label="Collapse categories"
+            data-tooltip="tooltipCollapseSidebar"
+          >
+            <i class="fas fa-table-columns"></i>
+          </button>
+          <div class="athkar-search-field">
+            <i class="fas fa-magnifying-glass athkar-search-icon"></i>
+            <input
+              type="text"
+              id="athkarSearchInput"
+              class="athkar-search-input"
+              placeholder="Search for a dhikr or dua..."
+              autocomplete="off"
+            />
+          </div>
         </div>
 
-        <!-- Athkar Content -->
-        <div class="athkar-content" id="athkarContent">
-          <div class="athkar-loading" id="athkarLoading">
-            <div class="athkar-loading-content">
-              <i class="fas fa-book-open fa-spin"></i>
-              <span id="loadingText">Loading Athkar...</span>
-            </div>
+        <!-- Two-pane body: category sidebar + athkar content -->
+        <div class="athkar-body">
+          <!-- Category Navigation (grouped, collapsible sidebar) -->
+          <div class="category-nav" id="categoryNav">
+            <!-- Groups + categories will be dynamically loaded -->
           </div>
 
-          <div class="athkar-list" id="athkarList">
-            <!-- Athkar cards will be loaded here -->
+          <!-- Athkar Content -->
+          <div class="athkar-content" id="athkarContent">
+            <div class="athkar-loading" id="athkarLoading">
+              <div class="athkar-loading-content">
+                <i class="fas fa-book-open athkar-loading-icon"></i>
+                <span class="athkar-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+                <span id="loadingText">Loading Athkar...</span>
+              </div>
+            </div>
+
+            <div class="athkar-list" id="athkarList">
+              <!-- Athkar cards will be loaded here -->
+            </div>
           </div>
         </div>
 
         <div class="athkar-footer">
           <div class="athkar-footer-text" id="athkarFooterText">
             Remembrances from the Sunnah
+          </div>
+          <div class="athkar-footer-text athkar-footer-verified" id="athkarFooterVerified">
+            Hadith references verified against sunnah.com
           </div>
         </div>
       </div>

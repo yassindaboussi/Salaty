@@ -6,6 +6,7 @@ const {
   t,
   getLanguage,
   whenReady,
+  applyLanguageDirection,
 } = require("../../js/core/i18n/translations");
 
 const MP3QURAN_LANG = { en: "eng", ar: "ar", fr: "fr" };
@@ -87,7 +88,10 @@ class AlbumsManager {
       if (settings) {
         const { state } = require("../../js/core/globalStore");
         state.settings = { ...state.settings, ...settings };
-        if (settings.language) setLanguage(settings.language);
+        if (settings.language) {
+          setLanguage(settings.language);
+          applyLanguageDirection(); // <html dir="rtl" lang="ar"> in Arabic, like the other pages
+        }
         if (settings.theme) {
           const app = document.getElementById("app");
           if (app) {

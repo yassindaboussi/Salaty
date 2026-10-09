@@ -7,13 +7,14 @@
   max-width: 500px;
   background: var(--bg-surface);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(var(--accent-rgb), 0.2); /* Fix variable */
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
   border-radius: 0 0 12px 12px;
   padding: 8px 16px;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
+  box-shadow: 0 4px 12px var(--black-a20);
+  z-index: var(--z-floating);
+
   /* Fully removed from the render tree by default — not just invisible.
      Electron's own docs note that draggable regions "ignore all pointer
      events," meaning drag-region hit-testing operates independently of
@@ -85,13 +86,14 @@
 }
 
 .mini-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--surface-3);
 }
 
 .mini-play-btn {
   background: var(--accent-color);
-  color: white;
+  color: var(--text-bright);
 }
+
 .mini-play-btn:hover {
   background: var(--accent-color);
   filter: brightness(1.1);
@@ -102,8 +104,17 @@
   opacity: 0.6;
   font-size: 12px;
 }
+
 .mini-close-btn:hover {
   opacity: 1;
   background: rgba(244, 67, 54, 0.15);
-  color: #f44336;
+  color: var(--red-500);
+}
+
+/* Arabic: the previous/next arrows point the other way. Flipping the icon (not the
+   button) reverses the arrow without changing click targets or layout. */
+[dir="rtl"] .mini-prev-btn i,
+[dir="rtl"] .mini-next-btn i {
+  display: inline-block;
+  transform: scaleX(-1);
 }

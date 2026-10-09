@@ -1,17 +1,50 @@
 /*
-  Main renderer stylesheet bundle.
-  Order matters: settings -> base -> layout -> reusable components -> utilities -> RTL overrides.
-  Page-specific CSS is linked by each HTML page from css/04-pages/.
+  Main renderer stylesheet.
+
+  Cascade layers decide which rule wins, in this order (a later layer always wins over an
+  earlier one, whatever the selectors):
+    vendor -> tokens -> base -> themes -> layout -> components -> pages -> utilities
+
+  vendor      third-party CSS (Font Awesome; Tom Select is imported by settings.css)
+  tokens      design tokens: colours, layers (z-index), fonts, spacing   00-settings/tokens.css
+  base        reset, scrollbar, shared animations                        01-base/
+  themes      the 13 colour themes                                       00-settings/themes.css
+  layout      frameless-window chrome                                    02-layout/
+  components  reusable pieces (buttons, page header, cards, toasts...)   03-components/
+  pages       one file per page, linked by that page's HTML              04-pages/
+  utilities   tiny helpers that must always win (.hidden)                06-utilities/
+
+  Themes come after base so a theme's background replaces the default one. Pages come
+  after components so a page can adjust a shared component with a normal rule (no
+  !important). Every app file is in a layer: page files wrap their rules in
+  `@layer pages { }`, and the component files a page links itself use
+  `@layer components { }`.
+
+  Arabic (RTL): spacing uses logical properties (margin-inline-start, inset-inline-start,
+  text-align: start, ...) which mirror by themselves; the few real Arabic-only rules live
+  next to the component they change.
+
+  Naming: lowercase-with-dashes. Shared components use BEM (`block__element--modifier`,
+  e.g. .page-header__title). Page classes start with the page name (.athkar-card,
+  .tasbih-ring). States are added next to a block class (.athkar-card.active), never
+  styled on their own.
 */
-@import url("./01-base/reset.css");
-@import url("./02-layout/window.css");
-@import url("./00-settings/themes.css");
-@import url("./03-components/buttons.css");
-@import url("./03-components/prayer-cards.css");
-@import url("./03-components/adhan-toggle.css");
-@import url("./03-components/modals.css");
-@import url("./03-components/mini-player.css");
-@import url("./03-components/banners.css");
-@import url("./03-components/tooltips.css");
-@import url("./06-utilities/utilities.css");
-@import url("./01-base/rtl.css");
+@layer vendor, tokens, base, themes, layout, components, pages, utilities;
+
+@import url("../vendor/fontawesome/css/all.min.css") layer(vendor);
+@import url("./00-settings/tokens.css") layer(tokens);
+@import url("./01-base/reset.css") layer(base);
+@import url("./01-base/scrollbar.css") layer(base);
+@import url("./01-base/animations.css") layer(base);
+@import url("./00-settings/themes.css") layer(themes);
+@import url("./02-layout/window.css") layer(layout);
+@import url("./03-components/buttons.css") layer(components);
+@import url("./03-components/page-header.css") layer(components);
+@import url("./03-components/prayer-cards.css") layer(components);
+@import url("./03-components/adhan-toggle.css") layer(components);
+@import url("./03-components/modals.css") layer(components);
+@import url("./03-components/mini-player.css") layer(components);
+@import url("./03-components/banners.css") layer(components);
+@import url("./03-components/selection-copy.css") layer(components);
+@import url("./03-components/feedback.css") layer(components);
+@import url("./06-utilities/utilities.css") layer(utilities);

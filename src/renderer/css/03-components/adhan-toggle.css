@@ -8,21 +8,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--surface-3);
   backdrop-filter: blur(5px);
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-soft);
   font-size: 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
   -webkit-app-region: no-drag;
 }
 
 .adhan-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--surface-active);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .adhan-toggle-btn:active {
@@ -46,7 +46,11 @@
   top: 0;
   left: 0;
   pointer-events: none;
-  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+  background-image: radial-gradient(
+    circle,
+    var(--white) 10%,
+    transparent 10.01%
+  );
   background-repeat: no-repeat;
   background-position: 50%;
   transform: scale(10, 10);
@@ -62,6 +66,8 @@
   transition: 0s;
 }
 
-.adhan-toggle-icon {
-  margin: 0 !important;
+/* Also matches inside a prayer row, so it wins over `.prayer-item i` without !important */
+.adhan-toggle-icon,
+.prayer-item .adhan-toggle-icon {
+  margin: 0;
 }

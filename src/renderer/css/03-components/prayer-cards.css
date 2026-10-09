@@ -1,12 +1,12 @@
 /* Prayer Cards */
 .prayer-card {
   flex: 1;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-1);
   border-radius: 12px;
   padding: 12px 8px;
   text-align: center;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px var(--black-a10);
   position: relative;
   overflow: hidden;
   min-height: 105px;
@@ -22,11 +22,7 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.1) 0%,
-    transparent 60%
-  );
+  background: radial-gradient(circle, var(--surface-3) 0%, transparent 60%);
   opacity: 0;
   transition: opacity 0.5s ease;
   pointer-events: none;
@@ -42,19 +38,19 @@
     rgba(var(--accent-rgb, 74, 107, 255), 0.9),
     rgba(var(--accent-rgb, 74, 107, 255), 0.7)
   );
-  color: white;
+  color: var(--text-bright);
   box-shadow: 0 4px 20px rgba(var(--accent-rgb, 74, 107, 255), 0.2);
 }
 
 .prayer-card.next {
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface-1);
+  color: var(--text-soft);
+  border: 1px solid var(--border-medium);
 }
 
 .prayer-card.next .prayer-name,
 .prayer-card.next .prayer-time {
-  color: #fff;
+  color: var(--text-bright);
 }
 
 .prayer-card.next .countdown {
@@ -112,11 +108,12 @@
   padding: 8px 12px;
   margin: 4px 0;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--surface-3);
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
   position: relative;
   overflow: hidden;
+  animation: fade-in-up 0.4s ease-out;
 }
 
 .prayer-item.current-prayer {
@@ -132,7 +129,7 @@
 .prayer-item.current-prayer::before {
   content: "";
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 0;
   height: 100%;
   width: 3px;
@@ -140,7 +137,7 @@
 }
 
 .prayer-item:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--white-a18);
   transform: translateY(-1px);
 }
 
@@ -150,68 +147,57 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--white-a12);
   border-radius: 6px;
-  margin-right: 10px;
-  color: #fff;
+  margin-inline-end: 10px;
+  color: var(--text-bright);
   font-size: 14px;
+  flex-shrink: 0;
 }
 
 .prayer-item .prayer-name {
   flex-grow: 1;
   font-size: 14px;
   font-weight: 500;
-  color: #fff;
+  color: var(--text-bright);
 }
 
 .prayer-item .prayer-time {
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
-  margin-right: 4px;
+  color: var(--text-bright);
+  flex-shrink: 0;
+}
+
+/* Space between the time and the adhan button. It sits on the button (not the time)
+   because the time is LTR in every language, while the button follows the row. */
+.prayer-item .adhan-toggle-btn {
+  margin-inline-start: 4px;
 }
 
 /* Current Indicator */
 .current-indicator {
   display: inline-block;
   background: var(--accent-color, #4a6bff);
-  color: white;
+  color: var(--text-bright);
   font-size: 10px;
   font-weight: 600;
   padding: 2px 6px;
   border-radius: 10px;
-  margin-left: 8px;
+  margin-inline-start: 8px;
   vertical-align: middle;
   animation: pulse 2s infinite;
 }
 
-/* Ripple Effects */
-.control-btn::after,
-.settings-btn::after,
-.features-btn::after,
-.back-btn::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
-  background-repeat: no-repeat;
-  background-position: 50%;
-  transform: scale(10, 10);
-  opacity: 0;
-  transition:
-    transform 0.6s,
-    opacity 1s;
+/* ── Arabic ───────────────────────────────────────────────────────────────
+   Prayer times and the countdown keep their left-to-right digit order.
+   The "now" badge sits inside the time but is Arabic text, so it reads RTL. */
+[dir="rtl"] .prayer-time,
+[dir="rtl"] .countdown {
+  direction: ltr;
+  unicode-bidi: embed;
 }
 
-.control-btn:active::after,
-.settings-btn:active::after,
-.features-btn:active::after,
-.back-btn:active::after {
-  transform: scale(0, 0);
-  opacity: 0.3;
-  transition: 0s;
+[dir="rtl"] .current-indicator {
+  direction: rtl;
 }

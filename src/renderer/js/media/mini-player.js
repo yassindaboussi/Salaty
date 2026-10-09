@@ -30,9 +30,9 @@ function setupMiniPlayer() {
     b.innerHTML = `<i class="fas fa-${icon}"></i>`;
     return b;
   };
-  const prevBtn = mkBtn("miniPrevBtn", "step-backward");
+  const prevBtn = mkBtn("miniPrevBtn", "step-backward", "mini-prev-btn");
   const playBtn = mkBtn("miniPlayBtn", "play", "mini-play-btn");
-  const nextBtn = mkBtn("miniNextBtn", "step-forward");
+  const nextBtn = mkBtn("miniNextBtn", "step-forward", "mini-next-btn");
   const playlistBtn = mkBtn("miniPlaylistBtn", "list");
   playlistBtn.title = "Open Playlist";
   const closeBtn = mkBtn("miniCloseBtn", "times", "mini-close-btn");

@@ -12,7 +12,7 @@ body {
   height: 100%;
   background: transparent;
   overflow: hidden;
-  font-family: "Segoe UI", "Inter", sans-serif;
+  font-family: "Segoe UI", Inter, sans-serif;
   -webkit-app-region: no-drag;
 }
 
@@ -32,24 +32,28 @@ body {
     0 1px 0 rgba(var(--accent-rgb, 74, 144, 226), 0.18) inset;
   overflow: hidden;
   position: relative;
-  /* Zone draggable sur toute la barre sauf éléments interactifs */
+
+  /* The whole bar drags the window, except interactive elements */
   -webkit-app-region: drag;
-  /* Entrée animée – glisse depuis le haut */
+
+  /* Entrance animation: slides in from the top */
   opacity: 0;
   transform: translateY(-100%);
-  animation: tbIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-#app.closing {
-  animation: tbOut 0.22s ease-in forwards;
+  animation: tb-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-@keyframes tbIn {
+#app.closing {
+  animation: tb-out 0.22s ease-in forwards;
+}
+
+@keyframes tb-in {
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-@keyframes tbOut {
+
+@keyframes tb-out {
   to {
     opacity: 0;
     transform: translateY(-100%);
@@ -74,7 +78,7 @@ body {
   pointer-events: none;
 }
 
-/* ── Logo mosquée ── */
+/* ── Mosque logo ── */
 .tb-logo {
   font-size: 13px;
   color: var(--accent-color, #4a90e2);
@@ -83,7 +87,7 @@ body {
   pointer-events: none;
 }
 
-/* ── Séparateurs verticaux ── */
+/* ── Vertical separators ── */
 .tb-div {
   width: 1px;
   height: 18px;
@@ -91,14 +95,14 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Conteneur des prières ── */
+/* ── Prayers container ── */
 .tb-prayers {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: space-around;
   gap: 4px;
-  direction: ltr; /* ordre chronologique fixe, indépendant du RTL */
+  direction: ltr; /* fixed chronological order, not mirrored in Arabic */
   -webkit-app-region: no-drag;
 }
 
@@ -108,7 +112,7 @@ body {
   margin: 0 auto;
 }
 
-/* ── Colonne de prière ── */
+/* ── Prayer column ── */
 .tb-col {
   flex: 1;
   display: flex;
@@ -128,12 +132,13 @@ body {
   background: rgba(var(--accent-rgb, 74, 144, 226), 0.18);
   border-color: rgba(var(--accent-rgb, 74, 144, 226), 0.3);
 }
+
 .tb-col.next {
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.09);
 }
 
-/* Icône */
+/* Icon */
 .tb-col-icon {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.36);
@@ -142,10 +147,12 @@ body {
     color 0.2s,
     filter 0.2s;
 }
+
 .tb-col.active .tb-col-icon {
   color: var(--accent-color, #4a90e2);
   filter: drop-shadow(0 0 4px rgba(var(--accent-rgb, 74, 144, 226), 0.7));
 }
+
 .tb-col.next .tb-col-icon {
   color: rgba(255, 255, 255, 0.6);
 }
@@ -159,9 +166,11 @@ body {
   letter-spacing: 0.2px;
   line-height: 1;
 }
+
 .tb-col.active .tb-col-time {
   color: var(--accent-color, #4a90e2);
 }
+
 .tb-col.next .tb-col-time {
   color: rgba(255, 255, 255, 0.65);
 }
@@ -178,11 +187,12 @@ body {
   background: var(--accent-color, #4a90e2);
   box-shadow: 0 0 5px rgba(var(--accent-rgb, 74, 144, 226), 0.9);
 }
+
 .tb-col:not(.active) .tb-col-dot {
   display: none;
 }
 
-/* ── Compte à rebours ── */
+/* ── Countdown ── */
 .tb-timer {
   font-size: 10px;
   font-weight: 800;
@@ -195,7 +205,7 @@ body {
   -webkit-app-region: no-drag;
 }
 
-/* ── Contrôles ── */
+/* ── Controls ── */
 .tb-controls {
   display: flex;
   align-items: center;
@@ -219,27 +229,31 @@ body {
   transition: all 0.18s;
   flex-shrink: 0;
 }
+
 .tb-btn:hover {
   background: rgba(255, 255, 255, 0.16);
   color: #fff;
   transform: scale(1.1);
 }
+
 .tb-btn--close:hover {
   background: rgba(200, 40, 40, 0.6);
   border-color: rgba(200, 40, 40, 0.5);
   color: #fff;
   transform: scale(1.1);
 }
+
 .tb-btn.pinned {
   background: rgba(var(--accent-rgb, 74, 144, 226), 0.22);
   border-color: var(--accent-color, #4a90e2);
   color: var(--accent-color, #4a90e2);
 }
+
 .tb-btn.pinned i {
   transform: rotate(45deg);
 }
 
-/* ── Thème Ramadan : supprimer les icônes SVG (fanoos / cannon) du fond ── */
+/* ── Ramadan theme: remove the SVG background icons (lantern / cannon) ── */
 #app.theme-ramadan {
   background-image:
     radial-gradient(
@@ -254,14 +268,14 @@ body {
     ),
     repeating-linear-gradient(
       45deg,
-      rgba(255, 215, 0, 0.03) 0px,
+      rgba(255, 215, 0, 0.03) 0,
       rgba(255, 215, 0, 0.03) 1px,
       transparent 1px,
       transparent 20px
     ),
     repeating-linear-gradient(
       -45deg,
-      rgba(255, 215, 0, 0.03) 0px,
+      rgba(255, 215, 0, 0.03) 0,
       rgba(255, 215, 0, 0.03) 1px,
       transparent 1px,
       transparent 20px

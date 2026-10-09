@@ -24,11 +24,19 @@ function refreshAllTooltipText() {
 
 let _initialized = false;
 
+// Binds hover/focus handlers to every element that has a data-tip. Defined inside
+// initTooltipSystem; window.updateTooltips calls it so elements that get a tooltip *after*
+// they were added to the page (e.g. toggled on later) are bound too.
+let _attachTips = () => {};
+
 let _hideTooltipNow = () => {};
 
 function initTooltipSystem() {
   refreshAllTooltipText();
-  window.updateTooltips = refreshAllTooltipText;
+  window.updateTooltips = () => {
+    refreshAllTooltipText();
+    _attachTips();
+  };
 
   if (_initialized) return;
   _initialized = true;
@@ -97,6 +105,7 @@ function initTooltipSystem() {
         el.addEventListener("blur", hide);
       });
   };
+  _attachTips = attach;
   attach();
   new MutationObserver(attach).observe(document.body, {
     childList: true,

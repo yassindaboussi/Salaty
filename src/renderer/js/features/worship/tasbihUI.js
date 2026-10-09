@@ -7,22 +7,22 @@ const { t, getLanguage } = require("../../core/i18n/translations");
 const analytics = require("../../utils/analytics");
 const { renderToast } = require("../../core/toast");
 
-const DEFAULT_DHIKR_LIST = [
-  { id: "subhanallah", name: "سُبْحَانَ اللَّهِ", count: 33, meaningKey: "dhikrSubhanallahMeaning" },
-  { id: "alhamdulillah", name: "الْحَمْدُ لِلَّهِ", count: 33, meaningKey: "dhikrAlhamdulillahMeaning" },
-  { id: "allahuakbar", name: "اللَّهُ أَكْبَرُ", count: 34, meaningKey: "dhikrAllahuAkbarMeaning" },
-  { id: "laIlahaIllallah", name: "لا إله إلا الله", count: 100, meaningKey: "dhikrLaIlahaMeaning" },
-  { id: "astaghfirullah", name: "أستغفر الله", count: 100, meaningKey: "dhikrAstaghfirullahMeaning" },
-  { id: "subhanallahiWaBihamdihi", name: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", count: 100, meaningKey: "dhikrSubhanallahiWaBihamdihiMeaning" },
-  { id: "salawat", name: "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ", count: 100, meaningKey: "dhikrSalawatMeaning" },
-  { id: "hawqala", name: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", count: 100, meaningKey: "dhikrHawqalaMeaning" },
-];
+// The dhikr list (Arabic text, counts, hadith references) lives in data/tasbih.json so it can be
+// edited and checked in one place. Counts match what is established in authentic hadith
+// (Sahih al-Bukhari / Sahih Muslim), not arbitrary round numbers. Where no hadith specifies a
+// fixed count the entry has "noFixedCount": true and defaults to "no limit" (∞); its "count"
+// is then only the size of one lap on the counter, never presented as a requirement.
+// meaningKey / sourceKey point to the translated texts in locales/<lang>/worship/tasbih.json.
+const DEFAULT_DHIKR_LIST = require("../../../data/tasbih.json").dhikrList;
+
+const DEFAULT_UNLIMITED_IDS = DEFAULT_DHIKR_LIST.filter((d) => d.noFixedCount).map((d) => d.id);
 
 const LEGACY_NAME_TO_ID = {
   "سُبْحَانَ اللَّهِ": "subhanallah",
   "الْحَمْدُ لِلَّهِ": "alhamdulillah",
   "اللَّهُ أَكْبَرُ": "allahuakbar",
   "لا إله إلا الله": "laIlahaIllallah",
+  "لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير": "laIlahaIllallah",
   "أستغفر الله": "astaghfirullah",
   "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ": "subhanallahiWaBihamdihi",
 };
@@ -106,9 +106,9 @@ function setupKeyboardListener() {
 function pulseRing() {
   const ring = document.getElementById("tbRingTap");
   if (!ring) return;
-  ring.classList.remove("tb-ring-tap--pulse");
+  ring.classList.remove("tasbih-ring-tap--pulse");
   void ring.offsetWidth;
-  ring.classList.add("tb-ring-tap--pulse");
+  ring.classList.add("tasbih-ring-tap--pulse");
 }
 
 
@@ -146,7 +146,15 @@ function loadTasbihState() {
       tasbihHistory = _migrateLegacyKeys(parsed);
     }
     const savedUnlimited = localStorage.getItem("tasbihUnlimitedMap");
-    if (savedUnlimited) unlimitedMap = JSON.parse(savedUnlimited) || {};
+    if (savedUnlimited) {
+      unlimitedMap = JSON.parse(savedUnlimited) || {};
+    } else {
+      // First run: default the dhikr with no fixed hadith count to "no limit"
+      DEFAULT_UNLIMITED_IDS.forEach((id) => {
+        unlimitedMap[id] = true;
+      });
+      saveUnlimitedMap();
+    }
 
     const lastDhikrId = localStorage.getItem("lastDhikrId");
     const found = DEFAULT_DHIKR_LIST.find((d) => d.id === lastDhikrId);
@@ -208,6 +216,7 @@ function populateDhikrGrid() {
     card.className = "dhikr-card";
     if (dhikr.id === currentDhikr.id) card.classList.add("active");
     card.dataset.id = dhikr.id;
+    if (dhikr.sourceKey) card.title = t(dhikr.sourceKey) || "";
 
     const nameSpan = document.createElement("span");
     nameSpan.className = "dhikr-name";
@@ -223,7 +232,7 @@ function populateDhikrGrid() {
 
     const countSpan = document.createElement("span");
     countSpan.className = "dhikr-count";
-    countSpan.textContent = dhikr.count;
+    countSpan.textContent = isUnlimited(dhikr.id) ? "∞" : dhikr.count;
     card.appendChild(countSpan);
 
     card.addEventListener("click", () => switchDhikr(dhikr));
@@ -255,13 +264,17 @@ function switchDhikr(dhikr) {
 function updateActiveDhikrPanel() {
   const nameEl = document.getElementById("activeDhikrName");
   const meaningEl = document.getElementById("activeDhikrMeaning");
+  const sourceEl = document.getElementById("activeDhikrSource");
   const lang = getLanguage();
+  const dhikr = DEFAULT_DHIKR_LIST.find((d) => d.id === currentDhikr.id);
   if (nameEl) nameEl.textContent = currentDhikr.name;
   if (meaningEl) {
-    const dhikr = DEFAULT_DHIKR_LIST.find((d) => d.id === currentDhikr.id);
     meaningEl.textContent =
       lang === "ar" ? "" : (dhikr && t(dhikr.meaningKey)) || "";
-    meaningEl.classList.toggle("tb-hidden", lang === "ar");
+    meaningEl.classList.toggle("hidden", lang === "ar");
+  }
+  if (sourceEl) {
+    sourceEl.textContent = (dhikr && dhikr.sourceKey && t(dhikr.sourceKey)) || "";
   }
 }
 
@@ -371,9 +384,9 @@ function updateCounterDisplay() {
         "{n}",
         state.lapNumber,
       );
-      roundBadge.classList.remove("tb-hidden");
+      roundBadge.classList.remove("hidden");
     } else {
-      roundBadge.classList.add("tb-hidden");
+      roundBadge.classList.add("hidden");
     }
   }
 
@@ -406,7 +419,7 @@ function updateLimitChip(unlimited) {
   const chipText = document.getElementById("tbLimitChipText");
   if (!chip || !chipText) return;
 
-  chip.classList.toggle("tb-limit-chip--unlimited", unlimited);
+  chip.classList.toggle("tasbih-limit-chip--unlimited", unlimited);
   chip.setAttribute("aria-pressed", String(unlimited));
   chipText.textContent = unlimited
     ? t("noLimit") || "No limit"

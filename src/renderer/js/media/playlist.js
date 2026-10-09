@@ -6,6 +6,7 @@ const {
   t,
   getLanguage,
   whenReady,
+  applyLanguageDirection,
 } = require("../../js/core/i18n/translations");
 const analytics = require("../../js/utils/analytics");
 
@@ -153,6 +154,7 @@ class PlaylistManager {
 
         if (settings.language) {
           setLanguage(settings.language);
+          applyLanguageDirection(); // <html dir="rtl" lang="ar"> in Arabic, like the other pages
         }
       }
     } catch (err) {

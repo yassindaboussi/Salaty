@@ -4,6 +4,9 @@ const adkarData = require("../../renderer/data/adkar.json");
 
 const CHECK_INTERVAL_MS = 30 * 1000;
 
+// The dua stays Arabic; only the popup title follows the app language.
+const ALERT_TITLES = { ar: "أذكار", en: "Athkar", fr: "Athkar" };
+
 let checkTimer = null;
 let getSettingsData = null;
 let wasEnabled = false;
@@ -56,7 +59,7 @@ function _fireAlert(settings) {
       icon: "fa-moon",
       theme: settings.theme || "navy",
       content: item.content,
-      title: "Salaty Time · أذكار",
+      title: `Salaty Time · ${ALERT_TITLES[settings.language] || ALERT_TITLES.en}`,
     },
     "athkar",
   );

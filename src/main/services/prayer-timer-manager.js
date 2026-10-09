@@ -5,7 +5,10 @@ const {
   PRAYER_KEYS,
   secondsFromTime,
   getCurrentAndNext,
+  isFridayIn,
+  displayPrayerKey,
 } = require("../../shared/prayerUtils");
+const { ALADHAN_API, locationQuery } = require("../../shared/aladhan");
 
 let mainWindow = null;
 let getSettingsData = null;
@@ -83,11 +86,9 @@ function _clearAdhanSession() {
 
 async function _loadPrayerData() {
   const settings = getSettingsData?.();
-  const city = settings?.city;
-  const country = settings?.country;
 
   try {
-    const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}`;
+    const url = `${ALADHAN_API}/timingsByCity?${locationQuery(settings)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
@@ -137,7 +138,7 @@ function _startTickLoop() {
           lastPreAdhanKey = nextPrayer.key;
           const actualMinutesRemaining = Math.max(1, Math.round(timeRemaining / 60));
           _sendToMain("show-pre-adhan-notification", {
-            prayer: nextPrayer,
+            prayer: _withDisplayKey(nextPrayer),
             minutes: actualMinutesRemaining,
           });
         }
@@ -172,7 +173,7 @@ function _maybeFireAdhan(prayer, nowSec) {
 
   adhanIsPlaying = adhanState !== "silent";
   activeAdhanSession = {
-    prayer,
+    prayer: _withDisplayKey(prayer),
     mode: adhanState,
     theme: settings.theme || "navy",
     startedAt: Date.now(),
@@ -184,6 +185,19 @@ function _maybeFireAdhan(prayer, nowSec) {
   }
 
   _sendToMain("trigger-adhan", activeAdhanSession);
+}
+
+
+// Adds the key the renderer should use for the prayer's *name*: on Fridays (in the prayer
+// location's own time zone) Dhuhr is announced as Jumu'ah. `key` itself is left as-is
+// because the adhan settings are keyed by it.
+function _withDisplayKey(prayer) {
+  return {
+    ...prayer,
+    displayKey: displayPrayerKey(prayer.key, {
+      isFriday: isFridayIn(prayerData?.meta?.timezone),
+    }),
+  };
 }
 
 

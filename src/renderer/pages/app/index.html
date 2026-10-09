@@ -4,10 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Salaty Time - Islamic Prayer Times</title>
-    <link
-      rel="stylesheet"
-      href="../../vendor/fontawesome/css/all.min.css"
-    />
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/home.css" />
     <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
@@ -106,7 +102,7 @@
       <div class="events-banner" id="eventsBanner" style="display: none">
         <div class="events-banner-content">
           <i class="fas fa-bullhorn events-icon"></i>
-          <span id="eventText"
+          <span class="events-text" id="eventText"
             >Bienvenue sur Salaty ! Restez à l'écoute pour les événements à
             venir.</span
           >
@@ -125,7 +121,7 @@
       </div>
 
       <div class="prayer-times" id="prayerTimes">
-        <div id="prayerList"></div>
+        <div class="prayer-list" id="prayerList"></div>
       </div>
 
       <!-- Update Modal -->
@@ -145,7 +141,7 @@
             <div class="progress-bar">
               <div class="progress-fill" id="updateProgressBar"></div>
             </div>
-            <span id="updateProgressText">0%</span>
+            <span class="update-progress-text" id="updateProgressText">0%</span>
           </div>
         </div>
       </div>

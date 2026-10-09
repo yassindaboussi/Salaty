@@ -12,6 +12,13 @@ let adhanAudio = null;
 let fadeTimer = null;
 let overlayEl = null;
 
+// Name to show for a prayer sent by the main process. `displayKey` is set there (e.g.
+// "Jumuah" for Friday's Dhuhr); `key` stays the prayer itself and is the fallback.
+function _prayerName(prayer) {
+  const key = prayer.displayKey || prayer.key;
+  return _t(key, "prayerNames") || key;
+}
+
 
 function initAdhanPlayer() {
   _injectOverlay();
@@ -32,8 +39,7 @@ function initAdhanPlayer() {
         const timeEl = document.getElementById("__adhan-prayer-time__");
         const labelEl = document.getElementById("__adhan-stop-label__");
         if (nameEl)
-          nameEl.textContent =
-            _t(session.prayer.key, "prayerNames") || session.prayer.key;
+          nameEl.textContent = _prayerName(session.prayer);
         if (timeEl) timeEl.textContent = session.prayer.time || "";
         if (labelEl) labelEl.textContent = _t("stopAdhan") || "Stop";
         _showOverlay(true);
@@ -114,7 +120,7 @@ function _getAdhanAudioSrc() {
 
 
 async function _playAdhan(prayer, mode, seekSec = 0) {
-  const prayerName = _t(prayer.key, "prayerNames") || prayer.key;
+  const prayerName = _prayerName(prayer);
   const prayerTime = prayer.time || "";
 
   const nameEl = document.getElementById("__adhan-prayer-name__");
@@ -260,7 +266,7 @@ function _showOverlay(visible) {
 
 
 function _showPreAdhanNotification(prayer, minutes) {
-  const prayerName = _t(prayer.key, "prayerNames") || prayer.key;
+  const prayerName = _prayerName(prayer);
   let body = _t("adhanInXmin") || "{prayer} in {minutes} minutes";
   body = body.replace("{prayer}", prayerName).replace("{minutes}", minutes);
 

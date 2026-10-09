@@ -62,8 +62,42 @@ class ScreenSizeManager {
       await ipcRenderer.invoke("maximize-window");
       return;
     }
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await this._waitForLayoutToSettle();
     await this._fitToContent();
+    // Safety net: at a cold boot (especially with the app auto-launching at
+    // login alongside other startup programs), the very first layout pass
+    // can still land slightly off even after the settle-wait above — a late
+    // web-font swap or a prayer-time re-render can nudge row heights after
+    // we already measured and resized. Re-measure once more shortly after
+    // and correct the window if it drifted, so the content never stays
+    // clipped.
+    setTimeout(() => this._fitToContent(), 400);
+  }
+
+  // A flat, short delay before measuring the page's height is unreliable:
+  // it works fine on a warm launch, but at boot — especially with the app
+  // auto-launching at login alongside a dozen other startup programs — web
+  // fonts and layout can easily take longer than that to settle. Measuring
+  // too early produces an undersized window that clips content (e.g. the
+  // last prayer row) until the user manually resizes it. Instead, wait for
+  // fonts to actually finish loading, then give the browser a couple of
+  // paint frames to apply the final layout before measuring anything.
+  async _waitForLayoutToSettle() {
+    try {
+      if (document.fonts && document.fonts.status !== "loaded") {
+        await Promise.race([
+          document.fonts.ready,
+          new Promise((resolve) => setTimeout(resolve, 1500)), // hard cap
+        ]);
+      }
+    } catch {
+      // document.fonts unsupported or rejected — fall through to the
+      // frame-based settle below, which still helps on its own.
+    }
+
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(resolve)),
+    );
   }
 
   async _fitToContent() {

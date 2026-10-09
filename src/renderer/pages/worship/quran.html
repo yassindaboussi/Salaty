@@ -4,10 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Holy Quran - Salaty Time</title>
-    <link
-      rel="stylesheet"
-      href="../../vendor/fontawesome/css/all.min.css"
-    />
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/home.css" />
     <link rel="stylesheet" href="../../css/04-pages/quran.css" />
@@ -19,12 +15,12 @@
 
       <!-- ═══════════════ VIEW: SURAH LIST ═══════════════ -->
       <div class="quran-container" id="viewSurahList">
-        <div class="quran-header">
+        <div class="page-header quran-header">
           <button class="back-btn" id="backBtn" aria-label="Back" data-tooltip="tooltipBack">
             <i class="fas fa-arrow-left"></i>
           </button>
-          <h2 class="quran-title" id="quranTitle">القرآن الكريم</h2>
-          <div class="quran-controls">
+          <h2 class="page-header__title quran-title" id="quranTitle">القرآن الكريم</h2>
+          <div class="page-header__controls quran-controls">
             <button class="control-btn" id="minimizeBtn" aria-label="Minimize" data-tooltip="tooltipMinimize">
               <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H5v-2h14v2z"/></svg>
             </button>
@@ -59,7 +55,8 @@
         <div class="quran-content" id="quranSurahContent">
           <div class="quran-loading" id="surahLoading">
             <div class="quran-loading-content">
-              <i class="fas fa-book-quran fa-spin"></i>
+              <i class="fas fa-book-quran quran-loading-icon"></i>
+              <span class="quran-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span>
               <span id="loadingText">Loading...</span>
             </div>
           </div>
@@ -74,15 +71,15 @@
 
       <!-- ═══════════════ VIEW: SURAH READER ═══════════════ -->
       <div class="quran-container" id="viewSurahReader" style="display:none;">
-        <div class="quran-header">
+        <div class="page-header quran-header">
           <button class="back-btn" id="readerBackBtn" aria-label="Back to Surah List" data-tooltip="tooltipBack">
             <i class="fas fa-arrow-left"></i>
           </button>
           <div class="reader-surah-info">
-            <h2 class="quran-title" id="readerSurahName"></h2>
+            <h2 class="page-header__title quran-title" id="readerSurahName"></h2>
             <span class="reader-surah-meta" id="readerSurahMeta"></span>
           </div>
-          <div class="quran-controls">
+          <div class="page-header__controls quran-controls">
             <button class="control-btn reader-settings-btn" id="readerSettingsBtn" aria-label="Settings" data-tooltip="tooltipSettings">
               <i class="fas fa-sliders-h"></i>
             </button>
@@ -113,14 +110,46 @@
               </div>
             </div>
             <div class="settings-divider"></div>
+            <div class="settings-group" id="numeralsGroup" role="group" aria-label="Numerals">
+              <!-- Material Symbols "123" (Apache-2.0), cropped to the glyph -->
+              <svg class="settings-group-icon settings-group-icon-svg" viewBox="3.5 8 16.5 8" aria-hidden="true" data-tooltip="numeralsLabel"><path fill="currentColor" d="M5.5 15v-4.5H4V9h3v6zM9 15v-2.5q0-.425.288-.712T10 11.5h2v-1H9V9h3.5q.425 0 .713.288T13.5 10v1.5q0 .425-.288.713t-.712.287h-2v1h3V15zm6 0v-1.5h3v-1h-2v-1h2v-1h-3V9h3.5q.425 0 .713.288T19.5 10v4q0 .425-.288.713T18.5 15z"/></svg>
+              <div class="numerals-toggle">
+                <button type="button" class="numerals-btn" id="numeralsArabicBtn" data-numerals="arabic" aria-pressed="false" aria-label="Arabic-Indic digits" data-tooltip="numeralsArabic">١٢٣</button>
+                <button type="button" class="numerals-btn" id="numeralsLatinBtn" data-numerals="latin" aria-pressed="false" aria-label="Western digits" data-tooltip="numeralsLatin">123</button>
+              </div>
+            </div>
+            <div class="settings-divider"></div>
             <div class="settings-group settings-group-translation">
-              <i class="fas fa-language settings-group-icon"></i>
-              <select class="settings-select" id="translationSelect" aria-label="Translation">
-                <option value="none">None (Arabic only)</option>
-                <option value="en.sahih">Sahih International (EN)</option>
-                <option value="en.asad">Muhammad Asad (EN)</option>
-                <option value="fr.hamidullah">Hamidullah (FR)</option>
-              </select>
+              <i class="fas fa-language settings-group-icon" data-tooltip="translation"></i>
+              <div class="translation-combo" id="translationCombo">
+                <button type="button" class="translation-combo-trigger" id="translationTrigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="translationList" aria-label="Translation">
+                  <span class="combo-value">
+                    <span class="combo-name" id="translationCurrentName">Arabic only</span>
+                    <span class="pill-lang" id="translationCurrentLang" hidden></span>
+                  </span>
+                  <i class="fas fa-chevron-down combo-chevron" aria-hidden="true"></i>
+                </button>
+                <ul class="translation-list" id="translationList" role="listbox" aria-label="Translation" hidden>
+                  <li class="translation-option" id="translationOpt-none" role="option" aria-selected="true" data-translation="none">
+                    <i class="fas fa-check combo-check" aria-hidden="true"></i>
+                    <span class="combo-name" id="translationNoneLabel">Arabic only</span>
+                  </li>
+                  <li class="translation-group-label" role="presentation" aria-hidden="true">English</li>
+                  <li class="translation-option" id="translationOpt-en-sahih" role="option" aria-selected="false" data-translation="en.sahih">
+                    <i class="fas fa-check combo-check" aria-hidden="true"></i>
+                    <span class="combo-name">Sahih International</span><span class="pill-lang">EN</span>
+                  </li>
+                  <li class="translation-option" id="translationOpt-en-asad" role="option" aria-selected="false" data-translation="en.asad" data-needs-internet="1">
+                    <i class="fas fa-check combo-check" aria-hidden="true"></i>
+                    <span class="combo-name">Muhammad Asad</span><span class="pill-lang">EN</span>
+                  </li>
+                  <li class="translation-group-label" role="presentation" aria-hidden="true">Français</li>
+                  <li class="translation-option" id="translationOpt-fr-hamidullah" role="option" aria-selected="false" data-translation="fr.hamidullah" data-needs-internet="1">
+                    <i class="fas fa-check combo-check" aria-hidden="true"></i>
+                    <span class="combo-name">Hamidullah</span><span class="pill-lang">FR</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -129,7 +158,8 @@
         <div class="reader-content" id="readerContent">
           <div class="quran-loading" id="readerLoading">
             <div class="quran-loading-content">
-              <i class="fas fa-book-quran fa-spin"></i>
+              <i class="fas fa-book-quran quran-loading-icon"></i>
+              <span class="quran-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span>
               <span>Loading Surah...</span>
             </div>
           </div>

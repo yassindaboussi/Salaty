@@ -1,193 +1,185 @@
-/* =============================================================================
-   ADHAN PLAYER OVERLAY  —  global, injected into every page by adhan-player.js
-   Uses only the CSS variables that exist in every theme:
-     --bg-surface      (theme-aware semi-transparent background)
-     --bg-primary      (deep background)
-     --accent-color    (theme accent — button, icon, pulse)
-     --border-color    (theme border)
-     --text-primary    (white or dark depending on theme)
-     --text-secondary  (muted text)
-   ============================================================================= */
+@layer components {
+  /* =============================================================================
+     ADHAN PLAYER OVERLAY  —  global, injected into every page by adhan-player.js
+     Uses only the CSS variables that exist in every theme:
+       --bg-surface      (theme-aware semi-transparent background)
+       --bg-primary      (deep background)
+       --accent-color    (theme accent — button, icon, pulse)
+       --border-color    (theme border)
+       --text-primary    (white or dark depending on theme)
+       --text-secondary  (muted text)
+     ============================================================================= */
 
-.adhan-player-overlay {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99999;
-  pointer-events: none;
-  padding: 0 12px 14px;
-  box-sizing: border-box;
-}
-
-/* ── Visibility states ─────────────────────────────────────────────────────── */
-.adhan-player-overlay--hidden {
-  opacity: 0;
-  transform: translateY(110%);
-  transition:
-    transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.35s ease;
-  pointer-events: none;
-}
-
-.adhan-player-overlay--visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition:
-    transform 0.52s cubic-bezier(0.34, 1.48, 0.64, 1),
-    opacity 0.3s ease;
-  pointer-events: auto;
-}
-
-/* ── The bar itself ────────────────────────────────────────────────────────── */
-.adhan-player-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 16px 13px 14px;
-  border-radius: 18px;
-
-  /* Use --bg-primary with opacity for glass effect — works on every theme */
-  background-color: var(--bg-primary, #0a1128);
-  background-image: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.07) 0%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-
-  border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.12));
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.45),
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-
-  max-width: 480px;
-  margin: 0 auto;
-}
-
-/* ── Mosque icon + pulse ring ──────────────────────────────────────────────── */
-.adhan-player-bar__icon-wrap {
-  position: relative;
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.adhan-player-bar__mosque-icon {
-  font-size: 1.55rem;
-  color: var(--accent-color, #4a6bff);
-  filter: drop-shadow(0 0 6px var(--accent-color, #4a6bff));
-  z-index: 1;
-  position: relative;
-}
-
-.adhan-player-bar__pulse {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 2px solid var(--accent-color, #4a6bff);
-  opacity: 0.6;
-  animation: adhanPulse 2.6s ease-in-out infinite;
-}
-
-@keyframes adhanPulse {
-  0%,
-  100% {
-    transform: scale(0.82);
-    opacity: 0.6;
+  .adhan-player-overlay {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--z-adhan-overlay);
+    pointer-events: none;
+    padding: 0 12px 14px;
+    box-sizing: border-box;
   }
-  50% {
-    transform: scale(1.35);
+
+  /* ── Visibility states ─────────────────────────────────────────────────────── */
+  .adhan-player-overlay--hidden {
     opacity: 0;
+    transform: translateY(110%);
+    transition:
+      transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.35s ease;
+    pointer-events: none;
   }
-}
 
-/* ── Text block ────────────────────────────────────────────────────────────── */
-.adhan-player-bar__text {
-  flex: 1;
-  min-width: 0;
-  line-height: 1.25;
-}
-
-.adhan-player-bar__prayer-name {
-  font-size: 0.96rem;
-  font-weight: 650;
-  color: var(--text-primary, #ffffff);
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.adhan-player-bar__time {
-  font-size: 0.78rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.55));
-  margin-top: 2px;
-  letter-spacing: 0.2px;
-}
-
-/* ── Stop button ───────────────────────────────────────────────────────────── */
-.adhan-player-bar__stop-btn {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 18px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-
-  /* Full theme-accent background */
-  background: var(--accent-color, #4a6bff);
-
-  /* Text: use --bg-primary so it contrasts against the accent on light themes */
-  color: var(--bg-primary, #0a1128);
-
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-  transition:
-    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
-    filter 0.18s ease,
-    box-shadow 0.22s ease;
-}
-
-/* Fall back to white text on themes where bg-primary is very dark */
-.adhan-player-bar__stop-btn {
-  color: var(--text-primary, #ffffff);
-  mix-blend-mode: normal;
-}
-
-.adhan-player-bar__stop-btn i {
-  font-size: 0.85rem;
-}
-
-.adhan-player-bar__stop-btn:hover {
-  transform: scale(1.06);
-  filter: brightness(1.12) saturate(1.2);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-}
-
-.adhan-player-bar__stop-btn:active {
-  transform: scale(0.96);
-  transition-duration: 0.08s;
-}
-
-/* ── Reduced motion ────────────────────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .adhan-player-overlay--hidden,
   .adhan-player-overlay--visible {
-    transition: opacity 0.2s ease !important;
-    transform: none !important;
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      transform 0.52s cubic-bezier(0.34, 1.48, 0.64, 1),
+      opacity 0.3s ease;
+    pointer-events: auto;
   }
+
+  /* ── The bar itself ────────────────────────────────────────────────────────── */
+  .adhan-player-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px 13px 14px;
+    border-radius: 18px;
+
+    /* Use --bg-primary with opacity for glass effect — works on every theme */
+    background-color: var(--bg-primary, #0a1128);
+    background-image: linear-gradient(
+      135deg,
+      var(--white-a07) 0%,
+      var(--white-a02) 100%
+    );
+    backdrop-filter: blur(20px) saturate(160%);
+    border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.12));
+    box-shadow:
+      0 8px 32px var(--black-a45),
+      0 2px 8px var(--black-a30),
+      inset 0 1px 0 var(--white-a08);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── Mosque icon + pulse ring ──────────────────────────────────────────────── */
+  .adhan-player-bar__icon-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .adhan-player-bar__mosque-icon {
+    font-size: 1.55rem;
+    color: var(--accent-color, #4a6bff);
+    filter: drop-shadow(0 0 6px var(--accent-color, #4a6bff));
+    z-index: 1;
+    position: relative;
+  }
+
   .adhan-player-bar__pulse {
-    animation: none !important;
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--accent-color, #4a6bff);
+    opacity: 0.6;
+    animation: adhan-pulse 2.6s ease-in-out infinite;
   }
+
+  @keyframes adhan-pulse {
+    0%,
+    100% {
+      transform: scale(0.82);
+      opacity: 0.6;
+    }
+
+    50% {
+      transform: scale(1.35);
+      opacity: 0;
+    }
+  }
+
+  /* ── Text block ────────────────────────────────────────────────────────────── */
+  .adhan-player-bar__text {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.25;
+  }
+
+  .adhan-player-bar__prayer-name {
+    font-size: 0.96rem;
+    font-weight: 650;
+    color: var(--text-primary, #fff);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .adhan-player-bar__time {
+    font-size: 0.78rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.55));
+    margin-top: 2px;
+    letter-spacing: 0.2px;
+  }
+
+  /* Fall back to white text on themes where bg-primary is very dark */
+  .adhan-player-bar__stop-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    background: var(--accent-color, #4a6bff);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 14px var(--black-a30);
+    transition:
+      transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+      filter 0.18s ease,
+      box-shadow 0.22s ease;
+    color: var(--text-primary, #fff);
+    mix-blend-mode: normal;
+  }
+
+  .adhan-player-bar__stop-btn i {
+    font-size: 0.85rem;
+  }
+
+  .adhan-player-bar__stop-btn:hover {
+    transform: scale(1.06);
+    filter: brightness(1.12) saturate(1.2);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .adhan-player-bar__stop-btn:active {
+    transform: scale(0.96);
+    transition-duration: 0.08s;
+  }
+
+  /* ── Reduced motion ────────────────────────────────────────────────────────── */
+  /* stylelint-disable declaration-no-important -- users who turn off animations in Windows must win over every animation */
+  @media (prefers-reduced-motion: reduce) {
+    .adhan-player-overlay--hidden,
+    .adhan-player-overlay--visible {
+      transition: opacity 0.2s ease !important;
+      transform: none !important;
+    }
+
+    .adhan-player-bar__pulse {
+      animation: none !important;
+    }
+  }
+  /* stylelint-enable declaration-no-important */
 }

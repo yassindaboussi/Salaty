@@ -5,6 +5,7 @@ const {
 const { state } = require("../../core/globalStore");
 const { t } = require("../../core/i18n/translations");
 const analytics = require("../../utils/analytics");
+const { ALADHAN_API, locationQuery } = require("../../../../shared/aladhan");
 
 let ramadanData = [];
 let assignedHijriYear = null;
@@ -87,8 +88,10 @@ async function fetchRamadanData() {
   }
 
   try {
-    const method = state.settings.method || 2;
-    const todayUrl = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${method}`;
+    // Same location/method query as the home page and the adhan: suhoor ends at Fajr, so the
+    // Ramadan page must never show a different Fajr than the one the adhan is played for.
+    const query = locationQuery(state.settings);
+    const todayUrl = `${ALADHAN_API}/timingsByCity?${query}`;
 
     const todayRes = await fetch(todayUrl);
     const todayData = await todayRes.json();
@@ -108,7 +111,7 @@ async function fetchRamadanData() {
     const titleEl = document.querySelector(".ramadan-title");
     if (titleEl) titleEl.textContent = `${t("ramadhan")} ${assignedHijriYear}`;
 
-    const ramadanUrl = `https://api.aladhan.com/v1/hijriCalendarByCity/${targetHijriYear}/9?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${method}`;
+    const ramadanUrl = `${ALADHAN_API}/hijriCalendarByCity/${targetHijriYear}/9?${query}`;
 
     const ramadanRes = await fetch(ramadanUrl);
     const ramadanJson = await ramadanRes.json();

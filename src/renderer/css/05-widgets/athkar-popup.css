@@ -13,7 +13,7 @@ body {
   min-height: 100%;
   background: transparent;
   overflow: hidden;
-  font-family: "Segoe UI", "Arial", sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   -webkit-app-region: no-drag;
 }
 
@@ -27,9 +27,10 @@ body {
   flex-direction: column;
   overflow: visible;
   position: relative;
+
   /* Slide-in from the right */
   transform: translateX(120%);
-  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: slide-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* Themed background: uses same CSS vars as the main app */
@@ -136,14 +137,14 @@ body {
 .popup-athkar-text {
   font-size: 15px;
   line-height: 1.8;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, #fff);
   text-align: center;
   direction: rtl;
   font-family:
-    "Traditional Arabic", "Arabic Typesetting", "Amiri", "Scheherazade New",
+    "Traditional Arabic", "Arabic Typesetting", Amiri, "Scheherazade New",
     "Segoe UI", sans-serif;
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 /* "Open App" button – adhan popup only */
@@ -213,6 +214,7 @@ body {
 }
 
 .hidden {
+  /* stylelint-disable-next-line declaration-no-important -- a hide helper must beat any other display, even inline styles */
   display: none !important;
 }
 
@@ -234,17 +236,18 @@ body {
 }
 
 /* Animations */
-@keyframes slideIn {
+@keyframes slide-in {
   to {
     transform: translateX(0);
   }
 }
 
-@keyframes fadeOut {
+@keyframes fade-out {
   from {
     opacity: 1;
     transform: translateX(0);
   }
+
   to {
     opacity: 0;
     transform: translateX(120%);
@@ -255,11 +258,12 @@ body {
   from {
     transform: scaleX(1);
   }
+
   to {
     transform: scaleX(0);
   }
 }
 
 #app.closing {
-  animation: fadeOut 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: fade-out 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }

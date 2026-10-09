@@ -4,12 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tasbih - Salaty Time</title>
-    <link
-      rel="stylesheet"
-      href="../../vendor/fontawesome/css/all.min.css"
-    />
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/tasbih.css" />
+    <link rel="stylesheet" href="../../css/03-components/success-toast.css" />
     <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
   </head>
   <body class="page-loading">
@@ -17,7 +14,7 @@
       <div class="drag-area"></div>
 
       <div class="tasbih-container">
-        <div class="tasbih-header">
+        <div class="page-header tasbih-header">
           <button
             class="back-btn"
             id="backBtn"
@@ -27,9 +24,9 @@
             <i class="fas fa-arrow-left"></i>
           </button>
 
-          <h2 class="tasbih-title" id="tasbihTitle">Tasbih</h2>
+          <h2 class="page-header__title tasbih-title" id="tasbihTitle">Tasbih</h2>
 
-          <div class="tasbih-controls">
+          <div class="page-header__controls tasbih-controls">
             <button
               class="control-btn minimize-btn"
               id="minimizeBtn"
@@ -65,21 +62,22 @@
 
         <div class="tasbih-content" id="tasbihContent">
           <!-- Active dhikr name + meaning -->
-          <div class="tb-active-dhikr">
-            <div class="tb-active-name" id="activeDhikrName">سُبْحَانَ اللَّهِ</div>
-            <div class="tb-active-meaning" id="activeDhikrMeaning">
+          <div class="tasbih-active-dhikr">
+            <div class="tasbih-active-name" id="activeDhikrName">سُبْحَانَ اللَّهِ</div>
+            <div class="tasbih-active-meaning" id="activeDhikrMeaning">
               Glory be to Allah
             </div>
+            <div class="tasbih-active-source" id="activeDhikrSource"></div>
           </div>
 
           <!-- Ring counter, flanked left/right by actions — same pattern as
                a dial-timer screen: dial in the middle, a secondary action
                to one side, the primary action to the other. -->
-          <div class="tb-ring-row">
-            <div class="tb-side tb-side-left">
+          <div class="tasbih-ring-row">
+            <div class="tasbih-side tasbih-side-left">
               <button
                 type="button"
-                class="tb-side-btn tb-side-btn--secondary"
+                class="tasbih-side-btn tasbih-side-btn--secondary"
                 id="resetBtn"
                 data-tooltip="tooltipReset"
               >
@@ -88,7 +86,7 @@
               </button>
               <button
                 type="button"
-                class="tb-icon-btn"
+                class="tasbih-icon-btn"
                 id="undoBtn"
                 aria-label="Undo"
                 data-tooltip="tooltipUndo"
@@ -97,35 +95,35 @@
               </button>
             </div>
 
-            <div class="tb-ring-wrap">
-              <svg class="tb-ring-svg" viewBox="0 0 220 220">
-                <circle class="tb-ring-track" cx="110" cy="110" r="96" />
+            <div class="tasbih-ring-wrap">
+              <svg class="tasbih-ring-svg" viewBox="0 0 220 220">
+                <circle class="tasbih-ring-track" cx="110" cy="110" r="96" />
                 <circle
-                  class="tb-ring-progress"
+                  class="tasbih-ring-progress"
                   id="tbRingProgress"
                   cx="110"
                   cy="110"
                   r="96"
                 />
-                <circle class="tb-ring-bead" id="tbRingBead" cx="110" cy="14" r="6" />
+                <circle class="tasbih-ring-bead" id="tbRingBead" cx="110" cy="14" r="6" />
               </svg>
               <button
                 type="button"
-                class="tb-ring-tap"
+                class="tasbih-ring-tap"
                 id="tbRingTap"
                 aria-label="Count"
                 data-tooltip="tooltipCount"
               >
-                <span class="tb-round-badge tb-hidden" id="tbRoundBadge"></span>
-                <span class="tb-count-value" id="counterValue">0</span>
-                <span class="tb-count-target" id="targetLine">/ 33</span>
+                <span class="tasbih-round-badge hidden" id="tbRoundBadge"></span>
+                <span class="tasbih-count-value" id="counterValue">0</span>
+                <span class="tasbih-count-target" id="targetLine">/ 33</span>
               </button>
             </div>
 
-            <div class="tb-side tb-side-right">
+            <div class="tasbih-side tasbih-side-right">
               <button
                 type="button"
-                class="tb-side-btn tb-side-btn--primary"
+                class="tasbih-side-btn tasbih-side-btn--primary"
                 id="incrementBtn"
                 data-tooltip="tooltipCount"
               >
@@ -134,12 +132,12 @@
               </button>
               <button
                 type="button"
-                class="tb-limit-chip"
+                class="tasbih-limit-chip"
                 id="tbLimitChip"
                 aria-pressed="false"
               >
                 <i class="fas fa-flag-checkered"></i>
-                <span class="tb-limit-chip-text" id="tbLimitChipText">Stop at 33</span>
+                <span class="tasbih-limit-chip-text" id="tbLimitChipText">Stop at 33</span>
               </button>
               <div class="spacebar-indicator">
                 <i class="fas fa-keyboard"></i><kbd>␣</kbd><span id="spacebarText">Space</span>

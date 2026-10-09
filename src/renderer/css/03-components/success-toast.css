@@ -1,0 +1,82 @@
+@layer components {
+  /* Success / error toast used by the Athkar and Tasbih pages (bottom-right, slides in,
+     slides out after 2s). Follows the active theme; errors stay red.
+     (The Names of Allah page has its own bottom-centre toast in asma.css.) */
+
+  .success-toast {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+
+    /* Follows the active theme: an accent tint over the theme background, theme text colour */
+    background:
+      linear-gradient(
+        135deg,
+        rgba(var(--accent-rgb), 0.3),
+        rgba(var(--accent-rgb), 0.14)
+      ),
+      var(--bg-primary, #0a1128);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 6px 20px var(--black-a35);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: var(--z-dialog);
+    animation:
+      toast-slide-in 0.2s ease,
+      toast-slide-out 0.2s ease 2s;
+    transform: translateX(100%);
+    opacity: 0;
+    max-width: 250px;
+    pointer-events: none;
+  }
+
+  .success-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .success-toast.error {
+    color: var(--text-bright);
+    border-color: transparent;
+    background: linear-gradient(
+      135deg,
+      var(--color-danger),
+      var(--color-danger-strong)
+    );
+    box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
+  }
+
+  .success-toast i {
+    font-size: 12px;
+  }
+
+  @keyframes toast-slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes toast-slide-out {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+}

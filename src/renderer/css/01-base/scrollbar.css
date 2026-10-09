@@ -1,0 +1,21 @@
+/*
+  Default scrollbar for every scrolling area (thin, theme accent on hover).
+*/
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--white-a12);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--white-a35);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--white-a55);
+}

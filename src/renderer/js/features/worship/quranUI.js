@@ -1,9 +1,12 @@
 "use strict";
 
 const { ipcRenderer } = require("electron");
-const { t } = require("../../core/i18n/translations");
+const { t, getLanguage } = require("../../core/i18n/translations");
+const { formatNumerals, toWestern } = require("../../utils/numerals");
 const analytics = require("../../utils/analytics");
 const screenSizeManager = require("../../core/screenSize");
+const { showToast } = require("../../core/toast");
+const { initSelectionCopy } = require("../../ui/selectionCopy");
 
 const ALQURAN_CLOUD_API = "https://api.alquran.cloud/v1";
 
@@ -16,6 +19,7 @@ let state = {
   translationId: "none",
   settingsOpen: true,
   activeTab: "surah",
+  numerals: "latin", // "arabic" (٠١٢٣) or "latin" (0123); resolved in initQuranPage
 };
 
 const SURAH_META = [
@@ -224,9 +228,95 @@ function stripHtmlTags(str) {
 }
 
 
+// ---- Numerals: Arabic-Indic (٠١٢٣) or Western (0123) digits ----
+// Default follows the app language (Arabic app -> Arabic digits). Once the user picks one in
+// the settings panel, that choice is remembered and wins over the language default.
+//
+// The remembered choice is stored per app language, and only when it differs from that
+// language's default. (An earlier version kept one global value written on every click, so a
+// click in Arabic made Arabic digits stick in English and French too; that old key is removed.)
+const NUMERALS_KEY_PREFIX = "quranNumerals.";
+const LEGACY_NUMERALS_KEY = "quranNumerals";
+
+const defaultNumerals = () => (getLanguage() === "ar" ? "arabic" : "latin");
+const numeralsKey = () => NUMERALS_KEY_PREFIX + getLanguage();
+
+function resolveNumerals() {
+  try {
+    localStorage.removeItem(LEGACY_NUMERALS_KEY);
+    const saved = localStorage.getItem(numeralsKey());
+    if (saved === "arabic" || saved === "latin") return saved;
+  } catch {
+    /* storage unavailable: use the language default */
+  }
+  return defaultNumerals();
+}
+
+const fmt = (value) => formatNumerals(value, state.numerals);
+
+function updateNumeralsUI() {
+  document.body.classList.toggle("numerals-arabic", state.numerals === "arabic");
+  document.querySelectorAll(".numerals-btn").forEach((btn) => {
+    const active = btn.dataset.numerals === state.numerals;
+    btn.classList.toggle("active", active);
+    btn.setAttribute("aria-pressed", String(active));
+    btn.setAttribute(
+      "aria-label",
+      t(btn.dataset.numerals === "arabic" ? "numeralsArabic" : "numeralsLatin"),
+    );
+  });
+  document.getElementById("numeralsGroup")?.setAttribute("aria-label", t("numeralsLabel"));
+}
+
+function updateReaderMeta() {
+  const meta = state.currentSurah;
+  if (!meta) return;
+  document.getElementById("readerSurahMeta").textContent =
+    `${t("surah") || "Surah"} ${fmt(meta.n)} · ${fmt(meta.count)} ${t("verses") || "verses"} · ${meta.type}`;
+  document.getElementById("readerPageInfo").textContent = `${fmt(meta.n)} / ${fmt(114)}`;
+}
+
+// Re-draws everything that shows a number after the user switches digit style.
+function refreshNumbers() {
+  renderSurahGrid(state.filteredSurahs);
+  renderJuzList();
+  const size = document.getElementById("fontSizeDisplay");
+  if (size) size.textContent = fmt(state.fontSize);
+  if (state.currentSurah) {
+    updateReaderMeta();
+    // Skip while a surah is still loading (the list is empty then and will render with the new digits).
+    if (state.currentAyahs.length && document.getElementById("ayahList").children.length) {
+      renderAyahs(state.currentAyahs);
+    }
+  }
+}
+
+function setNumerals(mode) {
+  try {
+    // Only a deviation from the language default is worth remembering.
+    if (mode === defaultNumerals()) localStorage.removeItem(numeralsKey());
+    else localStorage.setItem(numeralsKey(), mode);
+  } catch {
+    /* storage unavailable: the choice just won't be remembered */
+  }
+  if (mode === state.numerals) return;
+  state.numerals = mode;
+  updateNumeralsUI();
+  refreshNumbers();
+}
+
+// Copies the part of the reader the user highlighted (Ctrl/Cmd+C or right-click > Copy).
+function copySelectedText(text) {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => showToast(t("copiedToClipboard"), "success"))
+    .catch(() => showToast(t("failedToCopy"), "error"));
+}
+
 function initQuranPage() {
   screenSizeManager.initPageScreenSize();
   updateFullscreenButtons();
+  initSelectionCopy(document.getElementById("readerContent"), copySelectedText);
 
   document.getElementById("backBtn")?.addEventListener("click", () => {
     ipcRenderer.invoke("navigate-to", "features");
@@ -261,7 +351,12 @@ function initQuranPage() {
   document.getElementById("fontIncBtn")?.addEventListener("click", () => changeFontSize(2));
   document.getElementById("fontDecBtn")?.addEventListener("click", () => changeFontSize(-2));
 
-  document.getElementById("translationSelect")?.addEventListener("change", onTranslationChange);
+  bindTranslationCombo();
+
+  state.numerals = resolveNumerals();
+  document.querySelectorAll(".numerals-btn").forEach((btn) => {
+    btn.addEventListener("click", () => setNumerals(btn.dataset.numerals));
+  });
 
   document.getElementById("prevSurahBtn")?.addEventListener("click", () => {
     if (state.currentSurah && state.currentSurah.n > 1) {
@@ -275,6 +370,8 @@ function initQuranPage() {
   });
 
   updateQuranText();
+  updateNumeralsUI();
+  updateTranslationUI();
 
   state.surahs = SURAH_META;
   state.filteredSurahs = [...SURAH_META];
@@ -293,7 +390,7 @@ function updateQuranText() {
   if (el("tabSurah"))        el("tabSurah").textContent = t("surah") || "Surah";
   if (el("tabJuz"))          el("tabJuz").textContent = t("juz") || "Juz";
   if (el("surahSearchInput")) el("surahSearchInput").placeholder = t("searchSurah") || "Search surah...";
-  if (el("fontSizeDisplay")) el("fontSizeDisplay").textContent = state.fontSize;
+  if (el("fontSizeDisplay")) el("fontSizeDisplay").textContent = fmt(state.fontSize);
 }
 
 
@@ -308,7 +405,8 @@ function switchTab(tab) {
 
 
 function onSearch(e) {
-  const q = e.target.value.trim().toLowerCase();
+  // Accept Arabic-Indic digits too, so typing ٢ finds surah 2.
+  const q = toWestern(e.target.value).trim().toLowerCase();
   if (!q) {
     state.filteredSurahs = [...SURAH_META];
   } else {
@@ -336,11 +434,11 @@ function renderSurahGrid(surahs) {
 
   grid.innerHTML = surahs.map((s) => `
     <div class="surah-card" data-surah="${s.n}" role="button" tabindex="0">
-      <div class="surah-number-badge">${s.n}</div>
+      <div class="surah-number-badge">${fmt(s.n)}</div>
       <div class="surah-card-info">
         <div class="surah-arabic-name">${s.ar}</div>
         <div class="surah-transliteration">${s.en}</div>
-        <div class="surah-ayah-count">${s.count} ${t("verses") || "verses"} · ${s.type}</div>
+        <div class="surah-ayah-count">${fmt(s.count)} ${t("verses") || "verses"} · ${s.type}</div>
       </div>
     </div>
   `).join("");
@@ -358,10 +456,10 @@ function renderJuzList() {
   const list = document.getElementById("juzList");
   list.innerHTML = JUZ_META.map((j) => `
     <div class="juz-card" data-juz="${j.n}" role="button" tabindex="0">
-      <div class="juz-badge">${j.n}</div>
+      <div class="juz-badge">${fmt(j.n)}</div>
       <div class="juz-info">
-        <div class="juz-title">${t("juz") || "Juz"} ${j.n}</div>
-        <div class="juz-subtitle">${t("startingFrom") || "Starting from"}: ${j.start}</div>
+        <div class="juz-title">${t("juz") || "Juz"} ${fmt(j.n)}</div>
+        <div class="juz-subtitle">${t("startingFrom") || "Starting from"}: ${fmt(j.start)}</div>
       </div>
       <i class="fas fa-chevron-left juz-arrow"></i>
     </div>
@@ -390,8 +488,7 @@ async function openSurah(surahNum) {
   document.getElementById("readerSettingsPanel").style.display = "";
 
   document.getElementById("readerSurahName").textContent = `${meta.ar}  —  ${meta.en}`;
-  document.getElementById("readerSurahMeta").textContent =
-    `${t("surah") || "Surah"} ${meta.n} · ${meta.count} ${t("verses") || "verses"} · ${meta.type}`;
+  updateReaderMeta();
 
   const prevMeta = SURAH_META.find((s) => s.n === surahNum - 1);
   const nextMeta = SURAH_META.find((s) => s.n === surahNum + 1);
@@ -412,9 +509,6 @@ async function openSurah(surahNum) {
     nextBtn.disabled = true;
     document.getElementById("nextSurahLabel").textContent = "";
   }
-
-  document.getElementById("readerPageInfo").textContent =
-    `${surahNum} / 114`;
 
   const bismillah = document.getElementById("bismillahHeader");
   bismillah.style.display = (surahNum !== 1 && surahNum !== 9) ? "" : "none";
@@ -472,7 +566,7 @@ function renderAyahs(ayahs) {
     const flowHtml = ayahs
       .map(
         (a) =>
-          `${a.arabic} <span class="ayah-number-inline" data-ayah="${a.number}">(${a.number})</span>`,
+          `${a.arabic} <span class="ayah-number-inline" data-ayah="${a.number}">﴿${fmt(a.number)}﴾</span>`,
       )
       .join(" ");
     html += `<div class="surah-flow-text" id="surahFlowText" style="font-size:${state.fontSize}px">${flowHtml}</div>`;
@@ -482,7 +576,7 @@ function renderAyahs(ayahs) {
     html += `<div class="ayah-translation-list" id="ayahTranslationList" style="font-size:${state.fontSize}px">${withTranslation
       .map(
         (a) =>
-          `<div class="ayah-translation-row"><span class="ayah-translation-num">${a.number}.</span>${a.translation}</div>`,
+          `<div class="ayah-translation-row"><span class="ayah-translation-num">${fmt(a.number)}.</span> ${a.translation}</div>`,
       )
       .join("")}</div>`;
   }
@@ -514,18 +608,176 @@ function closeSettings() {
 
 function changeFontSize(delta) {
   state.fontSize = Math.max(18, Math.min(42, state.fontSize + delta));
-  document.getElementById("fontSizeDisplay").textContent = state.fontSize;
+  document.getElementById("fontSizeDisplay").textContent = fmt(state.fontSize);
   const flowText = document.getElementById("surahFlowText");
   if (flowText) flowText.style.fontSize = `${state.fontSize}px`;
   const translationList = document.getElementById("ayahTranslationList");
   if (translationList) translationList.style.fontSize = `${state.fontSize}px`;
 }
 
-async function onTranslationChange(e) {
-  state.translationId = e.target.value;
+// ---- Translation picker (custom combobox: trigger button + listbox) ----
+const translationOptions = () => [...document.querySelectorAll(".translation-option")];
+const isOptionDisabled = (opt) => opt.getAttribute("aria-disabled") === "true";
+const translationList = () => document.getElementById("translationList");
+const translationTrigger = () => document.getElementById("translationTrigger");
+const isTranslationListOpen = () => !translationList()?.hidden;
+
+// The bundled offline Quran data only has the English Sahih International text, so the other
+// translations need the internet. They are marked unavailable (not removed) while offline.
+// aria-disabled is used instead of `disabled` so the "needs internet" tooltip still shows.
+function updateTranslationAvailability() {
+  const offline = !navigator.onLine;
+  translationOptions().forEach((opt) => {
+    const blocked = offline && opt.dataset.needsInternet === "1";
+    if (blocked) {
+      opt.setAttribute("aria-disabled", "true");
+      opt.setAttribute("data-tooltip", "translationOnlineOnly");
+    } else {
+      opt.removeAttribute("aria-disabled");
+      opt.removeAttribute("data-tooltip");
+      opt.removeAttribute("data-tip");
+    }
+  });
+  if (offline && window.updateTooltips) window.updateTooltips();
+}
+
+// Shows the selected choice (name + language tag) on the trigger and marks it in the list.
+function updateTranslationUI() {
+  const label = t("translation");
+  translationTrigger()?.setAttribute("aria-label", label);
+  translationList()?.setAttribute("aria-label", label);
+  const none = document.getElementById("translationNoneLabel");
+  if (none) none.textContent = t("translationNone");
+
+  let selected = null;
+  translationOptions().forEach((opt) => {
+    const isSelected = opt.dataset.translation === state.translationId;
+    opt.setAttribute("aria-selected", String(isSelected));
+    if (isSelected) selected = opt;
+  });
+  if (selected) {
+    const name = selected.querySelector(".combo-name")?.textContent || "";
+    const lang = selected.querySelector(".pill-lang")?.textContent || "";
+    document.getElementById("translationCurrentName").textContent = name;
+    const langEl = document.getElementById("translationCurrentLang");
+    langEl.textContent = lang;
+    langEl.hidden = !lang;
+  }
+  updateTranslationAvailability();
+}
+
+function setActiveTranslationOption(opt) {
+  translationOptions().forEach((o) => o.classList.toggle("highlighted", o === opt));
+  const trigger = translationTrigger();
+  if (opt) {
+    trigger?.setAttribute("aria-activedescendant", opt.id);
+    opt.scrollIntoView({ block: "nearest" });
+  } else {
+    trigger?.removeAttribute("aria-activedescendant");
+  }
+}
+
+function closeTranslationList() {
+  const list = translationList();
+  if (!list || list.hidden) return;
+  list.hidden = true;
+  setActiveTranslationOption(null);
+  translationTrigger()?.setAttribute("aria-expanded", "false");
+}
+
+function openTranslationList() {
+  const list = translationList();
+  if (!list || !list.hidden) return;
+  list.hidden = false;
+  translationTrigger()?.setAttribute("aria-expanded", "true");
+  setActiveTranslationOption(
+    translationOptions().find((o) => o.getAttribute("aria-selected") === "true") || null,
+  );
+}
+
+async function setTranslation(id) {
+  if (id === state.translationId) return;
+  state.translationId = id;
+  updateTranslationUI();
   if (state.currentSurah) {
     await loadAyahs(state.currentSurah.n);
   }
+}
+
+function chooseTranslationOption(opt) {
+  if (!opt || isOptionDisabled(opt)) return;
+  closeTranslationList();
+  translationTrigger()?.focus();
+  setTranslation(opt.dataset.translation);
+}
+
+// Moves the highlight by one enabled option (wraps around).
+function moveTranslationHighlight(step) {
+  const options = translationOptions().filter((o) => !isOptionDisabled(o));
+  if (!options.length) return;
+  const current = options.findIndex((o) => o.classList.contains("highlighted"));
+  const next = current === -1 ? (step > 0 ? 0 : options.length - 1) : (current + step + options.length) % options.length;
+  setActiveTranslationOption(options[next]);
+}
+
+function onTranslationTriggerKeydown(e) {
+  const open = isTranslationListOpen();
+  switch (e.key) {
+    case "ArrowDown":
+    case "ArrowUp":
+      e.preventDefault();
+      if (!open) openTranslationList();
+      else moveTranslationHighlight(e.key === "ArrowDown" ? 1 : -1);
+      break;
+    case "Home":
+    case "End": {
+      if (!open) return;
+      e.preventDefault();
+      const options = translationOptions().filter((o) => !isOptionDisabled(o));
+      setActiveTranslationOption(e.key === "Home" ? options[0] : options[options.length - 1]);
+      break;
+    }
+    case "Enter":
+    case " ":
+      e.preventDefault();
+      if (!open) openTranslationList();
+      else chooseTranslationOption(translationOptions().find((o) => o.classList.contains("highlighted")));
+      break;
+    case "Escape":
+      if (open) {
+        e.preventDefault();
+        closeTranslationList();
+      }
+      break;
+    case "Tab":
+      closeTranslationList();
+      break;
+    default:
+  }
+}
+
+function bindTranslationCombo() {
+  const trigger = translationTrigger();
+  const list = translationList();
+  if (!trigger || !list) return;
+
+  trigger.addEventListener("click", () => {
+    if (isTranslationListOpen()) closeTranslationList();
+    else openTranslationList();
+  });
+  trigger.addEventListener("keydown", onTranslationTriggerKeydown);
+  list.addEventListener("click", (e) => chooseTranslationOption(e.target.closest(".translation-option")));
+  list.addEventListener("mouseover", (e) => {
+    const opt = e.target.closest(".translation-option");
+    if (opt && !isOptionDisabled(opt)) setActiveTranslationOption(opt);
+  });
+  // Clicking anywhere else, or losing window focus, closes the list.
+  document.addEventListener("mousedown", (e) => {
+    if (!document.getElementById("translationCombo")?.contains(e.target)) closeTranslationList();
+  });
+  window.addEventListener("blur", closeTranslationList);
+  window.addEventListener("online", updateTranslationAvailability);
+  window.addEventListener("offline", updateTranslationAvailability);
 }
 
 

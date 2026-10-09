@@ -1,0 +1,145 @@
+/*
+  Design tokens: shared values used across the app (colours per theme live in themes.css).
+  Use these instead of typing the raw number, so the same idea always has the same value
+  and can be changed in one place.
+*/
+:root {
+  /* ── Stacking layers (z-index) ───────────────────────────────────────────
+     Only for things that must sit above OTHER components. Small numbers (0–10) that
+     just order the parts inside one component stay as plain numbers. */
+  --z-page: 100; /* page container, above its own decorative background */
+  --z-page-header: 101;
+  --z-page-header-controls: 102;
+  --z-drag-area: 1000; /* invisible layer that lets you drag the frameless window */
+  --z-floating: 1000; /* floating UI: mini player, page toasts, map overlays */
+  --z-window-controls: 1100; /* home window buttons, above the drag area */
+  --z-dropdown: 1200;
+  --z-above-chrome: 2000; /* back button, small toasts and popups above window controls */
+  --z-modal: 9999; /* modals and the offline banner */
+  --z-dialog: 10000; /* confirm dialogs and success toasts, above modals */
+  --z-adhan-overlay: 99999; /* full-screen adhan player */
+  --z-top: 100000; /* text-selection copy menu: above everything */
+
+  /* ── Colours ──────────────────────────────────────────────────────────────
+     Theme colours (accent, backgrounds, main text) live in themes.css. These are the
+     shared colours used on top of every theme.
+     Tier 1 says what a colour IS (--white-a10 = white at 10%); tier 2 says what it is FOR
+     (--surface-3 = a raised panel). Components should use tier 2; a theme can override a
+     tier-2 token (e.g. a light theme could make surfaces dark) without touching components. */
+
+  /* Tier 1: neutrals (see-through white and black) */
+  --black: #000;
+  --black-a10: rgba(0, 0, 0, 0.1);
+  --black-a12: rgba(0, 0, 0, 0.12);
+  --black-a15: rgba(0, 0, 0, 0.15);
+  --black-a20: rgba(0, 0, 0, 0.2);
+  --black-a22: rgba(0, 0, 0, 0.22);
+  --black-a25: rgba(0, 0, 0, 0.25);
+  --black-a30: rgba(0, 0, 0, 0.3);
+  --black-a35: rgba(0, 0, 0, 0.35);
+  --black-a40: rgba(0, 0, 0, 0.4);
+  --black-a45: rgba(0, 0, 0, 0.45);
+  --black-a50: rgba(0, 0, 0, 0.5);
+  --black-a60: rgba(0, 0, 0, 0.6);
+  --black-a70: rgba(0, 0, 0, 0.7);
+  --black-a75: rgba(0, 0, 0, 0.75);
+  --black-a80: rgba(0, 0, 0, 0.8);
+  --black-a85: rgba(0, 0, 0, 0.85);
+  --white: #fff;
+  --white-a01: rgba(255, 255, 255, 0.01);
+  --white-a02: rgba(255, 255, 255, 0.02);
+  --white-a03: rgba(255, 255, 255, 0.03);
+  --white-a04: rgba(255, 255, 255, 0.04);
+  --white-a4-5: rgba(255, 255, 255, 0.045);
+  --white-a05: rgba(255, 255, 255, 0.05);
+  --white-a06: rgba(255, 255, 255, 0.06);
+  --white-a07: rgba(255, 255, 255, 0.07);
+  --white-a08: rgba(255, 255, 255, 0.08);
+  --white-a10: rgba(255, 255, 255, 0.1);
+  --white-a12: rgba(255, 255, 255, 0.12);
+  --white-a14: rgba(255, 255, 255, 0.14);
+  --white-a15: rgba(255, 255, 255, 0.15);
+  --white-a16: rgba(255, 255, 255, 0.16);
+  --white-a18: rgba(255, 255, 255, 0.18);
+  --white-a20: rgba(255, 255, 255, 0.2);
+  --white-a25: rgba(255, 255, 255, 0.25);
+  --white-a30: rgba(255, 255, 255, 0.3);
+  --white-a35: rgba(255, 255, 255, 0.35);
+  --white-a40: rgba(255, 255, 255, 0.4);
+  --white-a50: rgba(255, 255, 255, 0.5);
+  --white-a55: rgba(255, 255, 255, 0.55);
+  --white-a60: rgba(255, 255, 255, 0.6);
+  --white-a65: rgba(255, 255, 255, 0.65);
+  --white-a70: rgba(255, 255, 255, 0.7);
+  --white-a80: rgba(255, 255, 255, 0.8);
+  --white-a85: rgba(255, 255, 255, 0.85);
+  --white-a90: rgba(255, 255, 255, 0.9);
+
+  /* Tier 1: palette (Material 500 shades) */
+  --green-500: #4caf50;
+  --orange-500: #ff9800;
+  --red-500: #f44336;
+  --blue-500: #2196f3;
+
+  /* Tier 2: surfaces = translucent layers over the theme background, from faint to strong */
+  --surface-subtle: var(--white-a03);
+  --surface-1: var(--white-a05);
+  --surface-2: var(--white-a08);
+  --surface-3: var(--white-a10);
+  --surface-hover: var(--white-a15);
+  --surface-active: var(--white-a20);
+
+  /* Tier 2: borders */
+  --border-subtle: var(--white-a06);
+  --border-soft: var(--white-a08);
+  --border-medium: var(--white-a10);
+  --border-strong: var(--white-a15);
+
+  /* Tier 2: text on dark surfaces */
+  --text-bright: var(--white);
+  --text-soft: var(--white-a90);
+  --text-muted: var(--white-a70);
+  --text-faint: var(--white-a60);
+  --text-dim: var(--white-a50); /* placeholders, other-month dates */
+
+  /* Tier 2: status */
+  --color-danger: #ff6b6b;
+  --color-danger-strong: #ff5252;
+  --color-success: #4cd964;
+  --color-warning: #fa0;
+
+  /* Tier 2: shadows */
+  --shadow-sm: 0 2px 8px var(--black-a10);
+  --shadow-md: 0 4px 12px var(--black-a15);
+  --shadow-lg: 0 8px 24px var(--black-a40);
+  --shadow-danger-sm: 0 2px 8px rgba(255, 107, 107, 0.3);
+  --shadow-danger-md: 0 4px 12px rgba(255, 107, 107, 0.4);
+
+  /* ── Font stacks ─────────────────────────────────────────────────────────── */
+  --font-ui: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-arabic:
+    "Scheherazade New", "Traditional Arabic", "Segoe UI", Tahoma, sans-serif;
+  --font-quran:
+    "QuranFont", "Traditional Arabic", "Scheherazade New", "Amiri", serif;
+  --font-media: "DM Sans", sans-serif; /* radio and livestream pages */
+  --font-icons: "Font Awesome 6 Free";
+
+  /* ── Spacing and corner radius scale ──────────────────────────────────────
+     Use these for new or refactored code (the shared components already do). */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* ── Breakpoints ───────────────────────────────────────────────────────────
+     CSS cannot use variables inside @media, so these are the agreed values to use:
+       @media (max-width: 768px)  narrow window: tighter header, smaller title
+       @media (max-width: 480px)  small window: smallest buttons and text
+     The window opens 850px wide and cannot be resized below 400px, so rules for
+     widths under 400px never apply. */
+}

@@ -1,356 +1,383 @@
-/* Main Page Header */
-.header {
-  padding: 60px 20px 5px;
-  text-align: center;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), transparent);
-}
-
-/* Location Wrapper */
-.location-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  position: relative;
-}
-
-.location {
-  font-size: 18px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.3px;
-}
-
-/* Location Action Buttons */
-.location-switcher-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
-  color: rgba(255, 255, 255, 0.9);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  -webkit-app-region: no-drag;
-}
-
-.location-switcher-btn {
-  font-size: 10px;
-}
-
-.location-switcher-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-1px);
-}
-
-.location-switcher-btn.active {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.location-switcher-btn.active i {
-  transform: rotate(180deg);
-}
-
-.location-switcher-btn i {
-  transition: transform 0.3s ease;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+@layer pages {
+  /* Main Page Header */
+  .header {
+    padding: 60px 20px 5px;
+    text-align: center;
+    background: linear-gradient(180deg, var(--black-a15), transparent);
   }
-  to {
-    transform: rotate(360deg);
+
+  /* Location Wrapper */
+  .location-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    position: relative;
+  }
+
+  .location {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 0.3px;
+  }
+
+  .location-switcher-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1px solid var(--white-a20);
+    background: var(--surface-3);
+    backdrop-filter: blur(5px);
+    color: var(--text-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    -webkit-app-region: no-drag;
+    font-size: 10px;
+  }
+
+  .location-switcher-btn:hover {
+    background: var(--surface-active);
+    border-color: var(--white-a30);
+    transform: translateY(-1px);
+  }
+
+  .location-switcher-btn.active {
+    background: var(--surface-active);
+  }
+
+  .location-switcher-btn.active i {
+    transform: rotate(180deg);
+  }
+
+  .location-switcher-btn i {
+    transition: transform 0.3s ease;
+  }
+
+  /* Location Switcher Dropdown */
+  .location-switcher-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-top: 8px;
+    background: var(--bg-surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    min-width: 220px;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: var(--z-dropdown);
+    overflow: hidden;
+    pointer-events: none;
+    -webkit-app-region: no-drag;
+  }
+
+  .location-switcher-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Location Switcher Item */
+  .location-switcher-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid var(--white-a05);
+    pointer-events: auto;
+  }
+
+  .location-switcher-item:last-child {
+    border-bottom: none;
+  }
+
+  .location-switcher-item:hover {
+    background: var(--surface-1);
+  }
+
+  .location-switcher-item.active {
+    background: rgba(var(--accent-rgb), 0.1);
+  }
+
+  .switcher-item-info {
+    flex: 1;
+    min-width: 0;
+    pointer-events: none;
+  }
+
+  .switcher-item-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+    pointer-events: none;
+  }
+
+  .switcher-item-details {
+    font-size: 12px;
+    color: var(--text-secondary);
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+  }
+
+  .switcher-check {
+    color: var(--accent-color);
+    font-size: 14px;
+    margin-left: 8px;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  /* Detect Location Item - Special styling */
+  .location-switcher-item.detect-location-item {
+    border-bottom: 2px solid var(--border-medium);
+  }
+
+  .detect-location-item .switcher-item-name {
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .detect-location-item .switcher-item-name i {
+    font-size: 14px;
+  }
+
+  .detect-location-item:hover {
+    background: rgba(var(--accent-rgb), 0.08);
+  }
+
+  /* Date Container */
+  .date-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 13px;
+    color: var(--white-a85);
+  }
+
+  .date-separator {
+    opacity: 0.5;
+    font-weight: 300;
+  }
+
+  .ramadan-countdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: #fbbf24;
+    margin-bottom: 1px;
+    font-weight: 500;
+  }
+
+  .date-info {
+    font-size: 13px;
+    color: var(--white-a85);
+    font-weight: 400;
+    direction: ltr; /* the Gregorian date reads left-to-right in every language */
+  }
+
+  .hijri-date {
+    font-size: 13px;
+    color: var(--white-a85);
+  }
+
+  /* Prayer Cards Container */
+  .prayer-cards-container {
+    display: flex;
+    gap: 12px;
+    padding: 10px 16px;
+    margin-bottom: 0;
+  }
+
+  /* Prayer Times List */
+  .prayer-times {
+    padding: 0 16px 16px;
+    overflow-y: visible;
+    min-height: 0;
+  }
+
+  /* Settings Container */
+  .settings-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .settings-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Prayer Widget Toggle Button ── */
+  .widget-toggle-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-3);
+    backdrop-filter: blur(6px);
+    color: var(--white-a85);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    transition: all 0.25s ease;
+    -webkit-app-region: no-drag;
+    pointer-events: auto;
+  }
+
+  .widget-toggle-btn:hover {
+    background: var(--surface-active);
+    border-color: var(--white-a30);
+    color: var(--text-bright);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--black-a20);
+  }
+
+  .widget-toggle-btn--active {
+    background: rgba(var(--accent-rgb, 74, 144, 226), 0.3);
+    border-color: var(--accent-color, #4a90e2);
+    color: var(--accent-color, #4a90e2);
+    box-shadow: 0 0 10px rgba(var(--accent-rgb, 74, 144, 226), 0.3);
+  }
+
+  .widget-toggle-btn--active:hover {
+    background: rgba(var(--accent-rgb, 74, 144, 226), 0.45);
+  }
+
+  /* ── Index page layout ─────────────────────────────────────────────────────
+     The app-container is height:100vh (set in reset.css).
+     We make it a flex column so the prayer-times list fills remaining space
+     and scrolls internally — the window height never needs to change. */
+  .app-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Fullscreen mode: fill all vertical space ───────────────────────────────── */
+  body.fullscreen-mode .app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* Prayer cards: flexible — takes ~30% of screen height */
+  body.fullscreen-mode .prayer-cards-container {
+    flex: 3 1 0;
+    min-height: 0;
+    padding: 12px 24px;
+    gap: 16px;
+  }
+
+  /* Each card fills its half */
+  body.fullscreen-mode .prayer-card {
+    flex: 1;
+    min-height: 0;
+    justify-content: center;
+  }
+
+  /* Prayer list: takes ~70% of remaining space */
+  body.fullscreen-mode .prayer-times {
+    flex: 7 1 0;
+    min-height: 0;
+    padding: 0 24px 16px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Prayer list fills vertically — items stretch to fill */
+  body.fullscreen-mode .prayer-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    gap: 0;
+  }
+
+  /* Each prayer row grows to fill its share — constrained max height */
+  body.fullscreen-mode .prayer-item {
+    flex: 1;
+    max-height: 80px;
+    margin: 3px 0;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+  }
+
+  body.fullscreen-mode .prayer-item .prayer-name {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  body.fullscreen-mode .prayer-item .prayer-time {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  body.fullscreen-mode .prayer-item i {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+  }
+
+  body.fullscreen-mode .adhan-toggle-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  body.fullscreen-mode .current-indicator {
+    font-size: 11px;
+    padding: 2px 7px;
+  }
+
+  /* Prayer cards text stays readable but compact */
+  body.fullscreen-mode .prayer-card .prayer-label {
+    font-size: 13px;
+  }
+
+  body.fullscreen-mode .prayer-card .prayer-name {
+    font-size: 22px;
+    margin: 4px 0;
+  }
+
+  body.fullscreen-mode .prayer-card .prayer-time {
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+
+  body.fullscreen-mode .prayer-card .countdown {
+    font-size: 18px;
+  }
+
+  body.fullscreen-mode .prayer-card .time-remaining {
+    font-size: 12px;
+  }
+
+  body.fullscreen-mode .location {
+    font-size: 20px;
   }
 }
-
-/* Location Switcher Dropdown */
-.location-switcher-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-top: 8px;
-  background: var(--bg-surface);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  min-width: 220px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateX(-50%) translateY(-10px);
-  transition: all 0.3s ease;
-  z-index: 1200;
-  overflow: hidden;
-  pointer-events: none;
-  -webkit-app-region: no-drag;
-}
-
-.location-switcher-dropdown.active {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0) !important;
-  pointer-events: auto;
-}
-
-/* Location Switcher Item */
-.location-switcher-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  pointer-events: auto;
-}
-
-.location-switcher-item:last-child {
-  border-bottom: none;
-}
-
-.location-switcher-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.location-switcher-item.active {
-  background: rgba(var(--accent-rgb), 0.1);
-}
-
-.switcher-item-info {
-  flex: 1;
-  min-width: 0;
-  pointer-events: none;
-}
-
-.switcher-item-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 2px;
-  pointer-events: none;
-}
-
-.switcher-item-details {
-  font-size: 12px;
-  color: var(--text-secondary);
-  opacity: 0.8;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-}
-
-.switcher-check {
-  color: var(--accent-color);
-  font-size: 14px;
-  margin-left: 8px;
-  flex-shrink: 0;
-  pointer-events: none;
-}
-
-/* Detect Location Item - Special styling */
-.location-switcher-item.detect-location-item {
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.detect-location-item .switcher-item-name {
-  color: var(--accent-color);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.detect-location-item .switcher-item-name i {
-  font-size: 14px;
-}
-
-.detect-location-item:hover {
-  background: rgba(var(--accent-rgb), 0.08);
-}
-
-/* Date Container */
-.date-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 4px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.date-separator {
-  opacity: 0.5;
-  font-weight: 300;
-}
-
-.ramadan-countdown {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  color: #fbbf24;
-  margin-bottom: 1px;
-  font-weight: 500;
-}
-
-.date-info {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 400;
-}
-
-.hijri-date {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-/* Prayer Cards Container */
-.prayer-cards-container {
-  display: flex;
-  gap: 12px;
-  padding: 10px 16px;
-  margin-bottom: 0;
-}
-
-/* Prayer Times List */
-.prayer-times {
-  padding: 0 16px 16px;
-  overflow-y: visible;
-  min-height: 0;
-}
-
-/* Settings Container */
-.settings-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.settings-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ── Prayer Widget Toggle Button ── */
-.widget-toggle-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(6px);
-  color: rgba(255, 255, 255, 0.85);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  transition: all 0.25s ease;
-  -webkit-app-region: no-drag;
-  pointer-events: auto;
-}
-
-.widget-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.widget-toggle-btn--active {
-  background: rgba(var(--accent-rgb, 74, 144, 226), 0.3);
-  border-color: var(--accent-color, #4a90e2);
-  color: var(--accent-color, #4a90e2);
-  box-shadow: 0 0 10px rgba(var(--accent-rgb, 74, 144, 226), 0.3);
-}
-
-.widget-toggle-btn--active:hover {
-  background: rgba(var(--accent-rgb, 74, 144, 226), 0.45);
-}
-
-/* ── Index page layout ─────────────────────────────────────────────────────
-   The app-container is height:100vh (set in reset.css).
-   We make it a flex column so the prayer-times list fills remaining space
-   and scrolls internally — the window height never needs to change. */
-#app.app-container {
-  display: flex;
-  flex-direction: column;
-}
-
-
-
-/* ── Fullscreen mode: fill all vertical space ───────────────────────────────── */
-body.fullscreen-mode #app.app-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-/* Prayer cards: flexible — takes ~30% of screen height */
-body.fullscreen-mode #prayerCards {
-  flex: 3 1 0;
-  min-height: 0;
-  padding: 12px 24px;
-  gap: 16px;
-}
-
-/* Each card fills its half */
-body.fullscreen-mode .prayer-card {
-  flex: 1;
-  min-height: 0;
-  justify-content: center;
-}
-
-/* Prayer list: takes ~70% of remaining space */
-body.fullscreen-mode #prayerTimes {
-  flex: 7 1 0;
-  min-height: 0;
-  padding: 0 24px 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Prayer list fills vertically — items stretch to fill */
-body.fullscreen-mode #prayerList {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  gap: 0;
-}
-
-/* Each prayer row grows to fill its share — constrained max height */
-body.fullscreen-mode .prayer-item {
-  flex: 1;
-  max-height: 80px;
-  margin: 3px 0;
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
-}
-
-body.fullscreen-mode .prayer-item .prayer-name { font-size: 16px; font-weight: 600; }
-body.fullscreen-mode .prayer-item .prayer-time { font-size: 15px; font-weight: 600; }
-body.fullscreen-mode .prayer-item i { width: 32px; height: 32px; font-size: 15px; }
-body.fullscreen-mode .adhan-toggle-btn { width: 32px; height: 32px; }
-body.fullscreen-mode .current-indicator { font-size: 11px; padding: 2px 7px; }
-
-/* Prayer cards text stays readable but compact */
-body.fullscreen-mode .prayer-card .prayer-label { font-size: 13px; }
-body.fullscreen-mode .prayer-card .prayer-name  { font-size: 22px; margin: 4px 0; }
-body.fullscreen-mode .prayer-card .prayer-time  { font-size: 28px; margin-bottom: 4px; }
-body.fullscreen-mode .prayer-card .countdown    { font-size: 18px; }
-body.fullscreen-mode .prayer-card .time-remaining { font-size: 12px; }
-body.fullscreen-mode .location { font-size: 20px; }

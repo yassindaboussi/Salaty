@@ -6,6 +6,7 @@ const { t } = require("../../core/i18n/translations");
 const { getNamesOfAllah } = require("../../services/api/api");
 const analytics = require("../../utils/analytics");
 const { renderToast } = require("../../core/toast");
+const { initSelectionCopy } = require("../../ui/selectionCopy");
 
 let asmaData = null;
 let currentLanguage = "en";
@@ -33,6 +34,8 @@ function initAsmaPage() {
       ipcRenderer.invoke("navigate-to", "features");
     });
   }
+
+  initSelectionCopy(document.getElementById("asmaList"), copySelectedText);
 
   updateAsmaUI();
 
@@ -81,16 +84,28 @@ function renderAsmaList() {
     card.className = "asma-card";
 
     if (isArabic) {
+      const langData = item.ar;
+      const meaning = langData ? decodeUnicode(langData.meaning) : "";
+      const desc = langData ? decodeUnicode(langData.desc) : "";
+
       card.innerHTML = `
-        <button class="asma-copy-btn" aria-label="${t("copy")}">
-          <i class="fas fa-copy"></i>
-        </button>
-        <div class="asma-name">${item.name}</div>
-        <div class="asma-number">${item.number}</div>
+        <div class="asma-header-row">
+          <div class="asma-name-group">
+            <div class="asma-number">${item.number}</div>
+            <div class="asma-name">${item.name}</div>
+          </div>
+          <button class="asma-copy-btn" aria-label="${t("copy")}">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+        <div class="asma-meaning">${meaning}</div>
+        <div class="asma-desc">${desc}</div>
       `;
 
       const copyBtn = card.querySelector(".asma-copy-btn");
-      copyBtn.addEventListener("click", () => copyAsmaArabic(item.name));
+      copyBtn.addEventListener("click", () =>
+        copyAsmaArabic(item.name, meaning, desc),
+      );
     } else {
       const langData = item[currentLanguage] || item.en;
       const meaning = decodeUnicode(langData.meaning);
@@ -115,6 +130,17 @@ function renderAsmaList() {
   });
 }
 
+// Copies the part of a card the user highlighted (Ctrl/Cmd+C or right-click > Copy).
+function copySelectedText(text) {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      analytics.asmaCopied();
+      showSuccessToast(t("copiedToClipboard"));
+    })
+    .catch(() => showSuccessToast(t("failedToCopy"), true));
+}
+
 function copyAsma(item, meaning, desc) {
   const text = `${item.name} - ${item.transliteration} - ${meaning}\n${desc}`;
   navigator.clipboard
@@ -126,9 +152,12 @@ function copyAsma(item, meaning, desc) {
     .catch(() => showSuccessToast(t("failedToCopy"), true));
 }
 
-function copyAsmaArabic(name) {
+function copyAsmaArabic(name, meaning, desc) {
+  const text = meaning
+    ? `${name} — ${meaning}\n${desc}`
+    : name;
   navigator.clipboard
-    .writeText(name)
+    .writeText(text)
     .then(() => {
       analytics.asmaCopied();
       showSuccessToast(t("copiedToClipboard"));
@@ -138,7 +167,7 @@ function copyAsmaArabic(name) {
 
 function showSuccessToast(message, isError = false) {
   renderToast(
-    `success-toast ${isError ? "error" : ""}`,
+    `asma-toast ${isError ? "error" : ""}`,
     `<i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}"></i><span>${message}</span>`,
     { duration: 3000, removeDelay: 500 },
   );

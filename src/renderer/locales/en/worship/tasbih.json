@@ -31,9 +31,18 @@
   "dhikrSubhanallahMeaning": "Glory be to Allah",
   "dhikrAlhamdulillahMeaning": "Praise be to Allah",
   "dhikrAllahuAkbarMeaning": "Allah is the Greatest",
-  "dhikrLaIlahaMeaning": "There is no god but Allah",
+  "dhikrLaIlahaMeaning": "None has the right to be worshipped but Allah alone; His is the dominion and praise, and He is over all things Omnipotent",
   "dhikrAstaghfirullahMeaning": "I seek forgiveness from Allah",
   "dhikrSubhanallahiWaBihamdihiMeaning": "Glory be to Allah, and praise Him",
   "dhikrSalawatMeaning": "O Allah, send blessings upon Muhammad",
-  "dhikrHawqalaMeaning": "There is no power nor might except with Allah"
+  "dhikrHawqalaMeaning": "There is no power nor might except with Allah",
+
+  "dhikrSubhanallahSource": "33× after each prayer — Sahih Muslim 596",
+  "dhikrAlhamdulillahSource": "33× after each prayer — Sahih Muslim 596",
+  "dhikrAllahuAkbarSource": "34× after each prayer, completing the 100 — Sahih Muslim 596",
+  "dhikrLaIlahaSource": "100×/day — Sahih al-Bukhari 6403, Sahih Muslim 2691",
+  "dhikrAstaghfirullahSource": "100×/day — Sahih Muslim 2702",
+  "dhikrSubhanallahiWaBihamdihiSource": "100×/day — Sahih al-Bukhari 6405",
+  "dhikrSalawatSource": "No fixed number in an authentic hadith — recite it often, as much as you wish",
+  "dhikrHawqalaSource": "No fixed number in an authentic hadith — a \"treasure of Paradise,\" recite it often"
 }

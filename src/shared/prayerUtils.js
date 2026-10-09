@@ -62,9 +62,48 @@ function getCurrentAndNext(
   return { currentPrayer, nextPrayer, timeRemaining };
 }
 
+// ── Friday: Jumu'ah ──────────────────────────────────────────────────────────
+// On Friday, Jumu'ah takes the place of Dhuhr in the same time window, so only the
+// *name* changes; the calculated Dhuhr time is kept.
+
+const JUMUAH_KEY = "Jumuah";
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+/**
+ * Weekday name ("Friday", …) of `date` in the prayer location's time zone (the IANA
+ * name Aladhan returns as data.meta.timezone), so a city in another zone than the PC
+ * still gets its own day. Falls back to the PC clock when the zone is missing/invalid.
+ */
+function weekdayIn(timeZone, date = new Date()) {
+  if (timeZone) {
+    try {
+      return new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone }).format(date);
+    } catch {
+      /* unknown time zone: fall back to the PC clock */
+    }
+  }
+  return WEEKDAYS[date.getDay()];
+}
+
+function isFridayIn(timeZone, date) {
+  return weekdayIn(timeZone, date) === "Friday";
+}
+
+/**
+ * Key to use for the prayer's *display name* only. Anything keyed by prayer
+ * (adhan toggles, stored settings, timings) must keep using the original key.
+ */
+function displayPrayerKey(key, { isFriday } = {}) {
+  return key === "Dhuhr" && isFriday ? JUMUAH_KEY : key;
+}
+
 module.exports = {
   PRAYER_KEYS,
+  JUMUAH_KEY,
   secondsFromTime,
   formatTime,
   getCurrentAndNext,
+  weekdayIn,
+  isFridayIn,
+  displayPrayerKey,
 };

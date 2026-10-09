@@ -1,0 +1,105 @@
+/*
+  Page header: [back button]  [centred title]  [window buttons]
+  Shared by every page that has a back button. Markup:
+
+    <div class="page-header settings-header">
+      <button class="back-btn">…</button>
+      <h2 class="page-header__title settings-title">…</h2>
+      <div class="page-header__controls settings-controls">
+        <button class="control-btn minimize-btn">…</button> …
+      </div>
+    </div>
+
+  The row is always laid out left-to-right, like the operating-system title bar: the back
+  arrow stays on the left and the window buttons on the right in Arabic too. Only the title
+  text follows the language direction.
+  The page class next to it (settings-header, …) holds what is specific to that page,
+  e.g. a z-index or making the header a window-drag area. The buttons themselves are in
+  buttons.css.
+*/
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  direction: ltr;
+}
+
+/* Buttons stay clickable when a page makes its header a window-drag area */
+.page-header button {
+  -webkit-app-region: no-drag;
+}
+
+.page-header .back-btn {
+  flex: 0 0 auto;
+}
+
+.page-header__title {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-bright);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Arabic title reads right-to-left, so a title that is too long is cut at its end */
+[dir="rtl"] .page-header__title {
+  direction: rtl;
+}
+
+.page-header__controls {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+  position: relative;
+}
+
+/* Narrower windows: tighter header, smaller title and window buttons */
+@media (width <= 768px) {
+  .page-header {
+    padding-bottom: var(--space-2);
+    min-height: 32px;
+  }
+
+  .page-header__title {
+    font-size: 16px;
+  }
+
+  .page-header .control-btn {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (width <= 480px) {
+  .page-header__title {
+    font-size: 14px;
+  }
+
+  .page-header .control-btn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .page-header .control-btn i,
+  .page-header .control-btn svg {
+    font-size: 10px;
+    width: 10px;
+    height: 10px;
+  }
+}
+
+@media (width <= 320px) {
+  .page-header__title {
+    font-size: 13px;
+  }
+}

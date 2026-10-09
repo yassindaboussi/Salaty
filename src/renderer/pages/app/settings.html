@@ -4,14 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Settings - Salaty Time</title>
-    <link
-      rel="stylesheet"
-      href="../../vendor/fontawesome/css/all.min.css"
-    />
-    <link
-      href="../../vendor/tom-select/css/tom-select.css"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/settings.css" />
     <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
@@ -23,7 +15,7 @@
 
       <div class="settings-container">
         <!-- Settings Header with Controls -->
-        <div class="settings-header">
+        <div class="page-header settings-header">
           <button
             class="back-btn"
             id="backBtn"
@@ -32,10 +24,10 @@
           >
             <i class="fas fa-arrow-left"></i>
           </button>
-          <h2 class="settings-title" id="settingsTitle">Settings</h2>
+          <h2 class="page-header__title settings-title" id="settingsTitle">Settings</h2>
 
           <!-- Window Controls -->
-          <div class="settings-controls">
+          <div class="page-header__controls settings-controls">
             <!-- Minimize button -->
             <button
               class="control-btn minimize-btn"
@@ -641,7 +633,7 @@
       </div>
 
       <!-- Add/Edit Location Modal - SAME STRUCTURE AS MY LOCATIONS -->
-      <div class="modal-overlay" id="addEditLocationModal">
+      <div class="modal-overlay location-edit-modal" id="addEditLocationModal">
         <div
           class="modal-container modal-small"
           style="max-width: 450px; padding: 24px"

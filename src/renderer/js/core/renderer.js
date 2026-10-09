@@ -110,7 +110,7 @@ async function routePage(path) {
     initFastingPage();
   } else if (path.includes("monthly-prayer-times.html")) {
     analytics.featureOpen("monthly-prayer-times");
-    setupScreenSizeForPage("mpt-container");
+    setupScreenSizeForPage("monthly-container");
     const {
       initMonthlyPrayerTimesPage,
     } = require("../../js/features/worship/monthlyPrayerTimesUI");

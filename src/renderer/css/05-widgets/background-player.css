@@ -28,7 +28,7 @@ body {
   user-select: none;
 }
 
-/* Groupement des textes */
+/* Text group */
 .track-info {
   flex: 1;
   display: flex;
@@ -55,7 +55,7 @@ body {
   color: var(--text-dim);
 }
 
-/* Gestion des contrôles */
+/* Controls */
 .controls {
   display: flex;
   gap: 12px;
@@ -63,7 +63,7 @@ body {
   -webkit-app-region: no-drag;
 }
 
-/* Base commune pour tous les boutons */
+/* Shared base for all buttons */
 .btn,
 .mini-btn {
   background: var(--glass-white);
@@ -86,7 +86,7 @@ body {
   background: var(--glass-hover);
 }
 
-/* Variantes spécifiques */
+/* Variants */
 .btn-play {
   background: var(--accent-color, var(--accent-blue));
   width: 36px;
