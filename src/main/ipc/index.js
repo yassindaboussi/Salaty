@@ -1,20 +1,28 @@
 "use strict";
 
-const settingsHandlers = require("./handlers/settings-handlers");
-const windowHandlers = require("./handlers/window-handlers");
+// Registers every IPC channel the pages use (called once from app/bootstrap.js).
+const { registerSettingsHandlers } = require("./handlers/settings-handlers");
+const { registerWindowHandlers } = require("./handlers/window-handlers");
 const popupHandlers = require("./handlers/popup-handlers");
 const playerManager = require("../services/player-manager");
 const prayerTimerManager = require("../services/prayer-timer-manager");
+const analytics = require("../services/analytics-manager");
+const { refreshTrayMenu } = require("../windows/tray");
+const log = require("../services/logger").logger("IPC");
 
-function setupHandlers(mainWindow) {
-  settingsHandlers.setupHandlers(mainWindow, {
+// getMainWindow: returns the main window (or null); read whenever a handler runs.
+function registerIpcHandlers({ getMainWindow }) {
+  const sendToMain = (channel, payload) => {
+    const win = getMainWindow();
+    if (win && !win.isDestroyed()) win.webContents.send(channel, payload);
+  };
+
+  registerSettingsHandlers({
     onLocationChange: () => {
       prayerTimerManager
         .reloadPrayerData()
         .then(() => {
-          if (mainWindow && !mainWindow.isDestroyed()) {
-            mainWindow.webContents.send("location-changed");
-          }
+          sendToMain("location-changed");
           // The desktop widget already listens for fresh data; without this it kept the
           // old city/method's times until its own hourly refresh.
           const widget = popupHandlers.getPrayerWidgetWindow();
@@ -24,31 +32,24 @@ function setupHandlers(mainWindow) {
           }
         })
         .catch((err) => {
-          console.error("[IPC] reloadPrayerData failed:", err);
-          if (mainWindow && !mainWindow.isDestroyed()) {
-            mainWindow.webContents.send("location-changed");
-          }
+          log.error("reloading prayer times failed:", err);
+          sendToMain("location-changed");
         });
     },
     onThemeChange: (theme) => {
-      if (mainWindow && !mainWindow.isDestroyed())
-        mainWindow.webContents.send("theme-changed", theme);
-
+      sendToMain("theme-changed", theme);
       const playerWindow = playerManager.getPlayerWindow();
       if (playerWindow && !playerWindow.isDestroyed())
         playerWindow.webContents.send("theme-changed", theme);
-
       popupHandlers.broadcastThemeToPopups(theme);
     },
+    onLanguageChange: () => refreshTrayMenu(),
+    onAnalyticsChange: (enabled) => analytics.applyConsent(enabled),
   });
 
-  windowHandlers.setupHandlers(mainWindow);
+  registerWindowHandlers(getMainWindow);
+  popupHandlers.registerPopupHandlers({ getMainWindow });
+  playerManager.registerPlayerIpc(getMainWindow);
 }
 
-module.exports = {
-  loadSettings: settingsHandlers.loadSettings,
-  saveSettings: settingsHandlers.saveSettings,
-  getSettingsData: settingsHandlers.getSettingsData,
-  savePosition: settingsHandlers.savePosition,
-  setupHandlers,
-};
+module.exports = { registerIpcHandlers };

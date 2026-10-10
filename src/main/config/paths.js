@@ -46,7 +46,11 @@ const pages = {
   backgroundPlayer: PAGE_ROUTE_MAP["background-player"],
   prayerWidget: PAGE_ROUTE_MAP["prayer-widget"],
   athkarPopup: PAGE_ROUTE_MAP["athkar-popup"],
-  byName: (page) => PAGE_ROUTE_MAP[page] || PAGE_ROUTE_MAP.index,
+  // unknown names (or anything that is not a page name) open the home page
+  byName: (page) =>
+    typeof page === "string" && Object.hasOwn(PAGE_ROUTE_MAP, page)
+      ? PAGE_ROUTE_MAP[page]
+      : PAGE_ROUTE_MAP.index,
 };
 
 const icons = {

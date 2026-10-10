@@ -1,21 +1,26 @@
 /*
   Page header: [back button]  [centred title]  [window buttons]
-  Shared by every page that has a back button. Markup:
+  Shared by every page that has a back button. The page writes
 
-    <div class="page-header settings-header">
+    <header class="page-header settings-header" data-page-header data-back="home" …>
+      <h1 class="page-header__title settings-title">…</h1>
+    </header>
+
+  and js/components/page-header.js adds the buttons, giving
+    <header class="page-header settings-header">
       <button class="back-btn">…</button>
-      <h2 class="page-header__title settings-title">…</h2>
+      <h1 class="page-header__title settings-title">…</h1>
       <div class="page-header__controls settings-controls">
         <button class="control-btn minimize-btn">…</button> …
       </div>
-    </div>
+    </header>
 
   The row is always laid out left-to-right, like the operating-system title bar: the back
   arrow stays on the left and the window buttons on the right in Arabic too. Only the title
   text follows the language direction.
-  The page class next to it (settings-header, …) holds what is specific to that page,
-  e.g. a z-index or making the header a window-drag area. The buttons themselves are in
-  buttons.css.
+  The header is the window's title bar: dragging it moves the frameless window (the
+  buttons inside stay clickable). The page class next to it (settings-header, …) holds
+  what is specific to that page, e.g. a z-index. The buttons themselves are in buttons.css.
 */
 .page-header {
   display: flex;
@@ -26,9 +31,10 @@
   border-bottom: 1px solid var(--border-color);
   position: relative;
   direction: ltr;
+  -webkit-app-region: drag;
 }
 
-/* Buttons stay clickable when a page makes its header a window-drag area */
+/* Buttons stay clickable inside the drag area */
 .page-header button {
   -webkit-app-region: no-drag;
 }

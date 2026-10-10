@@ -1,0 +1,260 @@
+"use strict";
+const { ipcRenderer } = require("electron");
+const { state } = require("../core/store");
+const { t, getLocaleTag } = require("../core/i18n");
+const { hijriMonthName } = require("../utils/dates");
+const { escapeHtml } = require("../utils/html");
+const { setupConnectionRecovery } = require("../services/connection-recovery");
+
+const OCCASION_META = {
+  whiteDays: {
+    icon: "fa-moon",
+    titleKey: "whiteDaysTitle",
+    descKey: "whiteDaysDesc",
+  },
+  tasua: { icon: "fa-mosque", titleKey: "tasuaTitle", descKey: "tasuaDesc" },
+  ashura: { icon: "fa-mosque", titleKey: "ashuraTitle", descKey: "ashuraDesc" },
+  dhulHijjahFirst9: {
+    icon: "fa-star-and-crescent",
+    titleKey: "dhulHijjahFirst9Title",
+    descKey: "dhulHijjahFirst9Desc",
+  },
+  arafah: {
+    icon: "fa-mountain",
+    titleKey: "arafahTitle",
+    descKey: "arafahDesc",
+  },
+  shawwal6: {
+    icon: "fa-utensils",
+    titleKey: "shawwal6Title",
+    descKey: "shawwal6Desc",
+  },
+};
+
+let occasionsCache = [];
+
+function initFastingPage() {
+  // Only the occasions come from main; re-running the whole init would add every listener twice.
+  setupConnectionRecovery(_loadOccasions, "Fasting");
+
+  _setupLeadSelector();
+  _setupWeeklyToggle();
+  _loadOccasions();
+}
+
+function _setupLeadSelector() {
+  const select = document.getElementById("vfLeadSelect");
+  if (!select) return;
+
+  const fr = state.settings.fastingReminders || {};
+  select.value = String(fr.leadDays || 1);
+
+  select.addEventListener("change", () => {
+    const current = state.settings.fastingReminders || {
+      occasions: [],
+      weeklyMonThu: false,
+    };
+    const updated = { ...current, leadDays: parseInt(select.value, 10) || 1 };
+    state.settings.fastingReminders = updated;
+    ipcRenderer.invoke("save-settings", { fastingReminders: updated });
+    _renderHero();
+    _renderList();
+  });
+}
+
+function _currentLeadLabel() {
+  const fr = state.settings.fastingReminders || {};
+  const days = fr.leadDays || 1;
+  const key =
+    days >= 7
+      ? "leadOption7"
+      : days === 3
+        ? "leadOption3"
+        : days === 2
+          ? "leadOption2"
+          : "leadOption1";
+  return t(key);
+}
+
+function _setupWeeklyToggle() {
+  const toggle = document.getElementById("vfWeeklyToggle");
+  if (!toggle) return;
+
+  const fr = state.settings.fastingReminders || {};
+  toggle.checked = Boolean(fr.weeklyMonThu);
+
+  toggle.addEventListener("change", () => {
+    const current = state.settings.fastingReminders || {
+      occasions: [],
+      weeklyMonThu: false,
+    };
+    const updated = { ...current, weeklyMonThu: toggle.checked };
+    state.settings.fastingReminders = updated;
+    ipcRenderer.invoke("save-settings", { fastingReminders: updated });
+  });
+}
+
+async function _loadOccasions() {
+  try {
+    const occasions = await ipcRenderer.invoke("get-fasting-occasions");
+    occasionsCache = Array.isArray(occasions) ? occasions : [];
+  } catch {
+    occasionsCache = [];
+  }
+
+  _renderHero();
+  _renderList();
+}
+
+function _renderHero() {
+  const hero = document.getElementById("vfHero");
+  if (!hero) return;
+
+  const next = occasionsCache[0];
+  if (!next) {
+    hero.classList.add("hidden");
+    return;
+  }
+  hero.classList.remove("hidden");
+
+  const meta = OCCASION_META[next.type] || {};
+  document.getElementById("vfHeroIcon").innerHTML =
+    `<i class="fas ${meta.icon || "fa-utensils"}" aria-hidden="true"></i>`;
+  document.getElementById("vfHeroTitle").textContent =
+    (meta.titleKey && t(meta.titleKey)) || next.type;
+  document.getElementById("vfHeroDate").textContent = _formatDateLine(next);
+  document.getElementById("vfHeroCountdown").textContent = _relativeLabel(
+    next.gregorianDate,
+  );
+  document.getElementById("vfHeroDesc").textContent =
+    (meta.descKey && t(meta.descKey)) || "";
+
+  const btn = document.getElementById("vfHeroToggle");
+  const label = document.getElementById("vfHeroToggleLabel");
+  const isOn = _isReminderOn(next.id);
+  btn.classList.toggle("fasting-active", isOn);
+  btn.title = _currentLeadLabel();
+  label.textContent = t(isOn ? "reminderOn" : "remindMe");
+  btn.onclick = () => {
+    _toggleReminder(next.id);
+    const nowOn = _isReminderOn(next.id);
+    btn.classList.toggle("fasting-active", nowOn);
+    label.textContent = t(nowOn ? "reminderOn" : "remindMe");
+    _renderList();
+  };
+}
+
+function _renderList() {
+  const listEl = document.getElementById("vfList");
+  if (!listEl) return;
+
+  const rest = occasionsCache.slice(1);
+
+  if (rest.length === 0 && occasionsCache.length === 0) {
+    listEl.innerHTML = `<div class="fasting-empty">${escapeHtml(t("noUpcomingFastingDays"))}</div>`;
+    return;
+  }
+  if (rest.length === 0) {
+    listEl.innerHTML = "";
+    return;
+  }
+
+  listEl.innerHTML = rest.map((o) => _renderItem(o)).join("");
+
+  listEl.querySelectorAll("[data-occasion-id]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.occasionId;
+      _toggleReminder(id);
+      const nowOn = _isReminderOn(id);
+      el.classList.toggle("fasting-active", nowOn);
+    });
+  });
+}
+
+function _renderItem(o) {
+  const meta = OCCASION_META[o.type] || {};
+  const title = (meta.titleKey && t(meta.titleKey)) || o.type;
+  const desc = (meta.descKey && t(meta.descKey)) || "";
+  const isOn = _isReminderOn(o.id);
+
+  return `
+    <div class="fasting-item">
+      <div class="fasting-item-icon"><i class="fas ${meta.icon || "fa-utensils"}" aria-hidden="true"></i></div>
+      <div class="fasting-item-info">
+        <div class="fasting-item-title">${escapeHtml(title)}</div>
+        <div class="fasting-item-meta">
+          <span class="fasting-item-date-chip">${escapeHtml(_relativeLabel(o.gregorianDate))}</span>
+          <span>•</span>
+          <span>${escapeHtml(_formatDateLine(o))}</span>
+        </div>
+        <div class="fasting-item-desc">${escapeHtml(desc)}</div>
+      </div>
+      <button
+        type="button"
+        class="fasting-bell-btn${isOn ? " fasting-active" : ""}"
+        data-occasion-id="${escapeHtml(o.id)}"
+        aria-label="${escapeHtml(t("remindMe"))}"
+        title="${escapeHtml(_currentLeadLabel())}"
+      >
+        <i class="fas fa-bell" aria-hidden="true"></i>
+      </button>
+    </div>
+  `;
+}
+
+function _isReminderOn(occasionId) {
+  const fr = state.settings.fastingReminders || {};
+  return Array.isArray(fr.occasions) && fr.occasions.includes(occasionId);
+}
+
+function _toggleReminder(occasionId) {
+  const current = state.settings.fastingReminders || {
+    occasions: [],
+    weeklyMonThu: false,
+  };
+  const set = new Set(current.occasions || []);
+  if (set.has(occasionId)) set.delete(occasionId);
+  else set.add(occasionId);
+
+  const updated = { ...current, occasions: Array.from(set) };
+  state.settings.fastingReminders = updated;
+  ipcRenderer.invoke("save-settings", { fastingReminders: updated });
+}
+
+function _formatDateLine(o) {
+  const hijri = `${o.hijriDay} ${hijriMonthName(o.hijriMonth)}`;
+  const greg = _formatGregorian(o.gregorianDate);
+  return `${greg} — ${hijri}`;
+}
+
+function _formatGregorian(isoDate) {
+  const langTag = getLocaleTag();
+  const d = _parseISO(isoDate);
+  if (!d) return isoDate;
+  return d.toLocaleDateString(langTag, {
+    day: "numeric",
+    month: "long",
+  });
+}
+
+function _relativeLabel(isoDate) {
+  const target = _parseISO(isoDate);
+  if (!target) return "";
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  target.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.round((target - today) / 86400000);
+  if (diffDays === 0) return t("today");
+  if (diffDays === 1) return t("tomorrow");
+  return t("inDays").replace("{days}", diffDays);
+}
+
+function _parseISO(isoDate) {
+  if (!isoDate) return null;
+  const [y, m, d] = isoDate.split("-").map((n) => parseInt(n, 10));
+  if (!y || !m || !d) return null;
+  return new Date(y, m - 1, d);
+}
+
+module.exports = { initFastingPage };

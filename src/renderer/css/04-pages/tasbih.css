@@ -465,12 +465,6 @@
     color: var(--white-a85);
   }
 
-  .dhikr-card.active .dhikr-name,
-  .dhikr-card.active .dhikr-meaning,
-  .dhikr-card.active .dhikr-count {
-    color: var(--text-bright);
-  }
-
   .dhikr-name {
     font-size: 13px;
     font-weight: 600;
@@ -493,6 +487,12 @@
     border-radius: 12px;
     font-weight: 600;
     margin-top: 2px;
+  }
+
+  .dhikr-card.active .dhikr-name,
+  .dhikr-card.active .dhikr-meaning,
+  .dhikr-card.active .dhikr-count {
+    color: var(--text-bright);
   }
 
   .dhikr-card.active .dhikr-count {

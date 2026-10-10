@@ -1,0 +1,8 @@
+{
+  "trayShow": "Show Salaty Time",
+  "trayCheckUpdates": "Check for Updates",
+  "trayQuit": "Quit",
+  "athkarAlertTitle": "Athkar",
+  "crashTitle": "Unexpected error",
+  "crashMessage": "Something went wrong and the app needs to close."
+}

@@ -1,0 +1,23 @@
+# Weekly update pull requests for npm packages and GitHub Actions, so security fixes
+# (like the Electron ones) show up as a PR instead of waiting for a manual `npm audit`.
+# https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # one PR for all minor/patch updates of the build and lint tools
+      dev-tools:
+        dependency-type: development
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]

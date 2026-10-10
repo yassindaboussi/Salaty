@@ -8,7 +8,6 @@
   "weeklyMonThuDesc": "Jeûner les lundis et jeudis",
   "remindMe": "Me rappeler",
   "reminderOn": "Rappel activé",
-  "reminderOff": "Rappel désactivé",
   "leadOption1": "1 jour avant",
   "leadOption2": "2 jours avant",
   "leadOption3": "3 jours avant",
@@ -19,7 +18,6 @@
   "ramadanNote": "Le Ramadan a sa propre page — cette liste concerne uniquement le jeûne volontaire",
   "loadingFastingDays": "Chargement des jours de jeûne...",
   "noUpcomingFastingDays": "Aucun jour de jeûne à venir",
-
   "whiteDaysTitle": "Les Jours Blancs",
   "whiteDaysDesc": "Jeûner les 13, 14 et 15 du mois lunaire équivaut à jeûner tout le mois.",
   "tasuaTitle": "Tassoua",
@@ -32,7 +30,6 @@
   "arafahDesc": "Le 9 Dhul-Hijja — le jeûner efface les péchés de l'année passée et de l'année à venir.",
   "shawwal6Title": "Six jours de Chawwal",
   "shawwal6Desc": "Jeûner 6 jours de Chawwal après le Ramadan équivaut à jeûner toute l'année.",
-
   "fastingReminderPopupTitle": "Rappel de jeûne Sunnah",
   "fastingReminderWeeklyContent": "{when} ({day}) est un jour de jeûne Sunnah — n'oubliez pas votre intention avant Fajr.",
   "fastingReminderContent": "{when} : {occasion} — n'oubliez pas votre intention avant Fajr."

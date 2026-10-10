@@ -34,15 +34,6 @@
     border-bottom-color: rgba(74, 144, 226, 0.3);
   }
 
-  .offline-banner.theme-dark {
-    background: linear-gradient(
-      90deg,
-      rgba(15, 20, 35, 0.98) 0%,
-      rgba(15, 20, 35, 0.95) 100%
-    );
-    border-bottom-color: rgba(100, 150, 255, 0.3);
-  }
-
   .offline-banner.theme-purple {
     background: linear-gradient(
       90deg,
@@ -61,15 +52,6 @@
     border-bottom-color: rgba(244, 114, 182, 0.3);
   }
 
-  .offline-banner.theme-blue {
-    background: linear-gradient(
-      90deg,
-      rgba(20, 30, 50, 0.98) 0%,
-      rgba(20, 30, 50, 0.95) 100%
-    );
-    border-bottom-color: rgba(59, 130, 246, 0.3);
-  }
-
   .offline-banner.theme-green {
     background: linear-gradient(
       90deg,
@@ -77,15 +59,6 @@
       rgba(20, 40, 30, 0.95) 100%
     );
     border-bottom-color: rgba(34, 197, 94, 0.3);
-  }
-
-  .offline-banner.theme-orange {
-    background: linear-gradient(
-      90deg,
-      rgba(50, 30, 15, 0.98) 0%,
-      rgba(50, 30, 15, 0.95) 100%
-    );
-    border-bottom-color: rgba(251, 146, 60, 0.3);
   }
 
   .offline-banner.theme-brown {

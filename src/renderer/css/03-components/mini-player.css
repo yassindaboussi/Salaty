@@ -47,7 +47,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-right: 12px;
+  margin-inline-end: 12px;
 }
 
 .mini-track-title {
@@ -100,7 +100,7 @@
 }
 
 .mini-close-btn {
-  margin-left: 4px;
+  margin-inline-start: 4px;
   opacity: 0.6;
   font-size: 12px;
 }

@@ -1,5 +1,8 @@
 "use strict";
 
+// Composition root: the one place where the main process is wired together, in start-up
+// order. Services receive what they need (settings, a getter for the main window) instead of
+// importing each other's state.
 const { app, Menu } = require("electron");
 const {
   configureAutoUpdater,
@@ -10,26 +13,28 @@ const {
   showExistingWindow,
 } = require("../windows/main-window");
 const { createTray, destroyTray, hasTray } = require("../windows/tray");
-const ipcHandlers = require("../ipc");
+const { registerIpcHandlers } = require("../ipc");
+const { applySecurityRules } = require("./security");
+const settingsStore = require("../services/settings-store");
+const analytics = require("../services/analytics-manager");
 const prayerTimerManager = require("../services/prayer-timer-manager");
 const fastingCalendarManager = require("../services/fasting-calendar-manager");
 const connectionManager = require("../services/connection-manager");
 const athkarAlertManager = require("../services/athkar-alert-manager");
+const log = require("../services/logger").logger("Main");
 
 let mainWindow = null;
 let isQuitting = false;
+const getMainWindow = () => mainWindow;
 
 function startApplication() {
   configureApplication();
 
   Menu.setApplicationMenu(null);
 
-  configureAutoUpdater(
-    () => mainWindow,
-    () => {
-      isQuitting = true;
-    },
-  );
+  configureAutoUpdater(getMainWindow, () => {
+    isQuitting = true;
+  });
 
   const gotTheLock = app.requestSingleInstanceLock();
   if (!gotTheLock) {
@@ -39,8 +44,16 @@ function startApplication() {
 
   app.on("second-instance", () => showExistingWindow(mainWindow));
 
+  // Before any window exists, so every web page the app ever creates gets the rules.
+  applySecurityRules();
+
   app.whenReady().then(() => {
     try {
+      // 1. data, 2. IPC (before the first page asks for anything), 3. windows, 4. services
+      settingsStore.load();
+      analytics.init(settingsStore.get);
+      registerIpcHandlers({ getMainWindow });
+
       mainWindow = createMainWindow({
         onCloseToTray: (event) => {
           if (!isQuitting) {
@@ -51,8 +64,8 @@ function startApplication() {
       });
 
       createTray({
-        getSettings: ipcHandlers.getSettingsData,
-        getMainWindow: () => mainWindow,
+        getSettings: settingsStore.get,
+        getMainWindow,
         onQuit: () => {
           isQuitting = true;
           destroyTray();
@@ -60,16 +73,16 @@ function startApplication() {
         },
       });
 
-      connectionManager.initializeConnectionManager(mainWindow);
-      prayerTimerManager.init(mainWindow, ipcHandlers.getSettingsData);
-      fastingCalendarManager.init(mainWindow, ipcHandlers.getSettingsData);
-      athkarAlertManager.init(ipcHandlers.getSettingsData);
+      connectionManager.initializeConnectionManager(getMainWindow);
+      prayerTimerManager.init(getMainWindow, settingsStore.get);
+      fastingCalendarManager.init(getMainWindow, settingsStore.get);
+      athkarAlertManager.init(settingsStore.get);
 
-      const settings = ipcHandlers.getSettingsData();
-      app.setLoginItemSettings({ openAtLogin: settings.openAtLogin !== false });
+      settingsStore.syncOpenAtLogin();
       startUpdateChecks();
+      log.info(`started v${app.getVersion()}`);
     } catch (err) {
-      console.error("[Main] Startup error:", err);
+      log.error("start-up failed:", err);
     }
   });
 
@@ -77,16 +90,15 @@ function startApplication() {
     if (process.platform !== "darwin" && !hasTray()) app.quit();
   });
 
-  app.on("activate", () => {
-    if (!mainWindow || mainWindow.isDestroyed())
-      mainWindow = createMainWindow();
-    else mainWindow.show();
-  });
+  // macOS dock click. Closing the window only hides it (onCloseToTray above), so it still
+  // exists here.
+  app.on("activate", () => showExistingWindow(mainWindow));
 
   app.on("before-quit", () => {
     isQuitting = true;
   });
   app.on("will-quit", () => {
+    settingsStore.flush();
     connectionManager.cleanup();
     prayerTimerManager.cleanup();
     fastingCalendarManager.cleanup();

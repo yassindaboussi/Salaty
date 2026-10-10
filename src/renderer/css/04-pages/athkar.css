@@ -26,7 +26,6 @@
      (03-components/page-header.css). Only what is specific to this page is here. */
   .athkar-header {
     z-index: var(--z-page-header);
-    -webkit-app-region: drag;
   }
 
   /* Dragging over the title does not move the window */
@@ -362,6 +361,18 @@
     transition: flex-basis 0.2s ease;
   }
 
+  /* Touch scrolling improvements */
+  .category-nav,
+  .athkar-list {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Fullscreen mode */
+  .athkar-container.fullscreen .category-nav {
+    flex: 0 0 260px;
+  }
+
   .athkar-body.sidebar-collapsed .category-nav,
   .athkar-container.fullscreen .athkar-body.sidebar-collapsed .category-nav {
     flex: 0 0 56px;
@@ -394,8 +405,10 @@
   }
 
   /* Groups folded in the expanded view must still show their chips in the rail */
-  .athkar-body.sidebar-collapsed .category-group.collapsed .category-group-list,
-  .athkar-body.sidebar-collapsed .category-group-list {
+  .athkar-body.sidebar-collapsed .category-group-list,
+  .athkar-body.sidebar-collapsed
+    .category-group.collapsed
+    .category-group-list {
     display: flex;
     align-items: center;
     padding: 2px 0 6px;
@@ -495,6 +508,11 @@
     background: var(--accent-color);
     opacity: 0.35;
     animation: athkar-loading-dot 1.2s ease-in-out infinite;
+  }
+
+  .athkar-empty span {
+    font-size: 14px;
+    opacity: 0.7;
   }
 
   .athkar-loading-dots span:nth-child(2) {
@@ -608,13 +626,6 @@
   }
 
   /* Adjust hashtag alignment for RTL languages */
-  [dir="rtl"] .athkar-category,
-  [lang="ar"] .athkar-category,
-  [lang="fa"] .athkar-category,
-  [lang="ur"] .athkar-category,
-  [lang="he"] .athkar-category {
-    flex-direction: row-reverse; /* Reverse hashtag icon for RTL */
-  }
 
   .athkar-category {
     display: inline-flex;
@@ -628,6 +639,14 @@
     font-weight: 600;
     letter-spacing: 0;
     border: 1px solid var(--white-a20);
+  }
+
+  [dir="rtl"] .athkar-category,
+  [lang="ar"] .athkar-category,
+  [lang="fa"] .athkar-category,
+  [lang="ur"] .athkar-category,
+  [lang="he"] .athkar-category {
+    flex-direction: row-reverse; /* Reverse hashtag icon for RTL */
   }
 
   .athkar-category i {
@@ -653,6 +672,15 @@
     transition: all 0.15s ease;
     position: relative;
     overflow: hidden;
+  }
+
+  /* Prevent drag on scrollable areas */
+  .category-nav *,
+  .athkar-list *,
+  .athkar-card *,
+  .athkar-action-btn,
+  .count-btn {
+    -webkit-app-region: no-drag;
   }
 
   .athkar-action-btn:hover {
@@ -760,7 +788,7 @@
   .count-target {
     font-size: 11px;
     color: var(--text-secondary);
-    margin-left: 2px;
+    margin-inline-start: 2px;
     opacity: 0.7;
   }
 
@@ -999,11 +1027,6 @@
     color: var(--accent-color);
   }
 
-  .athkar-empty span {
-    font-size: 14px;
-    opacity: 0.7;
-  }
-
   /* Custom Confirm Dialog */
   .athkar-confirm-dialog {
     position: fixed;
@@ -1086,22 +1109,6 @@
     box-shadow: var(--shadow-danger-md);
   }
 
-  /* Touch scrolling improvements */
-  .category-nav,
-  .athkar-list {
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  }
-
-  /* Prevent drag on scrollable areas */
-  .category-nav *,
-  .athkar-list *,
-  .athkar-card *,
-  .athkar-action-btn,
-  .count-btn {
-    -webkit-app-region: no-drag;
-  }
-
   /* Scrollbar styling for better visibility */
   .athkar-list::-webkit-scrollbar-thumb:active {
     background: var(--accent-color);
@@ -1109,11 +1116,6 @@
   }
 
   /* Category name follows the reading direction so it stays inline with the count */
-
-  /* Fullscreen mode */
-  .athkar-container.fullscreen .category-nav {
-    flex: 0 0 260px;
-  }
 
   .athkar-container.fullscreen .athkar-card {
     padding: 20px;

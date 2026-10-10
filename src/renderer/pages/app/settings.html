@@ -2,83 +2,60 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.aladhan.com https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://makkahlive.netlify.app; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Settings - Salaty Time</title>
+    <title data-i18n="settings">Settings - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/settings.css" />
-    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
     <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
   </head>
   <body class="page-loading">
-    <div class="app-container theme-dark" id="app">
+    <div class="app-container" id="app">
       <div class="drag-area"></div>
 
       <div class="settings-container">
         <!-- Settings Header with Controls -->
-        <div class="page-header settings-header">
-          <button
-            class="back-btn"
-            id="backBtn"
-            aria-label="Back to Main"
-            data-tooltip="tooltipBack"
+        <header
+          class="page-header settings-header"
+          data-page-header
+          data-controls-class="settings-controls"
+          data-back="home"
+        >
+          <h1
+            class="page-header__title settings-title"
+            id="settingsTitle"
+            data-i18n="settings"
           >
-            <i class="fas fa-arrow-left"></i>
-          </button>
-          <h2 class="page-header__title settings-title" id="settingsTitle">Settings</h2>
+            Settings
+          </h1>
+        </header>
 
-          <!-- Window Controls -->
-          <div class="page-header__controls settings-controls">
-            <!-- Minimize button -->
-            <button
-              class="control-btn minimize-btn"
-              id="minimizeBtn"
-              aria-label="Minimize"
-              data-tooltip="tooltipMinimize"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 13H5v-2h14v2z" />
-              </svg>
-            </button>
-
-            <!-- Fullscreen button -->
-            <button
-              class="control-btn fullscreen-btn"
-              id="fullscreenBtn"
-              aria-label="Toggle Fullscreen"
-              data-tooltip="tooltipExpand"
-            >
-              <i class="fas fa-expand"></i>
-            </button>
-
-            <!-- Close button -->
-            <button
-              class="control-btn close-btn"
-              id="closeBtn"
-              aria-label="Close"
-              data-tooltip="tooltipClose"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="settings-content">
+        <main class="settings-content">
           <!-- Location Section -->
           <div class="settings-section">
             <div class="section-header">
               <div class="section-icon">
-                <i class="fas fa-map-marker-alt"></i>
+                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
               </div>
-              <h3 class="section-title" id="locationSectionTitle">Location</h3>
+              <h3
+                class="section-title"
+                id="locationSectionTitle"
+                data-i18n="location"
+              >
+                Location
+              </h3>
             </div>
 
             <div class="location-grid">
               <div class="form-field">
-                <label class="field-label" id="countryLabel" for="countryInput"
+                <label
+                  class="field-label"
+                  id="countryLabel"
+                  data-i18n="country"
+                  for="countryInput"
                   >Country</label
                 >
                 <select
@@ -89,7 +66,11 @@
               </div>
 
               <div class="form-field">
-                <label class="field-label" id="cityLabel" for="cityInput"
+                <label
+                  class="field-label"
+                  id="cityLabel"
+                  data-i18n="city"
+                  for="cityInput"
                   >City</label
                 >
                 <select id="cityInput" class="field-input" dir="ltr"></select>
@@ -97,14 +78,22 @@
             </div>
 
             <div class="location-actions-row">
-              <button id="detectLocationBtn" class="detect-btn">
-                <i class="fas fa-location-crosshairs"></i>
-                <span id="detectLocationLabel">Auto Detect Location</span>
+              <button type="button" id="detectLocationBtn" class="detect-btn">
+                <i class="fas fa-location-crosshairs" aria-hidden="true"></i>
+                <span id="detectLocationLabel" data-i18n="detectLocation"
+                  >Auto Detect Location</span
+                >
               </button>
 
-              <button id="manageLocationsBtn" class="manage-locations-btn">
-                <i class="fas fa-map-marked-alt"></i>
-                <span id="manageLocationsLabel">Manage Saved Locations</span>
+              <button
+                type="button"
+                id="manageLocationsBtn"
+                class="manage-locations-btn"
+              >
+                <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+                <span id="manageLocationsLabel" data-i18n="manageLocationsLabel"
+                  >Manage Saved Locations</span
+                >
               </button>
             </div>
 
@@ -113,12 +102,18 @@
                  Toggle lets the user opt out of that on-launch prompt. -->
             <div class="toggle-field location-travel-toggle">
               <div class="toggle-info">
-                <label class="subsection-label" id="travelModeLabel"
+                <label
+                  class="subsection-label"
+                  id="travelModeLabel"
+                  for="travelModeToggle"
+                  data-i18n="travelModeSectionTitle"
                   >Travel Mode</label
                 >
-                <span class="toggle-description" id="travelModeDescription"
-                  >Automatically detect and switch location when
-                  traveling</span
+                <span
+                  class="toggle-description"
+                  id="travelModeDescription"
+                  data-i18n="travelModeDescription"
+                  >Automatically detect and switch location when traveling</span
                 >
               </div>
               <label class="toggle-switch">
@@ -132,161 +127,237 @@
           <div class="settings-section">
             <div class="section-header">
               <div class="section-icon">
-                <i class="fas fa-palette"></i>
+                <i class="fas fa-palette" aria-hidden="true"></i>
               </div>
-              <h3 class="section-title" id="appearanceSectionTitle">
+              <h3
+                class="section-title"
+                id="appearanceSectionTitle"
+                data-i18n="appearance"
+              >
                 Appearance
               </h3>
             </div>
 
             <!-- Theme Selection -->
             <div class="subsection">
-              <label class="subsection-label" id="themeLabel">Theme</label>
+              <label class="subsection-label" id="themeLabel" data-i18n="theme"
+                >Theme</label
+              >
               <div class="theme-grid" id="themeOptions">
                 <div
                   class="theme-card"
                   data-theme="navy"
                   role="button"
-                  aria-label="Navy Theme"
+                  tabindex="0"
+                  aria-label="Navy"
+                  data-i18n-aria-label="themes:navy"
                 >
                   <div class="theme-preview theme-navy-preview"></div>
-                  <span class="theme-name">Navy</span>
+                  <span class="theme-name" data-i18n="themes:navy">Navy</span>
                 </div>
                 <div
                   class="theme-card"
                   data-theme="green"
                   role="button"
-                  aria-label="Green Theme"
+                  tabindex="0"
+                  aria-label="Green"
+                  data-i18n-aria-label="themes:green"
                 >
                   <div class="theme-preview theme-green-preview"></div>
-                  <span class="theme-name">Green</span>
+                  <span class="theme-name" data-i18n="themes:green">Green</span>
                 </div>
                 <div
                   class="theme-card"
                   data-theme="brown"
                   role="button"
-                  aria-label="Brown Theme"
+                  tabindex="0"
+                  aria-label="Brown"
+                  data-i18n-aria-label="themes:brown"
                 >
                   <div class="theme-preview theme-brown-preview"></div>
-                  <span class="theme-name">Brown</span>
+                  <span class="theme-name" data-i18n="themes:brown">Brown</span>
                 </div>
                 <div
                   class="theme-card"
                   data-theme="gold"
                   role="button"
-                  aria-label="Gold Theme"
+                  tabindex="0"
+                  aria-label="Gold"
+                  data-i18n-aria-label="themes:gold"
                 >
                   <div class="theme-preview theme-gold-preview"></div>
-                  <span class="theme-name">Gold</span>
+                  <span class="theme-name" data-i18n="themes:gold">Gold</span>
                 </div>
                 <div
                   class="theme-card"
                   data-theme="pink"
                   role="button"
-                  aria-label="Pink Theme"
+                  tabindex="0"
+                  aria-label="Pink"
+                  data-i18n-aria-label="themes:pink"
                 >
                   <div class="theme-preview theme-pink-preview"></div>
-                  <span class="theme-name">Pink</span>
+                  <span class="theme-name" data-i18n="themes:pink">Pink</span>
                 </div>
                 <div
                   class="theme-card"
                   data-theme="purple"
                   role="button"
-                  aria-label="Purple Theme"
+                  tabindex="0"
+                  aria-label="Purple"
+                  data-i18n-aria-label="themes:purple"
                 >
                   <div class="theme-preview theme-purple-preview"></div>
-                  <span class="theme-name">Purple</span>
+                  <span class="theme-name" data-i18n="themes:purple"
+                    >Purple</span
+                  >
                 </div>
                 <div
                   class="theme-card"
                   data-theme="emerald"
                   role="button"
-                  aria-label="Emerald Theme"
+                  tabindex="0"
+                  aria-label="Emerald"
+                  data-i18n-aria-label="themes:emerald"
                 >
                   <div class="theme-preview theme-emerald-preview"></div>
-                  <span class="theme-name">Emerald</span>
+                  <span class="theme-name" data-i18n="themes:emerald"
+                    >Emerald</span
+                  >
                 </div>
                 <div
                   class="theme-card"
                   data-theme="ocean"
                   role="button"
-                  aria-label="Ocean Theme"
+                  tabindex="0"
+                  aria-label="Ocean"
+                  data-i18n-aria-label="themes:ocean"
                 >
                   <div class="theme-preview theme-ocean-preview"></div>
-                  <span class="theme-name">Ocean</span>
+                  <span class="theme-name" data-i18n="themes:ocean">Ocean</span>
                 </div>
                 <div
                   class="theme-card"
                   data-theme="royal"
                   role="button"
-                  aria-label="Royal Theme"
+                  tabindex="0"
+                  aria-label="Royal"
+                  data-i18n-aria-label="themes:royal"
                 >
                   <div class="theme-preview theme-royal-preview"></div>
-                  <span class="theme-name">Royal</span>
+                  <span class="theme-name" data-i18n="themes:royal">Royal</span>
                 </div>
                 <div
                   class="theme-card"
                   data-theme="indigo"
                   role="button"
-                  aria-label="Indigo Theme"
+                  tabindex="0"
+                  aria-label="Indigo"
+                  data-i18n-aria-label="themes:indigo"
                 >
                   <div class="theme-preview theme-indigo-preview"></div>
-                  <span class="theme-name">Indigo</span>
+                  <span class="theme-name" data-i18n="themes:indigo"
+                    >Indigo</span
+                  >
                 </div>
                 <div
                   class="theme-card"
                   data-theme="classic"
                   role="button"
-                  aria-label="Classic Theme"
+                  tabindex="0"
+                  aria-label="Classic"
+                  data-i18n-aria-label="themes:classic"
                 >
                   <div class="theme-preview theme-classic-preview"></div>
-                  <span class="theme-name">Classic</span>
+                  <span class="theme-name" data-i18n="themes:classic"
+                    >Classic</span
+                  >
                 </div>
                 <div
                   class="theme-card"
                   data-theme="ramadan"
                   role="button"
-                  aria-label="Ramadan Theme"
+                  tabindex="0"
+                  aria-label="Ramadan"
+                  data-i18n-aria-label="themes:ramadan"
                 >
                   <div class="theme-preview theme-ramadan-preview"></div>
-                  <span class="theme-name">Ramadan</span>
+                  <span class="theme-name" data-i18n="themes:ramadan"
+                    >Ramadan</span
+                  >
                 </div>
               </div>
             </div>
 
             <!-- Language Selection -->
             <div class="subsection">
-              <label class="subsection-label" id="languageLabel"
+              <label
+                class="subsection-label"
+                id="languageLabel"
+                data-i18n="language"
                 >Language</label
               >
               <div class="language-grid" id="languageOptions">
-                <div class="language-card" data-lang="en" role="button">
-                  <i class="fas fa-globe"></i>
+                <div
+                  class="language-card"
+                  data-lang="en"
+                  role="button"
+                  tabindex="0"
+                >
+                  <i class="fas fa-globe" aria-hidden="true"></i>
                   <div class="language-info">
-                    <span class="lang-name" id="langNameEn">English</span>
+                    <span
+                      class="lang-name"
+                      id="langNameEn"
+                      data-i18n="englishLanguage"
+                      >English</span
+                    >
                     <span class="lang-native">English</span>
                   </div>
                 </div>
-                <div class="language-card" data-lang="ar" role="button">
-                  <i class="fas fa-globe"></i>
+                <div
+                  class="language-card"
+                  data-lang="ar"
+                  role="button"
+                  tabindex="0"
+                >
+                  <i class="fas fa-globe" aria-hidden="true"></i>
                   <div class="language-info">
-                    <span class="lang-name" id="langNameAr">Arabic</span>
+                    <span
+                      class="lang-name"
+                      id="langNameAr"
+                      data-i18n="arabicLanguage"
+                      >Arabic</span
+                    >
                     <span class="lang-native">العربية</span>
                   </div>
                 </div>
-                <div class="language-card" data-lang="fr" role="button">
-                  <i class="fas fa-globe"></i>
+                <div
+                  class="language-card"
+                  data-lang="fr"
+                  role="button"
+                  tabindex="0"
+                >
+                  <i class="fas fa-globe" aria-hidden="true"></i>
                   <div class="language-info">
-                    <span class="lang-name" id="langNameFr">French</span>
+                    <span
+                      class="lang-name"
+                      id="langNameFr"
+                      data-i18n="frenchLanguage"
+                      >French</span
+                    >
                     <span class="lang-native">Français</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Screen Size - CARD SELECTION VERSION -->
+            <!-- Screen Size -->
             <div class="subsection">
-              <label class="subsection-label" id="screenSizeSettingLabel"
+              <label
+                class="subsection-label"
+                id="screenSizeSettingLabel"
+                data-i18n="screenSizeSettingLabel"
                 >Screen Size</label
               >
               <div class="screen-size-grid" id="screenSizeOptions">
@@ -294,36 +365,46 @@
                   class="size-card"
                   data-size="big"
                   role="button"
+                  tabindex="0"
                   aria-label="Big Screen"
+                  data-i18n-aria-label="bigScreen"
                 >
                   <div class="size-icon">
-                    <i class="fas fa-desktop"></i>
+                    <i class="fas fa-desktop" aria-hidden="true"></i>
                   </div>
                   <div class="size-info">
-                    <span class="size-name" id="bigScreenLabel"
+                    <span
+                      class="size-name"
+                      id="bigScreenLabel"
+                      data-i18n="bigScreen"
                       >Big Screen</span
                     >
                   </div>
                   <div class="size-check">
-                    <i class="fas fa-check"></i>
+                    <i class="fas fa-check" aria-hidden="true"></i>
                   </div>
                 </div>
                 <div
                   class="size-card"
                   data-size="fullscreen"
                   role="button"
+                  tabindex="0"
                   aria-label="Full Screen"
+                  data-i18n-aria-label="fullScreen"
                 >
                   <div class="size-icon">
-                    <i class="fas fa-expand-arrows-alt"></i>
+                    <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
                   </div>
                   <div class="size-info">
-                    <span class="size-name" id="smallScreenLabel"
+                    <span
+                      class="size-name"
+                      id="smallScreenLabel"
+                      data-i18n="fullScreen"
                       >Full Screen</span
                     >
                   </div>
                   <div class="size-check">
-                    <i class="fas fa-check"></i>
+                    <i class="fas fa-check" aria-hidden="true"></i>
                   </div>
                 </div>
               </div>
@@ -334,9 +415,13 @@
           <div class="settings-section">
             <div class="section-header">
               <div class="section-icon">
-                <i class="fas fa-bell"></i>
+                <i class="fas fa-bell" aria-hidden="true"></i>
               </div>
-              <h3 class="section-title" id="notificationsSectionTitle">
+              <h3
+                class="section-title"
+                id="notificationsSectionTitle"
+                data-i18n="notification"
+              >
                 Notifications
               </h3>
             </div>
@@ -348,10 +433,17 @@
               <!-- Athkar Alerts -->
               <div class="notif-row">
                 <div class="toggle-info">
-                  <label class="subsection-label" id="athkarAlertsLabel"
+                  <label
+                    class="subsection-label"
+                    id="athkarAlertsLabel"
+                    for="athkarAlertsToggle"
+                    data-i18n="athkarAlerts"
                     >Athkar Alerts</label
                   >
-                  <span class="toggle-description" id="enableAthkarAlertsLabel"
+                  <span
+                    class="toggle-description"
+                    id="enableAthkarAlertsLabel"
+                    data-i18n="enableAthkarAlerts"
                     >Enable periodic reminders</span
                   >
                 </div>
@@ -362,6 +454,7 @@
                 >
                   <div class="num-spinner-wrap compact">
                     <button
+                      type="button"
                       class="num-spinner-btn"
                       data-target="athkarIntervalInput"
                       data-delta="-1"
@@ -373,6 +466,7 @@
                         stroke="currentColor"
                         stroke-width="2.5"
                         stroke-linecap="round"
+                        aria-hidden="true"
                       >
                         <line x1="5" y1="12" x2="19" y2="12" />
                       </svg>
@@ -380,12 +474,14 @@
                     <input
                       type="number"
                       id="athkarIntervalInput"
+                      data-i18n-aria-label="athkarInterval"
                       class="num-spinner-input"
                       min="1"
                       max="1440"
                       value="30"
                     />
                     <button
+                      type="button"
                       class="num-spinner-btn"
                       data-target="athkarIntervalInput"
                       data-delta="1"
@@ -397,12 +493,18 @@
                         stroke="currentColor"
                         stroke-width="2.5"
                         stroke-linecap="round"
+                        aria-hidden="true"
                       >
                         <line x1="12" y1="5" x2="12" y2="19" />
                         <line x1="5" y1="12" x2="19" y2="12" />
                       </svg>
                     </button>
-                    <span class="num-spinner-unit" id="minutesLabel">min</span>
+                    <span
+                      class="num-spinner-unit"
+                      id="minutesLabel"
+                      data-i18n="minutes"
+                      >min</span
+                    >
                   </div>
                 </div>
 
@@ -415,12 +517,17 @@
               <!-- Pre-Adhan Notification -->
               <div class="notif-row">
                 <div class="toggle-info">
-                  <label class="subsection-label" id="preAdhanNotificationLabel"
+                  <label
+                    class="subsection-label"
+                    id="preAdhanNotificationLabel"
+                    for="preAdhanNotificationToggle"
+                    data-i18n="preAdhanNotification"
                     >Pre-Adhan Notification</label
                   >
                   <span
                     class="toggle-description"
                     id="enablePreAdhanNotificationLabel"
+                    data-i18n="enablePreAdhanNotification"
                     >Alert before Adhan</span
                   >
                 </div>
@@ -431,6 +538,7 @@
                 >
                   <div class="num-spinner-wrap compact">
                     <button
+                      type="button"
                       class="num-spinner-btn"
                       data-target="preAdhanMinutesInput"
                       data-delta="-1"
@@ -442,6 +550,7 @@
                         stroke="currentColor"
                         stroke-width="2.5"
                         stroke-linecap="round"
+                        aria-hidden="true"
                       >
                         <line x1="5" y1="12" x2="19" y2="12" />
                       </svg>
@@ -449,12 +558,14 @@
                     <input
                       type="number"
                       id="preAdhanMinutesInput"
+                      data-i18n-aria-label="minutesBeforeAdhan"
                       class="num-spinner-input"
                       min="1"
                       max="60"
                       value="5"
                     />
                     <button
+                      type="button"
                       class="num-spinner-btn"
                       data-target="preAdhanMinutesInput"
                       data-delta="1"
@@ -466,12 +577,18 @@
                         stroke="currentColor"
                         stroke-width="2.5"
                         stroke-linecap="round"
+                        aria-hidden="true"
                       >
                         <line x1="12" y1="5" x2="12" y2="19" />
                         <line x1="5" y1="12" x2="19" y2="12" />
                       </svg>
                     </button>
-                    <span class="num-spinner-unit" id="minutesLabel2">min</span>
+                    <span
+                      class="num-spinner-unit"
+                      id="minutesLabel2"
+                      data-i18n="minutes"
+                      >min</span
+                    >
                   </div>
                 </div>
 
@@ -483,31 +600,78 @@
             </div>
           </div>
 
-          <!-- About Section -->
-          <div class="settings-section about-section" id="aboutSection">
+          <!-- Privacy Section: analytics are opt-in (off until the user turns them on) -->
+          <div class="settings-section">
             <div class="section-header">
               <div class="section-icon">
-                <i class="fas fa-circle-info"></i>
+                <i class="fas fa-shield-halved" aria-hidden="true"></i>
               </div>
-              <h3 class="section-title" id="aboutSectionTitle"></h3>
+              <h3
+                class="section-title"
+                id="privacySectionTitle"
+                data-i18n="privacySectionTitle"
+              >
+                Privacy
+              </h3>
+            </div>
+
+            <div class="toggle-field">
+              <div class="toggle-info">
+                <label
+                  class="subsection-label"
+                  id="analyticsLabel"
+                  data-i18n="analyticsLabel"
+                  for="analyticsToggle"
+                  >Anonymous usage statistics</label
+                >
+                <span
+                  class="toggle-description"
+                  id="analyticsDescription"
+                  data-i18n="analyticsDescription"
+                  >Share which features are used and app errors to help improve
+                  Salaty Time. Your location and what you listen to are never
+                  sent.</span
+                >
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="analyticsToggle" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- About Section -->
+          <div class="settings-section" id="aboutSection">
+            <div class="section-header">
+              <div class="section-icon">
+                <i class="fas fa-circle-info" aria-hidden="true"></i>
+              </div>
+              <h3
+                class="section-title"
+                id="aboutSectionTitle"
+                data-i18n="aboutTitle"
+              ></h3>
             </div>
 
             <div class="about-card">
               <!-- App identity -->
               <div class="about-identity">
                 <div class="about-app-icon">
-                  <i class="fas fa-mosque"></i>
+                  <i class="fas fa-mosque" aria-hidden="true"></i>
                 </div>
                 <div class="about-app-info">
                   <div class="about-name-row">
                     <span class="about-app-name">Salaty Time</span>
-                    <span class="about-app-version" id="appVersionDisplay"
-                      >v1.1.0</span
-                    >
+                    <span
+                      class="about-app-version"
+                      id="appVersionDisplay"
+                    ></span>
                   </div>
-                  <span class="about-app-tagline" id="aboutTagline"
-                    >Prayer times, Quran &amp; Islamic tools in one
-                    place</span
+                  <span
+                    class="about-app-tagline"
+                    id="aboutTagline"
+                    data-i18n="aboutTagline"
+                    >Prayer times, Quran &amp; Islamic tools in one place</span
                   >
                 </div>
               </div>
@@ -515,19 +679,24 @@
               <div class="about-divider"></div>
 
               <!-- Update row -->
-              <div class="about-update-row" id="aboutUpdateRow">
-                <div class="about-update-status" id="aboutUpdateStatus">
-                  <span class="about-status-badge" id="aboutStatusBadge">
+              <div class="about-update-row">
+                <div class="about-update-status">
+                  <span class="about-status-badge">
                     <i
                       class="fas fa-circle-check about-status-icon"
                       id="aboutStatusIcon"
+                      aria-hidden="true"
                     ></i>
                   </span>
                   <span id="aboutStatusText"></span>
                 </div>
-                <button class="about-check-btn" id="aboutCheckUpdateBtn">
-                  <i class="fas fa-rotate" id="aboutCheckIcon"></i>
-                  <span id="aboutCheckLabel"></span>
+                <button
+                  type="button"
+                  class="about-check-btn"
+                  id="aboutCheckUpdateBtn"
+                >
+                  <i class="fas fa-rotate" aria-hidden="true"></i>
+                  <span id="aboutCheckLabel" data-i18n="checkForUpdates"></span>
                 </button>
               </div>
 
@@ -542,26 +711,44 @@
               </div>
 
               <!-- Install button (hidden until downloaded) -->
-              <button class="about-install-btn hidden" id="aboutInstallBtn">
-                <i class="fas fa-bolt"></i>
-                <span id="aboutInstallLabel"></span>
+              <button
+                type="button"
+                class="about-install-btn hidden"
+                id="aboutInstallBtn"
+              >
+                <i class="fas fa-bolt" aria-hidden="true"></i>
+                <span
+                  id="aboutInstallLabel"
+                  data-i18n="restartAndInstall"
+                ></span>
               </button>
 
               <div class="about-divider"></div>
 
               <!-- Links row -->
               <div class="about-links-row">
-                <button class="about-link-btn" id="aboutGithubBtn">
-                  <i class="fab fa-github"></i>
-                  <span id="aboutGithubLabel">View on GitHub</span>
+                <button
+                  type="button"
+                  class="about-link-btn"
+                  id="aboutGithubBtn"
+                >
+                  <i class="fab fa-github" aria-hidden="true"></i>
+                  <span id="aboutGithubLabel" data-i18n="viewOnGithub"
+                    >View on GitHub</span
+                  >
                 </button>
                 <button
-                  class="about-link-btn about-email-btn"
+                  type="button"
+                  class="about-link-btn"
                   id="aboutContactBtn"
                   data-email="salatytime@gmail.com"
                 >
-                  <i class="fas fa-envelope" id="aboutContactIcon"></i>
-                  <span id="aboutContactLabel">salatytime@gmail.com</span>
+                  <i
+                    class="fas fa-envelope"
+                    id="aboutContactIcon"
+                    aria-hidden="true"
+                  ></i>
+                  <span>salatytime@gmail.com</span>
                 </button>
               </div>
             </div>
@@ -569,129 +756,104 @@
 
           <!-- Footer -->
           <div class="settings-footer">
-            <p class="footer-text" id="footerText">
+            <p class="footer-text" id="footerText" data-i18n="madeWith">
               Made with ❤️ for the Muslim Ummah
             </p>
           </div>
-        </div>
+        </main>
       </div>
 
-      <!-- Location Manager Modal - REDESIGNED -->
+      <!-- Location Manager Modal -->
       <div class="modal-overlay" id="locationManagerModal">
-        <div class="modal-container" style="max-width: 450px; padding: 24px">
+        <div class="modal-container">
           <!-- Close Button - RTL aware positioning -->
-          <button
-            class="modal-close-btn"
-            id="closeLocationModal"
-            style="position: absolute; top: 16px; right: 16px; left: auto"
-          >
-            <i class="fas fa-times"></i>
+          <button type="button" class="modal-close-btn" id="closeLocationModal">
+            <i class="fas fa-times" aria-hidden="true"></i>
           </button>
 
           <!-- Title - Will be translated dynamically -->
-          <h2
-            id="myLocationsTitle"
-            style="
-              margin: 0 0 24px 0;
-              font-size: 20px;
-              font-weight: 600;
-              color: var(--text-primary);
-            "
-          >
-            My Locations
-          </h2>
+          <h2 class="modal-title" id="myLocationsTitle">My Locations</h2>
 
           <!-- Locations List -->
-          <div
-            class="locations-list"
-            id="locationsList"
-            style="margin-bottom: 20px"
-          >
+          <div class="locations-list" id="locationsList">
             <!-- Locations will be dynamically inserted here -->
           </div>
 
           <!-- Add New Location Button -->
-          <button
-            class="add-location-btn"
-            id="addLocationBtn"
-            style="
-              width: 100%;
-              padding: 14px;
-              margin-top: 16px;
-              border: 2px dashed var(--accent-color);
-              background: transparent;
-              color: var(--accent-color);
-              font-weight: 600;
-              border-radius: 8px;
-              cursor: pointer;
-              transition: all 0.2s;
-            "
-          >
-            <i class="fas fa-plus"></i> Add New Location
+          <button type="button" class="add-location-btn" id="addLocationBtn">
+            <i class="fas fa-plus" aria-hidden="true"></i>
+            <span id="addLocationLabel" data-i18n="addNewLocation"
+              >Add New Location</span
+            >
           </button>
         </div>
       </div>
 
-      <!-- Add/Edit Location Modal - SAME STRUCTURE AS MY LOCATIONS -->
+      <!-- Add/Edit Location Modal -->
       <div class="modal-overlay location-edit-modal" id="addEditLocationModal">
-        <div
-          class="modal-container modal-small"
-          style="max-width: 450px; padding: 24px"
-        >
+        <div class="modal-container">
           <!-- Close Button - RTL aware positioning -->
-          <button
-            class="modal-close-btn"
-            id="closeAddEditModal"
-            style="position: absolute; top: 16px; right: 16px; left: auto"
-          >
-            <i class="fas fa-times"></i>
+          <button type="button" class="modal-close-btn" id="closeAddEditModal">
+            <i class="fas fa-times" aria-hidden="true"></i>
           </button>
 
           <!-- Title - Will be translated dynamically -->
-          <h2
-            id="addLocationTitle"
-            style="
-              margin: 0 0 24px 0;
-              font-size: 20px;
-              font-weight: 600;
-              color: var(--text-primary);
-            "
-          >
-            Add Location
-          </h2>
+          <h2 class="modal-title" id="addLocationTitle">Add Location</h2>
 
           <!-- Form Content -->
-          <div style="margin-bottom: 20px">
+          <div class="modal-form">
             <div class="form-field">
-              <label class="field-label" id="locationNameLabel"
+              <label
+                class="field-label"
+                id="locationNameLabel"
+                for="locationNameInput"
+                data-i18n="locationNameLabel"
                 >Location Name</label
               >
               <input
                 type="text"
                 id="locationNameInput"
                 class="field-input"
+                data-i18n-placeholder="locationNamePlaceholder"
                 placeholder="e.g. Home, Work, Family"
               />
             </div>
 
             <div class="form-field">
-              <label class="field-label" id="locationCountryLabel"
+              <label
+                class="field-label"
+                id="locationCountryLabel"
+                for="locationCountryInput"
+                data-i18n="locationCountryLabel"
                 >Country</label
               >
               <select id="locationCountryInput" class="field-input"></select>
             </div>
 
             <div class="form-field">
-              <label class="field-label" id="locationCityLabel">City</label>
+              <label
+                class="field-label"
+                id="locationCityLabel"
+                for="locationCityInput"
+                data-i18n="locationCityLabel"
+                >City</label
+              >
               <select id="locationCityInput" class="field-input"></select>
             </div>
 
             <div class="toggle-field">
               <div class="toggle-info">
-                <label class="subsection-label" id="favoriteLabel"
+                <label
+                  class="subsection-label"
+                  id="favoriteLabel"
+                  for="locationFavoriteToggle"
+                  data-i18n="favoriteLabel"
                   >Add to Favorites</label
                 >
-                <span class="toggle-description" id="favoriteDescription"
+                <span
+                  class="toggle-description"
+                  id="favoriteDescription"
+                  data-i18n="favoriteDescription"
                   >Show in quick switcher</span
                 >
               </div>
@@ -703,19 +865,21 @@
           </div>
 
           <!-- Buttons -->
-          <div style="display: flex; gap: 12px">
-            <button class="btn-secondary" id="cancelAddEditBtn" style="flex: 1">
-              <span id="cancelLabel">Cancel</span>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="cancelAddEditBtn">
+              <span id="cancelLabel" data-i18n="cancelLabel">Cancel</span>
             </button>
-            <button class="btn-primary" id="saveLocationBtn" style="flex: 1">
-              <i class="fas fa-check"></i>
-              <span id="saveLocationLabel">Save Location</span>
+            <button type="button" class="btn-primary" id="saveLocationBtn">
+              <i class="fas fa-check" aria-hidden="true"></i>
+              <span id="saveLocationLabel" data-i18n="saveLocationLabel"
+                >Save Location</span
+              >
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <script src="../../js-bundled/renderer.bundle.js"></script>
+    <script src="../../js-bundled/settings.bundle.js"></script>
   </body>
 </html>

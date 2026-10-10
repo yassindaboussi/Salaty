@@ -12,10 +12,6 @@
 
   /* Header: layout comes from the shared .page-header component
      (03-components/page-header.css). Only what is specific to this page is here. */
-  .ramadan-header {
-    -webkit-app-region: drag;
-  }
-
   .ramadan-controls {
     z-index: var(--z-page-header-controls);
   }
@@ -48,13 +44,6 @@
   }
 
   /* For Arabic text inside content */
-  [dir="rtl"] .ramadan-content .fasting-card,
-  [lang="ar"] .ramadan-content .fasting-card,
-  [lang="fa"] .ramadan-content .fasting-card,
-  [lang="ur"] .ramadan-content .fasting-card,
-  [lang="he"] .ramadan-content .fasting-card {
-    direction: rtl; /* Arabic text remains RTL */
-  }
 
   .fasting-card {
     background: var(--bg-surface);
@@ -63,6 +52,14 @@
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0 4px 15px var(--black-a10);
+  }
+
+  [dir="rtl"] .ramadan-content .fasting-card,
+  [lang="ar"] .ramadan-content .fasting-card,
+  [lang="fa"] .ramadan-content .fasting-card,
+  [lang="ur"] .ramadan-content .fasting-card,
+  [lang="he"] .ramadan-content .fasting-card {
+    direction: rtl; /* Arabic text remains RTL */
   }
 
   .fasting-card h3 {
@@ -109,6 +106,13 @@
     border-color: var(--accent-color);
   }
 
+  .day-tracker .gregorian-date {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    opacity: 0.8;
+  }
+
   .day-tracker.completed .gregorian-date {
     color: var(--white-a80);
   }
@@ -120,13 +124,6 @@
     font-weight: 700;
     margin-bottom: 2px;
     color: var(--text-primary);
-  }
-
-  .day-tracker .gregorian-date {
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    opacity: 0.8;
   }
 
   /* Special Days Styling */
@@ -399,12 +396,71 @@
     color: var(--text-secondary);
   }
 
+  .ramadan-table .current-day-row td {
+    background: rgba(var(--accent-rgb), 0.15);
+    color: var(--text-bright);
+  }
+
   .ramadan-table tr:hover td {
     background: var(--surface-1);
   }
 
-  .ramadan-table .current-day-row td {
-    background: rgba(var(--accent-rgb), 0.15);
-    color: var(--text-bright);
+  /* Today's card: suhoor | iftar */
+  .ramadan-today-times {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+  }
+
+  .ramadan-today-icon {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+  }
+
+  .ramadan-today-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .ramadan-today-time {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .ramadan-today--suhoor {
+    color: #a5b1c2;
+  }
+
+  .ramadan-today--iftar {
+    color: #f7b731;
+  }
+
+  .ramadan-today-divider {
+    height: 40px;
+    width: 1px;
+    background: var(--border-color);
+  }
+
+  /* "Mark as completed" button of the day dialog */
+  .ramadan-track-btn {
+    margin-top: 15px;
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid var(--border-color);
+  }
+
+  .ramadan-track-btn.is-tracked {
+    background: var(--accent-color);
+  }
+
+  /* Location missing / loading failed, in place of the days grid */
+  .ramadan-message {
+    text-align: center;
+    color: white;
+    width: 100%;
   }
 }

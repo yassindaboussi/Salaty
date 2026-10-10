@@ -53,6 +53,15 @@
   color: var(--text-soft);
 }
 
+.settings-btn i,
+.features-btn i {
+  transition: transform 0.3s ease;
+}
+
+.back-btn i {
+  transition: transform 0.3s ease;
+}
+
 .control-btn:hover i {
   transform: scale(1.1);
 }
@@ -108,11 +117,6 @@
   transition: transform 0.1s ease;
 }
 
-.settings-btn i,
-.features-btn i {
-  transition: transform 0.3s ease;
-}
-
 .settings-btn:hover i {
   transform: scale(1.1) rotate(45deg);
 }
@@ -146,10 +150,6 @@
   z-index: var(--z-above-chrome);
   -webkit-app-region: no-drag;
   pointer-events: auto;
-}
-
-.back-btn i {
-  transition: transform 0.3s ease;
 }
 
 .back-btn:hover {

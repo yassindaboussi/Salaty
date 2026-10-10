@@ -44,7 +44,9 @@
 @import url("./03-components/adhan-toggle.css") layer(components);
 @import url("./03-components/modals.css") layer(components);
 @import url("./03-components/mini-player.css") layer(components);
+@import url("./03-components/adhan-player.css") layer(components);
 @import url("./03-components/banners.css") layer(components);
 @import url("./03-components/selection-copy.css") layer(components);
+@import url("./03-components/tooltip.css") layer(components);
 @import url("./03-components/feedback.css") layer(components);
 @import url("./06-utilities/utilities.css") layer(utilities);

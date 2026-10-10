@@ -1,60 +1,74 @@
-'use strict';
+"use strict";
 
-const js      = require('@eslint/js');
-const globals = require('globals');
+// JavaScript linting: `npm run lint` (also run in CI).
+const js = require("@eslint/js");
+const globals = require("globals");
+
+// Shared code-quality rules for every part of the app.
+const quality = {
+  // Real bugs or dead code
+  "no-unused-vars": [
+    "error",
+    { args: "after-used", argsIgnorePattern: "^_", caughtErrors: "none" },
+  ],
+  "no-empty": ["error", { allowEmptyCatch: true }],
+  "no-shadow": "error",
+  eqeqeq: ["error", "smart"],
+  strict: ["error", "global"],
+  // Modern, consistent JavaScript
+  "no-var": "error",
+  "prefer-const": "error",
+  "prefer-template": "error",
+  "object-shorthand": "error",
+  "no-implicit-coercion": "error",
+  "no-unneeded-ternary": "error",
+  "no-lonely-if": "error",
+  "no-useless-return": "error",
+  "no-else-return": "error",
+  // Only warnings and errors reach the console in production code
+  "no-console": ["error", { allow: ["warn", "error"] }],
+};
 
 module.exports = [
-  {
-    ignores: ['src/renderer/vendor/**', 'src/renderer/js-bundled/**'],
-  },
+  { ignores: ["src/renderer/vendor/**", "src/renderer/js-bundled/**"] },
   js.configs.recommended,
 
-  // ── Main process: Node.js only ───────────────────────────────────────────
+  // Main process, preload and code shared with the main process: Node.js (CommonJS)
   {
-    files: ['src/main/**/*.js', 'src/preload/**/*.js', 'src/shared/**/*.js'],
+    files: [
+      "src/main/**/*.js",
+      "src/preload/**/*.js",
+      "src/shared/**/*.js",
+      "scripts/**/*.js",
+      "*.config.js",
+      "*.config.cjs",
+    ],
     languageOptions: {
-      ecmaVersion: 2021,
-      sourceType: 'commonjs',
-      globals: {
-        ...globals.node,
-        ...globals.commonjs,
-      },
+      ecmaVersion: "latest",
+      sourceType: "commonjs",
+      globals: { ...globals.node },
     },
-    rules: {
-      'no-unused-vars': 'warn',
-      'no-console': 'off',
-      'no-empty': ['error', { allowEmptyCatch: true }],
-    },
+    rules: quality,
   },
 
-  // ── Renderer process: browser + Node (nodeIntegration: true) ────────────
+  // Renderer: runs in the browser (sandboxed, no Node.js). Files are CommonJS only because
+  // esbuild bundles them (scripts/build-renderer.js), so `require`/`module` exist at build time.
   {
-    files: ['src/renderer/**/*.js'],
+    files: ["src/renderer/**/*.js"],
     languageOptions: {
-      ecmaVersion: 2021,
-      sourceType: 'commonjs',
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        ...globals.commonjs,
-      },
+      ecmaVersion: "latest",
+      sourceType: "commonjs",
+      globals: { ...globals.browser, require: "readonly", module: "writable" },
     },
-    rules: {
-      'no-unused-vars': 'warn',
-      'no-console': 'off',
-      'no-empty': ['error', { allowEmptyCatch: true }],
-    },
+    rules: quality,
   },
-  // ── background-player.js: Howler/Howl are loaded globally via a
-  //    <script> tag (src/renderer/vendor/howler/howler.min.js), not a
-  //    module import — declare them so lint doesn't flag them as undefined.
+
+  // Howler is loaded by a <script> tag (vendor/howler) on the background player page.
   {
-    files: ['src/renderer/js/media/background-player.js'],
-    languageOptions: {
-      globals: {
-        Howler: 'readonly',
-        Howl: 'readonly',
-      },
-    },
+    files: ["src/renderer/js/windows/background-player.js"],
+    languageOptions: { globals: { Howler: "readonly", Howl: "readonly" } },
   },
+
+  // Command-line scripts print their results.
+  { files: ["scripts/**/*.js"], rules: { "no-console": "off" } },
 ];

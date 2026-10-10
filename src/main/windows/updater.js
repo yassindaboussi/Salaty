@@ -1,10 +1,11 @@
 "use strict";
 
-const { ipcMain } = require("electron");
+const secureIpc = require("../ipc/secure-ipc");
 const { autoUpdater } = require("electron-updater");
+const log = require("../services/logger").logger("Updater");
 
 function configureAutoUpdater(getMainWindow, markQuitting) {
-  autoUpdater.logger = console;
+  autoUpdater.logger = log; // update checks/downloads go to the app log file
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
 
@@ -15,8 +16,8 @@ function configureAutoUpdater(getMainWindow, markQuitting) {
     }
   };
 
-  ipcMain.on("start-download", () => autoUpdater.downloadUpdate());
-  ipcMain.on("install-update", () => {
+  secureIpc.on("start-download", () => autoUpdater.downloadUpdate());
+  secureIpc.on("install-update", () => {
     markQuitting?.();
     autoUpdater.quitAndInstall(false, true);
   });
@@ -29,10 +30,12 @@ function configureAutoUpdater(getMainWindow, markQuitting) {
     send("download-progress", progress),
   );
 
-  autoUpdater.on("update-downloaded", (info) => send("update-downloaded", info));
+  autoUpdater.on("update-downloaded", (info) =>
+    send("update-downloaded", info),
+  );
 
   autoUpdater.on("error", (err) => {
-    console.error("[Updater] Error:", err);
+    log.error("update check failed:", err);
     send("update-error", err?.message || String(err));
   });
 }

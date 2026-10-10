@@ -2,12 +2,21 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop, feature/** ]
+    branches: [main, develop, feature/**]
     # Don't run on tag pushes (those are handled by version-release.yml)
     tags-ignore:
-      - 'v*.*.*'
+      - "v*.*.*"
   pull_request:
-    branches: [ main, develop, feature/** ]
+    branches: [main, develop, feature/**]
+
+# lint + build only: the token never needs to write
+permissions:
+  contents: read
+
+# npm would download the Electron binary on install; lint and electron-builder don't need it
+# (electron-builder fetches its own copy). Replaces the old .npmrc setting.
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
 
 jobs:
   test:
@@ -16,27 +25,31 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [18.x, 20.x]
+        node-version: [22.x, 24.x] # the maintained LTS lines
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v7
 
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Run linter (if available)
-      run: npm run lint --if-present
-      continue-on-error: true
+      - name: Lint (JavaScript + CSS)
+        run: npm run lint
 
-    - name: Build application
-      run: npm run build
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CSC_IDENTITY_AUTO_DISCOVERY: false
+      # once per run is enough: the report is the same on every OS
+      - name: Security audit (npm advisories)
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24.x'
+        run: npm run audit:check
+
+      - name: Build application (no publishing from CI)
+        run: npm run build -- --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false

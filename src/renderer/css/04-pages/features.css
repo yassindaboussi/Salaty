@@ -67,47 +67,31 @@
     opacity: 0.6;
   }
 
-  /* Available Cards */
-  .feature-card.available {
+  /* Card base + entrance animation */
+  .feature-card {
+    position: relative;
+    background: var(--white-a04);
+    border: 1px solid var(--white-a12);
+    border-radius: 10px;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    min-height: 120px;
     cursor: pointer;
-    border-color: var(--white-a12);
+    -webkit-app-region: no-drag;
+    animation: feature-card-in 0.5s ease backwards;
   }
 
-  .feature-card.available:hover {
+  .feature-card:hover {
     transform: translateY(-3px);
     border-color: var(--accent-color);
     background: var(--surface-2);
     box-shadow: 0 6px 16px var(--black-a20);
-  }
-
-  /* Coming Soon Cards */
-  .feature-card.coming-soon {
-    opacity: 0.6;
-  }
-
-  .feature-card.coming-soon:hover {
-    transform: translateY(-2px);
-    opacity: 0.75;
-  }
-
-  /* Coming Soon Badge */
-  .coming-soon-badge {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    background: linear-gradient(
-      135deg,
-      var(--color-danger),
-      var(--color-danger-strong)
-    );
-    color: var(--text-bright);
-    font-size: 8px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.2px;
-    box-shadow: 0 2px 6px rgba(255, 107, 107, 0.3);
   }
 
   /* Feature Icon */
@@ -140,6 +124,51 @@
     background: var(--surface-3);
   }
 
+  .quran-icon i {
+    color: var(--green-500);
+  }
+
+  .athkar-icon i {
+    color: #9c27b0;
+  }
+
+  .monthly-icon i {
+    color: #ffc107;
+  }
+
+  .tasbih-icon i,
+  .tasbih-icon svg {
+    color: var(--blue-500);
+  }
+
+  .calendar-icon i {
+    color: var(--orange-500);
+  }
+
+  .ramadhan-icon i {
+    color: #3f51b5;
+  }
+
+  .fasting-icon i {
+    color: #00bfa5;
+  }
+
+  .asma-icon i {
+    color: #e91e63;
+  }
+
+  .qibla-icon i {
+    color: #009688;
+  }
+
+  .radio-icon i {
+    color: #f50;
+  }
+
+  .livestreams-icon i {
+    color: #25981b;
+  }
+
   .feature-card:hover .feature-icon i,
   .feature-card:hover .feature-icon svg {
     transform: scale(1.1);
@@ -151,17 +180,9 @@
     border-color: rgba(76, 175, 80, 0.2);
   }
 
-  .quran-icon i {
-    color: var(--green-500);
-  }
-
   .athkar-icon {
     background: rgba(156, 39, 176, 0.1);
     border-color: rgba(156, 39, 176, 0.2);
-  }
-
-  .athkar-icon i {
-    color: #9c27b0;
   }
 
   .monthly-icon {
@@ -169,18 +190,9 @@
     border-color: rgba(255, 193, 7, 0.2);
   }
 
-  .monthly-icon i {
-    color: #ffc107;
-  }
-
   .tasbih-icon {
     background: rgba(33, 150, 243, 0.1);
     border-color: rgba(33, 150, 243, 0.2);
-  }
-
-  .tasbih-icon i,
-  .tasbih-icon svg {
-    color: var(--blue-500);
   }
 
   .calendar-icon {
@@ -188,17 +200,9 @@
     border-color: rgba(255, 152, 0, 0.2);
   }
 
-  .calendar-icon i {
-    color: var(--orange-500);
-  }
-
   .ramadhan-icon {
     background: rgba(63, 81, 181, 0.1);
     border-color: rgba(63, 81, 181, 0.2);
-  }
-
-  .ramadhan-icon i {
-    color: #3f51b5;
   }
 
   .fasting-icon {
@@ -206,17 +210,9 @@
     border-color: rgba(0, 191, 165, 0.2);
   }
 
-  .fasting-icon i {
-    color: #00bfa5;
-  }
-
   .asma-icon {
     background: rgba(233, 30, 99, 0.1);
     border-color: rgba(233, 30, 99, 0.2);
-  }
-
-  .asma-icon i {
-    color: #e91e63;
   }
 
   .qibla-icon {
@@ -224,26 +220,14 @@
     border-color: rgba(0, 150, 136, 0.2);
   }
 
-  .qibla-icon i {
-    color: #009688;
-  }
-
   .radio-icon {
     background: rgba(179, 84, 50, 0.1);
     border-color: rgba(194, 16, 16, 0.2);
   }
 
-  .radio-icon i {
-    color: #f50;
-  }
-
   .livestreams-icon {
     background: rgba(20, 201, 35, 0.1);
     border-color: rgba(53, 225, 40, 0.2);
-  }
-
-  .livestreams-icon i {
-    color: #25981b;
   }
 
   /* Feature Name */
@@ -294,6 +278,38 @@
     padding: 10px;
   }
 
+  .feature-card:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+
+  .feature-card:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .feature-card:nth-child(3) {
+    animation-delay: 0.15s;
+  }
+
+  .feature-card:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+
+  .feature-card:nth-child(5) {
+    animation-delay: 0.25s;
+  }
+
+  .feature-card:nth-child(6) {
+    animation-delay: 0.3s;
+  }
+
+  .feature-card:nth-child(7) {
+    animation-delay: 0.35s;
+  }
+
+  .feature-card:nth-child(8) {
+    animation-delay: 0.4s;
+  }
+
   .features-container.fullscreen .feature-card {
     padding: 16px 12px;
     min-height: 140px;
@@ -319,12 +335,6 @@
 
   .features-container.fullscreen .feature-description {
     font-size: 11px;
-  }
-
-  /* RTL Support */
-  [dir="rtl"] .coming-soon-badge {
-    right: 6px;
-    left: auto;
   }
 
   /* Responsive Grid */
@@ -360,58 +370,6 @@
     .feature-description {
       font-size: 9px;
     }
-  }
-
-  /* Animations */
-  .feature-card {
-    position: relative;
-    background: var(--white-a04);
-    border: 1px solid var(--border-soft);
-    border-radius: 10px;
-    padding: 12px 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    justify-content: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    min-height: 120px;
-    cursor: default;
-    -webkit-app-region: no-drag;
-    animation: feature-card-in 0.5s ease backwards;
-  }
-
-  .feature-card:nth-child(1) {
-    animation-delay: 0.05s;
-  }
-
-  .feature-card:nth-child(2) {
-    animation-delay: 0.1s;
-  }
-
-  .feature-card:nth-child(3) {
-    animation-delay: 0.15s;
-  }
-
-  .feature-card:nth-child(4) {
-    animation-delay: 0.2s;
-  }
-
-  .feature-card:nth-child(5) {
-    animation-delay: 0.25s;
-  }
-
-  .feature-card:nth-child(6) {
-    animation-delay: 0.3s;
-  }
-
-  .feature-card:nth-child(7) {
-    animation-delay: 0.35s;
-  }
-
-  .feature-card:nth-child(8) {
-    animation-delay: 0.4s;
   }
 
   @keyframes feature-card-in {

@@ -2,86 +2,59 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.aladhan.com https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://makkahlive.netlify.app; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Monthly Prayer Times - Salaty Time</title>
+    <title data-i18n="prayerTimesMonthly">
+      Monthly Prayer Times - Salaty Time
+    </title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/monthly-prayer-times.css" />
-    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
   </head>
   <body class="page-loading">
-    <div class="app-container theme-dark" id="app">
+    <div class="app-container" id="app">
       <div class="drag-area"></div>
 
       <div class="monthly-container">
-        <div class="page-header monthly-header">
-          <button
-            class="back-btn"
-            id="backBtn"
-            aria-label="Back to Features"
-            data-tooltip="tooltipBack"
+        <header
+          class="page-header monthly-header"
+          data-page-header
+          data-back="features"
+        >
+          <h1
+            class="page-header__title"
+            id="mptTitle"
+            data-i18n="prayerTimesMonthly"
           >
-            <i class="fas fa-arrow-left"></i>
-          </button>
+            Monthly Prayer Times
+          </h1>
+        </header>
 
-          <h2 class="page-header__title monthly-title" id="mptTitle">Monthly Prayer Times</h2>
-
-          <div class="page-header__controls monthly-controls">
-            <button
-              class="control-btn minimize-btn"
-              id="minimizeBtn"
-              aria-label="Minimize"
-              data-tooltip="tooltipMinimize"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 13H5v-2h14v2z" />
-              </svg>
-            </button>
-            <button
-              class="control-btn fullscreen-btn"
-              id="fullscreenBtn"
-              aria-label="Toggle Fullscreen"
-              data-tooltip="tooltipExpand"
-            >
-              <i class="fas fa-expand"></i>
-            </button>
-            <button
-              class="control-btn close-btn"
-              id="closeBtn"
-              aria-label="Close"
-              data-tooltip="tooltipClose"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="monthly-content" id="mptContent">
+        <main class="monthly-content">
           <!-- Month navigator -->
           <div class="monthly-nav">
             <button
               type="button"
               class="monthly-nav-btn"
               id="mptPrevBtn"
-              aria-label="Previous month"
+              data-tooltip="tooltipPrevMonth"
             >
-              <i class="fas fa-chevron-left"></i>
+              <i class="fas fa-chevron-left" aria-hidden="true"></i>
             </button>
             <div class="monthly-nav-label" id="mptMonthLabel">—</div>
             <button
               type="button"
               class="monthly-nav-btn"
               id="mptNextBtn"
-              aria-label="Next month"
+              data-tooltip="tooltipNextMonth"
             >
-              <i class="fas fa-chevron-right"></i>
+              <i class="fas fa-chevron-right" aria-hidden="true"></i>
             </button>
             <button type="button" class="monthly-today-btn" id="mptTodayBtn">
-              <i class="fas fa-calendar-day"></i>
-              <span id="mptTodayLabel">Today</span>
+              <i class="fas fa-calendar-day" aria-hidden="true"></i>
+              <span id="mptTodayLabel" data-i18n="today">Today</span>
             </button>
           </div>
 
@@ -94,10 +67,12 @@
           </div>
 
           <!-- Table -->
-          <div class="monthly-table-wrap" id="mptTableWrap">
+          <div class="monthly-table-wrap">
             <div class="monthly-loading" id="mptLoading">
-              <i class="fas fa-spinner fa-spin"></i>
-              <span id="mptLoadingText">Loading prayer times...</span>
+              <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+              <span id="mptLoadingText" data-i18n="loadingMonthlyPrayerTimes"
+                >Loading prayer times...</span
+              >
             </div>
             <table class="monthly-table hidden" id="mptTable">
               <thead>
@@ -106,16 +81,21 @@
               <tbody id="mptTableBody"></tbody>
             </table>
           </div>
-        </div>
+        </main>
 
-        <div class="monthly-footer">
-          <div class="monthly-footer-text" id="mptFooterText">
-            Times are calculated for your saved location and may differ slightly from your local mosque.
+        <footer class="monthly-footer">
+          <div
+            class="monthly-footer-text"
+            id="mptFooterText"
+            data-i18n="monthlyPrayerTimesFooter"
+          >
+            Times are calculated for your saved location and may differ slightly
+            from your local mosque.
           </div>
-        </div>
+        </footer>
       </div>
     </div>
 
-    <script src="../../js-bundled/renderer.bundle.js"></script>
+    <script src="../../js-bundled/monthly-prayer-times.bundle.js"></script>
   </body>
 </html>

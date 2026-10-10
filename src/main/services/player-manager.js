@@ -1,7 +1,13 @@
 "use strict";
-const { BrowserWindow, ipcMain, screen } = require("electron");
+const { BrowserWindow, screen } = require("electron");
+const secureIpc = require("../ipc/secure-ipc");
+const { THEMES, isPlainObject } = require("../ipc/validate");
 const { pages } = require("../config/paths");
-const { createBackgroundPlayerOptions } = require("../config/window-options");
+const {
+  createBackgroundPlayerOptions,
+  shouldOpenDevTools,
+} = require("../config/window-options");
+const log = require("./logger").logger("Player");
 
 let playerWindow = null;
 let isPlayerPlaying = false;
@@ -10,6 +16,18 @@ let isPlayerReady = false;
 let pendingCommands = [];
 
 const PLAYBACK_STARTING_COMMANDS = new Set(["set-playlist"]);
+// What the pages may ask the background player to do (windows/background-player.js).
+const PLAYER_COMMANDS = new Set([
+  "get-state",
+  "next",
+  "pause",
+  "play",
+  "prev",
+  "resume",
+  "seek",
+  "set-playlist",
+  "volume",
+]);
 
 function createPlayerWindow() {
   if (playerWindow && !playerWindow.isDestroyed()) return playerWindow;
@@ -18,7 +36,7 @@ function createPlayerWindow() {
   playerWindow = new BrowserWindow(createBackgroundPlayerOptions());
   playerWindow.loadFile(pages.backgroundPlayer);
 
-  if (process.argv.includes("--enable-logging"))
+  if (shouldOpenDevTools())
     playerWindow.webContents.openDevTools({ mode: "detach" });
 
   playerWindow.webContents.on("did-finish-load", () => {
@@ -64,19 +82,27 @@ function showMiniPlayer() {
     playerWindow.setAlwaysOnTop(true, "screen-saver");
     playerWindow.show();
   } catch (err) {
-    console.error("[PlayerManager] Error showing mini player:", err);
+    log.error("showing the mini player failed:", err);
     playerWindow.show();
   }
 }
 
-function setupPlayerIpc(mainWindow) {
-  ipcMain.on("theme-changed", (_e, theme) => {
+let ipcRegistered = false;
+
+// getMainWindow: returns the main window (or null), read each time a message arrives.
+function registerPlayerIpc(getMainWindow) {
+  if (ipcRegistered) return;
+  ipcRegistered = true;
+
+  secureIpc.on("theme-changed", (_e, theme) => {
+    if (!THEMES.has(theme)) return;
     currentTheme = theme;
     if (playerWindow && !playerWindow.isDestroyed())
       playerWindow.webContents.send("apply-theme", { theme });
   });
 
-  ipcMain.on("player-command", (_e, arg) => {
+  secureIpc.on("player-command", (_e, arg) => {
+    if (!isPlainObject(arg) || !PLAYER_COMMANDS.has(arg.type)) return;
     if (
       (!playerWindow || playerWindow.isDestroyed()) &&
       PLAYBACK_STARTING_COMMANDS.has(arg?.type)
@@ -87,18 +113,16 @@ function setupPlayerIpc(mainWindow) {
     sendPlayerCommand(arg);
   });
 
-  ipcMain.on("player-update", (_e, arg) => {
-    if (arg.type === "state") isPlayerPlaying = arg.state.isPlaying;
+  secureIpc.on("player-update", (_e, arg) => {
+    if (!isPlainObject(arg)) return;
+    if (arg.type === "state") isPlayerPlaying = arg.state?.isPlaying === true;
+    const mainWindow = getMainWindow();
     if (mainWindow && !mainWindow.isDestroyed())
       mainWindow.webContents.send("player-update", arg);
   });
 
-  ipcMain.on("close-mini-player", () => {
+  secureIpc.on("close-mini-player", () => {
     playerWindow?.hide();
-  });
-
-  ipcMain.on("player-get-state", () => {
-    sendPlayerCommand({ type: "get-state" });
   });
 }
 
@@ -112,7 +136,7 @@ function getIsPlayerPlaying() {
 module.exports = {
   createPlayerWindow,
   showMiniPlayer,
-  setupPlayerIpc,
+  registerPlayerIpc,
   getPlayerWindow,
   getIsPlayerPlaying,
 };

@@ -1,0 +1,8 @@
+# Third-party and generated files
+node_modules/
+dist/
+src/renderer/vendor/
+src/renderer/js-bundled/
+
+# Large content files (Quran text, adhkar, stations...): formatting would only add noise
+src/renderer/data/

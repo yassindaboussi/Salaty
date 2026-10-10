@@ -9,12 +9,6 @@
     position: relative;
   }
 
-  /* Header: layout comes from the shared .page-header component
-     (03-components/page-header.css). Only what is specific to this page is here. */
-  .monthly-header {
-    -webkit-app-region: drag;
-  }
-
   /* ========== CONTENT ========== */
   .monthly-content {
     flex: 1;
@@ -53,20 +47,6 @@
   /* Exceptions to the blanket rule above — these two need to stay physically
      LTR even in RTL languages (nav row for correct arrow meaning, table
      wrapper for a right-side scrollbar), so they need to win over it. */
-  [dir="rtl"] .monthly-content > .monthly-nav,
-  [lang="ar"] .monthly-content > .monthly-nav,
-  [lang="fa"] .monthly-content > .monthly-nav,
-  [lang="ur"] .monthly-content > .monthly-nav,
-  [lang="he"] .monthly-content > .monthly-nav,
-  [dir="rtl"] .monthly-content > .monthly-table-wrap,
-  [lang="ar"] .monthly-content > .monthly-table-wrap,
-  [lang="fa"] .monthly-content > .monthly-table-wrap,
-  [lang="ur"] .monthly-content > .monthly-table-wrap,
-  [lang="he"] .monthly-content > .monthly-table-wrap {
-    direction: ltr;
-  }
-
-  /* ========== Month navigator ========== */
 
   /* Deliberately NOT mirrored in RTL — same convention as the header controls
      and the Tasbih ring row. A "previous" chevron pointing left and a "next"
@@ -84,6 +64,51 @@
     border-radius: 12px;
     padding: 8px 10px;
     direction: ltr;
+  }
+
+  /* The scrollbar belongs to whichever element actually has overflow:auto —
+     that's this wrapper, not .monthly-content above it, so the earlier
+     content-level LTR fix never reached it. Force LTR here for the scrollbar
+     position, then force the table itself back to RTL explicitly (not just
+     inherited) so the column order — date on the right, Isha on the left —
+     stays exactly as it was. */
+  .monthly-table-wrap {
+    flex: 1;
+    min-height: 200px;
+    background: var(--black-a20);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 4px;
+    position: relative;
+    overflow-y: auto;
+    direction: ltr;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) transparent;
+  }
+
+  [dir="rtl"] .monthly-content > .monthly-nav,
+  [lang="ar"] .monthly-content > .monthly-nav,
+  [lang="fa"] .monthly-content > .monthly-nav,
+  [lang="ur"] .monthly-content > .monthly-nav,
+  [lang="he"] .monthly-content > .monthly-nav,
+  [dir="rtl"] .monthly-content > .monthly-table-wrap,
+  [lang="ar"] .monthly-content > .monthly-table-wrap,
+  [lang="fa"] .monthly-content > .monthly-table-wrap,
+  [lang="ur"] .monthly-content > .monthly-table-wrap,
+  [lang="he"] .monthly-content > .monthly-table-wrap {
+    direction: ltr;
+  }
+
+  /* ========== Month navigator ========== */
+
+  .monthly-nav-label {
+    direction: inherit;
+    flex: 1;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: capitalize;
   }
 
   [dir="rtl"] .monthly-nav-label,
@@ -110,16 +135,6 @@
   .monthly-nav-btn:hover {
     background: rgba(var(--accent-rgb), 0.18);
     border-color: var(--accent-color);
-  }
-
-  .monthly-nav-label {
-    direction: inherit;
-    flex: 1;
-    text-align: center;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text-primary);
-    text-transform: capitalize;
   }
 
   .monthly-today-btn {
@@ -219,26 +234,6 @@
 
   /* ========== Table ========== */
 
-  /* The scrollbar belongs to whichever element actually has overflow:auto —
-     that's this wrapper, not .monthly-content above it, so the earlier
-     content-level LTR fix never reached it. Force LTR here for the scrollbar
-     position, then force the table itself back to RTL explicitly (not just
-     inherited) so the column order — date on the right, Isha on the left —
-     stays exactly as it was. */
-  .monthly-table-wrap {
-    flex: 1;
-    min-height: 200px;
-    background: var(--black-a20);
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 4px;
-    position: relative;
-    overflow-y: auto;
-    direction: ltr;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-  }
-
   .monthly-table-wrap::-webkit-scrollbar {
     width: 5px;
   }
@@ -315,6 +310,12 @@
       "lnum" on;
   }
 
+  .monthly-today-row-highlight td {
+    background: rgba(var(--accent-rgb), 0.16);
+    color: var(--text-bright);
+    font-weight: 700;
+  }
+
   .monthly-table tbody tr:hover td {
     background: var(--white-a04);
   }
@@ -333,12 +334,6 @@
     color: var(--text-secondary);
     font-weight: 500;
     text-transform: uppercase;
-  }
-
-  .monthly-today-row-highlight td {
-    background: rgba(var(--accent-rgb), 0.16);
-    color: var(--text-bright);
-    font-weight: 700;
   }
 
   .monthly-today-row-highlight .monthly-date-cell {

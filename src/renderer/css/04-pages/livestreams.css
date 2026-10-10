@@ -34,7 +34,6 @@
   .livestreams-header {
     z-index: var(--z-page-header);
     padding: 12px 16px;
-    -webkit-app-region: drag;
     background: var(--bg-secondary, rgba(0, 0, 0, 0.3));
     backdrop-filter: blur(12px);
   }

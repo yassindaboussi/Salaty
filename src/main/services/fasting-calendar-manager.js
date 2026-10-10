@@ -1,10 +1,13 @@
 "use strict";
 
-const { ipcMain, app } = require("electron");
+const { app } = require("electron");
+const secureIpc = require("../ipc/secure-ipc");
 const fs = require("fs");
 const path = require("path");
+const { ALADHAN_API } = require("../../shared/aladhan");
+const log = require("./logger").logger("Fasting");
 
-let mainWindow = null;
+let getMainWindow = () => null;
 let getSettingsData = null;
 
 let occasions = [];
@@ -19,9 +22,9 @@ const REMINDER_HOUR_START = 19;
 const REMINDER_HOUR_END = 22;
 const TICK_MS = 10 * 60 * 1000;
 
-
-function init(window, settingsFn) {
-  mainWindow = window;
+// getMainWindowFn / settingsFn: return the main window and the settings when called.
+function init(getMainWindowFn, settingsFn) {
+  getMainWindow = getMainWindowFn;
   getSettingsData = settingsFn;
   firedTodayKeys = _loadFiredLog();
   _registerIpcHandlers();
@@ -43,22 +46,21 @@ function cleanup() {
   }
 }
 
-
 function _registerIpcHandlers() {
-  ipcMain.handle("get-fasting-occasions", async () => {
+  secureIpc.handle("get-fasting-occasions", async () => {
     if (readyPromise) await readyPromise;
     return occasions;
   });
 }
 
-
 async function _refreshOccasions() {
   try {
     const todayStr = _toDDMMYYYY(new Date());
-    const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${todayStr}`);
+    const res = await fetch(`${ALADHAN_API}/gToH?date=${todayStr}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-    if (json?.code !== 200 || !json?.data?.hijri) throw new Error("Invalid gToH response");
+    if (json?.code !== 200 || !json?.data?.hijri)
+      throw new Error("Invalid gToH response");
 
     const startMonth = parseInt(json.data.hijri.month.number, 10);
     const startYear = parseInt(json.data.hijri.year, 10);
@@ -75,7 +77,9 @@ async function _refreshOccasions() {
     occasions = collected
       .filter((o) => o.gregorianDate >= todayIso)
       .sort((a, b) => a.gregorianDate.localeCompare(b.gregorianDate));
-  } catch {
+  } catch (err) {
+    // offline or API down: keep the occasions we have; the midnight refresh tries again
+    log.warn("loading fasting occasions failed:", err.message);
   }
 }
 
@@ -83,7 +87,7 @@ async function _fetchMonthOccasions(hijriMonth, hijriYear) {
   if (hijriMonth === 9) return [];
 
   try {
-    const url = `https://api.aladhan.com/v1/hToGCalendar/${hijriMonth}/${hijriYear}`;
+    const url = `${ALADHAN_API}/hToGCalendar/${hijriMonth}/${hijriYear}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
@@ -99,7 +103,13 @@ async function _fetchMonthOccasions(hijriMonth, hijriYear) {
 
       if (hDay === 13 || hDay === 14 || hDay === 15) {
         results.push(
-          _makeOccasion("whiteDays", hDay, hijriMonth, hijriYear, gregorianDate),
+          _makeOccasion(
+            "whiteDays",
+            hDay,
+            hijriMonth,
+            hijriYear,
+            gregorianDate,
+          ),
         );
       }
 
@@ -116,7 +126,13 @@ async function _fetchMonthOccasions(hijriMonth, hijriYear) {
 
       if (hijriMonth === 12 && hDay === 1) {
         results.push(
-          _makeOccasion("dhulHijjahFirst9", hDay, hijriMonth, hijriYear, gregorianDate),
+          _makeOccasion(
+            "dhulHijjahFirst9",
+            hDay,
+            hijriMonth,
+            hijriYear,
+            gregorianDate,
+          ),
         );
       }
       if (hijriMonth === 12 && hDay === 9) {
@@ -132,7 +148,11 @@ async function _fetchMonthOccasions(hijriMonth, hijriYear) {
       }
     }
     return results;
-  } catch {
+  } catch (err) {
+    log.warn(
+      `loading Hijri month ${hijriMonth}/${hijriYear} failed:`,
+      err.message,
+    );
     return [];
   }
 }
@@ -148,7 +168,6 @@ function _makeOccasion(type, hijriDay, hijriMonth, hijriYear, gregorianDate) {
   };
 }
 
-
 function _startTick() {
   if (tickInterval) clearInterval(tickInterval);
   tickInterval = setInterval(_checkReminders, TICK_MS);
@@ -156,7 +175,7 @@ function _startTick() {
 }
 
 function _checkReminders() {
-  if (!mainWindow || mainWindow.isDestroyed()) return;
+  if (!_mainWindow()) return;
 
   const now = new Date();
   const hour = now.getHours();
@@ -165,7 +184,7 @@ function _checkReminders() {
   const settings = getSettingsData?.() || {};
   const fr = settings.fastingReminders || {};
   const enabledIds = new Set(fr.occasions || []);
-  const weeklyOn = !!fr.weeklyMonThu;
+  const weeklyOn = Boolean(fr.weeklyMonThu);
   const leadDays = Math.max(1, parseInt(fr.leadDays, 10) || 1);
   const todayMidnight = _midnight(now);
 
@@ -199,12 +218,14 @@ function _checkReminders() {
   if (didFire) _persistFiredLog();
 }
 
-function _sendToRenderer(payload) {
-  if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send("fasting-reminder-due", payload);
-  }
+function _mainWindow() {
+  const w = getMainWindow();
+  return w && !w.isDestroyed() ? w : null;
 }
 
+function _sendToRenderer(payload) {
+  _mainWindow()?.webContents.send("fasting-reminder-due", payload);
+}
 
 function _scheduleMidnightRefresh() {
   if (midnightTimer) clearTimeout(midnightTimer);
@@ -220,7 +241,6 @@ function _scheduleMidnightRefresh() {
   }, msLeft);
 }
 
-
 function _firedLogPath() {
   return path.join(app.getPath("userData"), "fasting-reminders-log.json");
 }
@@ -229,10 +249,14 @@ function _loadFiredLog() {
   try {
     const raw = fs.readFileSync(_firedLogPath(), "utf8");
     const parsed = JSON.parse(raw);
-    if (parsed?.date === _toISODate(new Date()) && Array.isArray(parsed.firedKeys)) {
+    if (
+      parsed?.date === _toISODate(new Date()) &&
+      Array.isArray(parsed.firedKeys)
+    ) {
       return new Set(parsed.firedKeys);
     }
   } catch {
+    // no log yet (first run today) or unreadable: start a fresh day
   }
   return new Set();
 }
@@ -246,10 +270,10 @@ function _persistFiredLog() {
         firedKeys: Array.from(firedTodayKeys),
       }),
     );
-  } catch {
+  } catch (err) {
+    log.warn("saving the reminder log failed:", err.message);
   }
 }
-
 
 function _pad2(n) {
   return String(n).padStart(2, "0");
@@ -268,7 +292,9 @@ function _midnight(date) {
 }
 
 function _daysBetween(fromMidnight, isoDate) {
-  const [y, m, d] = String(isoDate).split("-").map((n) => parseInt(n, 10));
+  const [y, m, d] = String(isoDate)
+    .split("-")
+    .map((n) => parseInt(n, 10));
   const target = new Date(y, (m || 1) - 1, d || 1);
   return Math.round((target - fromMidnight) / 86400000);
 }

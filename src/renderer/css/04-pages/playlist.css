@@ -12,10 +12,6 @@
 
   /* Header: layout comes from the shared .page-header component
      (03-components/page-header.css). Only what is specific to this page is here. */
-  .playlist-header {
-    -webkit-app-region: drag;
-  }
-
   .playlist-controls {
     z-index: 2;
   }

@@ -8,12 +8,28 @@
 const PRAYER_KEYS = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 /**
- * Convert "HH:MM" → total seconds from midnight.
+ * Aladhan times can carry a time-zone suffix ("05:12 (CET)"): keep "HH:MM".
+ * Missing times read "--:--".
+ */
+function cleanTime(raw) {
+  if (!raw) return "--:--";
+  return String(raw).split(" ")[0];
+}
+
+/**
+ * Convert "HH:MM" (suffix allowed) → total seconds from midnight. Unreadable parts count as 0.
  */
 function secondsFromTime(t) {
   if (!t) return 0;
-  const [h, m] = t.split(":").map(Number);
-  return h * 3600 + m * 60;
+  const [h, m] = cleanTime(t).split(":").map(Number);
+  return (h || 0) * 3600 + (m || 0) * 60;
+}
+
+/**
+ * Seconds elapsed since local midnight.
+ */
+function secondsSinceMidnight(date = new Date()) {
+  return date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds();
 }
 
 /**
@@ -67,7 +83,15 @@ function getCurrentAndNext(
 // *name* changes; the calculated Dhuhr time is kept.
 
 const JUMUAH_KEY = "Jumuah";
-const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const WEEKDAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 /**
  * Weekday name ("Friday", …) of `date` in the prayer location's time zone (the IANA
@@ -77,7 +101,10 @@ const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frida
 function weekdayIn(timeZone, date = new Date()) {
   if (timeZone) {
     try {
-      return new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone }).format(date);
+      return new Intl.DateTimeFormat("en-US", {
+        weekday: "long",
+        timeZone,
+      }).format(date);
     } catch {
       /* unknown time zone: fall back to the PC clock */
     }
@@ -100,10 +127,11 @@ function displayPrayerKey(key, { isFriday } = {}) {
 module.exports = {
   PRAYER_KEYS,
   JUMUAH_KEY,
+  cleanTime,
   secondsFromTime,
+  secondsSinceMidnight,
   formatTime,
   getCurrentAndNext,
-  weekdayIn,
   isFridayIn,
   displayPrayerKey,
 };

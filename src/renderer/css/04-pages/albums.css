@@ -12,12 +12,6 @@
     -webkit-app-region: no-drag;
   }
 
-  /* Header: layout comes from the shared .page-header component
-     (03-components/page-header.css). Only what is specific to this page is here. */
-  .albums-header {
-    -webkit-app-region: drag;
-  }
-
   /* Search Box */
   .search-container {
     padding: 0 4px;

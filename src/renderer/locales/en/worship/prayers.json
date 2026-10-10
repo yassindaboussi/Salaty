@@ -1,1 +1,8 @@
-{ "Fajr": "Fajr", "Dhuhr": "Dhuhr", "Jumuah": "Jumu'ah", "Asr": "Asr", "Maghrib": "Maghrib", "Isha": "Isha" }
+{
+  "Fajr": "Fajr",
+  "Dhuhr": "Dhuhr",
+  "Jumuah": "Jumu'ah",
+  "Asr": "Asr",
+  "Maghrib": "Maghrib",
+  "Isha": "Isha"
+}

@@ -2,11 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.aladhan.com https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://makkahlive.netlify.app; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Audio Albums - Salaty</title>
+    <title data-i18n="audioArchive">Audio Albums - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/albums.css" />
-    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
   </head>
   <body class="page-loading">
     <div class="app-container theme-navy" id="app">
@@ -14,80 +17,54 @@
 
       <div class="albums-container">
         <!-- Header -->
-        <div class="page-header albums-header">
-          <button
-            class="back-btn"
-            id="backBtn"
-            aria-label="Back"
-            data-tooltip="tooltipBack"
-          >
-            <i class="fas fa-arrow-left"></i>
-          </button>
-
-          <h2 class="page-header__title albums-title">Audio Archive</h2>
-
-          <div class="page-header__controls albums-controls">
-            <button
-              class="control-btn minimize-btn"
-              id="minimizeBtn"
-              aria-label="Minimize"
-              data-tooltip="tooltipMinimize"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 13H5v-2h14v2z" />
-              </svg>
-            </button>
-            <!-- Fullscreen button -->
-            <button
-              class="control-btn fullscreen-btn"
-              id="fullscreenBtn"
-              aria-label="Toggle Fullscreen"
-              data-tooltip="tooltipExpand"
-            >
-              <i class="fas fa-expand"></i>
-            </button>
-
-            <button
-              class="control-btn close-btn"
-              id="closeBtn"
-              aria-label="Close"
-              data-tooltip="tooltipClose"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
+        <header
+          class="page-header albums-header"
+          data-page-header
+          data-back="features"
+        >
+          <h1 class="page-header__title albums-title" data-i18n="audioArchive">
+            Audio Archive
+          </h1>
+        </header>
 
         <!-- Collapsible groups: Quran Recitation (reciters) and Tadabor.
              Both start collapsed; each has its own search + content area
              that only loads data once the user actually expands it. -->
-        <div class="archive-groups" id="archiveGroups">
+        <main class="archive-groups">
           <!-- Quran Recitation -->
           <div class="archive-group" id="reciteGroup">
             <button
+              type="button"
               class="archive-group-header"
               id="reciteGroupHeader"
               aria-expanded="false"
             >
               <span class="archive-group-header-left">
-                <i class="fas fa-book-quran archive-group-icon"></i>
-                <span class="archive-group-title" id="reciteGroupTitle"
+                <i
+                  class="fas fa-book-quran archive-group-icon"
+                  aria-hidden="true"
+                ></i>
+                <span
+                  class="archive-group-title"
+                  id="reciteGroupTitle"
+                  data-i18n="quranRecitation"
                   >Quran Recitation</span
                 >
               </span>
-              <i class="fas fa-chevron-down archive-group-chevron"></i>
+              <i
+                class="fas fa-chevron-down archive-group-chevron"
+                aria-hidden="true"
+              ></i>
             </button>
-            <div class="archive-group-content" id="reciteGroupContent">
+            <div class="archive-group-content">
               <div class="search-container">
                 <div class="search-box">
-                  <i class="fas fa-search"></i>
+                  <i class="fas fa-search" aria-hidden="true"></i>
                   <input
                     type="text"
                     id="searchInput"
+                    data-i18n-placeholder="searchReciters"
+                    data-i18n-aria-label="searchReciters"
                     class="search-input"
                     placeholder="Search reciters..."
                   />
@@ -107,37 +84,52 @@
           <!-- Tafasir -->
           <div class="archive-group" id="tafsirGroup">
             <button
+              type="button"
               class="archive-group-header"
               id="tafsirGroupHeader"
               aria-expanded="false"
             >
               <span class="archive-group-header-left">
-                <i class="fas fa-book-open archive-group-icon"></i>
-                <span class="archive-group-title" id="tafsirGroupTitle"
+                <i
+                  class="fas fa-book-open archive-group-icon"
+                  aria-hidden="true"
+                ></i>
+                <span
+                  class="archive-group-title"
+                  id="tafsirGroupTitle"
+                  data-i18n="tafasir"
                   >Tafasir</span
                 >
               </span>
-              <i class="fas fa-chevron-down archive-group-chevron"></i>
+              <i
+                class="fas fa-chevron-down archive-group-chevron"
+                aria-hidden="true"
+              ></i>
             </button>
-            <div class="archive-group-content" id="tafsirGroupContent">
+            <div class="archive-group-content">
               <div class="search-container">
                 <div class="search-box">
-                  <i class="fas fa-search"></i>
+                  <i class="fas fa-search" aria-hidden="true"></i>
                   <input
                     type="text"
                     id="tafsirSearchInput"
+                    data-i18n-placeholder="searchTafasir"
+                    data-i18n-aria-label="searchTafasir"
                     class="search-input"
                     placeholder="Search..."
                   />
                 </div>
               </div>
               <button
+                type="button"
                 class="archive-back-link"
                 id="tafsirBackBtn"
                 style="display: none"
               >
-                <i class="fas fa-arrow-left"></i>
-                <span id="tafsirBackBtnLabel">Tafsir books</span>
+                <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                <span id="tafsirBackBtnLabel" data-i18n="tafasirBooks"
+                  >Tafsir books</span
+                >
               </button>
               <div class="archive-body">
                 <div class="albums-grid" id="tafsirGrid">
@@ -150,25 +142,37 @@
           <!-- Tadabor -->
           <div class="archive-group" id="tadaborGroup">
             <button
+              type="button"
               class="archive-group-header"
               id="tadaborGroupHeader"
               aria-expanded="false"
             >
               <span class="archive-group-header-left">
-                <i class="fas fa-lightbulb archive-group-icon"></i>
-                <span class="archive-group-title" id="tadaborGroupTitle"
+                <i
+                  class="fas fa-lightbulb archive-group-icon"
+                  aria-hidden="true"
+                ></i>
+                <span
+                  class="archive-group-title"
+                  id="tadaborGroupTitle"
+                  data-i18n="tadabor"
                   >Tadabor</span
                 >
               </span>
-              <i class="fas fa-chevron-down archive-group-chevron"></i>
+              <i
+                class="fas fa-chevron-down archive-group-chevron"
+                aria-hidden="true"
+              ></i>
             </button>
-            <div class="archive-group-content" id="tadaborGroupContent">
+            <div class="archive-group-content">
               <div class="search-container">
                 <div class="search-box">
-                  <i class="fas fa-search"></i>
+                  <i class="fas fa-search" aria-hidden="true"></i>
                   <input
                     type="text"
                     id="tadaborSearchInput"
+                    data-i18n-placeholder="searchSurahs"
+                    data-i18n-aria-label="searchSurahs"
                     class="search-input"
                     placeholder="Search surahs..."
                   />
@@ -181,20 +185,22 @@
               </div>
             </div>
           </div>
-        </div>
+        </main>
       </div>
 
       <!-- Recitation-style picker (for reciters with more than one moshaf) -->
-      <div class="modal moshaf-modal" id="moshafModal">
+      <div class="modal" id="moshafModal">
         <div class="modal-content moshaf-modal-content">
           <div class="moshaf-modal-header">
-            <h3 id="moshafModalTitle">Reciter</h3>
+            <h3 id="moshafModalTitle"></h3>
             <button
+              type="button"
               class="moshaf-modal-close"
               id="moshafModalClose"
               aria-label="Close"
+              data-i18n-aria-label="close"
             >
-              <i class="fas fa-xmark"></i>
+              <i class="fas fa-xmark" aria-hidden="true"></i>
             </button>
           </div>
           <div class="moshaf-modal-list" id="moshafModalList">

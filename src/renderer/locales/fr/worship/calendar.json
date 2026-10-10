@@ -1,1 +1,35 @@
-{ "hijriCalendar":"Calendrier Hégirien","islamicCalendar":"Calendrier Islamique & Événements","gregorian":"Grégorien","hijri":"Hégirien","importantIslamicDates":"Dates Islamiques Importantes","noEventsThisMonth":"Aucun événement ce mois-ci","calendarDesc":"Calendrier et événements islamiques","prayerTimesMonthly":"Horaires mensuels","prayerTimesMonthlyDesc":"Tous les horaires de prière du mois","loadingMonthlyPrayerTimes":"Chargement des horaires de prière...","monthlyPrayerTimesFooter":"Les horaires sont calculés pour votre position enregistrée et peuvent différer légèrement de votre mosquée locale." }
+{
+  "hijriCalendar": "Calendrier Hégirien",
+  "importantIslamicDates": "Dates Islamiques Importantes",
+  "noEventsThisMonth": "Aucun événement ce mois-ci",
+  "prayerTimesMonthly": "Horaires mensuels",
+  "prayerTimesMonthlyDesc": "Tous les horaires de prière du mois",
+  "loadingMonthlyPrayerTimes": "Chargement des horaires de prière...",
+  "monthlyPrayerTimesFooter": "Les horaires sont calculés pour votre position enregistrée et peuvent différer légèrement de votre mosquée locale.",
+  "hijriMonths": [
+    "Mouharram",
+    "Safar",
+    "Rabia al-Awal",
+    "Rabia ath-Thani",
+    "Joumada al-Oula",
+    "Joumada ath-Thania",
+    "Rajab",
+    "Chaabane",
+    "Ramadan",
+    "Chawwal",
+    "Dhou al-Qiada",
+    "Dhou al-Hijja"
+  ],
+  "calendarEvents": {
+    "1-1": "Nouvel An Islamique",
+    "1-10": "Jour d'Achoura",
+    "3-12": "Mawlid (Naissance du Prophète)",
+    "7-27": "Isra et Miraj",
+    "8-15": "Mi-Chaabane",
+    "9-1": "Premier Jour de Ramadan",
+    "9-27": "Nuit du Destin",
+    "10-1": "Aïd al-Fitr",
+    "12-9": "Jour d'Arafat",
+    "12-10": "Aïd al-Adha"
+  }
+}

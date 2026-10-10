@@ -2,14 +2,19 @@ name: Version & Release
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'src/**'
-      - 'package.json'
-      - '.github/workflows/**'
+      - "src/**"
+      - "package.json"
+      - ".github/workflows/**"
 
 permissions:
   contents: write
+
+# npm would download the Electron binary on install; lint and electron-builder don't need it
+# (electron-builder fetches its own copy). Replaces the old .npmrc setting.
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
 
 jobs:
   version-and-tag:
@@ -18,7 +23,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
       tag: ${{ steps.version.outputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -53,15 +58,16 @@ jobs:
     if: needs.version-and-tag.outputs.tag != ''
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.version-and-tag.outputs.tag }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: "24"
+          cache: "npm"
 
-      - run: npm install
+      - run: npm ci
 
       - name: Bundle renderer scripts
         run: npm run build:renderer
@@ -72,7 +78,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows
           path: |
@@ -86,15 +92,16 @@ jobs:
     if: needs.version-and-tag.outputs.tag != ''
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.version-and-tag.outputs.tag }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: "24"
+          cache: "npm"
 
-      - run: npm install
+      - run: npm ci
 
       - name: Bundle renderer scripts
         run: npm run build:renderer
@@ -106,7 +113,7 @@ jobs:
           SKIP_CODE_SIGN: true
 
       - name: Upload macOS artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: macos
           path: |
@@ -120,15 +127,16 @@ jobs:
     if: needs.version-and-tag.outputs.tag != ''
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.version-and-tag.outputs.tag }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: "24"
+          cache: "npm"
 
-      - run: npm install
+      - run: npm ci
 
       - name: Bundle renderer scripts
         run: npm run build:renderer
@@ -137,7 +145,7 @@ jobs:
         run: npx electron-builder --linux --publish never
 
       - name: Upload Linux artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: linux
           path: |
@@ -150,30 +158,30 @@ jobs:
     if: always() && needs.version-and-tag.outputs.tag != ''
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Download Windows artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: windows
           path: release-artifacts
 
       - name: Download macOS artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: macos
           path: release-artifacts
 
       - name: Download Linux artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: linux
           path: release-artifacts
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           tag_name: ${{ needs.version-and-tag.outputs.tag }}
           body: |

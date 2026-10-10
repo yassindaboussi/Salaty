@@ -1,7 +1,7 @@
 # Privacy Policy – Salaty Time
 
 **Effective Date:** July 2, 2026  
-**Last Updated:** July 2, 2026  
+**Last Updated:** October 9, 2026  
 **App Version:** 1.1.3+
 
 ---
@@ -22,6 +22,9 @@ Salaty Time ("App", "we", "us", "our") is a lightweight Electron-based Islamic p
    - You manually enter your city and country in Settings to fetch accurate prayer times
    - These locations are stored **only on your device**
    - They are **never sent to us** — only to the [Aladhan API](https://aladhan.com) to calculate prayer times
+   - The Qibla page sends your city and country to [Photon](https://photon.komoot.io) (OpenStreetMap) to find its coordinates (if it can't, [ipapi.co](https://ipapi.co) guesses them from your IP address), and loads [OpenStreetMap](https://www.openstreetmap.org) map tiles
+   - **Auto Detect Location** (only when you press it) asks [freeipapi.com](https://freeipapi.com) to guess your city from your IP address
+   - All of these requests use encrypted HTTPS connections
    - You can delete this at any time via Settings
 
 2. **Prayer & App Preferences**
@@ -44,7 +47,7 @@ We use **Google Analytics 4 (GA4)** with offline-first queuing to understand how
 - App launches and feature opens (prayer times, Quran, radio, etc.)
 - Settings changes (language, theme, screen size preference)
 - Page navigation flows
-- Non-fatal errors (for debugging)
+- Non-fatal errors (for debugging; file paths are removed from error messages before sending)
 - System information (OS, CPU cores, RAM, app version) — for hardware compatibility
 
 **What We Do NOT Collect:**
@@ -69,10 +72,10 @@ We use **Google Analytics 4 (GA4)** with offline-first queuing to understand how
 - Does not identify you — it's purely for session grouping
 - Resets if you reinstall the App
 
-**To Disable Analytics:**
-- Settings → Notifications section
-  - The analytics data is embedded in our telemetry; disabling future feature tracking is the closest option
-  - No user-facing "opt-out" toggle yet — we recognize this gap and may add one
+**Turning Analytics On or Off:**
+- Settings → Privacy → "Anonymous usage statistics"
+  - Off by default: nothing is recorded or sent until you turn it on
+  - Turning it off deletes the events still waiting on your device and the random Client ID
 
 ### 🌐 Third-Party API Calls
 
@@ -192,10 +195,9 @@ Data is shared only in these scenarios:
 - Edit or delete any data via the App's Settings
 - Fully wipe all app data by uninstalling
 
-### Opt-Out of Analytics
-- No formal opt-out button currently exists; we're working on this
-- You can disable internet access for the App (via firewall) to prevent analytics transmission
-- Uninstall the App to stop all data collection
+### Opt-In / Opt-Out of Analytics
+- Analytics are off unless you turn on Settings → Privacy → "Anonymous usage statistics"
+- Turning the switch off stops collection immediately and deletes unsent events and the Client ID
 
 ### Right to Know (California CCPA / EU GDPR)
 - All data collected is disclosed in this policy

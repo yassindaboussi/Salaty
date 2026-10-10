@@ -1,5 +1,7 @@
 "use strict";
 
+const { escapeHtml } = require("../utils/html");
+
 const ICONS = {
   success: "check-circle",
   error: "exclamation-circle",
@@ -11,7 +13,9 @@ function renderToast(className, innerHTML, opts = {}) {
   const { duration = 2500, removeDelay, replaceExisting = true } = opts;
 
   if (replaceExisting) {
-    document.querySelectorAll(`.${className.split(" ")[0]}`).forEach((el) => el.remove());
+    document
+      .querySelectorAll(`.${className.split(" ")[0]}`)
+      .forEach((el) => el.remove());
   }
 
   const toast = document.createElement("div");
@@ -40,7 +44,7 @@ function renderToast(className, innerHTML, opts = {}) {
 function showToast(message, type = "info") {
   const toast = renderToast(
     `toast ${type}`,
-    `<i class="fas fa-${ICONS[type] ?? ICONS.info}"></i><span>${message}</span>`,
+    `<i class="fas fa-${ICONS[type] ?? ICONS.info}" aria-hidden="true"></i><span>${escapeHtml(message)}</span>`,
     { duration: 2500 },
   );
   if (type === "error") toast.style.background = ERROR_BG;

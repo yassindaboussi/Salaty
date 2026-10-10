@@ -1,3 +1,5 @@
+"use strict";
+
 // CSS linting for the renderer: `npm run lint:css` (also part of `npm run lint`, so CI checks it).
 // Architecture and naming rules are explained at the top of src/renderer/css/app.css.
 module.exports = {
@@ -8,7 +10,10 @@ module.exports = {
     // Class names: lowercase-with-dashes; shared components may use BEM (block__element--modifier).
     "selector-class-pattern": [
       "^[a-z][a-z0-9]*(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$",
-      { message: (name) => `"${name}": use lowercase-with-dashes (BEM block__element--modifier is fine)` },
+      {
+        message: (name) =>
+          `"${name}": use lowercase-with-dashes (BEM block__element--modifier is fine)`,
+      },
     ],
 
     // Cascade layers decide which rule wins; !important only for real overrides, with a reason.
@@ -25,7 +30,8 @@ module.exports = {
       ["margin-left", "margin-right", "padding-left", "padding-right"],
       {
         severity: "warning",
-        message: "Use logical properties (margin-inline-start/-end, padding-inline-start/-end) so the rule also works in RTL",
+        message:
+          "Use logical properties (margin-inline-start/-end, padding-inline-start/-end) so the rule also works in RTL",
       },
     ],
 
@@ -36,7 +42,18 @@ module.exports = {
     "alpha-value-notation": null,
 
     // Keywords are lowercase, except real font names that keep their capital letters.
-    "value-keyword-case": ["lower", { ignoreKeywords: ["BlinkMacSystemFont", "Tahoma", "Geneva", "Verdana", "Arial"] }],
+    "value-keyword-case": [
+      "lower",
+      {
+        ignoreKeywords: [
+          "BlinkMacSystemFont",
+          "Tahoma",
+          "Geneva",
+          "Verdana",
+          "Arial",
+        ],
+      },
+    ],
 
     // Order-based specificity checks are reported (not errors): layers already separate files,
     // and reordering rules just to satisfy this can change which rule wins.

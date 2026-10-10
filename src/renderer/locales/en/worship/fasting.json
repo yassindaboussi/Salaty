@@ -8,7 +8,6 @@
   "weeklyMonThuDesc": "Fast every Monday & Thursday",
   "remindMe": "Remind me",
   "reminderOn": "Reminder on",
-  "reminderOff": "Reminder off",
   "leadOption1": "1 day before",
   "leadOption2": "2 days before",
   "leadOption3": "3 days before",
@@ -19,7 +18,6 @@
   "ramadanNote": "Ramadan has its own page — this list is for voluntary fasting only",
   "loadingFastingDays": "Loading fasting days...",
   "noUpcomingFastingDays": "No upcoming fasting days found",
-
   "whiteDaysTitle": "White Days",
   "whiteDaysDesc": "Fasting the 13th, 14th & 15th of the lunar month is like fasting the whole month.",
   "tasuaTitle": "Tasu'a",
@@ -32,7 +30,6 @@
   "arafahDesc": "The 9th of Dhul-Hijjah — fasting it expiates the sins of the past year and the year to come.",
   "shawwal6Title": "Six Days of Shawwal",
   "shawwal6Desc": "Fast any 6 days of Shawwal after Ramadan — like fasting a whole year.",
-
   "fastingReminderPopupTitle": "Sunnah Fasting Reminder",
   "fastingReminderWeeklyContent": "{when} ({day}) is a Sunnah fasting day — don't forget your intention before Fajr.",
   "fastingReminderContent": "{when} is {occasion} — don't forget your intention before Fajr."

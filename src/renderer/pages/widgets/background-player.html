@@ -2,46 +2,57 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Salaty Player</title>
-    <link
-      rel="stylesheet"
-      href="../../vendor/fontawesome/css/all.min.css"
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.aladhan.com https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://makkahlive.netlify.app; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Salaty Player</title>
+    <link rel="stylesheet" href="../../vendor/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="../../css/05-widgets/widget-base.css" />
     <link rel="stylesheet" href="../../css/05-widgets/background-player.css" />
   </head>
-  <!-- theme class removed from here. background-player.js applies the saved theme on load. -->
-  <body id="miniPlayerBody">
+  <!-- background-player.js applies the saved theme on load -->
+  <body>
     <div class="track-info">
       <div id="title" class="title">Salaty Player</div>
-      <div id="artist" class="artist">Waiting for track...</div>
+      <div id="artist" class="artist" data-i18n="waitingForTrack">
+        Waiting for track...
+      </div>
     </div>
     <div class="controls">
-      <button id="prevBtn" class="btn" data-tooltip="tooltipPrev">
-        <i class="fas fa-step-backward"></i>
-      </button>
-      <button id="playBtn" class="btn btn-play" data-tooltip="tooltipPlayPause">
-        <i class="fas fa-play"></i>
-      </button>
-      <button id="nextBtn" class="btn" data-tooltip="tooltipNext">
-        <i class="fas fa-step-forward"></i>
+      <button type="button" id="prevBtn" class="btn" data-tooltip="tooltipPrev">
+        <i class="fas fa-step-backward" aria-hidden="true"></i>
       </button>
       <button
+        type="button"
+        id="playBtn"
+        class="btn btn-play"
+        data-tooltip="tooltipPlayPause"
+      >
+        <i class="fas fa-play" aria-hidden="true"></i>
+      </button>
+      <button type="button" id="nextBtn" class="btn" data-tooltip="tooltipNext">
+        <i class="fas fa-step-forward" aria-hidden="true"></i>
+      </button>
+      <button
+        type="button"
         id="miniPlaylistBtn"
         class="mini-btn"
         title="Open Playlist"
         data-tooltip="tooltipPlaylist"
       >
-        <i class="fas fa-list"></i>
+        <i class="fas fa-list" aria-hidden="true"></i>
       </button>
     </div>
     <button
+      type="button"
       id="closeBtn"
       class="btn btn-close"
       title="Close Mini Player"
       data-tooltip="tooltipClose"
     >
-      <i class="fas fa-times"></i>
+      <i class="fas fa-times" aria-hidden="true"></i>
     </button>
 
     <script src="../../vendor/howler/howler.min.js"></script>

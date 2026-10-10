@@ -119,7 +119,11 @@ npm run build             # بناء نسخة التثبيت
 npm run build:linux         # بناء نسخة Linux فقط
 npm run lint               # فحص الكود
 npm run format              # تنسيق الكود تلقائيًا
+npm run audit:check          # فحص الثغرات الأمنية في الحزم
 ```
+
+**متطلبات النظام:** Windows 10 أو أحدث (64-bit)، macOS 13 أو أحدث، Linux (x64 أو arm64).
+**للتطوير:** Node.js 22.12 أو أحدث.
 
 ---
 

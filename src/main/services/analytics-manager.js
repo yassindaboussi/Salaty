@@ -1,40 +1,44 @@
-
 "use strict";
 
+// Anonymous usage statistics (Google Analytics 4, Measurement Protocol).
+// Opt-in: nothing is recorded or sent unless the user turned "Anonymous usage statistics" on
+// in Settings (settings.analyticsEnabled === true). Turning it off deletes the queued events
+// and the random install id. Never sent: location, what is listened to, file paths.
+// Events are queued on disk first and sent in batches when online.
 
-const { app, ipcMain, net } = require("electron");
+const { app, net } = require("electron");
+const secureIpc = require("../ipc/secure-ipc");
+const check = require("../ipc/validate");
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
-const { v4: uuidv4 } = require("./analytics-uuid");
+const { randomUUID } = require("crypto");
+const log = require("./logger").logger("Analytics");
 
 const GA4_MEASUREMENT_ID = "G-YLJT04QTL3";
 const GA4_API_SECRET = "cK0q1iCuSwOtlLNT4VofcA";
-
-if (!GA4_MEASUREMENT_ID || !GA4_API_SECRET) {
-  console.warn(
-    "[Analytics] GA4 credentials missing; analytics will be disabled.",
-  );
-}
 
 const FLUSH_INTERVAL_MS = 30_000;
 const BATCH_SIZE = 25;
 const MAX_QUEUE_SIZE = 2_000;
 const MIN_BACKOFF_MS = 5_000;
 const MAX_BACKOFF_MS = 300_000;
+const QUEUE_SAVE_DELAY_MS = 2_000;
 
-const GA4_ENDPOINT =
-  GA4_MEASUREMENT_ID && GA4_API_SECRET
-    ? `https://www.google-analytics.com/mp/collect?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`
-    : null;
+const GA4_ENDPOINT = `https://www.google-analytics.com/mp/collect?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`;
 
 let QUEUE_FILE = null;
 let CLIENT_ID_FILE = null;
+let getSettings = () => ({});
 
 function initPaths() {
   const userData = app.getPath("userData");
   QUEUE_FILE = path.join(userData, "analytics-queue.json");
   CLIENT_ID_FILE = path.join(userData, "analytics-client-id.txt");
+}
+
+function isEnabled() {
+  return getSettings()?.analyticsEnabled === true;
 }
 
 let _clientId = null;
@@ -49,15 +53,15 @@ function getClientId() {
         return _clientId;
       }
     }
-    _clientId = uuidv4();
+    _clientId = randomUUID();
     fs.writeFileSync(CLIENT_ID_FILE, _clientId, "utf8");
   } catch {
-    _clientId = uuidv4();
+    _clientId = randomUUID();
   }
   return _clientId;
 }
 
-let _sessionId = String(Date.now());
+const _sessionId = String(Date.now());
 
 let _systemInfo = null;
 
@@ -85,8 +89,20 @@ function collectSystemInfo() {
   return _systemInfo;
 }
 
+// Error messages can contain file paths, and paths contain the user's account name.
+function scrubPaths(text) {
+  return String(text)
+    .replace(/file:\/\/[^\s'")]+/gi, "<path>")
+    .replace(/\b[A-Za-z]:[\\/][^\s'")]+/g, "<path>")
+    .replace(
+      /\/(?:Users|home|private|var|tmp|opt|Applications|Volumes)\/[^\s'")]+/g,
+      "<path>",
+    );
+}
+
 let _queue = [];
 let _queueDirty = false;
+let _saveTimer = null;
 
 function loadQueueFromDisk() {
   if (!QUEUE_FILE) return;
@@ -102,13 +118,21 @@ function loadQueueFromDisk() {
 }
 
 function saveQueueToDisk() {
+  clearTimeout(_saveTimer);
+  _saveTimer = null;
   if (!_queueDirty || !QUEUE_FILE) return;
   try {
     fs.writeFileSync(QUEUE_FILE, JSON.stringify(_queue), "utf8");
     _queueDirty = false;
   } catch (err) {
-    console.error("[Analytics] Failed to persist queue:", err.message);
+    log.error("Failed to persist queue:", err.message);
   }
+}
+
+// Several events often arrive together (page open + settings save...): write them once.
+function saveQueueSoon() {
+  if (!_saveTimer)
+    _saveTimer = setTimeout(saveQueueToDisk, QUEUE_SAVE_DELAY_MS);
 }
 
 function enqueueEvent(gaEvent) {
@@ -117,16 +141,27 @@ function enqueueEvent(gaEvent) {
   }
   _queue.push(gaEvent);
   _queueDirty = true;
-  saveQueueToDisk();
+  saveQueueSoon();
+}
+
+// Drops everything recorded so far: the queue (memory + file) and the random install id.
+function forgetAll() {
+  _queue = [];
+  _queueDirty = false;
+  clearTimeout(_saveTimer);
+  _saveTimer = null;
+  _clientId = null;
+  for (const file of [QUEUE_FILE, CLIENT_ID_FILE]) {
+    try {
+      if (file) fs.rmSync(file, { force: true });
+    } catch (err) {
+      log.error("Failed to delete", path.basename(file), err.message);
+    }
+  }
 }
 
 function sendBatchToGA4(events) {
   return new Promise((resolve) => {
-    if (!GA4_ENDPOINT) {
-      resolve(false);
-      return;
-    }
-
     if (!net.isOnline()) {
       resolve(false);
       return;
@@ -150,7 +185,7 @@ function sendBatchToGA4(events) {
 
     req.on("error", (err) => {
       if (!responded) {
-        console.warn("[Analytics] Request error:", err.message);
+        log.warn("Request error:", err.message);
         resolve(false);
       }
     });
@@ -165,7 +200,8 @@ let _backoffDelay = MIN_BACKOFF_MS;
 let _flushLocked = false;
 
 async function flushQueue() {
-  if (_flushLocked || _queue.length === 0 || !net.isOnline()) return;
+  if (!isEnabled() || _flushLocked || _queue.length === 0 || !net.isOnline())
+    return;
 
   _flushLocked = true;
   try {
@@ -183,8 +219,8 @@ async function flushQueue() {
       }
     } else {
       _backoffDelay = Math.min(_backoffDelay * 2, MAX_BACKOFF_MS);
-      console.warn(
-        `[Analytics] Flush failed. Next retry in ${_backoffDelay / 1000}s. Queue: ${_queue.length}`,
+      log.warn(
+        `Flush failed. Next retry in ${_backoffDelay / 1000}s. Queue: ${_queue.length}`,
       );
     }
   } finally {
@@ -206,6 +242,7 @@ function stopFlushLoop() {
 }
 
 function track(eventName, params = {}) {
+  if (!isEnabled()) return;
   const sys = collectSystemInfo();
 
   const event = {
@@ -226,7 +263,6 @@ function track(eventName, params = {}) {
   enqueueEvent(event);
 }
 
-
 function trackAppStart(userSettings = {}) {
   const sys = collectSystemInfo();
   track("app_start", {
@@ -238,8 +274,6 @@ function trackAppStart(userSettings = {}) {
     user_language: userSettings.language || "en",
     user_theme: userSettings.theme || "navy",
     screen_size: userSettings.bigScreen ? "big" : "small",
-    city: userSettings.city || "",
-    country: userSettings.country || "",
   });
 }
 
@@ -252,9 +286,6 @@ function trackSettingsSaved(settings = {}) {
     language: settings.language,
     theme: settings.theme,
     screen_size: settings.bigScreen ? "big" : "small",
-
-    city: settings.city || "",
-    country: settings.country || "",
 
     athkar_alert_enabled: settings.athkarAlertEnabled ? 1 : 0,
     athkar_alert_interval: settings.athkarAlertInterval || 0,
@@ -272,57 +303,63 @@ function trackNavigation(fromPage, toPage) {
 
 function trackError(context, message) {
   track("app_error", {
-    error_context: String(context).substring(0, 100),
-    error_message: String(message).substring(0, 100),
+    error_context: scrubPaths(context).substring(0, 100),
+    error_message: scrubPaths(message).substring(0, 100),
   });
 }
 
-function trackLocationAdded(params = {}) {
-  track("location_added", params);
+// Called when the Settings switch changes. Off: forget everything recorded so far.
+function applyConsent(enabled) {
+  if (enabled) {
+    trackAppStart(getSettings());
+  } else {
+    forgetAll();
+  }
 }
-function trackLocationEdited(params = {}) {
-  track("location_edited", params);
-}
-function trackLocationDeleted(params = {}) {
-  track("location_deleted", params);
-}
-function trackLocationActivated(params = {}) {
-  track("location_activated", params);
-}
-function trackLocationList(params = {}) {
-  track("location_list", params);
-}
-
 
 function setupIpcHandlers() {
-  ipcMain.on("analytics:track", (_e, eventName, params) => {
-    track(eventName, params || {});
+  // Everything a page sends is checked first (ipc/validate.js).
+  secureIpc.on("analytics:track", (_e, eventName, params) => {
+    const name = check.analyticsName(eventName);
+    if (name) track(name, check.analyticsParams(params));
   });
 
-  ipcMain.on("analytics:feature-open", (_e, featureName) => {
-    trackFeatureOpen(featureName);
+  secureIpc.on("analytics:feature-open", (_e, featureName) => {
+    const name = check.text(featureName, 100);
+    if (name) trackFeatureOpen(name);
   });
 
-  ipcMain.on("analytics:settings-saved", (_e, settings) => {
-    trackSettingsSaved(settings);
+  secureIpc.on("analytics:settings-saved", (_e, settings) => {
+    if (check.isPlainObject(settings)) trackSettingsSaved(settings);
   });
 
-  ipcMain.on("analytics:navigation", (_e, fromPage, toPage) => {
-    trackNavigation(fromPage, toPage);
+  secureIpc.on("analytics:navigation", (_e, fromPage, toPage) => {
+    trackNavigation(check.text(fromPage, 100), check.text(toPage, 100));
   });
 
-  ipcMain.on("analytics:error", (_e, context, message) => {
-    trackError(context, message);
+  secureIpc.on("analytics:error", (_e, context, message) => {
+    trackError(String(context ?? ""), String(message ?? ""));
   });
 }
 
+let _initialized = false;
 
-function init(initialSettings = {}) {
+// getSettingsFn: returns the current settings (read on every event, so the Settings switch
+// takes effect immediately).
+function init(getSettingsFn) {
+  if (_initialized) return;
+  _initialized = true;
+  getSettings = getSettingsFn;
+
   initPaths();
-  loadQueueFromDisk();
+  if (isEnabled()) {
+    loadQueueFromDisk();
+  } else {
+    forgetAll(); // also drops events queued by older versions, which sent statistics without asking
+  }
   setupIpcHandlers();
   startFlushLoop();
-  trackAppStart(initialSettings);
+  trackAppStart(getSettings());
 
   app.on("before-quit", () => {
     stopFlushLoop();
@@ -333,16 +370,7 @@ function init(initialSettings = {}) {
 
 module.exports = {
   init,
+  applyConsent,
   track,
-  trackAppStart,
-  trackFeatureOpen,
-  trackSettingsSaved,
-  trackNavigation,
   trackError,
-
-  trackLocationAdded,
-  trackLocationEdited,
-  trackLocationDeleted,
-  trackLocationActivated,
-  trackLocationList,
 };

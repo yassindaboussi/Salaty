@@ -2,93 +2,70 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.aladhan.com https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://makkahlive.netlify.app; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Live Streams - Salaty Time</title>
+    <title data-i18n="livestreamsTitle">Live Streams - Salaty Time</title>
 
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/livestreams.css" />
-    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
   </head>
   <body class="page-loading">
-    <div class="app-container theme-dark" id="app">
+    <div class="app-container" id="app">
       <div class="drag-area"></div>
 
       <div class="livestreams-container">
-        <!-- ── HEADER (preserved exactly) ── -->
-        <div class="page-header livestreams-header">
-          <button
-            class="back-btn"
-            id="backBtn"
-            aria-label="Back to Features"
-            data-tooltip="tooltipBack"
+        <!-- ── HEADER ── -->
+        <header
+          class="page-header livestreams-header"
+          data-page-header
+          data-controls-class="livestreams-controls"
+        >
+          <h1
+            class="page-header__title"
+            id="livestreamsTitle"
+            data-i18n="livestreamsTitle"
           >
-            <i class="fas fa-arrow-left"></i>
-          </button>
-          <h2 class="page-header__title livestreams-title" id="livestreamsTitle">
             Live Haramain Streams
-          </h2>
-          <div class="page-header__controls livestreams-controls">
-            <button
-              class="control-btn minimize-btn"
-              id="minimizeBtn"
-              aria-label="Minimize"
-              data-tooltip="tooltipMinimize"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 13H5v-2h14v2z" />
-              </svg>
-            </button>
-            <button
-              class="control-btn fullscreen-btn"
-              id="fullscreenBtn"
-              aria-label="Toggle Fullscreen"
-              data-tooltip="tooltipExpand"
-            >
-              <i class="fas fa-expand"></i>
-            </button>
-            <button
-              class="control-btn close-btn"
-              id="closeBtn"
-              aria-label="Close"
-              data-tooltip="tooltipClose"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
+          </h1>
+        </header>
 
         <!-- ── CHANNEL SELECTOR TABS ── -->
         <div class="channel-tabs" role="tablist">
           <button
+            type="button"
             class="channel-tab active"
             id="tabMakkah"
             role="tab"
             aria-selected="true"
             aria-controls="panelMakkah"
           >
-            <span class="channel-tab-icon"><i class="fas fa-kaaba"></i></span>
-            <span id="tabMakkahLabel">Makkah</span>
+            <span class="channel-tab-icon"
+              ><i class="fas fa-kaaba" aria-hidden="true"></i
+            ></span>
+            <span id="tabMakkahLabel" data-i18n="makkahTab">Makkah</span>
           </button>
           <button
+            type="button"
             class="channel-tab"
             id="tabMadina"
             role="tab"
             aria-selected="false"
             aria-controls="panelMadina"
           >
-            <span class="channel-tab-icon"><i class="fas fa-mosque"></i></span>
-            <span id="tabMadinaLabel">Madina</span>
+            <span class="channel-tab-icon"
+              ><i class="fas fa-mosque" aria-hidden="true"></i
+            ></span>
+            <span id="tabMadinaLabel" data-i18n="madinaTab">Madina</span>
           </button>
         </div>
 
         <!-- ── CONTENT PANELS ── -->
-        <div class="livestreams-content" id="livestreamsContent">
+        <main class="livestreams-content">
           <!-- Makkah Panel -->
           <div
             class="stream-panel active"
@@ -100,18 +77,23 @@
             <div class="stream-info-bar">
               <div class="stream-location">
                 <div class="stream-location-icon">
-                  <i class="fas fa-kaaba"></i>
+                  <i class="fas fa-kaaba" aria-hidden="true"></i>
                 </div>
                 <div class="stream-location-text">
-                  <span class="stream-location-name" id="makkahTitle"
+                  <span
+                    class="stream-location-name"
+                    id="makkahTitle"
+                    data-i18n="makkahLive"
                     >Al Masjid al-Haram</span
                   >
-                  <span class="stream-location-sub">Makkah al-Mukarramah</span>
+                  <span class="stream-location-sub" data-i18n="makkahLocation"
+                    >Makkah al-Mukarramah</span
+                  >
                 </div>
               </div>
               <div class="live-badge">
                 <span class="live-dot"></span>
-                <span class="live-text">Live</span>
+                <span class="live-text" data-i18n="live">Live</span>
               </div>
             </div>
 
@@ -122,20 +104,17 @@
                 class="responsive-iframe"
                 src="about:blank"
                 title="Makkah Live"
+                data-i18n-title="makkahLive"
                 frameborder="0"
                 allow="
-                  accelerometer;
                   autoplay;
-                  clipboard-write;
                   encrypted-media;
-                  gyroscope;
                   picture-in-picture;
                   fullscreen;
-                  display-capture;
                 "
                 allowfullscreen
                 referrerpolicy="strict-origin-when-cross-origin"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-presentation"
+                sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
               ></iframe>
             </div>
           </div>
@@ -151,20 +130,23 @@
             <div class="stream-info-bar">
               <div class="stream-location">
                 <div class="stream-location-icon">
-                  <i class="fas fa-mosque"></i>
+                  <i class="fas fa-mosque" aria-hidden="true"></i>
                 </div>
                 <div class="stream-location-text">
-                  <span class="stream-location-name" id="madinaTitle"
+                  <span
+                    class="stream-location-name"
+                    id="madinaTitle"
+                    data-i18n="madinaLive"
                     >Al Masjid an-Nabawi</span
                   >
-                  <span class="stream-location-sub"
+                  <span class="stream-location-sub" data-i18n="madinaLocation"
                     >Al-Madinah al-Munawwarah</span
                   >
                 </div>
               </div>
               <div class="live-badge">
                 <span class="live-dot"></span>
-                <span class="live-text">Live</span>
+                <span class="live-text" data-i18n="live">Live</span>
               </div>
             </div>
 
@@ -175,28 +157,25 @@
                 class="responsive-iframe"
                 src="about:blank"
                 title="Madina Live"
+                data-i18n-title="madinaLive"
                 frameborder="0"
                 allow="
-                  accelerometer;
                   autoplay;
-                  clipboard-write;
                   encrypted-media;
-                  gyroscope;
                   picture-in-picture;
                   fullscreen;
-                  display-capture;
                 "
                 allowfullscreen
                 referrerpolicy="strict-origin-when-cross-origin"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-presentation"
+                sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
               ></iframe>
             </div>
           </div>
-        </div>
+        </main>
         <!-- end .livestreams-content -->
       </div>
     </div>
 
-    <script src="../../js-bundled/renderer.bundle.js"></script>
+    <script src="../../js-bundled/livestreams.bundle.js"></script>
   </body>
 </html>

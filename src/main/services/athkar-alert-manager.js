@@ -4,8 +4,7 @@ const adkarData = require("../../renderer/data/adkar.json");
 
 const CHECK_INTERVAL_MS = 30 * 1000;
 
-// The dua stays Arabic; only the popup title follows the app language.
-const ALERT_TITLES = { ar: "أذكار", en: "Athkar", fr: "Athkar" };
+const { t } = require("./i18n");
 
 let checkTimer = null;
 let getSettingsData = null;
@@ -28,7 +27,7 @@ function cleanup() {
 
 function _check() {
   const settings = getSettingsData?.() || {};
-  const enabled = !!settings.athkarAlertEnabled;
+  const enabled = Boolean(settings.athkarAlertEnabled);
 
   if (!enabled) {
     wasEnabled = false;
@@ -59,7 +58,8 @@ function _fireAlert(settings) {
       icon: "fa-moon",
       theme: settings.theme || "navy",
       content: item.content,
-      title: `Salaty Time · ${ALERT_TITLES[settings.language] || ALERT_TITLES.en}`,
+      // the dua stays Arabic; only the popup title follows the app language
+      title: `Salaty Time · ${t("athkarAlertTitle", settings.language)}`,
     },
     "athkar",
   );

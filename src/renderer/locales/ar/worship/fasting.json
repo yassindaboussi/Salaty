@@ -8,7 +8,6 @@
   "weeklyMonThuDesc": "صيام يومي الإثنين والخميس",
   "remindMe": "ذكّرني",
   "reminderOn": "التذكير مفعّل",
-  "reminderOff": "التذكير متوقف",
   "leadOption1": "قبل يوم واحد",
   "leadOption2": "قبل يومين",
   "leadOption3": "قبل ثلاثة أيام",
@@ -19,7 +18,6 @@
   "ramadanNote": "لرمضان صفحته الخاصة — هذه القائمة للصيام التطوعي فقط",
   "loadingFastingDays": "جارِ تحميل أيام الصيام...",
   "noUpcomingFastingDays": "لا توجد أيام صيام قادمة",
-
   "whiteDaysTitle": "الأيام البيض",
   "whiteDaysDesc": "صيام 13 و14 و15 من كل شهر هجري كصيام الشهر كله.",
   "tasuaTitle": "التاسوعاء",
@@ -32,7 +30,6 @@
   "arafahDesc": "اليوم التاسع من ذي الحجة، صيامه يكفّر ذنوب السنة الماضية والقادمة.",
   "shawwal6Title": "ست من شوال",
   "shawwal6Desc": "صيام ستة أيام من شوال بعد رمضان كصيام الدهر كله.",
-
   "fastingReminderPopupTitle": "تذكير بصيام سنة",
   "fastingReminderWeeklyContent": "{when} ({day}) يوم صيام سنة، لا تنسَ النية قبل الفجر.",
   "fastingReminderContent": "{when} {occasion}، لا تنسَ النية قبل الفجر."

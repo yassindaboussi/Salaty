@@ -1,0 +1,26 @@
+/*
+  Tooltip bubble created by js/core/tooltips.js (used by the app pages and the popup windows).
+  The script only sets its position, and opacity/scale to show or hide it.
+  Popup windows load this file without tokens.css, so the values are written out here.
+*/
+.app-tooltip {
+  position: fixed;
+  z-index: 99999; /* same level as --z-adhan-overlay */
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+  transform: translateX(-50%) scale(0.88);
+  background: rgba(10, 15, 35, 0.92);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}

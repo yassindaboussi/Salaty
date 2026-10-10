@@ -2,73 +2,87 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.aladhan.com https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://makkahlive.netlify.app; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Salaty Time - Islamic Prayer Times</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/home.css" />
-    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
     <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
     <link rel="stylesheet" href="../../css/03-components/offline-banner.css" />
   </head>
   <body class="page-loading">
-    <div class="app-container theme-dark" id="app">
+    <div class="app-container" id="app">
       <div class="drag-area"></div>
 
-      <div class="header">
+      <header class="header">
         <div class="window-controls">
           <button
+            type="button"
             class="settings-btn"
             id="mainSettingsBtn"
-            aria-label="Settings"
             data-tooltip="tooltipSettings"
           >
-            <i class="fas fa-cog"></i>
+            <i class="fas fa-cog" aria-hidden="true"></i>
           </button>
           <button
+            type="button"
             class="features-btn"
             id="mainFeaturesBtn"
-            aria-label="Features"
             data-tooltip="tooltipFeatures"
           >
-            <i class="fas fa-th-large"></i>
+            <i class="fas fa-th-large" aria-hidden="true"></i>
           </button>
           <button
+            type="button"
             class="widget-toggle-btn"
             id="prayerWidgetBtn"
-            aria-label="Prayer Widget"
             data-tooltip="tooltipWidget"
+            aria-pressed="false"
           >
-            <i class="fas fa-clock"></i>
+            <i class="fas fa-clock" aria-hidden="true"></i>
           </button>
 
           <div class="draggable-header-space"></div>
 
           <div class="right-controls">
             <button
+              type="button"
               class="control-btn minimize-btn"
               id="minimizeBtn"
-              aria-label="Minimize"
+              data-window-action="minimize"
               data-tooltip="tooltipMinimize"
             >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
                 <path d="M19 13H5v-2h14v2z" />
               </svg>
             </button>
             <button
-              class="control-btn fullscreen-btn"
+              type="button"
+              class="control-btn"
               id="fullscreenBtn"
-              aria-label="Toggle Fullscreen"
               data-tooltip="tooltipExpand"
             >
-              <i class="fas fa-expand"></i>
+              <i class="fas fa-expand" aria-hidden="true"></i>
             </button>
             <button
+              type="button"
               class="control-btn close-btn"
               id="closeBtn"
-              aria-label="Close"
+              data-window-action="close"
               data-tooltip="tooltipClose"
             >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
                 <path
                   d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
                 />
@@ -79,12 +93,14 @@
         <div class="location-wrapper">
           <div class="location" id="location">Loading...</div>
           <button
+            type="button"
             class="location-switcher-btn"
             id="locationSwitcherBtn"
-            aria-label="Switch Location"
+            aria-label="Switch location"
+            data-i18n-aria-label="switchLocationLabel"
             style="display: none"
           >
-            <i class="fas fa-chevron-down"></i>
+            <i class="fas fa-chevron-down" aria-hidden="true"></i>
           </button>
           <div class="location-switcher-dropdown" id="locationSwitcherDropdown">
             <!-- Locations will be dynamically inserted here -->
@@ -96,28 +112,29 @@
           <span class="hijri-date" id="hijriDate"></span>
         </div>
         <div class="ramadan-countdown" id="ramadanCountdown"></div>
-      </div>
+      </header>
 
       <!-- Events Banner -->
       <div class="events-banner" id="eventsBanner" style="display: none">
         <div class="events-banner-content">
-          <i class="fas fa-bullhorn events-icon"></i>
-          <span class="events-text" id="eventText"
-            >Bienvenue sur Salaty ! Restez à l'écoute pour les événements à
-            venir.</span
-          >
+          <i class="fas fa-bullhorn events-icon" aria-hidden="true"></i>
+          <span class="events-text" id="eventText"></span>
         </div>
         <button
+          type="button"
           class="events-close-btn"
           id="closeEventBanner"
-          aria-label="Fermer"
+          aria-label="Close"
+          data-i18n-aria-label="close"
         >
-          <i class="fas fa-times"></i>
+          <i class="fas fa-times" aria-hidden="true"></i>
         </button>
       </div>
 
       <div class="prayer-cards-container" id="prayerCards">
-        <div class="loading" id="loadingText">Loading prayer times...</div>
+        <div class="loading" id="loadingText" data-i18n="loadingPrayerTimes">
+          Loading prayer times...
+        </div>
       </div>
 
       <div class="prayer-times" id="prayerTimes">
@@ -127,14 +144,24 @@
       <!-- Update Modal -->
       <div id="updateModal" class="modal">
         <div class="modal-content">
-          <h3 id="updateTitle">Mise à jour disponible</h3>
-          <p id="updateMessage">Une nouvelle version est disponible.</p>
+          <h3 id="updateTitle" data-i18n="updateAvailable">Update Available</h3>
+          <p id="updateMessage"></p>
           <div class="modal-buttons">
-            <button id="updateActionBtn" class="modal-btn primary">
-              Télécharger
+            <button
+              type="button"
+              id="updateActionBtn"
+              class="modal-btn primary"
+              data-i18n="download"
+            >
+              Download
             </button>
-            <button id="updateCancelBtn" class="modal-btn secondary">
-              Plus tard
+            <button
+              type="button"
+              id="updateCancelBtn"
+              class="modal-btn secondary"
+              data-i18n="later"
+            >
+              Later
             </button>
           </div>
           <div id="updateProgress" class="update-progress hidden">
@@ -147,6 +174,6 @@
       </div>
     </div>
 
-    <script src="../../js-bundled/index.bundle.js"></script>
+    <script src="../../js-bundled/home.bundle.js"></script>
   </body>
 </html>

@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * create-ga4-dimensions.js  (zero-dependency version)
  *
@@ -28,36 +30,132 @@ const KEY_FILE = path.join(__dirname, "service-account-key.json");
 const dimensions = [
   // Attached to EVERY event (not just app_start) — most valuable ones,
   // let you segment any report by app version or OS.
-  { displayName: "App Version", parameterName: "app_version", description: "Salaty version number (e.g. 1.2.0)" },
-  { displayName: "OS Platform", parameterName: "os_platform", description: "Windows / macOS / Linux" },
-  { displayName: "OS Architecture", parameterName: "os_arch", description: "x64 / arm64 / ia32" },
-  { displayName: "App Locale", parameterName: "app_locale", description: "System locale (e.g. en-US) — different from in-app language" },
+  {
+    displayName: "App Version",
+    parameterName: "app_version",
+    description: "Salaty version number (e.g. 1.2.0)",
+  },
+  {
+    displayName: "OS Platform",
+    parameterName: "os_platform",
+    description: "Windows / macOS / Linux",
+  },
+  {
+    displayName: "OS Architecture",
+    parameterName: "os_arch",
+    description: "x64 / arm64 / ia32",
+  },
+  {
+    displayName: "App Locale",
+    parameterName: "app_locale",
+    description: "System locale (e.g. en-US) — different from in-app language",
+  },
 
-  { displayName: "Feature Opened", parameterName: "feature_name", description: "Which app feature the user opened" },
-  { displayName: "Settings Language", parameterName: "language", description: "Language set via Settings save — different param than user_language (app_start uses user_language, settings_saved uses language)" },
-  { displayName: "Settings Theme", parameterName: "theme", description: "Theme set via Settings save — different param than user_theme" },
-  { displayName: "User Language", parameterName: "user_language", description: "App language (en/ar/fr)" },
-  { displayName: "User theme", parameterName: "user_theme", description: "App color theme" },
-  { displayName: "City", parameterName: "city", description: "User's configured city" },
-  { displayName: "Country", parameterName: "country", description: "User's configured country" },
-  { displayName: "Screen Size", parameterName: "screen_size", description: "'big' or 'small' screen mode" },
-  { displayName: "Station Name", parameterName: "station_name", description: "Radio station played" },
-  { displayName: "Dhikr Name", parameterName: "dhikr_name", description: "Tasbih/dhikr used" },
-  { displayName: "Athkar Category", parameterName: "category_name", description: "Athkar category opened" },
-  { displayName: "Album Name", parameterName: "album_name", description: "Quran audio archive album played" },
-  { displayName: "Livestream", parameterName: "stream", description: "'makkah' or 'madina' livestream" },
-  { displayName: "Ramadan Tab", parameterName: "tab_name", description: "Ramadan page tab selected" },
-  { displayName: "Athkar Alert Enabled", parameterName: "athkar_alert_enabled", description: "Athkar reminder on/off" },
-  { displayName: "Athkar Alert Interval", parameterName: "athkar_alert_interval", description: "Athkar reminder interval (minutes)" },
-  { displayName: "Pre Adhan Enabled", parameterName: "pre_adhan_enabled", description: "Pre-adhan reminder on/off" },
-  { displayName: "Pre Adhan Minutes", parameterName: "pre_adhan_minutes", description: "Pre-adhan lead time (minutes)" },
-  { displayName: "OS Release", parameterName: "os_release", description: "Operating system version" },
-  { displayName: "Electron Version", parameterName: "electron_ver", description: "Electron runtime version" },
-  { displayName: "Error Context", parameterName: "error_context", description: "Where in the app an error occurred" },
-  { displayName: "From Page", parameterName: "from_page", description: "Navigation source page" },
-  { displayName: "To Page", parameterName: "to_page", description: "Navigation destination page" },
-  { displayName: "Location City", parameterName: "location_city", description: "City of a saved/managed location" },
-  { displayName: "Location Country", parameterName: "location_country", description: "Country of a saved/managed location" },
+  {
+    displayName: "Feature Opened",
+    parameterName: "feature_name",
+    description: "Which app feature the user opened",
+  },
+  {
+    displayName: "Settings Language",
+    parameterName: "language",
+    description:
+      "Language set via Settings save — different param than user_language (app_start uses user_language, settings_saved uses language)",
+  },
+  {
+    displayName: "Settings Theme",
+    parameterName: "theme",
+    description:
+      "Theme set via Settings save — different param than user_theme",
+  },
+  {
+    displayName: "User Language",
+    parameterName: "user_language",
+    description: "App language (en/ar/fr)",
+  },
+  {
+    displayName: "User theme",
+    parameterName: "user_theme",
+    description: "App color theme",
+  },
+  {
+    displayName: "Screen Size",
+    parameterName: "screen_size",
+    description: "'big' or 'small' screen mode",
+  },
+  {
+    displayName: "Dhikr Name",
+    parameterName: "dhikr_name",
+    description: "Tasbih/dhikr used",
+  },
+  {
+    displayName: "Athkar Category",
+    parameterName: "category_name",
+    description: "Athkar category opened",
+  },
+  {
+    displayName: "Livestream",
+    parameterName: "stream",
+    description: "'makkah' or 'madina' livestream",
+  },
+  {
+    displayName: "Ramadan Tab",
+    parameterName: "tab_name",
+    description: "Ramadan page tab selected",
+  },
+  {
+    displayName: "Athkar Alert Enabled",
+    parameterName: "athkar_alert_enabled",
+    description: "Athkar reminder on/off",
+  },
+  {
+    displayName: "Athkar Alert Interval",
+    parameterName: "athkar_alert_interval",
+    description: "Athkar reminder interval (minutes)",
+  },
+  {
+    displayName: "Pre Adhan Enabled",
+    parameterName: "pre_adhan_enabled",
+    description: "Pre-adhan reminder on/off",
+  },
+  {
+    displayName: "Pre Adhan Minutes",
+    parameterName: "pre_adhan_minutes",
+    description: "Pre-adhan lead time (minutes)",
+  },
+  {
+    displayName: "OS Release",
+    parameterName: "os_release",
+    description: "Operating system version",
+  },
+  {
+    displayName: "Electron Version",
+    parameterName: "electron_ver",
+    description: "Electron runtime version",
+  },
+  {
+    displayName: "Error Context",
+    parameterName: "error_context",
+    description: "Where in the app an error occurred",
+  },
+  {
+    displayName: "From Page",
+    parameterName: "from_page",
+    description: "Navigation source page",
+  },
+  {
+    displayName: "To Page",
+    parameterName: "to_page",
+    description: "Navigation destination page",
+  },
+  {
+    displayName: "Action",
+    parameterName: "action",
+    description:
+      "Location action (added/edited/activated/deleted) or Ramadan day mark/unmark",
+  },
+  // Not sent any more (privacy): city, country, station_name, album_name, location_city,
+  // location_country. Existing dimensions for them can be archived in GA4 Admin.
 ];
 
 function base64url(input) {
@@ -80,8 +178,16 @@ function buildSignedJwt(key) {
     iat: now,
   };
   const unsigned = `${base64url(JSON.stringify(header))}.${base64url(JSON.stringify(claims))}`;
-  const signature = crypto.sign("RSA-SHA256", Buffer.from(unsigned), key.private_key);
-  const signatureB64 = signature.toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+  const signature = crypto.sign(
+    "RSA-SHA256",
+    Buffer.from(unsigned),
+    key.private_key,
+  );
+  const signatureB64 = signature
+    .toString("base64")
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
   return `${unsigned}.${signatureB64}`;
 }
 
@@ -120,7 +226,7 @@ function getAccessToken(jwt) {
 
 // ── Step 3: call the Admin API to create one custom dimension ──
 function createDimension(accessToken, dim) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const body = JSON.stringify({
       parameterName: dim.parameterName,
       displayName: dim.displayName,
@@ -159,11 +265,15 @@ function createDimension(accessToken, dim) {
 
 async function main() {
   if (!PROPERTY_ID) {
-    console.error("❌ Missing property ID.\n\nUsage:  node create-ga4-dimensions.js <PROPERTY_ID>\nExample: node create-ga4-dimensions.js 383400508");
+    console.error(
+      "❌ Missing property ID.\n\nUsage:  node create-ga4-dimensions.js <PROPERTY_ID>\nExample: node create-ga4-dimensions.js 383400508",
+    );
     process.exit(1);
   }
   if (!fs.existsSync(KEY_FILE)) {
-    console.error(`❌ Can't find service-account-key.json in this folder (${__dirname}).`);
+    console.error(
+      `❌ Can't find service-account-key.json in this folder (${__dirname}).`,
+    );
     process.exit(1);
   }
 
@@ -173,7 +283,9 @@ async function main() {
   const accessToken = await getAccessToken(jwt);
   console.log(`✅ Authenticated.\n`);
 
-  console.log(`Creating ${dimensions.length} custom dimensions on property ${PROPERTY_ID}...\n`);
+  console.log(
+    `Creating ${dimensions.length} custom dimensions on property ${PROPERTY_ID}...\n`,
+  );
   for (const dim of dimensions) {
     const result = await createDimension(accessToken, dim);
     if (result.ok && result.skipped) {
@@ -184,7 +296,9 @@ async function main() {
       console.log(`❌ Failed:  ${dim.displayName}  —  ${result.error}`);
     }
   }
-  console.log("\nDone! Check Admin → Définitions personnalisées in GA4 to confirm.");
+  console.log(
+    "\nDone! Check Admin → Définitions personnalisées in GA4 to confirm.",
+  );
 }
 
 main().catch((err) => {

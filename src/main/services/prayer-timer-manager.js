@@ -1,16 +1,19 @@
 "use strict";
 
-const { ipcMain } = require("electron");
+const secureIpc = require("../ipc/secure-ipc");
 const {
   PRAYER_KEYS,
   secondsFromTime,
+  secondsSinceMidnight,
   getCurrentAndNext,
   isFridayIn,
   displayPrayerKey,
 } = require("../../shared/prayerUtils");
 const { ALADHAN_API, locationQuery } = require("../../shared/aladhan");
+const log = require("./logger").logger("Prayer");
+const { bringToFrontForAdhan } = require("../windows/main-window");
 
-let mainWindow = null;
+let getMainWindow = () => null;
 let getSettingsData = null;
 let prayerData = null;
 
@@ -27,9 +30,9 @@ let lastPreAdhanKey = null;
 
 const ADHAN_TOLERANCE_SEC = 900;
 
-
-function init(window, settingsFn) {
-  mainWindow = window;
+// getMainWindowFn / settingsFn: return the main window and the settings when called.
+function init(getMainWindowFn, settingsFn) {
+  getMainWindow = getMainWindowFn;
   getSettingsData = settingsFn;
   _registerIpcHandlers();
   _loadPrayerData().then(() => {
@@ -56,33 +59,28 @@ function cleanup() {
   }
 }
 
-
 function _registerIpcHandlers() {
-  ipcMain.on("prayer-data-updated", (_ev, data) => {
+  secureIpc.on("prayer-data-updated", (_ev, data) => {
     if (data) {
       prayerData = data;
       currentPrayerKey = null;
     }
   });
 
-  ipcMain.on("stop-adhan", () => _clearAdhanSession());
-  ipcMain.on("stop-adhan-from-popup", () => _clearAdhanSession());
+  secureIpc.on("stop-adhan", () => _clearAdhanSession());
 
-  ipcMain.handle("get-adhan-state", () => ({
+  secureIpc.handle("get-adhan-state", () => ({
     isPlaying: adhanIsPlaying,
     session: activeAdhanSession,
   }));
-
-  ipcMain.on("reload-prayer-data", () => _loadPrayerData());
 }
 
 function _clearAdhanSession() {
   adhanIsPlaying = false;
   activeAdhanSession = null;
-  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.flashFrame(false);
+  _mainWindow()?.flashFrame(false);
   _sendToMain("force-stop-adhan", {});
 }
-
 
 async function _loadPrayerData() {
   const settings = getSettingsData?.();
@@ -100,19 +98,18 @@ async function _loadPrayerData() {
     } else {
       throw new Error("Invalid API response");
     }
-  } catch {
+  } catch (err) {
+    // offline or API down: keep yesterday's data; the midnight/location reload tries again
+    log.warn("loading prayer times failed:", err.message);
   }
 }
-
 
 function _startTickLoop() {
   if (tickInterval) clearInterval(tickInterval);
   tickInterval = setInterval(() => {
-    if (!prayerData || !mainWindow || mainWindow.isDestroyed()) return;
+    if (!prayerData || !_mainWindow()) return;
     try {
-      const now = new Date();
-      const nowSec =
-        now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+      const nowSec = secondsSinceMidnight();
       const { currentPrayer, nextPrayer, timeRemaining } = getCurrentAndNext(
         nowSec,
         prayerData.timings,
@@ -136,18 +133,21 @@ function _startTickLoop() {
       if (preEnabled && timeRemaining > 0 && timeRemaining <= preMinutes * 60) {
         if (lastPreAdhanKey !== nextPrayer.key) {
           lastPreAdhanKey = nextPrayer.key;
-          const actualMinutesRemaining = Math.max(1, Math.round(timeRemaining / 60));
+          const actualMinutesRemaining = Math.max(
+            1,
+            Math.round(timeRemaining / 60),
+          );
           _sendToMain("show-pre-adhan-notification", {
             prayer: _withDisplayKey(nextPrayer),
             minutes: actualMinutesRemaining,
           });
         }
       }
-    } catch {
+    } catch (err) {
+      log.error("prayer tick failed:", err);
     }
   }, 1000);
 }
-
 
 function _maybeFireAdhan(prayer, nowSec) {
   if (lastAdhanPrayer === prayer.key) return;
@@ -180,13 +180,11 @@ function _maybeFireAdhan(prayer, nowSec) {
   };
 
   if (adhanIsPlaying) {
-    const { bringToFrontForAdhan } = require("../windows/main-window");
-    bringToFrontForAdhan(mainWindow);
+    bringToFrontForAdhan(_mainWindow());
   }
 
   _sendToMain("trigger-adhan", activeAdhanSession);
 }
-
 
 // Adds the key the renderer should use for the prayer's *name*: on Fridays (in the prayer
 // location's own time zone) Dhuhr is announced as Jumu'ah. `key` itself is left as-is
@@ -200,7 +198,6 @@ function _withDisplayKey(prayer) {
   };
 }
 
-
 function _scheduleMidnightReload() {
   if (midnightTimer) clearTimeout(midnightTimer);
   const now = new Date();
@@ -212,10 +209,13 @@ function _scheduleMidnightReload() {
   }, msLeft);
 }
 
+function _mainWindow() {
+  const w = getMainWindow();
+  return w && !w.isDestroyed() ? w : null;
+}
 
 function _sendToMain(channel, payload) {
-  if (mainWindow && !mainWindow.isDestroyed())
-    mainWindow.webContents.send(channel, payload);
+  _mainWindow()?.webContents.send(channel, payload);
 }
 
 module.exports = { init, cleanup, reloadPrayerData, getPrayerData };

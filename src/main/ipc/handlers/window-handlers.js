@@ -1,81 +1,102 @@
 "use strict";
 
-const { ipcMain, app, clipboard } = require("electron");
+// IPC for the main window: window buttons, size, page navigation, app info, clipboard.
+const { app, clipboard } = require("electron");
+const secureIpc = require("../secure-ipc");
+const check = require("../validate");
 const { pages, getAdhanAudioSrc } = require("../../config/paths");
+const {
+  showExistingWindow,
+  syncWindowState,
+} = require("../../windows/main-window");
+const { openExternalSafely } = require("../../app/security");
 
-let _registered = false;
+let registered = false;
 
-function setupHandlers(mainWindow) {
-  if (_registered) return;
-  _registered = true;
+// getMainWindow: returns the main window (or null); read on every call so the handlers never
+// keep a stale window.
+function registerWindowHandlers(getMainWindow) {
+  if (registered) return;
+  registered = true;
 
-  ipcMain.handle("minimize-window", () => mainWindow?.minimize());
-  ipcMain.handle("close-window", () => mainWindow?.hide());
+  const win = () => {
+    const w = getMainWindow();
+    return w && !w.isDestroyed() ? w : null;
+  };
 
-  ipcMain.handle("resize-window", (_e, width, height) => {
-    if (!mainWindow) return { width: 850, height: 560 };
-    if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize();
+  secureIpc.handle("minimize-window", () => win()?.minimize());
+  secureIpc.handle("close-window", () => win()?.hide());
+
+  // A page fitting the window to its content. Never un-maximizes: whether the window is
+  // maximized is the user's choice (see syncWindowState), not a side effect of a resize.
+  secureIpc.handle("resize-window", (_e, width, height) => {
+    const w = win();
+    const size = check.windowSize(width, height);
+    if (!w || !size) return { width: 850, height: 560 };
+    if (w.isMaximized()) {
+      const [cw, ch] = w.getSize();
+      return { width: cw, height: ch };
     }
-    mainWindow.setSize(Math.round(width), Math.round(height), false);
-    return { width, height };
+    w.setSize(size.width, size.height, false);
+    return size;
   });
 
-  ipcMain.handle("maximize-window", () => {
-    if (!mainWindow) return;
-    mainWindow.maximize();
+  // The page's expand/compress button. The page updates when "window-maximized-changed"
+  // arrives; if nothing changes (already in that state) the state is sent again.
+  secureIpc.handle("maximize-window", () => {
+    const w = win();
+    if (!w) return false;
+    if (w.isMaximized()) syncWindowState(w);
+    else w.maximize();
+    return true;
   });
-
-  ipcMain.handle("unmaximize-window", () => {
-    if (!mainWindow) return;
-    if (mainWindow.isMaximized()) mainWindow.unmaximize();
-  });
-
-  ipcMain.handle("navigate-to", (_e, page, width, height) => {
-    if (!mainWindow) return false;
-    if (width && height) {
-      if (mainWindow.isMaximized()) mainWindow.unmaximize();
-      mainWindow.setSize(Math.round(width), Math.round(height), false);
-    }
-    mainWindow.loadFile(pages.byName(page));
+  secureIpc.handle("unmaximize-window", () => {
+    const w = win();
+    if (!w) return false;
+    if (w.isMaximized()) w.unmaximize();
+    else syncWindowState(w);
     return true;
   });
 
-  ipcMain.handle("go-back", () => {
-    mainWindow?.loadFile(pages.index);
+  secureIpc.handle("navigate-to", (_e, page, width, height) => {
+    const w = win();
+    if (!w) return false;
+    // a page that needs a size (e.g. the playlist from the mini player) gets it only in
+    // normal mode; a maximized window stays maximized
+    const size = width && height ? check.windowSize(width, height) : null;
+    if (size && !w.isMaximized()) w.setSize(size.width, size.height, false);
+    w.loadFile(pages.byName(page));
     return true;
   });
 
-  ipcMain.once("app-ready", () => {
-    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.show();
-  });
-
-  ipcMain.handle("show-playlist-in-main", () => {
-    if (!mainWindow) return false;
-    mainWindow.setSize(850, 600, true);
-    mainWindow.show();
-    mainWindow.focus();
-    mainWindow.loadFile(pages.playlist);
+  secureIpc.handle("go-back", () => {
+    win()?.loadFile(pages.index);
     return true;
   });
 
-  ipcMain.handle("is-dev-mode", () => !app.isPackaged);
-  ipcMain.handle("get-app-version", () => app.getVersion());
-  ipcMain.handle("get-adhan-audio-src", () => getAdhanAudioSrc());
-  ipcMain.handle("check-for-updates-manual", () => {
+  // The window starts hidden and is shown once the first page has rendered.
+  secureIpc.once("app-ready", () => win()?.show());
+
+  secureIpc.handle("get-app-version", () => app.getVersion());
+  secureIpc.handle("get-adhan-audio-src", () => getAdhanAudioSrc());
+  secureIpc.handle("check-for-updates-manual", () => {
     const { autoUpdater } = require("electron-updater");
     return autoUpdater.checkForUpdates();
   });
 
-  ipcMain.handle("clipboard-write-text", (_e, text) => {
-    clipboard.writeText(String(text ?? ""));
+  // Electron 44+: clipboard calls return a Promise
+  secureIpc.handle("clipboard-write-text", async (_e, text) => {
+    const clean = check.clipboardText(text);
+    if (clean === undefined) return false;
+    await clipboard.writeText(clean);
     return true;
   });
 
-  ipcMain.on(
-    "show-main-window",
-    () => mainWindow?.show() && mainWindow?.focus(),
-  );
+  // Links to outside sites (allow-list in app/security.js).
+  secureIpc.handle("open-external", (_e, url) => openExternalSafely(url));
+
+  // "Open app" in the popups.
+  secureIpc.on("show-main-window", () => showExistingWindow(win()));
 }
 
-module.exports = { setupHandlers };
+module.exports = { registerWindowHandlers };

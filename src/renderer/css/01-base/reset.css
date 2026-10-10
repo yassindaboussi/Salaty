@@ -25,7 +25,11 @@ body {
   backdrop-filter: none;
   overflow: hidden;
   position: relative;
-  -webkit-app-region: drag;
+
+  /* Never -webkit-app-region: drag here. Since Electron 44 the property is inherited, so every
+     element of the page would become its own drag rectangle, including invisible ones (e.g. a
+     card's oversized hover glow) that then cover the title-bar buttons and give them the arrow
+     cursor. Only title bars are drag areas: .header (home.css), .page-header, .drag-area. */
 }
 
 /* Page transition fade-in.

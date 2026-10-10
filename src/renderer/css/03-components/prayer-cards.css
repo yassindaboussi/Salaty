@@ -48,25 +48,6 @@
   border: 1px solid var(--border-medium);
 }
 
-.prayer-card.next .prayer-name,
-.prayer-card.next .prayer-time {
-  color: var(--text-bright);
-}
-
-.prayer-card.next .countdown {
-  color: var(--accent-color, #4a6bff);
-  font-weight: 600;
-}
-
-/* Prayer Card Content */
-.prayer-label {
-  font-size: 12px;
-  opacity: 0.9;
-  margin-bottom: 4px;
-  font-weight: 500;
-  line-height: 1.2;
-}
-
 .prayer-card .prayer-name {
   font-size: 18px;
   font-weight: 600;
@@ -85,12 +66,32 @@
   letter-spacing: 0.5px;
 }
 
-.prayer-card .time-remaining {
-  font-size: 12px;
-  opacity: 0.9;
+/* ── Arabic ───────────────────────────────────────────────────────────────
+   Prayer times and the countdown keep their left-to-right digit order.
+   The "now" badge sits inside the time but is Arabic text, so it reads RTL. */
+[dir="rtl"] .prayer-time,
+[dir="rtl"] .countdown {
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+.prayer-item .prayer-name {
+  flex-grow: 1;
+  font-size: 14px;
   font-weight: 500;
-  color: inherit;
-  margin-top: 2px;
+  color: var(--text-bright);
+}
+
+.prayer-item .prayer-time {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-bright);
+  flex-shrink: 0;
+}
+
+.prayer-card.next .prayer-name,
+.prayer-card.next .prayer-time {
+  color: var(--text-bright);
 }
 
 .prayer-card .countdown {
@@ -99,6 +100,28 @@
   letter-spacing: 0.5px;
   margin-top: 2px;
   color: #4a6bff;
+}
+
+.prayer-card.next .countdown {
+  color: var(--accent-color, #4a6bff);
+  font-weight: 600;
+}
+
+/* Prayer Card Content */
+.prayer-label {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-bottom: 4px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.prayer-card .time-remaining {
+  font-size: 12px;
+  opacity: 0.9;
+  font-weight: 500;
+  color: inherit;
+  margin-top: 2px;
 }
 
 /* Prayer Items */
@@ -155,20 +178,6 @@
   flex-shrink: 0;
 }
 
-.prayer-item .prayer-name {
-  flex-grow: 1;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-bright);
-}
-
-.prayer-item .prayer-time {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-bright);
-  flex-shrink: 0;
-}
-
 /* Space between the time and the adhan button. It sits on the button (not the time)
    because the time is LTR in every language, while the button follows the row. */
 .prayer-item .adhan-toggle-btn {
@@ -187,15 +196,6 @@
   margin-inline-start: 8px;
   vertical-align: middle;
   animation: pulse 2s infinite;
-}
-
-/* ── Arabic ───────────────────────────────────────────────────────────────
-   Prayer times and the countdown keep their left-to-right digit order.
-   The "now" badge sits inside the time but is Arabic text, so it reads RTL. */
-[dir="rtl"] .prayer-time,
-[dir="rtl"] .countdown {
-  direction: ltr;
-  unicode-bidi: embed;
 }
 
 [dir="rtl"] .current-indicator {

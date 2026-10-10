@@ -2,10 +2,8 @@
   "tasbih": "Tasbih",
   "selectDhikr": "Select Dhikr",
   "recitations": "Recitations",
-  "total": "Total",
   "completed": "Completed",
   "tasbihDesc": "Digital prayer beads",
-
   "countBtn": "Count",
   "undoBtn": "Undo",
   "resetBtn": "Reset",
@@ -13,13 +11,10 @@
   "noLimit": "No limit",
   "roundLabel": "Round {n}",
   "spacebarHint": "Space",
-
   "dhikrSwitched": "Switched to {name}",
   "dhikrCompleted": "Completed! {count} times",
   "dhikrRoundCompleted": "Round {n} complete — keep going",
   "counterReset": "Counter reset",
-  "allCountersReset": "All counters reset",
-
   "resetConfirmTitle": "Reset Counter",
   "resetConfirmMessage": "Are you sure you want to reset this counter?",
   "resetAllConfirmTitle": "Reset All Counters",
@@ -27,7 +22,6 @@
   "cancel": "Cancel",
   "reset": "Reset",
   "resetAllBtn": "Reset All",
-
   "dhikrSubhanallahMeaning": "Glory be to Allah",
   "dhikrAlhamdulillahMeaning": "Praise be to Allah",
   "dhikrAllahuAkbarMeaning": "Allah is the Greatest",
@@ -36,7 +30,6 @@
   "dhikrSubhanallahiWaBihamdihiMeaning": "Glory be to Allah, and praise Him",
   "dhikrSalawatMeaning": "O Allah, send blessings upon Muhammad",
   "dhikrHawqalaMeaning": "There is no power nor might except with Allah",
-
   "dhikrSubhanallahSource": "33× after each prayer — Sahih Muslim 596",
   "dhikrAlhamdulillahSource": "33× after each prayer — Sahih Muslim 596",
   "dhikrAllahuAkbarSource": "34× after each prayer, completing the 100 — Sahih Muslim 596",
@@ -44,5 +37,12 @@
   "dhikrAstaghfirullahSource": "100×/day — Sahih Muslim 2702",
   "dhikrSubhanallahiWaBihamdihiSource": "100×/day — Sahih al-Bukhari 6405",
   "dhikrSalawatSource": "No fixed number in an authentic hadith — recite it often, as much as you wish",
-  "dhikrHawqalaSource": "No fixed number in an authentic hadith — a \"treasure of Paradise,\" recite it often"
+  "dhikrHawqalaSource": "No fixed number in an authentic hadith — a \"treasure of Paradise,\" recite it often",
+  "footerQuotes": [
+    "\"So remember Me; I will remember you\" [Quran 2:152]",
+    "\"And the remembering of Allah is greater\" [Quran 29:45]",
+    "\"Glory and praise be to Allah, by whose grace good deeds are accomplished\"",
+    "\"Whoever remembers his Lord and glorifies Him, his sins fall away\"",
+    "\"The best of deeds is to remember Allah\""
+  ]
 }

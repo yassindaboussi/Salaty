@@ -19,10 +19,6 @@
 
   /* Header: layout comes from the shared .page-header component
      (03-components/page-header.css). Only what is specific to this page is here. */
-  .settings-header {
-    -webkit-app-region: drag;
-  }
-
   .settings-header .back-btn {
     z-index: 2;
   }
@@ -69,7 +65,8 @@
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 16px;
-    margin-right: 8px; /* physical on purpose: space from the scrollbar, which stays on the right */
+    /* stylelint-disable-next-line property-disallowed-list -- space from the scrollbar, which stays on the right in every language */
+    margin-right: 8px;
     transition: all 0.3s ease;
   }
 
@@ -293,6 +290,11 @@
     border-top: 1px solid var(--white-a05);
   }
 
+  .toggle-info {
+    flex: 1;
+    min-width: 0;
+  }
+
   .notif-row .toggle-info {
     flex: 1;
     min-width: 0;
@@ -377,26 +379,6 @@
     margin-bottom: 12px;
   }
 
-  .location-actions-row .detect-btn,
-  .location-actions-row .manage-locations-btn {
-    flex: 1;
-    min-width: 0;
-    margin: 0;
-  }
-
-  .location-actions-row .detect-btn span,
-  .location-actions-row .manage-locations-btn span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  @media (width <= 400px) {
-    .location-actions-row {
-      flex-direction: column;
-    }
-  }
-
   /* Detect Button */
   .detect-btn {
     width: 100%;
@@ -416,6 +398,56 @@
     margin-bottom: 12px;
   }
 
+  .manage-locations-btn {
+    width: 100%;
+    background: var(--surface-1);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    margin-top: 12px;
+  }
+
+  .manage-locations-btn:hover {
+    background: var(--surface-2);
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+  }
+
+  .location-actions-row .detect-btn,
+  .location-actions-row .manage-locations-btn {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .about-link-btn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .location-actions-row .detect-btn span,
+  .location-actions-row .manage-locations-btn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (width <= 400px) {
+    .location-actions-row {
+      flex-direction: column;
+    }
+  }
+
   .detect-btn:hover {
     background: rgba(var(--accent-rgb), 0.15);
     border-color: rgba(var(--accent-rgb), 0.5);
@@ -429,6 +461,47 @@
   .detect-btn.loading {
     opacity: 0.6;
     pointer-events: none;
+  }
+
+  .language-card i {
+    font-size: 18px;
+    color: var(--text-secondary);
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .size-check i {
+    font-size: 10px;
+    color: var(--text-bright);
+  }
+
+  .about-link-btn i {
+    font-size: 12px;
+    color: var(--accent-color);
+  }
+
+  .manage-locations-btn i {
+    font-size: 14px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+  }
+
+  .empty-state i {
+    font-size: 48px;
+    opacity: 0.3;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .empty-state p {
+    font-size: 14px;
+    opacity: 0.7;
+    margin: 0;
   }
 
   .detect-btn.loading i {
@@ -594,14 +667,6 @@
     border-color: var(--accent-color);
   }
 
-  .language-card i {
-    font-size: 18px;
-    color: var(--text-secondary);
-    width: 24px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-
   .language-card.selected i {
     color: var(--accent-color);
   }
@@ -724,11 +789,6 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .size-check i {
-    font-size: 10px;
-    color: var(--text-bright);
-  }
-
   .size-card.selected .size-check {
     opacity: 1;
     transform: scale(1);
@@ -797,11 +857,6 @@
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px solid var(--border-color);
-  }
-
-  .toggle-info {
-    flex: 1;
-    min-width: 0;
   }
 
   .toggle-info .subsection-label {
@@ -1068,15 +1123,15 @@
     flex-shrink: 0;
   }
 
+  .about-check-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
   .about-check-btn:hover:not(:disabled) {
     background: rgba(var(--accent-rgb), 0.22);
     border-color: var(--accent-color);
     transform: translateY(-1px);
-  }
-
-  .about-check-btn:disabled {
-    opacity: 0.5;
-    cursor: default;
   }
 
   /* Progress */
@@ -1170,17 +1225,6 @@
     transition: all 0.2s ease;
   }
 
-  .about-link-btn i {
-    font-size: 12px;
-    color: var(--accent-color);
-  }
-
-  .about-link-btn span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
   .about-link-btn:hover {
     background: rgba(var(--accent-rgb), 0.1);
     border-color: rgba(var(--accent-rgb), 0.35);
@@ -1257,34 +1301,6 @@
      LOCATION MANAGEMENT
      ======================================== */
 
-  .manage-locations-btn {
-    width: 100%;
-    background: var(--surface-1);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--text-primary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: all 0.3s ease;
-    margin-top: 12px;
-  }
-
-  .manage-locations-btn:hover {
-    background: var(--surface-2);
-    border-color: var(--accent-color);
-    transform: translateY(-1px);
-  }
-
-  .manage-locations-btn i {
-    font-size: 14px;
-  }
-
   /* Modal Overlay */
   .modal-overlay {
     position: fixed;
@@ -1314,8 +1330,9 @@
     border: 1px solid var(--border-color);
     border-radius: 16px;
     width: 90%;
-    max-width: 500px;
+    max-width: 450px;
     max-height: 80vh;
+    padding: 24px;
     display: flex;
     flex-direction: column;
     box-shadow: 0 20px 60px var(--black-a50);
@@ -1325,10 +1342,6 @@
 
   .modal-overlay.active .modal-container {
     transform: scale(1);
-  }
-
-  .modal-container.modal-small {
-    max-width: 400px;
   }
 
   /* Responsive modal for small screens */
@@ -1351,26 +1364,13 @@
       padding: 16px 18px;
     }
 
-    .modal-container.modal-small {
-      max-width: 95%;
-    }
-
     .locations-list {
       max-height: 300px;
-    }
-
-    .location-item {
-      padding: 12px;
-    }
-
-    .location-name {
-      font-size: 14px;
     }
 
     .action-btn {
       width: 28px;
       height: 28px;
-      font-size: 12px;
     }
   }
 
@@ -1391,6 +1391,10 @@
   }
 
   .modal-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    left: auto;
     width: 32px;
     height: 32px;
     border-radius: 8px;
@@ -1408,6 +1412,22 @@
   .modal-close-btn:hover {
     background: var(--surface-3);
     transform: rotate(90deg);
+  }
+
+  .modal-title {
+    margin: 0 0 24px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .modal-form {
+    margin-bottom: 20px;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
   }
 
   /* Modal Content */
@@ -1436,7 +1456,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     max-height: 400px;
     overflow-y: auto;
     padding-inline-end: 4px; /* scrollbar side (left in Arabic) */
@@ -1461,10 +1481,11 @@
   }
 
   .location-item {
-    background: var(--surface-subtle);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1472,24 +1493,36 @@
     transition: all 0.3s ease;
   }
 
-  .location-item:hover {
-    background: var(--surface-1);
-    border-color: var(--accent-color);
-  }
-
-  .location-item.active {
-    background: rgba(var(--accent-rgb), 0.1);
-    border-color: var(--accent-color);
-  }
-
-  .location-name {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
+  .location-item-title {
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+  }
+
+  .location-item-name {
+    font-weight: 600;
+  }
+
+  .location-item-badge {
+    background: #ffd700;
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .location-item-star {
+    color: #ffd700;
+  }
+
+  .location-item-place {
+    font-size: 13px;
+    opacity: 0.7;
+    color: var(--text-secondary);
   }
 
   .location-actions {
@@ -1501,67 +1534,36 @@
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--surface-subtle);
-    color: var(--text-primary);
+    border: none;
+    background: transparent;
+    color: var(--accent-color);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
-    transition: all 0.3s ease;
+    font-size: 16px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
   }
 
   .action-btn:hover {
-    background: var(--surface-2);
     transform: translateY(-2px);
   }
 
-  .activate-btn:hover {
-    background: rgba(76, 175, 80, 0.2);
-    border-color: var(--green-500);
-    color: var(--green-500);
-  }
-
-  .edit-btn:hover {
-    background: rgba(33, 150, 243, 0.2);
-    border-color: var(--blue-500);
-    color: var(--blue-500);
-  }
-
-  .delete-btn:hover {
-    background: rgba(244, 67, 54, 0.2);
-    border-color: var(--red-500);
-    color: var(--red-500);
+  .action-btn.delete-btn {
+    color: #ff6b6b;
   }
 
   /* Empty State */
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-secondary);
-  }
-
-  .empty-state i {
-    font-size: 48px;
-    opacity: 0.3;
-    margin-bottom: 16px;
-    display: block;
-  }
-
-  .empty-state p {
-    font-size: 14px;
-    opacity: 0.7;
-    margin: 0;
-  }
 
   /* Add Location Button */
   .add-location-btn {
     width: 100%;
-    background: rgba(var(--accent-rgb), 0.1);
-    border: 1px dashed var(--accent-color);
-    border-radius: 10px;
-    padding: 12px 16px;
+    margin-top: 16px;
+    background: transparent;
+    border: 2px dashed var(--accent-color);
+    border-radius: 8px;
+    padding: 14px;
     font-size: 13px;
     font-weight: 600;
     color: var(--accent-color);
@@ -1570,11 +1572,10 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: all 0.3s ease;
+    transition: all 0.2s;
   }
 
   .add-location-btn:hover {
-    background: rgba(var(--accent-rgb), 0.2);
     transform: translateY(-1px);
   }
 

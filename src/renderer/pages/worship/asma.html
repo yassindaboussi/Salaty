@@ -2,93 +2,62 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.aladhan.com https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://makkahlive.netlify.app; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Asma Allah - Salaty Time</title>
+    <title data-i18n="asmaAllah">Asma Allah - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/asma.css" />
-    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
   </head>
   <body class="page-loading">
-    <div class="app-container theme-dark" id="app">
+    <div class="app-container" id="app">
       <div class="drag-area"></div>
 
       <div class="asma-container">
-        <div class="page-header asma-header">
-          <!-- Back button -->
-          <button
-            class="back-btn"
-            id="backBtn"
-            aria-label="Back to Main"
-            data-tooltip="tooltipBack"
-          >
-            <i class="fas fa-arrow-left"></i>
-          </button>
-
-          <!-- Centered title -->
-          <h2 class="page-header__title asma-title" id="asmaTitle">99 Names of Allah</h2>
-
-          <!-- Controls with minimize, fullscreen, and close -->
-          <div class="page-header__controls asma-controls">
-            <!-- Minimize button -->
-            <button
-              class="control-btn minimize-btn"
-              id="minimizeBtn"
-              aria-label="Minimize"
-              data-tooltip="tooltipMinimize"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 13H5v-2h14v2z" />
-              </svg>
-            </button>
-
-            <!-- Fullscreen button -->
-            <button
-              class="control-btn fullscreen-btn"
-              id="fullscreenBtn"
-              aria-label="Toggle Fullscreen"
-              data-tooltip="tooltipExpand"
-            >
-              <i class="fas fa-expand"></i>
-            </button>
-
-            <!-- Close button -->
-            <button
-              class="control-btn close-btn"
-              id="closeBtn"
-              aria-label="Close"
-              data-tooltip="tooltipClose"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
+        <header
+          class="page-header asma-header"
+          data-page-header
+          data-controls-class="asma-controls"
+          data-back="features"
+        >
+          <h1 class="page-header__title" id="asmaTitle" data-i18n="asmaAllah">
+            99 Names of Allah
+          </h1>
+        </header>
 
         <!-- Asma Content -->
-        <div class="asma-content" id="asmaContent">
+        <main class="asma-content" id="asmaContent">
           <div class="asma-loading" id="asmaLoading">
             <div class="asma-loading-content">
-              <i class="fas fa-star-and-crescent fa-spin"></i>
-              <span id="loadingTextAsma">Loading Names...</span>
+              <i
+                class="fas fa-star-and-crescent fa-spin"
+                aria-hidden="true"
+              ></i>
+              <span id="loadingTextAsma" data-i18n="loadingAsma"
+                >Loading Names...</span
+              >
             </div>
           </div>
 
           <div class="asma-list" id="asmaList">
             <!-- Asma cards will be loaded here -->
           </div>
-        </div>
+        </main>
 
-        <div class="asma-footer">
-          <div class="asma-footer-text" id="asmaFooterText">
+        <footer class="asma-footer">
+          <div
+            class="asma-footer-text"
+            id="asmaFooterText"
+            data-i18n="beautifulNames"
+          >
             The Beautiful Names of Allah
           </div>
-        </div>
+        </footer>
       </div>
     </div>
 
-    <script src="../../js-bundled/renderer.bundle.js"></script>
+    <script src="../../js-bundled/asma.bundle.js"></script>
   </body>
 </html>

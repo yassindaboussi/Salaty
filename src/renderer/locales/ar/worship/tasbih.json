@@ -2,10 +2,8 @@
   "tasbih": "التسبيح",
   "selectDhikr": "اختر الذكر",
   "recitations": "التكرارات",
-  "total": "الإجمالي",
   "completed": "المكتمل",
   "tasbihDesc": "المسبحة الرقمية",
-
   "countBtn": "تسبيح",
   "undoBtn": "تراجع",
   "resetBtn": "إعادة",
@@ -13,13 +11,10 @@
   "noLimit": "بلا حد",
   "roundLabel": "الجولة {n}",
   "spacebarHint": "مسافة",
-
   "dhikrSwitched": "تم التبديل إلى {name}",
   "dhikrCompleted": "أكملت! {count} تسبيحة",
   "dhikrRoundCompleted": "اكتملت الجولة {n} — واصل",
   "counterReset": "تم إعادة العداد",
-  "allCountersReset": "تم إعادة جميع العدادات",
-
   "resetConfirmTitle": "إعادة العداد",
   "resetConfirmMessage": "هل أنت متأكد أنك تريد إعادة هذا العداد؟",
   "resetAllConfirmTitle": "إعادة جميع العدادات",
@@ -27,7 +22,6 @@
   "cancel": "إلغاء",
   "reset": "إعادة",
   "resetAllBtn": "إعادة الكل",
-
   "dhikrSubhanallahMeaning": "تنزيه الله عن كل نقص",
   "dhikrAlhamdulillahMeaning": "الثناء على الله بصفاته",
   "dhikrAllahuAkbarMeaning": "تعظيم الله فوق كل شيء",
@@ -36,7 +30,6 @@
   "dhikrSubhanallahiWaBihamdihiMeaning": "تسبيح مقرون بالحمد",
   "dhikrSalawatMeaning": "الصلاة على النبي ﷺ",
   "dhikrHawqalaMeaning": "كنز من كنوز الجنة",
-
   "dhikrSubhanallahSource": "33 مرة بعد كل صلاة — صحيح مسلم 596",
   "dhikrAlhamdulillahSource": "33 مرة بعد كل صلاة — صحيح مسلم 596",
   "dhikrAllahuAkbarSource": "34 مرة بعد كل صلاة إتمامًا للمائة — صحيح مسلم 596",
@@ -44,5 +37,12 @@
   "dhikrAstaghfirullahSource": "100 مرة في اليوم — صحيح مسلم 2702",
   "dhikrSubhanallahiWaBihamdihiSource": "100 مرة في اليوم — صحيح البخاري 6405",
   "dhikrSalawatSource": "لم يرد عدد محدد في حديث صحيح — أكثروا منها كما شئتم",
-  "dhikrHawqalaSource": "لم يرد عدد محدد في حديث صحيح — كنز من كنوز الجنة، أكثروا من ذكرها"
+  "dhikrHawqalaSource": "لم يرد عدد محدد في حديث صحيح — كنز من كنوز الجنة، أكثروا من ذكرها",
+  "footerQuotes": [
+    "\"فَاذْكُرُونِي أَذْكُرْكُمْ\" [البقرة 152]",
+    "\"وَلَذِكْرُ اللَّهِ أَكْبَرُ\" [العنكبوت 45]",
+    "\"سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ\"",
+    "\"مَنْ ذَكَرَ رَبَّهُ وَسَبَّحَهُ تَسَاقَطَتْ خَطَايَاهُ\"",
+    "\"أَفْضَلُ الْأَعْمَالِ ذِكْرُ اللَّهِ\""
+  ]
 }

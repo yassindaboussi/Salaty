@@ -1,1 +1,9 @@
-{ "qiblaFinder":"محدد القبلة","fromNorth":"من الشمال","dragToAdjustInfo":"يمكنك سحب العلامة لتعديل موقعك.","dragToAdjust":"أنت هنا. اسحب للتعديل.","qiblaDesc":"اعثر على اتجاه الصلاة" }
+{
+  "qiblaFinder": "محدد القبلة",
+  "fromNorth": "من الشمال",
+  "dragToAdjustInfo": "يمكنك سحب العلامة لتعديل موقعك.",
+  "dragToAdjust": "أنت هنا. اسحب للتعديل.",
+  "qiblaDesc": "اعثر على اتجاه الصلاة",
+  "locationApprox": "موقعك تقريبي. اسحب العلامة لضبطه.",
+  "approximate": "تقريبي"
+}

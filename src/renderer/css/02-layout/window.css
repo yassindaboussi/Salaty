@@ -7,14 +7,14 @@
   -webkit-app-region: drag;
 }
 
-/* Window Controls */
+/* Window Controls: the home page title-bar row. The row itself stays part of the header drag
+   area; only its buttons opt out (no-drag, below), like an OS title bar. */
 .window-controls {
   position: absolute;
   top: 16px;
   right: 16px;
   left: 16px;
   display: flex;
-  -webkit-app-region: no-drag;
   pointer-events: auto;
   justify-content: space-between;
   gap: 12px;
@@ -26,7 +26,7 @@
 .window-controls .right-controls {
   display: flex;
   gap: 12px;
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 /* Interactive Elements (make them non-draggable) */
@@ -42,12 +42,10 @@ a,
   pointer-events: auto;
 }
 
+/* Empty space between the button groups: drags the window like the rest of the header, with
+   the normal arrow cursor (in a drag area Windows shows the arrow whatever the CSS says). */
 .draggable-header-space {
   flex: 1;
   height: 32px;
   margin: 0 12px;
-  -webkit-app-region: drag;
-  cursor: move;
-  z-index: var(--z-window-controls);
-  position: relative;
 }

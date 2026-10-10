@@ -4,6 +4,7 @@
     padding: 60px 20px 5px;
     text-align: center;
     background: linear-gradient(180deg, var(--black-a15), transparent);
+    -webkit-app-region: drag; /* the home page's title bar (see reset.css .app-container) */
   }
 
   /* Location Wrapper */
@@ -50,12 +51,12 @@
     background: var(--surface-active);
   }
 
-  .location-switcher-btn.active i {
-    transform: rotate(180deg);
-  }
-
   .location-switcher-btn i {
     transition: transform 0.3s ease;
+  }
+
+  .location-switcher-btn.active i {
+    transform: rotate(180deg);
   }
 
   /* Location Switcher Dropdown */
@@ -138,7 +139,7 @@
   .switcher-check {
     color: var(--accent-color);
     font-size: 14px;
-    margin-left: 8px;
+    margin-inline-start: 8px;
     flex-shrink: 0;
     pointer-events: none;
   }

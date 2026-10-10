@@ -3,16 +3,11 @@
   "holyQuran": "Saint Coran",
   "loadingQuran": "Chargement du Coran...",
   "listenReadQuran": "Lisez et méditez le Saint Coran",
-  "enterFullscreen": "Plein écran",
-  "exitFullscreen": "Quitter le plein écran",
   "quranError": "Échec du chargement. Vérifiez votre connexion internet.",
-  "refreshQuran": "Actualiser",
-  "quranDesc": "Lisez et réfléchissez",
   "surah": "Sourate",
   "juz": "Juz",
   "verses": "versets",
   "searchSurah": "Rechercher une sourate...",
-  "fontSize": "Taille de police",
   "translation": "Traduction",
   "translationNone": "Arabe uniquement",
   "translationOnlineOnly": "Nécessite une connexion Internet",
@@ -23,5 +18,8 @@
   "decreaseFontSize": "Réduire la taille de police",
   "retry": "Réessayer",
   "noResults": "Aucune sourate trouvée",
-  "startingFrom": "À partir de"
+  "startingFrom": "À partir de",
+  "meccan": "Mecquoise",
+  "medinan": "Médinoise",
+  "loadingSurah": "Chargement de la sourate..."
 }

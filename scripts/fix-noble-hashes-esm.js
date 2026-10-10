@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Workaround for electron-builder/app-builder-lib bug.
  *
@@ -28,7 +30,7 @@ const targetFile = path.join(
   "out",
   "targets",
   "blockmap",
-  "blockmap.js"
+  "blockmap.js",
 );
 
 function main() {
@@ -40,7 +42,8 @@ function main() {
 
   let content = fs.readFileSync(targetFile, "utf8");
 
-  const brokenRequire = 'const blake2_js_1 = require("@noble/hashes/blake2.js");';
+  const brokenRequire =
+    'const blake2_js_1 = require("@noble/hashes/blake2.js");';
   const alreadyPatchedMarker = "/* patched: dynamic-import @noble/hashes */";
 
   if (content.includes(alreadyPatchedMarker)) {
@@ -59,21 +62,24 @@ function main() {
       alreadyPatchedMarker,
       "let blake2_js_1;",
       'async function __loadBlake2() { blake2_js_1 = await import("@noble/hashes/blake2.js"); }',
-    ].join("\n")
+    ].join("\n"),
   );
 
   // 2. Ensure buildBlockMap awaits the loader before using blake2b.
   //    buildBlockMap is declared as: async function buildBlockMap(inFile, compressionFormat, outFile) {
-  const fnSignature = "async function buildBlockMap(inFile, compressionFormat, outFile) {";
+  const fnSignature =
+    "async function buildBlockMap(inFile, compressionFormat, outFile) {";
   if (content.includes(fnSignature)) {
     content = content.replace(
       fnSignature,
-      `${fnSignature}\n    await __loadBlake2();`
+      `${fnSignature}\n    await __loadBlake2();`,
     );
   }
 
   fs.writeFileSync(targetFile, content, "utf8");
-  console.log("[fix-noble-hashes-esm] Patched app-builder-lib blockmap.js for ESM compatibility.");
+  console.log(
+    "[fix-noble-hashes-esm] Patched app-builder-lib blockmap.js for ESM compatibility.",
+  );
 }
 
 main();

@@ -1,13 +1,35 @@
 {
   "hijriCalendar": "Hijri Calendar",
-  "islamicCalendar": "Islamic Calendar & Events",
-  "gregorian": "Gregorian",
-  "hijri": "Hijri",
   "importantIslamicDates": "Important Islamic Dates",
   "noEventsThisMonth": "No special events this month",
-  "calendarDesc": "Islamic calendar & events",
   "prayerTimesMonthly": "Monthly Prayer Times",
   "prayerTimesMonthlyDesc": "All prayer times for the month",
   "loadingMonthlyPrayerTimes": "Loading prayer times...",
-  "monthlyPrayerTimesFooter": "Times are calculated for your saved location and may differ slightly from your local mosque."
+  "monthlyPrayerTimesFooter": "Times are calculated for your saved location and may differ slightly from your local mosque.",
+  "hijriMonths": [
+    "Muharram",
+    "Safar",
+    "Rabi al-Awwal",
+    "Rabi al-Thani",
+    "Jumada al-Awwal",
+    "Jumada al-Thani",
+    "Rajab",
+    "Shaban",
+    "Ramadan",
+    "Shawwal",
+    "Dhul-Qadah",
+    "Dhul-Hijjah"
+  ],
+  "calendarEvents": {
+    "1-1": "Islamic New Year",
+    "1-10": "Day of Ashura",
+    "3-12": "Mawlid al-Nabi",
+    "7-27": "Isra and Miraj",
+    "8-15": "Mid-Shaban",
+    "9-1": "First Day of Ramadan",
+    "9-27": "Laylat al-Qadr",
+    "10-1": "Eid al-Fitr",
+    "12-9": "Day of Arafah",
+    "12-10": "Eid al-Adha"
+  }
 }

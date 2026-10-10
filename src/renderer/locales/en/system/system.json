@@ -1,4 +1,10 @@
 {
-  "common": { "timetable": "Timetable", "day": "Day", "date": "Date" },
-  "offline": { "noInternetConnection": "No internet connection", "connectionRestored": "Connection restored. Reloading data..." }
+  "common": {
+    "timetable": "Timetable",
+    "day": "Day",
+    "date": "Date"
+  },
+  "offline": {
+    "noInternetConnection": "No internet connection"
+  }
 }

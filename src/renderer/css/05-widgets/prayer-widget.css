@@ -36,20 +36,35 @@ body {
   /* The whole bar drags the window, except interactive elements */
   -webkit-app-region: drag;
 
-  /* Entrance animation: slides in from the top */
+  /* Hidden until prayer-widget.js has applied the theme, direction and prayer times; it then
+     adds .is-shown and main shows the window at the same moment. */
   opacity: 0;
   transform: translateY(-100%);
-  animation: tb-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Shown: slides in from the top. The resting state is the visible one, so the closing
+   animation below starts from here instead of jumping to the hidden state. */
+#app.is-shown {
+  opacity: 1;
+  transform: none;
+  animation: tb-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 #app.closing {
   animation: tb-out 0.22s ease-in forwards;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  #app.is-shown,
+  #app.closing {
+    animation: none;
+  }
+}
+
 @keyframes tb-in {
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
   }
 }
 

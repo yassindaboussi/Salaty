@@ -10,14 +10,8 @@
   "englishLanguage": "الإنجليزية",
   "arabicLanguage": "العربية",
   "frenchLanguage": "الفرنسية",
-  "cityPlaceholder": "مثال: تونس",
-  "countryPlaceholder": "مثال: تونس",
-  "cityHint": "مدينتك",
-  "countryHint": "بلدك",
-  "enterBothCityCountry": "يرجى إدخال المدينة والبلد",
   "screenSizeSettingLabel": "حجم الشاشة",
   "bigScreen": "شاشة كبيرة",
-  "smallScreen": "ملء الشاشة",
   "notification": "إشعارات",
   "athkarAlerts": "تنبيهات الأذكار (تسابيح)",
   "enableAthkarAlerts": "تفعيل التنبيهات",
@@ -27,10 +21,8 @@
   "minutesBeforeAdhan": "دقائق قبل الأذان",
   "enablePreAdhanNotification": "تنبيه قبل الأذان",
   "manageLocationsLabel": "إدارة المواقع المحفوظة",
-  "manageLocationsTitle": "إدارة المواقع",
-  "openAtLogin": "تشغيل عند بدء النظام",
   "fullScreen": "ملء الشاشة",
-  "bigScreenDimensions": "نافذة ثابتة",
-  "fullScreenDimensions": "يملأ شاشتك",
-  "changesSavedAutomatically": "يتم حفظ التغييرات تلقائيًا"
+  "privacySectionTitle": "الخصوصية",
+  "analyticsLabel": "إحصاءات استخدام مجهولة الهوية",
+  "analyticsDescription": "مشاركة الميزات المستخدمة وأخطاء التطبيق للمساعدة في تحسين صلاتي. لا يُرسَل موقعك ولا ما تستمع إليه أبداً."
 }

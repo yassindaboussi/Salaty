@@ -1,24 +1,20 @@
 "use strict";
 
 const { app, BrowserWindow } = require("electron");
-const { createMainWindowOptions } = require("../config/window-options");
+const {
+  createMainWindowOptions,
+  shouldOpenDevTools,
+} = require("../config/window-options");
 const { pages } = require("../config/paths");
-const ipcHandlers = require("../ipc");
+const settingsStore = require("../services/settings-store");
 const playerManager = require("../services/player-manager");
-const analytics = require("../services/analytics-manager");
 
+// Builds the main window (settings must already be loaded; IPC is registered by bootstrap).
 function createMainWindow({ onCloseToTray } = {}) {
-  ipcHandlers.loadSettings();
-
-  const settings = ipcHandlers.getSettingsData();
-  analytics.init(settings);
-
+  const settings = settingsStore.get();
   const mainWindow = new BrowserWindow(createMainWindowOptions(settings));
 
-  ipcHandlers.setupHandlers(mainWindow);
-  playerManager.setupPlayerIpc(mainWindow);
-
-  if (process.argv.includes("--enable-logging")) {
+  if (shouldOpenDevTools()) {
     mainWindow.webContents.openDevTools({ mode: "detach" });
   }
 
@@ -42,20 +38,20 @@ function createMainWindow({ onCloseToTray } = {}) {
   mainWindow.on("show", hideStaleTooltip);
   mainWindow.on("focus", hideStaleTooltip);
 
-  mainWindow.on("unmaximize", () => {
-    setImmediate(() => {
-      const s = ipcHandlers.getSettingsData();
-      if (!s.bigScreen) {
-        mainWindow.maximize();
-      }
-    });
-  });
+  // Windows is the source of truth for maximized/normal. Every way of changing it ends up
+  // here: the app's own button, a double-click on the title bar, dragging the window to or
+  // away from the top edge, Win+Up/Down, Snap. The saved setting and the page follow.
+  mainWindow.on("maximize", () => syncWindowState(mainWindow));
+  mainWindow.on("unmaximize", () => syncWindowState(mainWindow));
   mainWindow.on("restore", () => playerManager.getPlayerWindow()?.hide());
   mainWindow.on("show", () => playerManager.getPlayerWindow()?.hide());
 
+  // Only the normal position is remembered: a maximized window sits at about -7,-7, and
+  // reopening the app there in normal size would put its edge off screen.
   mainWindow.on("moved", () => {
+    if (mainWindow.isMaximized() || mainWindow.isMinimized()) return;
     const [x, y] = mainWindow.getPosition();
-    ipcHandlers.savePosition(x, y);
+    settingsStore.savePosition(x, y);
   });
 
   if (onCloseToTray) mainWindow.on("close", onCloseToTray);
@@ -67,6 +63,19 @@ function createMainWindow({ onCloseToTray } = {}) {
   }
 
   return mainWindow;
+}
+
+// Saves the app's mode ("full screen" = maximized) and tells the page, which updates its
+// layout and the expand/compress button. Also called to re-send the state when a page asks
+// for a change that is already true.
+function syncWindowState(mainWindow) {
+  if (!mainWindow || mainWindow.isDestroyed() || mainWindow.isMinimized())
+    return;
+  const maximized = mainWindow.isMaximized();
+  if (settingsStore.get().bigScreen === maximized) {
+    settingsStore.update({ bigScreen: !maximized });
+  }
+  mainWindow.webContents.send("window-maximized-changed", maximized);
 }
 
 function showExistingWindow(mainWindow) {
@@ -120,4 +129,9 @@ function bringToFrontForAdhan(mainWindow) {
   }
 }
 
-module.exports = { createMainWindow, showExistingWindow, bringToFrontForAdhan };
+module.exports = {
+  createMainWindow,
+  showExistingWindow,
+  bringToFrontForAdhan,
+  syncWindowState,
+};

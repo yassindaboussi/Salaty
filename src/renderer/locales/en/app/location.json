@@ -32,5 +32,7 @@
   "travelModeDisabled": "Travel mode disabled",
   "errorDetectingLocation": "Error detecting location",
   "locationChangedMessage": "You appear to be in {detectedLocation}, but your current location is set to {currentLocation}. Would you like to switch?",
-  "addNewLocation": "Add New Location"
+  "addNewLocation": "Add New Location",
+  "switchLocationLabel": "Switch location",
+  "locationNamePlaceholder": "e.g. Home, Work, Family"
 }

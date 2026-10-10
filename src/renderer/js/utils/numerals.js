@@ -22,4 +22,4 @@ function formatNumerals(value, mode) {
   return mode === "arabic" ? toArabicIndic(value) : String(value);
 }
 
-module.exports = { toArabicIndic, toWestern, formatNumerals };
+module.exports = { toWestern, formatNumerals };

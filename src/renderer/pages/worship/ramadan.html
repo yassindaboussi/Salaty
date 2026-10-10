@@ -2,128 +2,73 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.aladhan.com https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://makkahlive.netlify.app; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ramadhan - Salaty Time</title>
+    <title data-i18n="ramadhan">Ramadhan - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/ramadan.css" />
-    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
   </head>
   <body class="page-loading">
-    <div class="app-container theme-dark" id="app">
+    <div class="app-container" id="app">
       <div class="drag-area"></div>
 
       <div class="ramadan-container">
-        <div class="page-header ramadan-header">
-          <button
-            class="back-btn"
-            id="backBtn"
-            aria-label="Back to Features"
-            data-tooltip="tooltipBack"
-          >
-            <i class="fas fa-arrow-left"></i>
-          </button>
+        <header
+          class="page-header ramadan-header"
+          data-page-header
+          data-controls-class="ramadan-controls"
+          data-back="features"
+        >
+          <h1 class="page-header__title ramadan-title" data-i18n="ramadhan">
+            Ramadhan
+          </h1>
+        </header>
 
-          <h2 class="page-header__title ramadan-title">Ramadhan</h2>
-
-          <!-- Controls -->
-          <div class="page-header__controls ramadan-controls">
-            <!-- Minimize button -->
-            <button
-              class="control-btn minimize-btn"
-              id="minimizeBtn"
-              aria-label="Minimize"
-              data-tooltip="tooltipMinimize"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 13H5v-2h14v2z" />
-              </svg>
-            </button>
-
-            <!-- Fullscreen button -->
-            <button
-              class="control-btn fullscreen-btn"
-              id="fullscreenBtn"
-              aria-label="Toggle Fullscreen"
-              data-tooltip="tooltipExpand"
-            >
-              <i class="fas fa-expand"></i>
-            </button>
-
-            <!-- Close button -->
-            <button
-              class="control-btn close-btn"
-              id="closeBtn"
-              aria-label="Close"
-              data-tooltip="tooltipClose"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="ramadan-content">
+        <main class="ramadan-content">
           <!-- Today's Overview -->
           <div class="fasting-card" id="todayCard">
-            <h3 id="todayFastingTitle">Today's Fasting</h3>
-            <div id="fastingTimes">
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-around;
-                  align-items: center;
-                  text-align: center;
-                "
-              >
+            <h3 id="todayFastingTitle" data-i18n="todayFasting">
+              Today's Fasting
+            </h3>
+            <div>
+              <div class="ramadan-today-times">
                 <div>
                   <i
-                    class="fas fa-moon"
-                    style="
-                      color: #a5b1c2;
-                      font-size: 1.2rem;
-                      margin-bottom: 5px;
-                    "
+                    class="fas fa-moon ramadan-today-icon ramadan-today--suhoor"
+                    aria-hidden="true"
                   ></i>
                   <div
+                    class="ramadan-today-label"
                     id="labelTodaySuhoor"
-                    style="font-size: 0.9rem; color: var(--text-secondary)"
+                    data-i18n="suhoor"
                   >
                     Suhoor
                   </div>
                   <div
-                    style="font-size: 1.2rem; font-weight: bold; color: #a5b1c2"
+                    class="ramadan-today-time ramadan-today--suhoor"
                     id="todaySuhoor"
                   >
                     --:--
                   </div>
                 </div>
-                <div
-                  style="
-                    height: 40px;
-                    width: 1px;
-                    background: var(--border-color);
-                  "
-                ></div>
+                <div class="ramadan-today-divider"></div>
                 <div>
                   <i
-                    class="fas fa-sun"
-                    style="
-                      color: #f7b731;
-                      font-size: 1.2rem;
-                      margin-bottom: 5px;
-                    "
+                    class="fas fa-sun ramadan-today-icon ramadan-today--iftar"
+                    aria-hidden="true"
                   ></i>
                   <div
+                    class="ramadan-today-label"
                     id="labelTodayIftar"
-                    style="font-size: 0.9rem; color: var(--text-secondary)"
+                    data-i18n="iftar"
                   >
                     Iftar
                   </div>
                   <div
-                    style="font-size: 1.2rem; font-weight: bold; color: #f7b731"
+                    class="ramadan-today-time ramadan-today--iftar"
                     id="todayIftar"
                   >
                     --:--
@@ -133,18 +78,22 @@
             </div>
           </div>
 
-          <div class="fasting-card" id="mainCard">
+          <div class="fasting-card">
             <!-- Tabs header -->
             <div class="ramadan-tabs">
               <button
+                type="button"
                 class="ramadan-tab active"
-                id="tabTrackerBtn"
                 data-tab="tracker"
               >
-                <span id="trackerTitle">Fasting Tracker</span>
+                <span id="trackerTitle" data-i18n="fastingTracker"
+                  >Fasting Tracker</span
+                >
               </button>
-              <button class="ramadan-tab" id="tabTableBtn" data-tab="table">
-                <span id="tableTitle">Timetable</span>
+              <button type="button" class="ramadan-tab" data-tab="table">
+                <span id="tableTitle" data-i18n="common:timetable"
+                  >Timetable</span
+                >
               </button>
             </div>
 
@@ -163,10 +112,10 @@
                 <table class="ramadan-table" id="ramadanTable">
                   <thead>
                     <tr>
-                      <th id="thDay">Day</th>
-                      <th id="thDate">Date</th>
-                      <th id="thSuhoor">Suhoor</th>
-                      <th id="thIftar">Iftar</th>
+                      <th id="thDay" data-i18n="common:day">Day</th>
+                      <th id="thDate" data-i18n="common:date">Date</th>
+                      <th id="thSuhoor" data-i18n="suhoor">Suhoor</th>
+                      <th id="thIftar" data-i18n="iftar">Iftar</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -176,25 +125,26 @@
               </div>
             </div>
           </div>
-        </div>
+        </main>
       </div>
 
       <!-- Modal for Daily Times -->
       <div id="dayModal" class="cal-modal">
         <div class="cal-modal-content">
           <span class="cal-modal-close" id="modalClose">&times;</span>
-          <div class="cal-modal-title" id="modalTitle">Ramadhan Day X</div>
+          <div class="cal-modal-title" id="modalTitle"></div>
 
           <div class="prayer-time-row">
             <div class="prayer-time-label" id="modalLabelSuhoor">
-              <i class="fas fa-utensils"></i> Suhoor (Fajr)
+              <i class="fas fa-utensils" aria-hidden="true"></i> Suhoor (Fajr)
             </div>
             <div class="prayer-time-value" id="modalSuhoor">--:--</div>
           </div>
 
           <div class="prayer-time-row">
             <div class="prayer-time-label" id="modalLabelIftar">
-              <i class="fas fa-glass-water"></i> Iftar (Maghrib)
+              <i class="fas fa-glass-water" aria-hidden="true"></i> Iftar
+              (Maghrib)
             </div>
             <div class="prayer-time-value" id="modalIftar">--:--</div>
           </div>
@@ -202,6 +152,6 @@
       </div>
     </div>
 
-    <script src="../../js-bundled/renderer.bundle.js"></script>
+    <script src="../../js-bundled/ramadan.bundle.js"></script>
   </body>
 </html>

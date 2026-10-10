@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g., v1.0.0)'
+        description: "Version to release (e.g., v1.0.0)"
         required: true
   # Automatic releases are now handled by version-release.yml, which
   # auto-tags from package.json on every push to main and builds +
@@ -15,6 +15,11 @@ on:
 permissions:
   contents: write
 
+# npm would download the Electron binary on install; lint and electron-builder don't need it
+# (electron-builder fetches its own copy). Replaces the old .npmrc setting.
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+
 jobs:
   release:
     runs-on: ${{ matrix.os }}
@@ -24,43 +29,43 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v7
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: "npm"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Bundle renderer scripts
-      run: npm run build:renderer
+      - name: Bundle renderer scripts
+        run: npm run build:renderer
 
-    # electron-builder --publish always will:
-    #   1. Build the installer (.exe / .dmg / .tar.gz)
-    #   2. Generate latest.yml / latest-mac.yml / latest-linux.yml
-    #   3. Upload EVERYTHING to the GitHub Release in one step
-    # This is required for electron-updater to work in packaged apps.
+      # electron-builder --publish always will:
+      #   1. Build the installer (.exe / .dmg / .tar.gz)
+      #   2. Generate latest.yml / latest-mac.yml / latest-linux.yml
+      #   3. Upload EVERYTHING to the GitHub Release in one step
+      # This is required for electron-updater to work in packaged apps.
 
-    - name: Build and publish (Linux)
-      if: matrix.os == 'ubuntu-latest'
-      run: npx electron-builder --linux --publish always
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: npx electron-builder --linux --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and publish (Windows)
-      if: matrix.os == 'windows-latest'
-      run: npx electron-builder --win --publish always
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish (Windows)
+        if: matrix.os == 'windows-latest'
+        run: npx electron-builder --win --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and publish (macOS)
-      if: matrix.os == 'macos-latest'
-      run: npx electron-builder --mac --publish always
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CSC_IDENTITY_AUTO_DISCOVERY: false
-        SKIP_CODE_SIGN: true
+      - name: Build and publish (macOS)
+        if: matrix.os == 'macos-latest'
+        run: npx electron-builder --mac --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          SKIP_CODE_SIGN: true

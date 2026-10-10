@@ -2,76 +2,44 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.aladhan.com https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://makkahlive.netlify.app; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Audio Playlist - Salaty</title>
+    <title data-i18n="audioArchive">Audio Playlist - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/playlist.css" />
-    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
   </head>
   <body class="page-loading">
     <div class="app-container theme-navy" id="app">
       <div class="drag-area"></div>
 
       <div class="playlist-container">
-        <!-- Header matching Features page -->
-        <div class="page-header playlist-header">
-          <button
-            class="back-btn"
-            id="backBtn"
-            aria-label="Back"
-            data-tooltip="tooltipBack"
+        <!-- Header -->
+        <header
+          class="page-header playlist-header"
+          data-page-header
+          data-controls-class="playlist-controls"
+          data-back="albums"
+        >
+          <h1
+            class="page-header__title playlist-title"
+            data-i18n="audioArchive"
           >
-            <i class="fas fa-arrow-left"></i>
-          </button>
-
-          <h2 class="page-header__title playlist-title">Audio Archive</h2>
-
-          <div class="page-header__controls playlist-controls">
-            <!-- Minimize button -->
-            <button
-              class="control-btn minimize-btn"
-              id="minimizeBtn"
-              aria-label="Minimize"
-              data-tooltip="tooltipMinimize"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 13H5v-2h14v2z" />
-              </svg>
-            </button>
-
-            <!-- Fullscreen button -->
-            <button
-              class="control-btn fullscreen-btn"
-              id="fullscreenBtn"
-              aria-label="Toggle Fullscreen"
-              data-tooltip="tooltipExpand"
-            >
-              <i class="fas fa-expand"></i>
-            </button>
-
-            <!-- Close button -->
-            <button
-              class="control-btn close-btn"
-              id="closeBtn"
-              aria-label="Close"
-              data-tooltip="tooltipClose"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
+            Audio Archive
+          </h1>
+        </header>
 
         <!-- Search Box -->
         <div class="search-container">
           <div class="search-box">
-            <i class="fas fa-search"></i>
+            <i class="fas fa-search" aria-hidden="true"></i>
             <input
               type="text"
               id="searchInput"
+              data-i18n-placeholder="searchInPlaylist"
+              data-i18n-aria-label="searchInPlaylist"
               class="search-input"
               placeholder="Search in playlist..."
             />
@@ -79,7 +47,7 @@
         </div>
 
         <!-- Main Content Area -->
-        <div class="content-area">
+        <main class="content-area">
           <!-- Results List -->
           <div class="results-list" id="resultsList">
             <!-- Results will be injected here -->
@@ -89,7 +57,7 @@
           <div class="player-controls">
             <!-- Album Art -->
             <div class="album-art">
-              <i class="fas fa-music"></i>
+              <i class="fas fa-music" aria-hidden="true"></i>
             </div>
 
             <!-- Track Info -->
@@ -112,34 +80,34 @@
             <!-- Control Buttons -->
             <div class="control-buttons">
               <button
+                type="button"
                 class="skip-btn prev-btn"
                 id="prevBtn"
-                aria-label="Previous"
                 data-tooltip="tooltipPrev"
               >
-                <i class="fas fa-step-backward"></i>
+                <i class="fas fa-step-backward" aria-hidden="true"></i>
               </button>
               <button
+                type="button"
                 class="play-pause-btn"
                 id="playPauseBtn"
-                aria-label="Play/Pause"
                 data-tooltip="tooltipPlayPause"
               >
-                <i class="fas fa-play"></i>
+                <i class="fas fa-play" aria-hidden="true"></i>
               </button>
               <button
+                type="button"
                 class="skip-btn next-btn"
                 id="nextBtn"
-                aria-label="Next"
                 data-tooltip="tooltipNext"
               >
-                <i class="fas fa-step-forward"></i>
+                <i class="fas fa-step-forward" aria-hidden="true"></i>
               </button>
             </div>
 
             <!-- Volume Control -->
             <div class="volume-control">
-              <i class="fas fa-volume-up"></i>
+              <i class="fas fa-volume-up" aria-hidden="true"></i>
               <input
                 type="range"
                 class="volume-slider"
@@ -148,10 +116,11 @@
                 max="100"
                 value="100"
                 aria-label="Volume"
+                data-i18n-aria-label="volume"
               />
             </div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
     <script src="../../js-bundled/playlist.bundle.js"></script>

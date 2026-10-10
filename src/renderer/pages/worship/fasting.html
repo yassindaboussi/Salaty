@@ -2,84 +2,74 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.aladhan.com https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://makkahlive.netlify.app; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sunnah Fasting - Salaty Time</title>
+    <title data-i18n="sunnahFastingTitle">Sunnah Fasting - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/fasting.css" />
-    <link rel="stylesheet" href="../../css/03-components/adhan-player.css" />
   </head>
   <body class="page-loading">
-    <div class="app-container theme-dark" id="app">
+    <div class="app-container" id="app">
       <div class="drag-area"></div>
 
       <div class="fasting-container">
-        <div class="page-header fasting-header">
-          <button
-            class="back-btn"
-            id="backBtn"
-            aria-label="Back to Features"
-            data-tooltip="tooltipBack"
+        <header
+          class="page-header fasting-header"
+          data-page-header
+          data-controls-class="fasting-controls"
+          data-back="features"
+        >
+          <h1
+            class="page-header__title"
+            id="fastingTitle"
+            data-i18n="sunnahFastingTitle"
           >
-            <i class="fas fa-arrow-left"></i>
-          </button>
+            Sunnah Fasting
+          </h1>
+        </header>
 
-          <h2 class="page-header__title fasting-title" id="fastingTitle">Sunnah Fasting</h2>
-
-          <div class="page-header__controls fasting-controls">
-            <button
-              class="control-btn minimize-btn"
-              id="minimizeBtn"
-              aria-label="Minimize"
-              data-tooltip="tooltipMinimize"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 13H5v-2h14v2z" />
-              </svg>
-            </button>
-            <button
-              class="control-btn fullscreen-btn"
-              id="fullscreenBtn"
-              aria-label="Toggle Fullscreen"
-              data-tooltip="tooltipExpand"
-            >
-              <i class="fas fa-expand"></i>
-            </button>
-            <button
-              class="control-btn close-btn"
-              id="closeBtn"
-              aria-label="Close"
-              data-tooltip="tooltipClose"
-            >
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="fasting-content" id="fastingContent">
+        <main class="fasting-content">
           <!-- Reminder lead time -->
           <div class="fasting-lead-row">
             <div class="fasting-lead-label">
-              <i class="fas fa-bell"></i>
-              <span id="vfLeadLabel">Remind me</span>
+              <i class="fas fa-bell" aria-hidden="true"></i>
+              <span id="vfLeadLabel" data-i18n="remindMe">Remind me</span>
             </div>
-            <select class="fasting-lead-select" id="vfLeadSelect">
-              <option value="1" id="vfLeadOpt1">The evening before</option>
-              <option value="2" id="vfLeadOpt2">2 days before</option>
-              <option value="3" id="vfLeadOpt3">3 days before</option>
-              <option value="7" id="vfLeadOpt7">1 week before</option>
+            <select
+              class="fasting-lead-select"
+              id="vfLeadSelect"
+              aria-labelledby="vfLeadLabel"
+            >
+              <option value="1" id="vfLeadOpt1" data-i18n="leadOption1">
+                The evening before
+              </option>
+              <option value="2" id="vfLeadOpt2" data-i18n="leadOption2">
+                2 days before
+              </option>
+              <option value="3" id="vfLeadOpt3" data-i18n="leadOption3">
+                3 days before
+              </option>
+              <option value="7" id="vfLeadOpt7" data-i18n="leadOption7">
+                1 week before
+              </option>
             </select>
           </div>
 
           <!-- Next occasion hero card -->
           <div class="fasting-hero hidden" id="vfHero">
-            <div class="fasting-hero-label" id="vfHeroLabel">Next Fasting Day</div>
+            <div
+              class="fasting-hero-label"
+              id="vfHeroLabel"
+              data-i18n="nextFastingDay"
+            >
+              Next Fasting Day
+            </div>
             <div class="fasting-hero-main">
               <div class="fasting-hero-icon" id="vfHeroIcon">
-                <i class="fas fa-utensils"></i>
+                <i class="fas fa-utensils" aria-hidden="true"></i>
               </div>
               <div class="fasting-hero-info">
                 <div class="fasting-hero-title" id="vfHeroTitle">—</div>
@@ -89,23 +79,40 @@
             </div>
             <p class="fasting-hero-desc" id="vfHeroDesc"></p>
             <button class="fasting-toggle-btn" id="vfHeroToggle" type="button">
-              <i class="fas fa-bell"></i>
-              <span id="vfHeroToggleLabel">Remind me</span>
+              <i class="fas fa-bell" aria-hidden="true"></i>
+              <span id="vfHeroToggleLabel" data-i18n="remindMe">Remind me</span>
             </button>
           </div>
 
           <!-- Weekly Sunnah (Monday & Thursday) -->
           <div class="fasting-section">
-            <div class="fasting-weekly-card" id="vfWeeklyCard">
-              <div class="fasting-weekly-icon"><i class="fas fa-calendar-week"></i></div>
+            <div class="fasting-weekly-card">
+              <div class="fasting-weekly-icon">
+                <i class="fas fa-calendar-week" aria-hidden="true"></i>
+              </div>
               <div class="fasting-weekly-info">
-                <div class="fasting-weekly-title" id="vfWeeklyTitle">Weekly Sunnah</div>
-                <div class="fasting-weekly-desc" id="vfWeeklyDesc">
+                <div
+                  class="fasting-weekly-title"
+                  id="vfWeeklyTitle"
+                  data-i18n="weeklySunnah"
+                >
+                  Weekly Sunnah
+                </div>
+                <div
+                  class="fasting-weekly-desc"
+                  id="vfWeeklyDesc"
+                  data-i18n="weeklyMonThuDesc"
+                >
                   Fast every Monday & Thursday
                 </div>
               </div>
-              <label class="fasting-switch" aria-label="Toggle weekly reminder">
-                <input type="checkbox" id="vfWeeklyToggle" />
+              <label class="fasting-switch">
+                <input
+                  aria-label="Weekly Sunnah"
+                  data-i18n-aria-label="weeklySunnah"
+                  type="checkbox"
+                  id="vfWeeklyToggle"
+                />
                 <span class="fasting-switch-slider"></span>
               </label>
             </div>
@@ -113,24 +120,34 @@
 
           <!-- Upcoming occasions list -->
           <div class="fasting-section">
-            <h3 class="fasting-section-title" id="vfUpcomingTitle">
+            <h3
+              class="fasting-section-title"
+              id="vfUpcomingTitle"
+              data-i18n="upcomingFastingDays"
+            >
               Upcoming Fasting Days
             </h3>
             <div class="fasting-list" id="vfList">
-              <div class="fasting-loading" id="vfLoading">
-                <i class="fas fa-spinner fa-spin"></i>
-                <span id="vfLoadingText">Loading fasting days...</span>
+              <div class="fasting-loading">
+                <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+                <span id="vfLoadingText" data-i18n="loadingFastingDays"
+                  >Loading fasting days...</span
+                >
               </div>
             </div>
           </div>
 
-          <p class="fasting-ramadan-note" id="vfRamadanNote">
+          <p
+            class="fasting-ramadan-note"
+            id="vfRamadanNote"
+            data-i18n="ramadanNote"
+          >
             Ramadan has its own page — this list is for voluntary fasting only
           </p>
-        </div>
+        </main>
       </div>
     </div>
 
-    <script src="../../js-bundled/renderer.bundle.js"></script>
+    <script src="../../js-bundled/fasting.bundle.js"></script>
   </body>
 </html>

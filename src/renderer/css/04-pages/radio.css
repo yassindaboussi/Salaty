@@ -298,6 +298,13 @@
     animation: bar 1s infinite ease-in-out;
   }
 
+  .station-card-bars span {
+    width: 2px;
+    background: var(--color-warning);
+    border-radius: 1px;
+    animation: bar 0.8s infinite ease-in-out;
+  }
+
   .sound-bars span:nth-child(1) {
     height: 6px;
     animation-delay: 0s;
@@ -392,7 +399,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-left: 4px;
+    margin-inline-start: 4px;
   }
 
   .volume-slider {
@@ -540,18 +547,11 @@
     align-items: flex-end;
     gap: 2px;
     height: 12px;
-    margin-right: 4px;
+    margin-inline-end: 4px;
   }
 
   .station-card.active .station-card-bars {
     display: flex;
-  }
-
-  .station-card-bars span {
-    width: 2px;
-    background: var(--color-warning);
-    border-radius: 1px;
-    animation: bar 0.8s infinite ease-in-out;
   }
 
   .station-card-bars span:nth-child(1) {
@@ -662,5 +662,12 @@
     opacity: 1;
   }
 
-  /* ========== RESPONSIVE ========== */
+  /* Station logo inside the vinyl label (shown by radio.js while a station plays) */
+  .vinyl-station-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+  }
 }

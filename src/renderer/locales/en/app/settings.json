@@ -10,14 +10,8 @@
   "englishLanguage": "English",
   "arabicLanguage": "Arabic",
   "frenchLanguage": "French",
-  "cityPlaceholder": "e.g., Tunis",
-  "countryPlaceholder": "e.g., Tunisia",
-  "cityHint": "Your city",
-  "countryHint": "Your country",
-  "enterBothCityCountry": "Please enter both city and country",
   "screenSizeSettingLabel": "Screen Size",
   "bigScreen": "Big Screen",
-  "smallScreen": "Full Screen",
   "notification": "Notification",
   "athkarAlerts": "Athkar Alerts (Tasbih)",
   "enableAthkarAlerts": "Enable Alerts",
@@ -27,10 +21,8 @@
   "minutesBeforeAdhan": "Minutes before Adhan",
   "enablePreAdhanNotification": "Alert before Adhan",
   "manageLocationsLabel": "Manage Saved Locations",
-  "manageLocationsTitle": "Manage Locations",
-  "openAtLogin": "Launch at startup",
   "fullScreen": "Full Screen",
-  "bigScreenDimensions": "Fixed window",
-  "fullScreenDimensions": "Fills your screen",
-  "changesSavedAutomatically": "Changes are saved automatically"
+  "privacySectionTitle": "Privacy",
+  "analyticsLabel": "Anonymous usage statistics",
+  "analyticsDescription": "Share which features are used and app errors to help improve Salaty Time. Your location and what you listen to are never sent."
 }
