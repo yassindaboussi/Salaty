@@ -1,5 +1,6 @@
 "use strict";
 
+require("../core/error-watch"); // first: errors while the page starts are logged too
 const { ipcRenderer } = require("electron");
 const { t } = require("../core/i18n");
 const { loadSettings } = require("../core/bootstrap");

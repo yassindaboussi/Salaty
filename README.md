@@ -96,6 +96,7 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 - 3 languages (Arabic, English, French)
 - Every change is saved automatically, with no "Save" button
 - Automatic updates
+- "Send feedback" from inside the app: report a problem or suggest an idea in a few clicks
 
 ---
 

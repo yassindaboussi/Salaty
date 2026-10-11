@@ -111,6 +111,14 @@ The App communicates with external services **only when you interact with them:*
 - Playback is handled locally; no data is sent to us about what you're listening to
 - Those services have their own privacy policies
 
+### 💬 Feedback: Problems and Suggestions (Only When You Ask)
+
+- Errors and crashes are written to a log file **on your device** (main.log), so the App can recover and problems can be reported
+- **Settings → About → Send feedback** opens a small window: choose "A problem" or "A suggestion" and write your message. Your email address is optional (only if you want a reply)
+- For a problem, if you leave "Include technical details" ticked, the message also contains: the App version, your operating system, the language, and the last errors from the log. You can read exactly what is included before sending. File paths and your saved city, country and location names are **removed** from it. Suggestions never include technical details
+- **Only when you press Send**, your message is emailed to us through [Web3Forms](https://web3forms.com), a form-to-email service (it keeps submissions for 30 days and does not share or sell them). Without internet, the message waits on your device and is sent when you are back online
+- If the App closes unexpectedly, its error message offers "Report a problem": the window then opens the next time you start the App
+
 ---
 
 ## 🛡️ How We Protect Your Data

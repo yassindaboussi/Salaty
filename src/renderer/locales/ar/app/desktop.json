@@ -4,5 +4,7 @@
   "trayQuit": "إغلاق",
   "athkarAlertTitle": "أذكار",
   "crashTitle": "خطأ غير متوقع",
-  "crashMessage": "حدث خطأ ويجب إغلاق التطبيق."
+  "crashMessage": "حدث خطأ ويجب إغلاق التطبيق.",
+  "crashClose": "إغلاق",
+  "reportProblem": "الإبلاغ عن مشكلة"
 }

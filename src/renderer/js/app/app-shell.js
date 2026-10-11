@@ -3,6 +3,7 @@
 // Start-up shared by every page of the main window (each page's entry file calls startPage):
 // saved settings, theme and text direction, the adhan overlay and fasting reminders, then the
 // page itself, the window buttons, the mini player and the tooltips.
+require("../core/error-watch"); // first: errors while the page starts are logged too
 const { ipcRenderer } = require("electron");
 const { applyLanguageDirection, applyTranslations } = require("../core/i18n");
 const { loadSettings } = require("../core/bootstrap");

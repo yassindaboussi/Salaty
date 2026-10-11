@@ -17,4 +17,9 @@ function logger(scope) {
   return log.scope(scope);
 }
 
-module.exports = { logger };
+/** Full path of the log file (main.log). */
+function logFile() {
+  return log.transports.file.getFile().path;
+}
+
+module.exports = { logger, logFile };

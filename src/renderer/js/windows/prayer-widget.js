@@ -1,5 +1,6 @@
 "use strict";
 
+require("../core/error-watch"); // first: errors while the page starts are logged too
 const { ipcRenderer } = require("electron");
 const {
   PRAYER_KEYS,

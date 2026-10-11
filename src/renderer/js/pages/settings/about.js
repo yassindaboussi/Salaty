@@ -7,6 +7,7 @@ const { t } = require("../../core/i18n");
 const { showToast } = require("../../core/toast");
 const analytics = require("../../services/analytics");
 const { query } = require("../../core/dom");
+const { openFeedbackDialog } = require("../../components/feedback-dialog");
 
 async function initAboutSection() {
   try {
@@ -28,6 +29,7 @@ async function initAboutSection() {
   const githubBtn = document.getElementById("aboutGithubBtn");
   const contactBtn = document.getElementById("aboutContactBtn");
   const contactIcon = document.getElementById("aboutContactIcon");
+  const feedbackBtn = document.getElementById("aboutFeedbackBtn");
 
   if (statusText) statusText.textContent = t("upToDate");
 
@@ -37,6 +39,9 @@ async function initAboutSection() {
       "https://github.com/yassindaboussi/Salaty",
     );
   });
+
+  // The "Report a problem" window: what happened + the technical details, sent by email.
+  feedbackBtn?.addEventListener("click", () => openFeedbackDialog());
 
   if (contactBtn) {
     const email = contactBtn.dataset.email;

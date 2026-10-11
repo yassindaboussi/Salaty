@@ -2,6 +2,7 @@
 // Howl and Howler are globals from vendor/howler/howler.min.js (a <script> in background-player.html)
 "use strict";
 
+require("../core/error-watch"); // first: errors while the page starts are logged too
 const { ipcRenderer } = require("electron");
 const { setThemeClass } = require("../core/theme");
 const { loadSettings } = require("../core/bootstrap");

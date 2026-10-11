@@ -7,6 +7,7 @@
     "type": "git",
     "url": "https://github.com/yassindaboussi/Salaty.git"
   },
+  "feedbackAccessKey": "3d932ba5-2d84-43fa-9234-127772d3517b",
   "main": "src/main/index.js",
   "scripts": {
     "postinstall": "node scripts/fix-noble-hashes-esm.js",

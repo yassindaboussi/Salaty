@@ -3,6 +3,7 @@
 // Registers every IPC channel the pages use (called once from app/bootstrap.js).
 const { registerSettingsHandlers } = require("./handlers/settings-handlers");
 const { registerWindowHandlers } = require("./handlers/window-handlers");
+const { registerFeedbackHandlers } = require("./handlers/feedback-handlers");
 const popupHandlers = require("./handlers/popup-handlers");
 const playerManager = require("../services/player-manager");
 const prayerTimerManager = require("../services/prayer-timer-manager");
@@ -87,6 +88,7 @@ function registerIpcHandlers({ getMainWindow }) {
   });
 
   registerWindowHandlers(getMainWindow);
+  registerFeedbackHandlers();
   popupHandlers.registerPopupHandlers({ getMainWindow });
   playerManager.registerPlayerIpc(getMainWindow);
 }

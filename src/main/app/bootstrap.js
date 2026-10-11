@@ -24,6 +24,7 @@ const prayerTimerManager = require("../services/prayer-timer-manager");
 const fastingCalendarManager = require("../services/fasting-calendar-manager");
 const connectionManager = require("../services/connection-manager");
 const athkarAlertManager = require("../services/athkar-alert-manager");
+const feedback = require("./feedback");
 const log = require("../services/logger").logger("Main");
 
 /** @import { BrowserWindow } from "electron" */
@@ -91,6 +92,9 @@ function startApplication() {
       prayerTimerManager.init(getMainWindow, settingsStore.get);
       // back online: refresh the prayer times (the cache covered the offline time)
       connectionManager.onRestored(() => prayerTimerManager.reloadPrayerData());
+      // feedback written while offline
+      connectionManager.onRestored(() => feedback.flushQueue());
+      setTimeout(() => feedback.flushQueue(), 30_000);
       fastingCalendarManager.init(getMainWindow, settingsStore.get);
       athkarAlertManager.init(settingsStore.get);
 

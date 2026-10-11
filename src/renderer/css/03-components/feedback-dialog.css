@@ -1,0 +1,233 @@
+/* "Send feedback" window (js/components/feedback-dialog.js), on top of the shared dialog styles
+   (custom-dialog.css). Linked by the pages that can open it: home and settings. */
+@layer components {
+  /* Small windows: only the middle part scrolls, the buttons always stay in view */
+  .feedback-dialog {
+    display: flex;
+    flex-direction: column;
+    max-width: 520px;
+    max-height: calc(100vh - 32px);
+    overflow: hidden;
+    padding-block: 24px 20px;
+    text-align: start;
+  }
+
+  .feedback-dialog__form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .feedback-dialog__form[hidden] {
+    display: none;
+  }
+
+  .feedback-dialog__body {
+    min-height: 0;
+    overflow-y: auto;
+
+    /* room for the focus outlines, which would be cut at the scroll edge */
+    margin-inline: -4px;
+    padding-inline: 4px;
+  }
+
+  .feedback-dialog__actions {
+    flex-shrink: 0;
+    padding-block-start: 8px;
+  }
+
+  .feedback-dialog .custom-dialog-icon {
+    width: 44px;
+    height: 44px;
+    margin-block-end: 10px;
+    font-size: 20px;
+  }
+
+  .feedback-dialog__title {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--text-primary);
+  }
+
+  .feedback-dialog__intro {
+    margin: 0 0 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+
+  .feedback-dialog__label {
+    display: block;
+    margin-block-end: 6px;
+    padding: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* "A problem" / "A suggestion": two big choices (real radio buttons, so the keyboard and
+     screen readers work as usual) */
+  .feedback-dialog__types {
+    min-inline-size: 0;
+    margin: 0 0 12px;
+    padding: 0;
+    border: 0;
+  }
+
+  .feedback-dialog__choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .feedback-dialog__choice {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .feedback-dialog__choice input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .feedback-dialog__choice span {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease;
+  }
+
+  .feedback-dialog__choice input:checked + span {
+    border-color: var(--accent-color);
+    background: rgba(var(--accent-rgb), 0.15);
+    color: var(--accent-color);
+  }
+
+  .feedback-dialog__choice input:focus-visible + span {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+  }
+
+  .feedback-dialog__input {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin-block-end: 10px;
+    padding: 9px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 14px;
+  }
+
+  textarea.feedback-dialog__input {
+    min-height: 72px;
+    resize: vertical;
+  }
+
+  .feedback-dialog__input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+  }
+
+  .feedback-dialog__input:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 1px;
+  }
+
+  .feedback-dialog__check {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-block-end: 8px;
+    font-size: 13px;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .feedback-dialog__check input {
+    flex-shrink: 0;
+    margin: 2px 0 0;
+    accent-color: var(--accent-color);
+  }
+
+  .feedback-dialog__details {
+    margin-block-end: 14px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .feedback-dialog__details summary {
+    cursor: pointer;
+  }
+
+  .feedback-dialog__details pre {
+    max-height: 160px;
+    margin: 8px 0 0;
+    padding: 10px;
+    overflow: auto;
+    border-radius: var(--radius-sm);
+    background: var(--surface-1);
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    text-align: start; /* the element is dir="ltr": the details are English */
+  }
+
+  .feedback-dialog__note {
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .feedback-dialog__status {
+    min-height: 1.4em;
+    margin: 0 0 12px;
+    font-size: 13px;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+
+  .feedback-dialog__status[data-kind="error"] {
+    color: var(--red-500);
+  }
+
+  .feedback-dialog__done {
+    padding-block: 12px 4px;
+  }
+
+  .feedback-dialog .feedback-dialog__done-icon {
+    width: 64px;
+    height: 64px;
+    font-size: 30px;
+    background: color-mix(in srgb, var(--green-500) 15%, transparent);
+    color: var(--green-500);
+  }
+
+  /* Windows contrast themes: the chosen card keeps a visible frame */
+  @media (forced-colors: active) {
+    .feedback-dialog__choice input:checked + span {
+      border: 2px solid Highlight;
+    }
+  }
+}

@@ -4,5 +4,7 @@
   "trayQuit": "Quitter",
   "athkarAlertTitle": "Athkar",
   "crashTitle": "Erreur inattendue",
-  "crashMessage": "Une erreur est survenue et l’application doit se fermer."
+  "crashMessage": "Une erreur est survenue et l’application doit se fermer.",
+  "crashClose": "Fermer",
+  "reportProblem": "Signaler un problème"
 }

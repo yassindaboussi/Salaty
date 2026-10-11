@@ -16,6 +16,7 @@ const {
   updateLocationSwitcher,
 } = require("../components/location-switcher");
 const { initOfflineBanner } = require("../components/offline-banner");
+const { openFeedbackDialog } = require("../components/feedback-dialog");
 const { setupConnectionRecovery } = require("../services/connection-recovery");
 const analytics = require("../services/analytics");
 const { byId } = require("../core/dom");
@@ -87,6 +88,10 @@ async function initHomePage() {
   updateCurrentAndNextPrayer();
 
   await screenSizeManager.forceApplyScreenSize();
+
+  // the app crashed last time and the user chose "Report a problem" in the crash dialog
+  if (await ipcRenderer.invoke("take-crash-report").catch(() => false))
+    openFeedbackDialog({ type: "problem", afterCrash: true });
 
   ipcRenderer.removeAllListeners("location-changed");
   ipcRenderer.on("location-changed", async () => {

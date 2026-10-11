@@ -96,6 +96,7 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 - 3 langues (arabe, anglais, français)
 - Chaque modification est enregistrée automatiquement, sans bouton « Enregistrer »
 - Mises à jour automatiques
+- « Envoyer un avis » depuis l'application : signalez un problème ou proposez une idée en quelques clics
 
 ---
 

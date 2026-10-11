@@ -4,5 +4,7 @@
   "trayQuit": "Quit",
   "athkarAlertTitle": "Athkar",
   "crashTitle": "Unexpected error",
-  "crashMessage": "Something went wrong and the app needs to close."
+  "crashMessage": "Something went wrong and the app needs to close.",
+  "crashClose": "Close",
+  "reportProblem": "Report a problem"
 }

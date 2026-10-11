@@ -119,6 +119,16 @@ because macOS lets only Developer ID-signed apps replace themselves.
 - **AppImage**: for other distributions. Needs `libfuse2`. On Ubuntu 24.04+, AppArmor blocks
   Electron's sandbox for AppImages, so point Ubuntu users to the .deb.
 
+## "Send feedback" emails
+
+The app's "Send feedback" window (problems and suggestions) emails them to
+salatytime@gmail.com through [Web3Forms](https://web3forms.com) (free: 250 messages a month).
+
+The access key is `feedbackAccessKey` in `package.json`. It is public by design: it only lets
+someone send email to that address, and Web3Forms filters spam. To change it, create a new key on
+<https://web3forms.com> with the same email address and replace the value. The environment
+variable `WEB3FORMS_ACCESS_KEY` overrides it (e.g. to test with another key).
+
 ## Verify a release
 
 ```bash

@@ -42,4 +42,30 @@ async function isReachable(url, { timeoutMs = 5_000 } = {}) {
   }
 }
 
-module.exports = { fetchJson, isReachable };
+/**
+ * POST a JSON body to an API. Network failures (offline, timeout) throw; any HTTP answer,
+ * error or not, is returned for the caller to read.
+ * @param {string} url
+ * @param {unknown} body
+ * @param {{ timeoutMs?: number }} [options]
+ * @returns {Promise<{ status: number, json: any }>}
+ */
+async function postJson(url, body, { timeoutMs = DEFAULT_TIMEOUT_MS } = {}) {
+  const res = await net.fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(timeoutMs),
+    cache: "no-store",
+  });
+  /** @type {any} */
+  let json = null;
+  try {
+    json = await res.json();
+  } catch {
+    // not JSON (a proxy's error page...): the status says enough
+  }
+  return { status: res.status, json };
+}
+
+module.exports = { fetchJson, isReachable, postJson };
