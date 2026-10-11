@@ -1,3 +1,5 @@
+/// <reference types="howler" />
+// Howl and Howler are globals from vendor/howler/howler.min.js (a <script> in background-player.html)
 "use strict";
 
 const { ipcRenderer } = require("electron");
@@ -5,6 +7,7 @@ const { setThemeClass } = require("../core/theme");
 const { loadSettings } = require("../core/bootstrap");
 const { t, applyTranslations } = require("../core/i18n");
 const { initTooltipSystem } = require("../core/tooltips");
+const { byId } = require("../core/dom");
 
 class BackgroundPlayer {
   constructor() {
@@ -75,10 +78,10 @@ class BackgroundPlayer {
   initUI() {
     this.ui = {
       title: document.getElementById("title"),
-      artist: document.getElementById("artist"),
-      playBtn: document.getElementById("playBtn"),
-      prevBtn: document.getElementById("prevBtn"),
-      nextBtn: document.getElementById("nextBtn"),
+      artist: byId("artist", HTMLElement),
+      playBtn: byId("playBtn", HTMLButtonElement),
+      prevBtn: byId("prevBtn", HTMLButtonElement),
+      nextBtn: byId("nextBtn", HTMLButtonElement),
       closeBtn: document.getElementById("closeBtn"),
       playlistBtn: document.getElementById("miniPlaylistBtn"),
     };

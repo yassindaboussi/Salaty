@@ -83,6 +83,7 @@ async function _buildLocale(lang) {
   };
 }
 
+/** @type {Record<"en" | "ar" | "fr", any>} the merged locale files, once loaded */
 const translations = { en: null, ar: null, fr: null };
 
 const _readyPromise = Promise.all([
@@ -141,14 +142,23 @@ function _translateMarked(value) {
   return sep === -1 ? t(value) : t(value.slice(sep + 1), value.slice(0, sep));
 }
 
+/**
+ * Fills every element marked with data-i18n / data-i18n-* inside `root`.
+ * @param {ParentNode} [root]
+ */
 function applyTranslations(root = document) {
-  root.querySelectorAll("[data-i18n]").forEach((el) => {
+  /** @param {string} selector */
+  const marked = (selector) =>
+    /** @type {NodeListOf<HTMLElement | SVGElement>} */ (
+      root.querySelectorAll(selector)
+    );
+  marked("[data-i18n]").forEach((el) => {
     const text = _translateMarked(el.dataset.i18n);
     el.textContent = el.tagName === "TITLE" ? `${text} - ${APP_NAME}` : text;
   });
   for (const [dataKey, attribute] of Object.entries(I18N_ATTRIBUTES)) {
     const selector = `[data-${dataKey.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}]`;
-    root.querySelectorAll(selector).forEach((el) => {
+    marked(selector).forEach((el) => {
       el.setAttribute(attribute, _translateMarked(el.dataset[dataKey]));
     });
   }

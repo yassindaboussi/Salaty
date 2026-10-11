@@ -1,0 +1,16 @@
+{
+  // Type checking of the pages' JavaScript (see ../../tsconfig.base.json), set up the way
+  // scripts/build-renderer.js bundles it with esbuild: browser code (DOM, no Node), require()
+  // resolved by the bundler, and "electron" meaning core/electron-bridge.js.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Electron 44 = Chromium; esbuild lowers the syntax for its own target
+    "target": "ES2024",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "paths": { "electron": ["./js/core/electron-bridge.js"] },
+    "types": [] // no Node globals (process, Buffer...): the pages run without Node
+  },
+  "include": ["js/**/*.js", "js/**/*.d.ts"]
+}

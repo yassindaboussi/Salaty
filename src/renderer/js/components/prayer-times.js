@@ -11,17 +11,17 @@ const {
   isFridayIn,
   displayPrayerKey,
 } = require("../../../shared/prayerUtils");
-const { ALADHAN_API, locationQuery } = require("../../../shared/aladhan");
 const {
   getGregorianDate,
   getHijriDate,
   checkUpcomingEvent,
-} = require("../utils/dates");
+} = require("../core/dates");
 const { state, prayerIcons } = require("../core/store");
 const { updateRamadanCountdown } = require("./ramadan-countdown");
 const screenSizeManager = require("../core/screen-size");
 const { escapeHtml } = require("../utils/html");
 
+/** @type {any} */
 let prayerData = null;
 let currentActivePrayer = null;
 let adhanByPrayer = {};
@@ -35,22 +35,28 @@ async function loadPrayerTimes() {
   }
 
   try {
-    const url = `${ALADHAN_API}/timingsByCity?${locationQuery(state.settings)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    if (json?.code !== 200) throw new Error("Invalid API response");
-
-    prayerData = json.data;
-    ipcRenderer.send("prayer-data-updated", prayerData);
-    _renderPrayerUI();
-    updateRamadanCountdown(prayerData);
+    // from the main process, which keeps them on disk (works offline, same data as the adhan)
+    const data = await ipcRenderer.invoke("get-prayer-data");
+    if (!data?.timings)
+      throw new Error("no prayer times yet (offline, nothing saved)");
+    showPrayerData(data);
   } catch (err) {
     console.error("[Prayer] loadPrayerTimes:", err);
     if (locationEl) locationEl.textContent = t("errorLoading");
     showToast(t("errorLoading"), "error");
   }
 }
+
+function showPrayerData(data) {
+  prayerData = data;
+  _renderPrayerUI();
+  updateRamadanCountdown(prayerData);
+}
+
+// Main sends new times by itself: a new day, another location, back online.
+ipcRenderer.on("prayer-data-from-main", (_e, data) => {
+  if (data?.timings) showPrayerData(data);
+});
 
 // Name shown for a prayer. On Fridays (in the prayer location's own time zone) Dhuhr reads
 // "Jumu'ah". Only the label changes: timings and the per-prayer adhan settings stay keyed by
@@ -139,8 +145,9 @@ function _renderPrayerUI() {
     .join("");
 
   listEl.onclick = (e) => {
+    if (!(e.target instanceof Element)) return;
     const btn = e.target.closest(".adhan-toggle-btn");
-    if (btn) _toggleAdhan(btn.dataset.prayer);
+    if (btn instanceof HTMLElement) _toggleAdhan(btn.dataset.prayer);
   };
 }
 

@@ -5,6 +5,7 @@ const { t } = require("../core/i18n");
 const { showConfirmDialog } = require("./confirm-dialog");
 const { state } = require("../core/store");
 const { escapeHtml } = require("../utils/html");
+const { queryAll } = require("../core/dom");
 
 let isDropdownOpen = false;
 
@@ -25,6 +26,7 @@ async function initLocationSwitcher() {
 
   document.addEventListener("click", (e) => {
     if (isDropdownOpen) {
+      if (!(e.target instanceof Element)) return;
       if (e.target === switcherBtn || switcherBtn.contains(e.target)) {
         return;
       }
@@ -188,7 +190,7 @@ async function updateLocationSwitcher() {
 
   dropdown.innerHTML = detectLocationItem + locationItems;
 
-  const items = dropdown.querySelectorAll(".location-switcher-item");
+  const items = queryAll(".location-switcher-item", HTMLElement, dropdown);
 
   items.forEach((item) => {
     item.addEventListener("click", async (e) => {

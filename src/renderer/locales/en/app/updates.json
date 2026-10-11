@@ -2,6 +2,8 @@
   "updateAvailable": "Update Available",
   "newVersionAvailable": "Version {version} is available. Download now?",
   "download": "Download",
+  "openDownloadPage": "Open download page",
+  "updatesFromStore": "Updates are installed by the Microsoft Store",
   "updateReady": "Update Ready",
   "updateDownloaded": "Update downloaded. Install now?",
   "install": "Install",

@@ -1,0 +1,119 @@
+name: Microsoft Store package
+
+# Builds the MSIX package for the Microsoft Store, install-tests it, and keeps it as a workflow
+# artifact to upload in Partner Center (RELEASING.md). Runs for every release (called by
+# release.yml) and from the Actions tab (Microsoft Store package -> Run workflow).
+# The Store signs the package and installs/updates it on users' PCs: no SmartScreen warning, and
+# the app leaves updates to the Store (main/windows/updater.js, "store" mode).
+# Needs the repository variables MSSTORE_IDENTITY_NAME, MSSTORE_PUBLISHER and
+# MSSTORE_PUBLISHER_DISPLAY_NAME (Partner Center > the app > Product identity). They are public
+# (every installed copy shows them), so variables, not secrets.
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+
+jobs:
+  package:
+    name: Build and install-test (MSIX)
+    runs-on: windows-latest
+    env:
+      IDENTITY_NAME: ${{ vars.MSSTORE_IDENTITY_NAME }}
+      PUBLISHER: ${{ vars.MSSTORE_PUBLISHER }}
+      PUBLISHER_DISPLAY_NAME: ${{ vars.MSSTORE_PUBLISHER_DISPLAY_NAME }}
+    steps:
+      - name: Check the Store identity
+        shell: bash
+        run: |
+          if [ -z "$IDENTITY_NAME" ] || [ -z "$PUBLISHER" ] || [ -z "$PUBLISHER_DISPLAY_NAME" ]; then
+            echo "::error::Set the repository variables MSSTORE_IDENTITY_NAME, MSSTORE_PUBLISHER and MSSTORE_PUBLISHER_DISPLAY_NAME (Partner Center > Product identity). See RELEASING.md."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build:renderer
+
+      - name: Read the version
+        id: version
+        shell: bash
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      # the identity comes from the variables: it is the Store's, not part of the source
+      - name: Build the MSIX package
+        shell: bash
+        run: |
+          npx electron-builder --win appx --publish never \
+            -c.appx.identityName="$IDENTITY_NAME" \
+            -c.appx.publisher="$PUBLISHER" \
+            -c.appx.publisherDisplayName="$PUBLISHER_DISPLAY_NAME"
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false" # the Store signs the package
+
+      # Windows installs only signed packages, so a copy is signed with a throwaway certificate
+      # for the same publisher, trusted on this runner only. Then: install it, start it from the
+      # Start menu (with package identity, as the Store version runs), wait for its start-up line
+      # in the log, check it does not look for updates itself, uninstall it.
+      # Windows PowerShell: its Appx module (Add-AppxPackage, ...) is built in.
+      - name: Install, start, uninstall
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Stop"
+          $appx = Get-ChildItem dist -Filter *.appx | Select-Object -First 1
+          $cert = New-SelfSignedCertificate -Type Custom -Subject $env:PUBLISHER -KeyUsage DigitalSignature `
+            -FriendlyName "Salaty Time CI test" -CertStoreLocation Cert:\CurrentUser\My `
+            -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}")
+          $cer = Join-Path $env:RUNNER_TEMP "test.cer"
+          Export-Certificate -Cert $cert -FilePath $cer | Out-Null
+          Import-Certificate -FilePath $cer -CertStoreLocation Cert:\LocalMachine\TrustedPeople | Out-Null
+          $test = Join-Path $env:RUNNER_TEMP "test.appx"
+          Copy-Item $appx.FullName $test
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" |
+            Sort-Object { [version]$_.Directory.Parent.Name } | Select-Object -Last 1
+          & $signtool.FullName sign /fd SHA256 /sha1 $cert.Thumbprint /s My $test
+          if ($LASTEXITCODE -ne 0) { throw "Could not sign the test copy" }
+
+          Add-AppxPackage -Path $test
+          $pkg = Get-AppxPackage -Name $env:IDENTITY_NAME
+          if (-not $pkg) { throw "The package did not install" }
+          $categories = (Get-AppxPackageManifest $pkg).Package.Applications.Application.Extensions.Extension.Category
+          if ($categories -notcontains "windows.startupTask") { throw "The package has no start-at-login task" }
+          Start-Process "shell:AppsFolder\$($pkg.PackageFamilyName)!SalatyTime"
+
+          # a packaged app's AppData writes land in its own folder under Packages
+          $logDirs = @("$env:LOCALAPPDATA\Packages\$($pkg.PackageFamilyName)", "$env:APPDATA\Salaty Time")
+          $deadline = (Get-Date).AddSeconds(90)
+          do {
+            Start-Sleep -Seconds 2
+            $log = Get-ChildItem $logDirs -Recurse -Filter main.log -ErrorAction SilentlyContinue | Select-Object -First 1
+            $line = if ($log) { Select-String -Path $log.FullName -Pattern "start-up \(ms after launch\)" }
+          } until ($line -or (Get-Date) -gt $deadline)
+          Start-Sleep -Seconds 6 # the installer build's first update check runs 3 s after start
+          $checked = $log -and (Select-String -Path $log.FullName -Pattern "Checking for update" -Quiet)
+          Get-Process "Salaty Time" -ErrorAction SilentlyContinue | Stop-Process -Force
+          if (-not $line) {
+            if ($log) { Get-Content $log.FullName }
+            throw "The installed app did not show its window"
+          }
+          if ($checked) { throw "The Store version looked for updates itself (the Store updates it)" }
+          Write-Output "Started: $line"
+
+          Remove-AppxPackage -Package $pkg.PackageFullName
+          if (Get-AppxPackage -Name $env:IDENTITY_NAME) { throw "The package was not removed" }
+          Write-Output "Uninstalled"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: store-package-v${{ steps.version.outputs.version }}
+          path: dist/*.appx
+          if-no-files-found: error
+          retention-days: 30

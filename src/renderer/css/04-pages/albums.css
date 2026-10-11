@@ -159,7 +159,7 @@
   }
 
   /* Trigger the fade on the next frame after display:flex is applied
-     (see albums.js) — animating opacity directly on toggle would otherwise
+     (see albums/sections.js) — animating opacity directly on toggle would otherwise
      jump straight to 1 since display:none can't be transitioned. */
   .archive-group.expanded.content-visible .archive-group-content {
     opacity: 1;

@@ -1,0 +1,18 @@
+{
+  // Shared by tsconfig.json (main process, preload, shared) and src/renderer/tsconfig.json
+  // (the pages): how strictly the app's JavaScript is type-checked. Every option is set
+  // explicitly (TypeScript 7 changed several defaults).
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+
+    // JS checking: catch "this might be null/undefined" mistakes and wrong types; parameters
+    // without a JSDoc type stay `any` (noImplicitAny in plain JS mostly reports noise)
+    "strict": true,
+    "noImplicitAny": false,
+    "useUnknownInCatchVariables": false
+  }
+}

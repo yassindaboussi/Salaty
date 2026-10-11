@@ -165,3 +165,13 @@ const preloadImages = () => {
 };
 
 preloadImages();
+
+// The latest release's version (the page itself is static). If GitHub can't be reached, the
+// version written in the HTML stays.
+fetch('https://api.github.com/repos/yassindaboussi/Salaty/releases/latest')
+    .then(res => (res.ok ? res.json() : null))
+    .then(release => {
+        const el = document.getElementById('latest-version');
+        if (el && release && release.tag_name) el.textContent = release.tag_name;
+    })
+    .catch(() => {});

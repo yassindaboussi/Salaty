@@ -6,6 +6,8 @@ const mp3quranApi = require("../services/api/mp3quran");
 const { t, getLanguage } = require("../core/i18n");
 const analytics = require("../services/analytics");
 const { escapeHtml, asButton } = require("../utils/html");
+// (query renamed: this file uses "query" for search text)
+const { byId, query: queryOne, queryAll } = require("../core/dom");
 
 const mp3quranLang = mp3quranApi.apiLanguage;
 
@@ -45,7 +47,7 @@ class PlaylistManager {
     if (storedAlbum) {
       try {
         const album = JSON.parse(storedAlbum);
-        document.querySelector(".playlist-title").innerText = getLocalized(
+        queryOne(".playlist-title", HTMLElement).innerText = getLocalized(
           album.title,
         );
         await this.loadTracks(album);
@@ -149,7 +151,7 @@ class PlaylistManager {
     this.currentTrackData = state.currentTrack;
 
     this.updatePlayBtn();
-    const items = document.querySelectorAll(".track-item");
+    const items = queryAll(".track-item", HTMLElement);
     items.forEach((item) => {
       if (
         item.dataset.url === (state.currentTrack ? state.currentTrack.url : "")
@@ -170,8 +172,8 @@ class PlaylistManager {
 
     if (state.volume !== undefined) {
       const volPercent = Math.round(state.volume * 100);
-      if (Math.abs(this.volumeSlider.value - volPercent) > 1) {
-        this.volumeSlider.value = volPercent;
+      if (Math.abs(Number(this.volumeSlider.value) - volPercent) > 1) {
+        this.volumeSlider.value = String(volPercent);
         this.updateVolumeFill();
       } else if (this.volumeSlider.style.background === "") {
         this.updateVolumeFill();
@@ -192,21 +194,34 @@ class PlaylistManager {
     this.fullscreenBtn = document.getElementById("fullscreenBtn");
     this.closeBtn = document.getElementById("closeBtn");
 
-    this.searchInput = document.getElementById("searchInput");
+    // typed here: set in a method rather than the constructor, so the checker would add undefined
+    /** @type {HTMLInputElement} */
+    this.searchInput = byId("searchInput", HTMLInputElement);
 
-    this.resultsList = document.getElementById("resultsList");
+    /** @type {HTMLElement} */
+    this.resultsList = byId("resultsList", HTMLElement);
 
-    this.playPauseBtn = document.getElementById("playPauseBtn");
-    this.prevBtn = document.getElementById("prevBtn");
-    this.nextBtn = document.getElementById("nextBtn");
-    this.progressBar = document.getElementById("progressBar");
-    this.progressFill = document.getElementById("progressFill");
-    this.volumeSlider = document.getElementById("volumeSlider");
+    /** @type {HTMLButtonElement} */
+    this.playPauseBtn = byId("playPauseBtn", HTMLButtonElement);
+    /** @type {HTMLButtonElement} */
+    this.prevBtn = byId("prevBtn", HTMLButtonElement);
+    /** @type {HTMLButtonElement} */
+    this.nextBtn = byId("nextBtn", HTMLButtonElement);
+    /** @type {HTMLElement} */
+    this.progressBar = byId("progressBar", HTMLElement);
+    /** @type {HTMLElement} */
+    this.progressFill = byId("progressFill", HTMLElement);
+    /** @type {HTMLInputElement} */
+    this.volumeSlider = byId("volumeSlider", HTMLInputElement);
 
-    this.currentTrackTitle = document.getElementById("currentTrackTitle");
-    this.currentTrackArtist = document.getElementById("currentTrackArtist");
-    this.currentTimeEl = document.getElementById("currentTime");
-    this.durationEl = document.getElementById("duration");
+    /** @type {HTMLElement} */
+    this.currentTrackTitle = byId("currentTrackTitle", HTMLElement);
+    /** @type {HTMLElement} */
+    this.currentTrackArtist = byId("currentTrackArtist", HTMLElement);
+    /** @type {HTMLElement} */
+    this.currentTimeEl = byId("currentTime", HTMLElement);
+    /** @type {HTMLElement} */
+    this.durationEl = byId("duration", HTMLElement);
   }
 
   initListeners() {
@@ -247,8 +262,8 @@ class PlaylistManager {
       }
     });
 
-    this.volumeSlider.addEventListener("input", (e) => {
-      const vol = e.target.value / 100;
+    this.volumeSlider.addEventListener("input", () => {
+      const vol = Number(this.volumeSlider.value) / 100;
       ipcRenderer.send("player-command", { type: "volume", value: vol });
       this.updateVolumeFill();
     });
@@ -294,7 +309,7 @@ class PlaylistManager {
 
   updateVolumeFill() {
     const val = this.volumeSlider.value;
-    const percentage = (val / 100) * 100;
+    const percentage = (Number(val) / 100) * 100;
     const isRtl = document.documentElement.dir === "rtl";
 
     if (isRtl) {
@@ -305,7 +320,7 @@ class PlaylistManager {
   }
 }
 
-// Settings, theme, window buttons and tooltips: core/app-shell.js.
+// Settings, theme, window buttons and tooltips: app/app-shell.js.
 function initPlaylistPage() {
   return new PlaylistManager().init();
 }

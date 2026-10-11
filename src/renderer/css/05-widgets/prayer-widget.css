@@ -300,3 +300,28 @@ body {
   background-position: 0 0;
   background-repeat: no-repeat;
 }
+
+/* Windows contrast themes: the current prayer shows like a selected item (Highlight), the next
+   one with a Highlight outline; backgrounds alone would vanish (see the app's
+   06-utilities/forced-colors.css for the reasons). */
+@media (forced-colors: active) {
+  .tb-col.active {
+    forced-color-adjust: none;
+    background: Highlight;
+    border-color: Highlight;
+  }
+
+  /* as specific as the rules that colour them above */
+  .tb-col.active :is(.tb-col-icon, .tb-col-time) {
+    color: HighlightText;
+  }
+
+  .tb-col.active .tb-col-dot {
+    background: HighlightText;
+  }
+
+  .tb-col.next {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}

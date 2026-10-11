@@ -5,13 +5,14 @@ const { t } = require("../core/i18n");
 const { loadSettings } = require("../core/bootstrap");
 const { initTooltipSystem } = require("../core/tooltips");
 const { setThemeClass } = require("../core/theme");
+const { byId } = require("../core/dom");
 
 const CLOSE_DELAY_MS = 10000;
 
-const app = document.getElementById("app");
-const athkarText = document.getElementById("athkarText");
-const closeBtn = document.getElementById("closeBtn");
-const titleEl = document.getElementById("popupTitle");
+const app = byId("app", HTMLElement);
+const athkarText = byId("athkarText", HTMLElement);
+const closeBtn = byId("closeBtn", HTMLButtonElement);
+const titleEl = byId("popupTitle", HTMLElement);
 const iconEl = document.querySelector(".popup-icon i");
 const openAppBtn = document.getElementById("openAppBtn");
 

@@ -1,32 +1,24 @@
 "use strict";
-const https = require("https");
 const secureIpc = require("../ipc/secure-ipc");
+const { isReachable } = require("./http");
+
+/** @import { BrowserWindow } from "electron" */
 
 let isOnline = true;
+/** @type {() => BrowserWindow | null} */
 let getMainWindow = () => null;
+/** @type {ReturnType<typeof setInterval> | null} */
 let checkInterval = null;
 let handlersRegistered = false;
+/** @type {Set<() => void>} */
+const restoredListeners = new Set();
 
 const CHECK_URL = "https://api.aladhan.com";
 const CHECK_MS = 10_000;
 const TIMEOUT_MS = 5_000;
 
-async function checkConnection() {
-  return new Promise((resolve) => {
-    const req = https.get(
-      CHECK_URL,
-      { timeout: TIMEOUT_MS, method: "HEAD" },
-      (res) => {
-        resolve(res.statusCode < 500);
-        res.resume();
-      },
-    );
-    req.on("error", () => resolve(false));
-    req.on("timeout", () => {
-      req.destroy();
-      resolve(false);
-    });
-  });
+function checkConnection() {
+  return isReachable(CHECK_URL, { timeoutMs: TIMEOUT_MS });
 }
 
 // Checks now and tells the main window when the state flips; pages reload their network
@@ -40,10 +32,12 @@ async function refresh() {
       isOnline ? "connection-restored" : "connection-lost",
     );
   }
+  if (!wasOnline && isOnline)
+    for (const listener of restoredListeners) listener();
   return isOnline;
 }
 
-// getMainWindowFn: returns the main window (or null) when called.
+/** @param {() => BrowserWindow | null} getMainWindowFn returns the main window (or null) */
 function initializeConnectionManager(getMainWindowFn) {
   getMainWindow = getMainWindowFn;
 
@@ -63,8 +57,18 @@ function cleanup() {
   if (checkInterval) clearInterval(checkInterval);
 }
 
+/**
+ * Called when the connection comes back after being lost.
+ * @param {() => void} listener
+ */
+function onRestored(listener) {
+  restoredListeners.add(listener);
+  return () => restoredListeners.delete(listener);
+}
+
 module.exports = {
   initializeConnectionManager,
   cleanup,
+  onRestored,
   isOnline: () => isOnline,
 };

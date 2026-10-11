@@ -149,9 +149,16 @@ class ScreenSizeManager {
       // frame-based settle below, which still helps on its own.
     }
 
-    await new Promise((resolve) =>
-      requestAnimationFrame(() => requestAnimationFrame(resolve)),
-    );
+    // A window that has not been shown yet (the app starts hidden and shows itself once the
+    // page is ready) may get about one frame per second: never wait more than 50 ms for
+    // frames, which a visible window delivers in ~30 ms (measured: up to 1 s lost otherwise).
+    // The measurements that follow read the layout directly, which is always up to date.
+    await Promise.race([
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+      new Promise((resolve) => setTimeout(resolve, 50)),
+    ]);
   }
 
   // Fits the big window to the home page's content (other pages: the default height).
@@ -163,7 +170,7 @@ class ScreenSizeManager {
     const banner = document.getElementById("eventsBanner");
     const cards = document.getElementById("prayerCards");
 
-    if (!prayerList || !header || !cards) {
+    if (!prayerList || !(header instanceof HTMLElement) || !cards) {
       await this._sendResize();
       return;
     }

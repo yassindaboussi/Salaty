@@ -26,8 +26,9 @@ function _setupCards() {
   if (!grid) return;
 
   grid.addEventListener("click", (e) => {
+    if (!(e.target instanceof Element)) return;
     const card = e.target.closest(".feature-card");
-    if (!card) return;
+    if (!(card instanceof HTMLElement)) return;
 
     const feature = card.dataset.feature;
     const route = CARD_ROUTES[feature];

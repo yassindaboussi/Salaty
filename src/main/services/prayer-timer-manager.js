@@ -9,32 +9,63 @@ const {
   isFridayIn,
   displayPrayerKey,
 } = require("../../shared/prayerUtils");
-const { ALADHAN_API, locationQuery } = require("../../shared/aladhan");
+const prayerTimes = require("./prayer-times");
 const log = require("./logger").logger("Prayer");
 const { bringToFrontForAdhan } = require("../windows/main-window");
 
+/**
+ * @import { BrowserWindow } from "electron"
+ * @import { PrayerDay } from "./prayer-times"
+ * @typedef {{ prayer: object, mode: true | "silent", theme: string, startedAt: number }} AdhanSession
+ */
+
+/** @type {() => BrowserWindow | null} */
 let getMainWindow = () => null;
+/** @type {(() => any) | null} returns the current settings */
 let getSettingsData = null;
+/** @type {PrayerDay | null} today's times for the saved location */
 let prayerData = null;
 
+/** @type {ReturnType<typeof setInterval> | null} */
 let tickInterval = null;
+/** @type {ReturnType<typeof setTimeout> | null} */
 let midnightTimer = null;
 
+/** @type {string | null} */
 let currentPrayerKey = null;
 let isFirstTick = true;
 let adhanIsPlaying = false;
+/** @type {AdhanSession | null} */
 let activeAdhanSession = null;
 
+/** @type {string | null} */
 let lastAdhanPrayer = null;
+/** @type {string | null} */
 let lastPreAdhanKey = null;
+
+/** @type {Promise<void> | null} the load in progress, shared by everyone who asks meanwhile */
+let loading = null;
+// Without today's times (offline, server down, a first download that timed out) try again:
+// 30 s, 1, 2, 5 min, then every 10 min until they arrive.
+const RETRY_DELAYS_MS = [30_000, 60_000, 120_000, 300_000, 600_000];
+/** @type {ReturnType<typeof setTimeout> | null} */
+let retryTimer = null;
+let retryCount = 0;
+/** @type {Set<(data: PrayerDay) => void>} */
+const dataListeners = new Set();
 
 const ADHAN_TOLERANCE_SEC = 900;
 
-// getMainWindowFn / settingsFn: return the main window and the settings when called.
+/**
+ * @param {() => BrowserWindow | null} getMainWindowFn returns the main window (or null)
+ * @param {() => any} settingsFn returns the current settings
+ */
 function init(getMainWindowFn, settingsFn) {
   getMainWindow = getMainWindowFn;
   getSettingsData = settingsFn;
   _registerIpcHandlers();
+  // a corrected calendar downloaded in the background: re-read today
+  prayerTimes.onChange(() => _loadPrayerData());
   _loadPrayerData().then(() => {
     _startTickLoop();
     _scheduleMidnightReload();
@@ -47,6 +78,21 @@ function reloadPrayerData() {
 function getPrayerData() {
   return prayerData;
 }
+// Today's data once the current load has finished; tries again when there is none yet
+// (offline at start-up with an empty cache).
+async function getPrayerDataWhenReady() {
+  if (loading) await loading;
+  if (!prayerData) await _loadPrayerData();
+  return prayerData;
+}
+/**
+ * Called with the new data whenever today's times change (new day, location, correction).
+ * @param {(data: PrayerDay) => void} listener
+ */
+function onDataChange(listener) {
+  dataListeners.add(listener);
+  return () => dataListeners.delete(listener);
+}
 
 function cleanup() {
   if (tickInterval) {
@@ -57,16 +103,22 @@ function cleanup() {
     clearTimeout(midnightTimer);
     midnightTimer = null;
   }
+  if (retryTimer) clearTimeout(retryTimer);
+  retryTimer = null;
+}
+
+function _scheduleRetry() {
+  if (retryTimer) return;
+  const delay =
+    RETRY_DELAYS_MS[Math.min(retryCount, RETRY_DELAYS_MS.length - 1)];
+  retryCount++;
+  retryTimer = setTimeout(() => {
+    retryTimer = null;
+    _loadPrayerData();
+  }, delay);
 }
 
 function _registerIpcHandlers() {
-  secureIpc.on("prayer-data-updated", (_ev, data) => {
-    if (data) {
-      prayerData = data;
-      currentPrayerKey = null;
-    }
-  });
-
   secureIpc.on("stop-adhan", () => _clearAdhanSession());
 
   secureIpc.handle("get-adhan-state", () => ({
@@ -82,24 +134,42 @@ function _clearAdhanSession() {
   _sendToMain("force-stop-adhan", {});
 }
 
-async function _loadPrayerData() {
-  const settings = getSettingsData?.();
+/**
+ * Today's times from services/prayer-times.js (disk cache, so this works offline). Loads
+ * asked for while one is running share it.
+ * @returns {Promise<void>}
+ */
+function _loadPrayerData() {
+  if (!loading) {
+    loading = _load().finally(() => {
+      loading = null;
+    });
+  }
+  return loading;
+}
 
+async function _load() {
+  const settings = getSettingsData?.();
   try {
-    const url = `${ALADHAN_API}/timingsByCity?${locationQuery(settings)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    if (json?.code === 200) {
-      prayerData = json.data;
-      currentPrayerKey = null;
-      lastAdhanPrayer = null;
-      lastPreAdhanKey = null;
-    } else {
-      throw new Error("Invalid API response");
+    const data = await prayerTimes.getToday(settings);
+    if (!data) {
+      // offline with nothing cached: keep what we have and try again a bit later
+      log.warn("no prayer times available yet");
+      _scheduleRetry();
+      return;
     }
+    retryCount = 0;
+    if (retryTimer) clearTimeout(retryTimer);
+    retryTimer = null;
+    if (JSON.stringify(data) === JSON.stringify(prayerData)) return;
+    // A new day or different times: forget which adhan/reminder already played. Not on an
+    // identical reload, which would play the current prayer's adhan a second time.
+    prayerData = data;
+    currentPrayerKey = null;
+    lastAdhanPrayer = null;
+    lastPreAdhanKey = null;
+    for (const listener of dataListeners) listener(prayerData);
   } catch (err) {
-    // offline or API down: keep yesterday's data; the midnight/location reload tries again
     log.warn("loading prayer times failed:", err.message);
   }
 }
@@ -203,19 +273,31 @@ function _scheduleMidnightReload() {
   const now = new Date();
   const midnight = new Date(now);
   midnight.setHours(24, 0, 30, 0);
-  const msLeft = midnight - now;
+  const msLeft = midnight.getTime() - now.getTime();
   midnightTimer = setTimeout(() => {
     _loadPrayerData().then(_scheduleMidnightReload);
   }, msLeft);
 }
 
+/** @returns {BrowserWindow | null} the main window while it exists */
 function _mainWindow() {
   const w = getMainWindow();
   return w && !w.isDestroyed() ? w : null;
 }
 
+/**
+ * @param {string} channel
+ * @param {unknown} payload
+ */
 function _sendToMain(channel, payload) {
   _mainWindow()?.webContents.send(channel, payload);
 }
 
-module.exports = { init, cleanup, reloadPrayerData, getPrayerData };
+module.exports = {
+  init,
+  cleanup,
+  reloadPrayerData,
+  getPrayerData,
+  getPrayerDataWhenReady,
+  onDataChange,
+};

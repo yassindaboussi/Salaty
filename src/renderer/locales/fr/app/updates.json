@@ -2,6 +2,8 @@
   "updateAvailable": "Mise à jour disponible",
   "newVersionAvailable": "La version {version} est disponible. Télécharger ?",
   "download": "Télécharger",
+  "openDownloadPage": "Ouvrir la page de téléchargement",
+  "updatesFromStore": "Les mises à jour sont installées par le Microsoft Store",
   "updateReady": "Mise à jour prête",
   "updateDownloaded": "Mise à jour téléchargée. Installer ?",
   "install": "Installer",

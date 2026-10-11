@@ -9,10 +9,12 @@ const {
 } = require("../config/window-options");
 const log = require("./logger").logger("Player");
 
+/** @type {BrowserWindow | null} */
 let playerWindow = null;
 let isPlayerPlaying = false;
 let currentTheme = "navy";
 let isPlayerReady = false;
+/** @type {object[]} commands sent before the player page finished loading */
 let pendingCommands = [];
 
 const PLAYBACK_STARTING_COMMANDS = new Set(["set-playlist"]);
@@ -33,29 +35,27 @@ function createPlayerWindow() {
   if (playerWindow && !playerWindow.isDestroyed()) return playerWindow;
 
   isPlayerReady = false;
-  playerWindow = new BrowserWindow(createBackgroundPlayerOptions());
-  playerWindow.loadFile(pages.backgroundPlayer);
+  const win = new BrowserWindow(createBackgroundPlayerOptions());
+  playerWindow = win;
+  win.loadURL(pages.backgroundPlayer);
 
-  if (shouldOpenDevTools())
-    playerWindow.webContents.openDevTools({ mode: "detach" });
+  if (shouldOpenDevTools()) win.webContents.openDevTools({ mode: "detach" });
 
-  playerWindow.webContents.on("did-finish-load", () => {
+  win.webContents.on("did-finish-load", () => {
     isPlayerReady = true;
-    playerWindow.webContents.send("apply-theme", { theme: currentTheme });
+    win.webContents.send("apply-theme", { theme: currentTheme });
 
     const queued = pendingCommands;
     pendingCommands = [];
-    queued.forEach((cmd) =>
-      playerWindow.webContents.send("player-command", cmd),
-    );
+    queued.forEach((cmd) => win.webContents.send("player-command", cmd));
   });
 
-  playerWindow.on("closed", () => {
+  win.on("closed", () => {
     playerWindow = null;
     isPlayerReady = false;
     pendingCommands = [];
   });
-  return playerWindow;
+  return win;
 }
 
 function sendPlayerCommand(arg) {
@@ -68,28 +68,29 @@ function sendPlayerCommand(arg) {
 }
 
 function showMiniPlayer() {
-  if (!playerWindow) return;
+  const win = playerWindow;
+  if (!win) return;
   try {
     const { x, y, width, height } = screen.getPrimaryDisplay().workArea;
     const w = 300,
       h = 100;
-    playerWindow.setBounds({
+    win.setBounds({
       x: x + width - w - 20,
       y: y + height - h - 20,
       width: w,
       height: h,
     });
-    playerWindow.setAlwaysOnTop(true, "screen-saver");
-    playerWindow.show();
+    win.setAlwaysOnTop(true, "screen-saver");
+    win.show();
   } catch (err) {
     log.error("showing the mini player failed:", err);
-    playerWindow.show();
+    win.show();
   }
 }
 
 let ipcRegistered = false;
 
-// getMainWindow: returns the main window (or null), read each time a message arrives.
+/** @param {() => BrowserWindow | null} getMainWindow read each time a message arrives */
 function registerPlayerIpc(getMainWindow) {
   if (ipcRegistered) return;
   ipcRegistered = true;

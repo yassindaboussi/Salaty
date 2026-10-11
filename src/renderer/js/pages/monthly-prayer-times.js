@@ -10,7 +10,8 @@ const {
   secondsFromTime,
   secondsSinceMidnight,
 } = require("../../../shared/prayerUtils");
-const { ALADHAN_API, locationQuery } = require("../../../shared/aladhan");
+const { ipcRenderer } = require("electron");
+const { locationQuery } = require("../../../shared/aladhan");
 const { escapeHtml } = require("../utils/html");
 
 let viewYear = 0;
@@ -80,13 +81,13 @@ async function _loadMonth(scrollToToday = false, instant = false) {
     _showLoading(true);
     _showTable(false);
     try {
-      const url = `${ALADHAN_API}/calendarByCity?${query}&month=${viewMonth}&year=${viewYear}`;
-      const res = await fetch(url);
-      const json = await res.json();
-      if (json?.code !== 200 || !Array.isArray(json.data)) {
-        throw new Error("Invalid calendarByCity response");
+      // from the main process, which keeps months on disk (works offline)
+      days = await ipcRenderer.invoke("get-prayer-month", viewYear, viewMonth);
+      if (!Array.isArray(days)) {
+        throw new Error(
+          "no prayer times for this month (offline, nothing saved)",
+        );
       }
-      days = json.data;
       monthCache[cacheKey] = days;
     } catch (err) {
       console.error("[MonthlyPrayerTimes] fetch error:", err);
@@ -150,6 +151,7 @@ function _renderTodayCard(days) {
   });
 
   const nowSec = secondsSinceMidnight();
+  /** @type {string | null} */
   let nextKey = null;
   let nextDiff = Infinity;
   for (const key of PRAYER_KEYS) {

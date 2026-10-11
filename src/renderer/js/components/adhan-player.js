@@ -5,8 +5,11 @@ const { ipcRenderer } = require("electron");
 const { t } = require("../core/i18n");
 const { state } = require("../core/store");
 
+/** @type {HTMLAudioElement | null} */
 let adhanAudio = null;
+/** @type {ReturnType<typeof setInterval> | null} */
 let fadeTimer = null;
+/** @type {HTMLElement | null} */
 let overlayEl = null;
 
 // Name to show for a prayer sent by the main process. `displayKey` is set there (e.g.
@@ -102,6 +105,7 @@ function _registerIpcListeners() {
   });
 }
 
+/** @type {Promise<any> | null} */
 let _adhanAudioSrcPromise = null;
 function _getAdhanAudioSrc() {
   if (!_adhanAudioSrcPromise) {
@@ -155,14 +159,14 @@ async function _playAdhan(prayer, mode, seekSec = 0) {
 
       fadeTimer = setInterval(() => {
         if (!adhanAudio || adhanAudio.paused) {
-          clearInterval(fadeTimer);
+          if (fadeTimer) clearInterval(fadeTimer);
           fadeTimer = null;
           return;
         }
         const next = Math.min(targetVol, adhanAudio.volume + stepPerTick);
         adhanAudio.volume = next;
         if (next >= targetVol) {
-          clearInterval(fadeTimer);
+          if (fadeTimer) clearInterval(fadeTimer);
           fadeTimer = null;
         }
       }, 80);
@@ -234,10 +238,10 @@ function _syncThemeVars() {
     "--text-secondary",
   ];
 
-  vars.forEach((v) => {
+  for (const v of vars) {
     const val = cs.getPropertyValue(v).trim();
     if (val) overlayEl.style.setProperty(v, val);
-  });
+  }
 }
 
 function _showOverlay(visible) {

@@ -15,6 +15,9 @@ const {
 const { createTray, destroyTray, hasTray } = require("../windows/tray");
 const { registerIpcHandlers } = require("../ipc");
 const { applySecurityRules } = require("./security");
+const { registerAppScheme, handleAppScheme } = require("./app-protocol");
+const { migrateLocalStorage } = require("../services/storage-migration");
+const startup = require("./startup-timing");
 const settingsStore = require("../services/settings-store");
 const analytics = require("../services/analytics-manager");
 const prayerTimerManager = require("../services/prayer-timer-manager");
@@ -23,6 +26,9 @@ const connectionManager = require("../services/connection-manager");
 const athkarAlertManager = require("../services/athkar-alert-manager");
 const log = require("../services/logger").logger("Main");
 
+/** @import { BrowserWindow } from "electron" */
+
+/** @type {BrowserWindow | null} */
 let mainWindow = null;
 let isQuitting = false;
 const getMainWindow = () => mainWindow;
@@ -46,23 +52,31 @@ function startApplication() {
 
   // Before any window exists, so every web page the app ever creates gets the rules.
   applySecurityRules();
+  // The pages' app:// scheme must be declared before "ready".
+  registerAppScheme();
 
-  app.whenReady().then(() => {
+  app.whenReady().then(async () => {
+    startup.mark("ready");
     try {
-      // 1. data, 2. IPC (before the first page asks for anything), 3. windows, 4. services
+      // 1. data, 2. IPC (before the first page asks for anything), 3. the pages' protocol
+      // and their data moved from file:// (once), 4. windows, 5. services
       settingsStore.load();
       analytics.init(settingsStore.get);
       registerIpcHandlers({ getMainWindow });
+      handleAppScheme();
+      await migrateLocalStorage();
 
+      startup.mark("migrated");
       mainWindow = createMainWindow({
         onCloseToTray: (event) => {
           if (!isQuitting) {
             event.preventDefault();
-            mainWindow.hide();
+            mainWindow?.hide();
           }
         },
       });
 
+      startup.mark("window");
       createTray({
         getSettings: settingsStore.get,
         getMainWindow,
@@ -75,6 +89,8 @@ function startApplication() {
 
       connectionManager.initializeConnectionManager(getMainWindow);
       prayerTimerManager.init(getMainWindow, settingsStore.get);
+      // back online: refresh the prayer times (the cache covered the offline time)
+      connectionManager.onRestored(() => prayerTimerManager.reloadPrayerData());
       fastingCalendarManager.init(getMainWindow, settingsStore.get);
       athkarAlertManager.init(settingsStore.get);
 
@@ -87,6 +103,8 @@ function startApplication() {
   });
 
   app.on("window-all-closed", () => {
+    // also emitted when the storage move closes its hidden window, before the main one exists
+    if (!mainWindow) return;
     if (process.platform !== "darwin" && !hasTray()) app.quit();
   });
 

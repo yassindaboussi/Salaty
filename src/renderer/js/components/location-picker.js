@@ -8,6 +8,7 @@ const { t } = require("../core/i18n");
 // Country + city pickers of the settings page. Returns { reloadIfEmpty } so the page can fill
 // in a list that failed to load while offline once the connection comes back.
 async function initSelectLocation(onChange) {
+  /** @type {{ country: string, city: string } | null} */
   let detectedLocationTarget = null;
   let savedSettings = {};
   try {
@@ -19,7 +20,7 @@ async function initSelectLocation(onChange) {
   const commonConfig = {
     valueField: "name",
     labelField: "name",
-    searchField: "name",
+    searchField: ["name"],
     maxOptions: 500,
   };
 
@@ -52,6 +53,7 @@ async function initSelectLocation(onChange) {
   };
 
   let citiesRequestId = 0;
+  /** @param {string | null} [defaultCity] */
   async function loadCities(countryName, defaultCity = null, notify = false) {
     const myRequestId = ++citiesRequestId;
     citySelect.clear();
@@ -79,6 +81,7 @@ async function initSelectLocation(onChange) {
   countrySelect.on("change", (value) => {
     if (!value) return;
 
+    /** @type {string | null} */
     let defaultCity = null;
     if (detectedLocationTarget && detectedLocationTarget.country === value) {
       defaultCity = detectedLocationTarget.city;
@@ -101,7 +104,7 @@ async function initSelectLocation(onChange) {
   });
 
   const detectBtn = document.getElementById("detectLocationBtn");
-  if (detectBtn) {
+  if (detectBtn instanceof HTMLButtonElement) {
     detectBtn.addEventListener("click", async () => {
       detectBtn.disabled = true;
       detectBtn.classList.add("loading");

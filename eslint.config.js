@@ -63,6 +63,18 @@ module.exports = [
     rules: quality,
   },
 
+  // Renderer modules stay small and focused (src/renderer/js/README.md): a file that grows past
+  // this is split into a feature folder.
+  {
+    files: ["src/renderer/js/**/*.js"],
+    rules: {
+      "max-lines": [
+        "error",
+        { max: 300, skipBlankLines: true, skipComments: true },
+      ],
+    },
+  },
+
   // Howler is loaded by a <script> tag (vendor/howler) on the background player page.
   {
     files: ["src/renderer/js/windows/background-player.js"],

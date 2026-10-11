@@ -6,6 +6,7 @@ const QiblaMap = require("salaty-qibla-map");
 const analytics = require("../services/analytics");
 const { setupConnectionRecovery } = require("../services/connection-recovery");
 
+/** @type {InstanceType<typeof QiblaMap> | null} */
 let _map = null;
 let _lat = null;
 let _lng = null;

@@ -4,11 +4,13 @@ const { setupConnectionRecovery } = require("../services/connection-recovery");
 const { state } = require("../core/store");
 const { t } = require("../core/i18n");
 const analytics = require("../services/analytics");
-const { ALADHAN_API, locationQuery } = require("../../../shared/aladhan");
+const { ipcRenderer } = require("electron");
 const { cleanTime } = require("../../../shared/prayerUtils");
 const { escapeHtml, asButton } = require("../utils/html");
+const { byId, query, queryAll } = require("../core/dom");
 
 let ramadanData = [];
+/** @type {number | null} */
 let assignedHijriYear = null;
 
 function initRamadanPage() {
@@ -42,24 +44,20 @@ function initRamadanPage() {
 async function fetchRamadanData() {
   const { city, country } = state.settings;
   if (!city || !country) {
-    document.getElementById("trackerGrid").innerHTML =
+    byId("trackerGrid", HTMLElement).innerHTML =
       `<p class="ramadan-message">${t("locationNotSet")}</p>`;
     return;
   }
 
   try {
-    // Same location/method query as the home page and the adhan: suhoor ends at Fajr, so the
-    // Ramadan page must never show a different Fajr than the one the adhan is played for.
-    const query = locationQuery(state.settings);
-    const todayUrl = `${ALADHAN_API}/timingsByCity?${query}`;
+    // From the main process, like the home page and the adhan (same location and method:
+    // suhoor ends at Fajr, so this page must never show a different Fajr), and from its disk
+    // cache, so the page also works offline.
+    const today = await ipcRenderer.invoke("get-prayer-data");
+    if (!today?.date)
+      throw new Error("no prayer times yet (offline, nothing saved)");
 
-    const todayRes = await fetch(todayUrl);
-    const todayData = await todayRes.json();
-
-    if (!todayData || !todayData.data)
-      throw new Error("Could not fetch today's data");
-
-    const currentDate = todayData.data.date;
+    const currentDate = today.date;
     const currentHijriMonth = currentDate.hijri.month.number;
     let targetHijriYear = parseInt(currentDate.hijri.year);
 
@@ -71,21 +69,20 @@ async function fetchRamadanData() {
     const titleEl = document.querySelector(".ramadan-title");
     if (titleEl) titleEl.textContent = `${t("ramadhan")} ${assignedHijriYear}`;
 
-    const ramadanUrl = `${ALADHAN_API}/hijriCalendarByCity/${targetHijriYear}/9?${query}`;
-
-    const ramadanRes = await fetch(ramadanUrl);
-    const ramadanJson = await ramadanRes.json();
-
-    if (ramadanJson && ramadanJson.data) {
-      ramadanData = ramadanJson.data;
-      renderCalendar(ramadanData);
-      renderTable(ramadanData);
-      updateTodayCard(ramadanData);
-    }
+    const days = await ipcRenderer.invoke(
+      "get-ramadan-calendar",
+      targetHijriYear,
+    );
+    if (!Array.isArray(days))
+      throw new Error("no Ramadan calendar (offline, nothing saved)");
+    ramadanData = days;
+    renderCalendar(ramadanData);
+    renderTable(ramadanData);
+    updateTodayCard(ramadanData);
   } catch (error) {
     console.error("Error fetching Ramadan data:", error);
     analytics.error("ramadan_fetch", error.message || String(error));
-    document.getElementById("trackerGrid").innerHTML =
+    byId("trackerGrid", HTMLElement).innerHTML =
       `<p class="ramadan-message">${t("ramadanError")}</p>`;
   }
 }
@@ -180,7 +177,7 @@ function updateTodayCard(data) {
     firstDayDate.setHours(0, 0, 0, 0);
 
     if (today < firstDayDate) {
-      const diffTime = firstDayDate - today;
+      const diffTime = firstDayDate.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       if (cardTitle)
@@ -209,12 +206,12 @@ function openDayModal(dayData, element) {
   const hijriDay = dayData.date.hijri.day;
   const gregDate = dayData.date.gregorian.date;
 
-  document.getElementById("modalTitle").textContent =
+  byId("modalTitle", HTMLElement).textContent =
     `${t("ramadhan")} ${hijriDay} (${gregDate})`;
-  document.getElementById("modalSuhoor").textContent = cleanTime(
+  byId("modalSuhoor", HTMLElement).textContent = cleanTime(
     dayData.timings.Fajr,
   );
-  document.getElementById("modalIftar").textContent = cleanTime(
+  byId("modalIftar", HTMLElement).textContent = cleanTime(
     dayData.timings.Maghrib,
   );
 
@@ -239,7 +236,7 @@ function openDayModal(dayData, element) {
     toggleDayTracking(hijriDay, element, trackBtn);
   };
 
-  const modalContent = document.querySelector(".cal-modal-content");
+  const modalContent = query(".cal-modal-content", HTMLElement);
   modalContent.appendChild(trackBtn);
 
   modal.classList.add("show");
@@ -270,7 +267,7 @@ function toggleDayTracking(hijriDay, dayElement, btn) {
 
 function initTabs() {
   const tabBtns = document.querySelectorAll(".ramadan-tab");
-  const tabContents = document.querySelectorAll(".tab-content");
+  const tabContents = queryAll(".tab-content", HTMLElement);
 
   tabBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -280,6 +277,7 @@ function initTabs() {
       tabContents.forEach((content) => (content.style.display = "none"));
 
       const tabId = btn.getAttribute("data-tab");
+      if (tabId === null) return;
       const targetContent = document.getElementById(
         `content${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`,
       );

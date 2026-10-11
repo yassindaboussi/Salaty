@@ -1,6 +1,6 @@
 "use strict";
 
-const { startPageWhenReady } = require("../core/app-shell");
+const { startPageWhenReady } = require("../app/app-shell");
 const { initRamadanPage } = require("../pages/ramadan");
 
 startPageWhenReady({

@@ -1,6 +1,7 @@
 "use strict";
 
 const { t } = require("../core/i18n");
+const { query } = require("../core/dom");
 
 // The application menu is removed (Menu.setApplicationMenu(null)), so there is no Edit
 // menu and no default right-click menu. This module restores "copy the selected text"
@@ -9,8 +10,10 @@ const { t } = require("../core/i18n");
 //   - right-clicking a selection shows a small "Copy" popup
 // Which text can be selected is decided by each page's CSS (user-select: text).
 
+/** @type {HTMLElement | null} */
 let menuEl = null;
 let globalBound = false;
+/** @type {((text: string) => void) | null} */
 let onCopyHandler = null;
 
 function selectedText() {
@@ -33,7 +36,7 @@ function openMenu(x, y, text) {
   menu.innerHTML = `<button type="button" role="menuitem"><i class="fas fa-copy" aria-hidden="true"></i>${t("copy")}</button>`;
   // Keep the text selected while the menu is used.
   menu.addEventListener("mousedown", (e) => e.preventDefault());
-  menu.querySelector("button").addEventListener("click", () => {
+  query("button", HTMLButtonElement, menu).addEventListener("click", () => {
     onCopyHandler?.(text);
     closeMenu();
   });
@@ -58,7 +61,9 @@ function bindGlobal() {
       !e.altKey &&
       e.key.toLowerCase() === "c";
     // Inputs (e.g. a search box) keep their native copy behaviour.
-    if (!isCopy || e.target.closest?.("input, textarea")) return;
+    const inInput =
+      e.target instanceof Element && e.target.closest("input, textarea");
+    if (!isCopy || inInput) return;
     const text = selectedText();
     if (!text) return;
     e.preventDefault();
@@ -66,7 +71,8 @@ function bindGlobal() {
   });
 
   document.addEventListener("mousedown", (e) => {
-    if (menuEl && !menuEl.contains(e.target)) closeMenu();
+    if (menuEl && !(e.target instanceof Node && menuEl.contains(e.target)))
+      closeMenu();
   });
   window.addEventListener("blur", closeMenu);
   window.addEventListener("resize", closeMenu);

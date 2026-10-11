@@ -8,6 +8,7 @@ const { ipcRenderer } = require("electron");
 const { whenReady, setLanguage } = require("./i18n");
 const { state } = require("./store");
 
+/** @type {Promise<typeof state.settings> | null} */
 let _loading = null;
 
 function loadSettings() {

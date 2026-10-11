@@ -9,6 +9,21 @@ const RENDERER_DIR = path.join(SRC_DIR, "renderer");
 const ASSETS_DIR = path.join(SRC_DIR, "assets");
 const PRELOAD_ENTRY = path.join(SRC_DIR, "preload", "index.js");
 
+// The pages are served from app://salaty/ (app/app-protocol.js): src/<path> is
+// app://salaty/<path>.
+const APP_SCHEME = "app";
+const APP_HOST = "salaty";
+const APP_ORIGIN = `${APP_SCHEME}://${APP_HOST}`;
+
+/**
+ * The app:// URL of a file under src/ (only some folders are served: app/app-protocol.js).
+ * @param {string} file absolute path
+ */
+function appUrl(file) {
+  const rel = path.relative(SRC_DIR, file).split(path.sep);
+  return `${APP_ORIGIN}/${rel.map(encodeURIComponent).join("/")}`;
+}
+
 const PAGE_GROUPS = Object.freeze({
   app: ["index", "features", "settings"],
   worship: [
@@ -26,18 +41,16 @@ const PAGE_GROUPS = Object.freeze({
   widgets: ["prayer-widget", "athkar-popup", "background-player"],
 });
 
+// page name -> app:// URL of its HTML file (for win.loadURL)
 const PAGE_ROUTE_MAP = Object.freeze(
   Object.entries(PAGE_GROUPS).reduce((routes, [group, pageNames]) => {
     pageNames.forEach((pageName) => {
-      routes[pageName] = path.join(
-        RENDERER_DIR,
-        "pages",
-        group,
-        `${pageName}.html`,
+      routes[pageName] = appUrl(
+        path.join(RENDERER_DIR, "pages", group, `${pageName}.html`),
       );
     });
     return routes;
-  }, {}),
+  }, /** @type {Record<string, string>} */ ({})),
 );
 
 const pages = {
@@ -64,25 +77,8 @@ const icons = {
       : path.join(ASSETS_DIR, "icons", "app_icon.ico"),
 };
 
-const fs = require("fs");
-const { pathToFileURL } = require("url");
-
-function getAdhanAudioSrc() {
-  const candidates = [];
-
-  if (process.resourcesPath) {
-    candidates.push(
-      path.join(process.resourcesPath, "src", "assets", "adhan.mp3"),
-      path.join(process.resourcesPath, "assets", "adhan.mp3"),
-    );
-  }
-
-  candidates.push(path.join(ASSETS_DIR, "adhan.mp3"));
-
-  const foundPath =
-    candidates.find((candidate) => fs.existsSync(candidate)) || candidates[0];
-  return pathToFileURL(foundPath).href;
-}
+// The adhan the pages play. An app:// page cannot load file:// media, so it is served too.
+const ADHAN_AUDIO_URL = appUrl(path.join(ASSETS_DIR, "adhan.mp3"));
 
 module.exports = {
   ROOT_DIR,
@@ -91,9 +87,13 @@ module.exports = {
   RENDERER_DIR,
   ASSETS_DIR,
   PRELOAD_ENTRY,
+  APP_SCHEME,
+  APP_HOST,
+  APP_ORIGIN,
+  appUrl,
   PAGE_GROUPS,
   PAGE_ROUTE_MAP,
   pages,
   icons,
-  getAdhanAudioSrc,
+  ADHAN_AUDIO_URL,
 };

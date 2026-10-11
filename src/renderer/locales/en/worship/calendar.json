@@ -31,5 +31,6 @@
     "10-1": "Eid al-Fitr",
     "12-9": "Day of Arafah",
     "12-10": "Eid al-Adha"
-  }
+  },
+  "calendarMonthUnavailable": "This month isn’t saved for offline use yet. Connect to the internet to load it."
 }

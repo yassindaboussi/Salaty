@@ -7,12 +7,13 @@
 
   vendor      third-party CSS (Font Awesome; Tom Select is imported by settings.css)
   tokens      design tokens: colours, layers (z-index), fonts, spacing   00-settings/tokens.css
-  base        reset, scrollbar, shared animations                        01-base/
+  base        reset, scrollbar, shared animations, bundled web fonts     01-base/
   themes      the 13 colour themes                                       00-settings/themes.css
   layout      frameless-window chrome                                    02-layout/
   components  reusable pieces (buttons, page header, cards, toasts...)   03-components/
   pages       one file per page, linked by that page's HTML              04-pages/
-  utilities   tiny helpers that must always win (.hidden)                06-utilities/
+  utilities   tiny helpers that must always win (.hidden), and the fixes   06-utilities/
+              for Windows contrast themes (forced-colors.css)
 
   Themes come after base so a theme's background replaces the default one. Pages come
   after components so a page can adjust a shared component with a normal rule (no
@@ -36,6 +37,7 @@
 @import url("./01-base/reset.css") layer(base);
 @import url("./01-base/scrollbar.css") layer(base);
 @import url("./01-base/animations.css") layer(base);
+@import url("./01-base/web-fonts.css") layer(base);
 @import url("./00-settings/themes.css") layer(themes);
 @import url("./02-layout/window.css") layer(layout);
 @import url("./03-components/buttons.css") layer(components);
@@ -50,3 +52,4 @@
 @import url("./03-components/tooltip.css") layer(components);
 @import url("./03-components/feedback.css") layer(components);
 @import url("./06-utilities/utilities.css") layer(utilities);
+@import url("./06-utilities/forced-colors.css") layer(utilities);

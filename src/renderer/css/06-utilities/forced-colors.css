@@ -1,0 +1,161 @@
+/*
+  Windows contrast themes (High Contrast): forced colours.
+
+  In a contrast theme Chromium replaces the app's colours with the user's few system colours
+  and drops backgrounds, gradients and shadows. Most of the app survives that as-is (text and
+  borders take the theme's colours). What does not, and is fixed here:
+    - states shown only by a background (the current prayer, a selected card, the active tab)
+    - switches, progress bars and sliders drawn with backgrounds
+    - inline SVG icons: their fill/stroke is not adjusted, so a white icon vanishes on a
+      white theme
+    - focus shown with a box-shadow (dropped), where the browser outline is hidden
+
+  Only system colours are used, in their pairs (Canvas/CanvasText, ButtonFace/ButtonText,
+  Highlight/HighlightText, GrayText), so every contrast theme stays readable; selected and
+  current items look like Windows' own selected list items (Highlight + HighlightText).
+  https://developer.mozilla.org/docs/Web/CSS/@media/forced-colors
+  https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/
+
+  This file is in the utilities layer, so it wins over the page files without !important.
+  Check a change with Settings > Accessibility > Contrast themes, or DevTools > Rendering >
+  "Emulate CSS media feature forced-colors".
+*/
+@media (forced-colors: active) {
+  /* ── Icons drawn as inline SVG ─────────────────────────────────────── */
+  .control-btn svg {
+    fill: ButtonText;
+  }
+
+  .settings-group-icon-svg {
+    fill: CanvasText;
+  }
+
+  /* ── Selected and current items ──────────────────────────────────────
+     Shown like Windows' own selected list items: Highlight with HighlightText. Their colours
+     are set here down to every child (forced-color-adjust: none), otherwise the browser
+     draws a Canvas-coloured backplate behind each text and HighlightText vanishes on it. */
+  :is(
+    .prayer-card.current,
+    .prayer-item.current-prayer,
+    .language-card.selected,
+    .size-card.selected,
+    .theme-card.selected,
+    .category-card.active,
+    .quran-tab.active,
+    .numerals-btn.active,
+    .ramadan-tab.active,
+    .ramadan-table .current-day-row td,
+    .day-tracker.completed,
+    .calendar-day.today,
+    .channel-tab.active,
+    .az-index-letter.active,
+    .track-item.active,
+    .station-card.active,
+    .location-switcher-item.active,
+    .widget-toggle-btn--active,
+    .ts-dropdown .option.active
+  ) {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+    box-shadow: none;
+  }
+
+  :is(
+      .prayer-card.current,
+      .prayer-item.current-prayer,
+      .language-card.selected,
+      .size-card.selected,
+      .theme-card.selected,
+      .category-card.active,
+      .quran-tab.active,
+      .numerals-btn.active,
+      .ramadan-tab.active,
+      .ramadan-table .current-day-row td,
+      .day-tracker.completed,
+      .calendar-day.today,
+      .channel-tab.active,
+      .az-index-letter.active,
+      .track-item.active,
+      .station-card.active,
+      .location-switcher-item.active,
+      .widget-toggle-btn--active,
+      .ts-dropdown .option.active
+    )
+    * {
+    background: transparent;
+    color: HighlightText;
+    border-color: HighlightText;
+  }
+
+  /* the bar beside the current prayer */
+  .prayer-item.current-prayer::before {
+    background: HighlightText;
+  }
+
+  /* a card whose count is complete keeps its contents as they are: marked by its outline */
+  .athkar-card.completed {
+    outline: 3px solid Highlight;
+    outline-offset: -1px;
+  }
+
+  /* ── Switches (Settings travel mode, Sunnah fasting weekly reminder) ── */
+  .toggle-slider,
+  .fasting-switch-slider {
+    background-color: ButtonFace;
+    border: 1px solid ButtonText;
+  }
+
+  .toggle-slider::before,
+  .fasting-switch-slider::before {
+    background-color: ButtonText;
+  }
+
+  .toggle-switch input:checked + .toggle-slider,
+  .fasting-switch input:checked + .fasting-switch-slider {
+    background-color: Highlight;
+    border-color: Highlight;
+  }
+
+  .toggle-switch input:checked + .toggle-slider::before,
+  .fasting-switch input:checked + .fasting-switch-slider::before {
+    background-color: HighlightText;
+  }
+
+  /* the checkbox itself is invisible, and its normal focus ring is a box-shadow */
+  .toggle-switch input:focus-visible + .toggle-slider,
+  .fasting-switch input:focus-visible + .fasting-switch-slider {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  /* ── Progress bars: an outlined track, filled with Highlight ───────── */
+  .update-progress .progress-bar,
+  .progress-container .progress-bar,
+  .count-progress {
+    border: 1px solid CanvasText;
+  }
+
+  .progress-fill,
+  .count-progress .progress-bar {
+    background-color: Highlight;
+  }
+
+  .tasbih-ring-track {
+    stroke: GrayText;
+  }
+
+  .tasbih-ring-progress {
+    stroke: Highlight;
+  }
+
+  .tasbih-ring-bead {
+    fill: CanvasText;
+  }
+
+  /* ── Sliders: the native control, which follows the contrast theme ──── */
+  .volume-slider {
+    appearance: auto;
+  }
+}

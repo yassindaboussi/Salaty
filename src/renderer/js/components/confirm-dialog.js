@@ -2,6 +2,7 @@
 
 const { t } = require("../core/i18n");
 const { escapeHtml } = require("../utils/html");
+const { queryAll } = require("../core/dom");
 
 function _showDialog(message, { icon, iconClass = "", buttons }) {
   return new Promise((resolve) => {
@@ -43,14 +44,14 @@ function _showDialog(message, { icon, iconClass = "", buttons }) {
     });
 
     const primaryBtn = dialog.querySelector("[data-action]:last-of-type");
-    (primaryBtn || dialog).focus();
+    (primaryBtn instanceof HTMLElement ? primaryBtn : dialog).focus();
 
     const getFocusable = () =>
-      Array.from(
-        dialog.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        ),
-      ).filter((el) => !el.disabled);
+      queryAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        HTMLElement,
+        dialog,
+      ).filter((el) => !("disabled" in el && el.disabled));
 
     const handleAction = (action) => {
       overlay.classList.remove("active");
@@ -61,7 +62,10 @@ function _showDialog(message, { icon, iconClass = "", buttons }) {
         if (p.contains(overlay)) p.removeChild(overlay);
       }, 300);
 
-      if (previouslyFocused && document.contains(previouslyFocused)) {
+      if (
+        previouslyFocused instanceof HTMLElement &&
+        document.contains(previouslyFocused)
+      ) {
         previouslyFocused.focus();
       }
 
@@ -89,7 +93,7 @@ function _showDialog(message, { icon, iconClass = "", buttons }) {
     };
     document.addEventListener("keydown", handleKeydown);
 
-    dialog.querySelectorAll("[data-action]").forEach((btn) => {
+    queryAll("[data-action]", HTMLElement, dialog).forEach((btn) => {
       btn.addEventListener("click", () => handleAction(btn.dataset.action));
     });
 

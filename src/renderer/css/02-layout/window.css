@@ -49,3 +49,20 @@ a,
   height: 32px;
   margin: 0 12px;
 }
+
+/* While another window is active, the title bar fades like a native one (Windows design
+   guidance: "all title bar elements should be semi-transparent when the window is
+   inactive", https://learn.microsoft.com/windows/apps/design/basics/titlebar-design).
+   js/core/app-shell.js sets the class. A button under the pointer or focused from the
+   keyboard shows at full strength, as on a native title bar. */
+.window-inactive
+  :is(.window-controls button, .page-header button, .page-header__title) {
+  opacity: var(--title-bar-inactive-opacity);
+  transition: opacity 0.15s ease;
+}
+
+.window-inactive
+  :is(.window-controls, .page-header)
+  button:is(:hover, :focus-visible) {
+  opacity: 1;
+}

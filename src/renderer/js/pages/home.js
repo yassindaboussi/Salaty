@@ -6,7 +6,7 @@ const { ipcRenderer } = require("electron");
 const { t } = require("../core/i18n");
 const { state } = require("../core/store");
 const screenSizeManager = require("../core/screen-size");
-const { revealPage } = require("../core/app-shell");
+const { revealPage } = require("../app/app-shell");
 const {
   loadPrayerTimes,
   updateCurrentAndNextPrayer,
@@ -18,7 +18,9 @@ const {
 const { initOfflineBanner } = require("../components/offline-banner");
 const { setupConnectionRecovery } = require("../services/connection-recovery");
 const analytics = require("../services/analytics");
+const { byId } = require("../core/dom");
 
+/** @type {ReturnType<typeof setInterval> | null} */
 let _prayerTick = null;
 
 // The desktop widget toggle. Main owns the open/closed state and announces every change
@@ -72,7 +74,7 @@ async function initHomePage() {
   initPrayerWidgetButton();
 
   document.getElementById("closeEventBanner")?.addEventListener("click", () => {
-    document.getElementById("eventsBanner").style.display = "none";
+    byId("eventsBanner", HTMLElement).style.display = "none";
     screenSizeManager.setBannerVisible(false);
   });
 
@@ -112,12 +114,22 @@ function initUpdateDialog() {
   const progressFill = document.getElementById("updateProgressBar");
   const progressText = document.getElementById("updateProgressText");
   let downloaded = false;
+  // "auto": download and install here; otherwise "Download" opens the download page (macOS)
+  let updateMode = "auto";
+  ipcRenderer
+    .invoke("get-update-mode")
+    .then((mode) => (updateMode = mode))
+    .catch(() => {});
 
   cancelBtn?.addEventListener("click", () => modal.classList.remove("show"));
   actionBtn?.addEventListener("click", () => {
     if (!downloaded) {
       ipcRenderer.send("start-download");
-      if (actionBtn) actionBtn.disabled = true;
+      if (updateMode !== "auto") {
+        modal.classList.remove("show");
+        return;
+      }
+      if (actionBtn instanceof HTMLButtonElement) actionBtn.disabled = true;
       if (cancelBtn) cancelBtn.style.display = "none";
       if (progressWrap) progressWrap.classList.remove("hidden");
     } else {
@@ -133,8 +145,10 @@ function initUpdateDialog() {
         "{version}",
         info.version,
       );
-    if (actionBtn) {
-      actionBtn.textContent = t("download");
+    if (actionBtn instanceof HTMLButtonElement) {
+      actionBtn.textContent = t(
+        updateMode === "auto" ? "download" : "openDownloadPage",
+      );
       actionBtn.disabled = false;
     }
     if (cancelBtn) {
@@ -154,7 +168,7 @@ function initUpdateDialog() {
     downloaded = true;
     if (titleEl) titleEl.textContent = t("updateReady");
     if (messageEl) messageEl.textContent = t("updateDownloaded");
-    if (actionBtn) {
+    if (actionBtn instanceof HTMLButtonElement) {
       actionBtn.textContent = t("install");
       actionBtn.disabled = false;
     }

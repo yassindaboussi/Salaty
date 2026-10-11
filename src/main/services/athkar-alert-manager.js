@@ -6,11 +6,14 @@ const CHECK_INTERVAL_MS = 30 * 1000;
 
 const { t } = require("./i18n");
 
+/** @type {ReturnType<typeof setInterval> | null} */
 let checkTimer = null;
+/** @type {(() => any) | null} returns the current settings */
 let getSettingsData = null;
 let wasEnabled = false;
 let lastFiredAt = 0;
 
+/** @param {() => any} settingsFn returns the current settings */
 function init(settingsFn) {
   getSettingsData = settingsFn;
   wasEnabled = false;

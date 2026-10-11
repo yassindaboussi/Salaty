@@ -4,12 +4,15 @@
 const { app, clipboard } = require("electron");
 const secureIpc = require("../secure-ipc");
 const check = require("../validate");
-const { pages, getAdhanAudioSrc } = require("../../config/paths");
+const { pages, ADHAN_AUDIO_URL } = require("../../config/paths");
 const {
   showExistingWindow,
   syncWindowState,
 } = require("../../windows/main-window");
 const { openExternalSafely } = require("../../app/security");
+const { checkForUpdatesNow } = require("../../windows/updater");
+const startup = require("../../app/startup-timing");
+const log = require("../../services/logger").logger("Main");
 
 let registered = false;
 
@@ -65,24 +68,25 @@ function registerWindowHandlers(getMainWindow) {
     // normal mode; a maximized window stays maximized
     const size = width && height ? check.windowSize(width, height) : null;
     if (size && !w.isMaximized()) w.setSize(size.width, size.height, false);
-    w.loadFile(pages.byName(page));
+    w.loadURL(pages.byName(page));
     return true;
   });
 
   secureIpc.handle("go-back", () => {
-    win()?.loadFile(pages.index);
+    win()?.loadURL(pages.index);
     return true;
   });
 
   // The window starts hidden and is shown once the first page has rendered.
-  secureIpc.once("app-ready", () => win()?.show());
+  secureIpc.once("app-ready", () => {
+    win()?.show();
+    startup.mark("shown");
+    startup.reportStartup(log);
+  });
 
   secureIpc.handle("get-app-version", () => app.getVersion());
-  secureIpc.handle("get-adhan-audio-src", () => getAdhanAudioSrc());
-  secureIpc.handle("check-for-updates-manual", () => {
-    const { autoUpdater } = require("electron-updater");
-    return autoUpdater.checkForUpdates();
-  });
+  secureIpc.handle("get-adhan-audio-src", () => ADHAN_AUDIO_URL);
+  secureIpc.handle("check-for-updates-manual", () => checkForUpdatesNow());
 
   // Electron 44+: clipboard calls return a Promise
   secureIpc.handle("clipboard-write-text", async (_e, text) => {

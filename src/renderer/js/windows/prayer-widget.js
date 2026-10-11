@@ -10,11 +10,11 @@ const {
   isFridayIn,
   displayPrayerKey,
 } = require("../../../shared/prayerUtils");
-const { ALADHAN_API, locationQuery } = require("../../../shared/aladhan");
 const { t } = require("../core/i18n");
 const { loadSettings } = require("../core/bootstrap");
 const { setThemeClass } = require("../core/theme");
 const { escapeHtml } = require("../utils/html");
+const { byId } = require("../core/dom");
 
 const PRAYER_ICONS = {
   Fajr: "fa-cloud-moon",
@@ -24,18 +24,20 @@ const PRAYER_ICONS = {
   Isha: "fa-moon",
 };
 
+/** @type {Awaited<ReturnType<typeof loadSettings>> | null} */
 let settings = null;
+/** @type {any} */
 let prayerData = null;
 let lang = "en";
+/** @type {ReturnType<typeof setInterval> | null} */
 let tickTimer = null;
-let fetchTimer = null;
 let isPinned = true;
 
-const appEl = document.getElementById("app");
-const timerEl = document.getElementById("timerDisplay");
-const prayerListEl = document.getElementById("prayerList");
-const closeBtnEl = document.getElementById("closeBtn");
-const pinBtnEl = document.getElementById("pinBtn");
+const appEl = byId("app", HTMLElement);
+const timerEl = byId("timerDisplay", HTMLElement);
+const prayerListEl = byId("prayerList", HTMLElement);
+const closeBtnEl = byId("closeBtn", HTMLButtonElement);
+const pinBtnEl = byId("pinBtn", HTMLButtonElement);
 
 function applyTheme(theme) {
   if (!theme) return;
@@ -58,13 +60,14 @@ function computePrayers() {
       wrapped: sec < now ? sec + 86400 : sec,
     };
   })
-    .filter(Boolean)
+    .filter((p) => p !== null)
     .sort((a, b) => a.wrapped - b.wrapped);
 
   if (!prayers.length) return null;
   const nextIdx = prayers.findIndex((p) => p.wrapped > now);
   const nextPrayer = nextIdx >= 0 ? prayers[nextIdx] : prayers[0];
-  const activePrayer = nextIdx > 0 ? prayers[nextIdx - 1] : prayers.at(-1);
+  const activePrayer =
+    nextIdx > 0 ? prayers[nextIdx - 1] : prayers[prayers.length - 1];
   return {
     prayers,
     nextPrayer,
@@ -83,7 +86,7 @@ function renderList() {
   const { nextPrayer, activePrayer } = result;
   const ordered = PRAYER_KEYS.map((k) =>
     result.prayers.find((p) => p.key === k),
-  ).filter(Boolean);
+  ).filter((p) => p !== undefined);
 
   // Tooltip text for each column: the prayer's name in the app language. On Fridays
   // (in the location's own time zone) Dhuhr reads "Jumu'ah", like the rest of the app.
@@ -114,18 +117,18 @@ function tick() {
   if (result.timeRemaining % 60 === 0) renderList();
 }
 
-// Today's times as main already has them (no network). False when main has none yet.
-async function showCachedPrayerData() {
+// Today's times from the main process (saved on disk, so also offline).
+async function showPrayerData() {
   try {
-    const cached = await ipcRenderer.invoke("get-prayer-data");
-    if (cached?.timings) {
-      prayerData = cached;
+    const data = await ipcRenderer.invoke("get-prayer-data");
+    if (data?.timings) {
+      prayerData = data;
       renderList();
       tick();
       return true;
     }
   } catch (e) {
-    console.error("Error reading cached prayer data:", e);
+    console.error("[widget] reading prayer times failed:", e);
   }
   return false;
 }
@@ -137,28 +140,6 @@ function reveal() {
   if (appEl.classList.contains("is-shown")) return;
   appEl.classList.add("is-shown");
   ipcRenderer.send("prayer-widget-ready");
-}
-
-async function fetchPrayerData() {
-  // Re-read settings so the hourly refresh uses the current city and calculation method,
-  // not the ones from when the widget opened.
-  try {
-    settings = (await ipcRenderer.invoke("get-settings")) || settings;
-  } catch {
-    /* keep the settings we have */
-  }
-  if (!settings?.city || !settings?.country) return;
-  try {
-    const url = `${ALADHAN_API}/timingsByCity?${locationQuery(settings)}`;
-    const data = await (await fetch(url)).json();
-    if (data?.code === 200 && data?.data) {
-      prayerData = data.data;
-      renderList();
-      tick();
-    }
-  } catch (e) {
-    console.error("[widget] HTTP fetch failed:", e);
-  }
 }
 
 pinBtnEl.addEventListener("click", () => {
@@ -238,7 +219,7 @@ function initWidgetTooltips() {
     return el.getBoundingClientRect();
   }
 
-  function show(el) {
+  const show = (el) => {
     const text = el.getAttribute("data-tip");
     if (!text) return;
     tip.textContent = text;
@@ -263,11 +244,11 @@ function initWidgetTooltips() {
     tip.style.top = `${r.top + r.height / 2}px`;
     tip.style.transform = "translateY(-50%) scale(1)";
     tip.style.opacity = "1";
-  }
-  function hide() {
+  };
+  const hide = () => {
     tip.style.opacity = "0";
     tip.style.transform = "translateY(-50%) scale(0.85)";
-  }
+  };
 
   document.querySelectorAll("[data-tip]").forEach((el) => {
     el.addEventListener("mouseenter", () => show(el));
@@ -278,12 +259,17 @@ function initWidgetTooltips() {
   // Prayer columns are re-rendered every minute (renderList), so they can't keep their own
   // listeners; one delegated listener on the list covers whatever columns exist now.
   prayerListEl.addEventListener("mouseover", (e) => {
+    if (!(e.target instanceof Element)) return;
     const col = e.target.closest(".tb-col[data-tip]");
     if (col) show(col);
   });
   prayerListEl.addEventListener("mouseout", (e) => {
     const to = e.relatedTarget;
-    if (!to || !prayerListEl.contains(to) || !to.closest(".tb-col[data-tip]"))
+    if (
+      !(to instanceof Element) ||
+      !prayerListEl.contains(to) ||
+      !to.closest(".tb-col[data-tip]")
+    )
       hide();
   });
 }
@@ -295,15 +281,15 @@ async function init() {
     applyTheme(settings.theme || "navy");
     initWidgetTooltips();
 
-    const hasTimes = await showCachedPrayerData();
+    // Main usually has today's times already (a few ms). On a first run it may still be
+    // downloading them: show the bar with its spinner meanwhile, the times fill in after.
+    const times = showPrayerData();
+    await Promise.race([times, new Promise((r) => setTimeout(r, 300))]);
     reveal();
-    // no times in main yet: fetch them while the bar shows its spinner
-    if (!hasTimes) await fetchPrayerData();
+    await times;
 
     if (tickTimer) clearInterval(tickTimer);
-    if (fetchTimer) clearInterval(fetchTimer);
     tickTimer = setInterval(tick, 1000);
-    fetchTimer = setInterval(fetchPrayerData, 3_600_000);
   } catch (e) {
     console.error("[widget] init error:", e);
   } finally {

@@ -4,7 +4,7 @@
 
 تطبيق سطح مكتب إسلامي شامل — مواقيت الصلاة، القرآن الكريم، الأذكار وأدوات أخرى، في تطبيق واحد خفيف
 
-[![Version](https://img.shields.io/badge/version-1.1.4-yellow)](https://github.com/yassindaboussi/Salaty/releases)
+[![Version](https://img.shields.io/github/v/release/yassindaboussi/Salaty?label=version&color=yellow)](https://github.com/yassindaboussi/Salaty/releases/latest)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational)](#-التشغيل-والتطوير)
 
@@ -15,6 +15,7 @@
 ## 📑 المحتويات
 
 - [نظرة عامة](#-نظرة-عامة)
+- [التحميل](#-التحميل)
 - [لقطات من التطبيق](#-لقطات-من-التطبيق)
 - [المميزات](#-المميزات)
 - [التقنيات المستخدمة](#️-التقنيات-المستخدمة)
@@ -28,6 +29,21 @@
 ## 🌙 نظرة عامة
 
 تطبيق سطح مكتب يجمع أهم الأشياء اللي يحتاجها المسلم يوميًا في مكان واحد: مواقيت الصلاة، قارئ قرآن، أرشيف صوتي فيه تلاوات وتدبر وتفاسير، أذكار، وأدوات إسلامية متنوعة. يدعم العربية والإنجليزية والفرنسية، وأغلب الميزات المهمة تشتغل حتى بدون إنترنت.
+
+---
+
+## 📥 التحميل
+
+| النظام | الملف | ملاحظات |
+| --- | --- | --- |
+| Windows 10/11 | [Salaty-Time-Setup.exe](https://github.com/yassindaboussi/Salaty/releases/latest/download/Salaty-Time-Setup.exe) | 64-bit |
+| macOS 13+ | [Salaty-Time-mac-universal.dmg](https://github.com/yassindaboussi/Salaty/releases/latest/download/Salaty-Time-mac-universal.dmg) | Apple silicon وIntel |
+| Linux | [Salaty-Time-linux-amd64.deb](https://github.com/yassindaboussi/Salaty/releases/latest/download/Salaty-Time-linux-amd64.deb) | Ubuntu وDebian وLinux Mint. نسخ arm64 وAppImage للتوزيعات الأخرى في [صفحة الإصدارات](https://github.com/yassindaboussi/Salaty/releases/latest) |
+
+- **Windows:** المثبّت مش موقّع رقميًا بعد، فممكن يظهر تحذير "Windows protected your PC" (SmartScreen): اضغط **More info** ثم **Run anyway**.
+- **macOS:** التطبيق مش موثّق من Apple: افتحه مرة، ثم من **System Settings ← Privacy & Security** اضغط **Open Anyway**.
+- **التحديثات:** التطبيق يلقى الإصدارات الجديدة وحده: على Windows وLinux يثبّتها، وعلى macOS يفتح صفحة التحميل.
+- **التحقق من الملف:** كل إصدار فيه `SHA256SUMS.txt`، وكل ملف عنده شهادة بناء من GitHub: `gh attestation verify <الملف> --repo yassindaboussi/Salaty`
 
 ---
 
@@ -118,9 +134,13 @@ npm run dev              # تشغيل التطبيق في وضع التطوير
 npm run build             # بناء نسخة التثبيت
 npm run build:linux         # بناء نسخة Linux فقط
 npm run lint               # فحص الكود
+npm run lint:types         # فحص الأنواع (TypeScript على كود JavaScript، جزء من lint)
 npm run format              # تنسيق الكود تلقائيًا
 npm run audit:check          # فحص الثغرات الأمنية في الحزم
+npm run assets:store         # صور متجر Microsoft (بعد تغيير أيقونة التطبيق)
 ```
+
+**نشر إصدار جديد:** راجع [RELEASING.md](RELEASING.md).
 
 **متطلبات النظام:** Windows 10 أو أحدث (64-bit)، macOS 13 أو أحدث، Linux (x64 أو arm64).
 **للتطوير:** Node.js 22.12 أو أحدث.

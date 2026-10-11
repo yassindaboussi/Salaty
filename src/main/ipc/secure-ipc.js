@@ -8,11 +8,21 @@ const { ipcMain } = require("electron");
 const { isAppPage } = require("../app/security");
 const log = require("../services/logger").logger("IPC");
 
+/**
+ * @import { IpcMainEvent, IpcMainInvokeEvent } from "electron"
+ * @import { InvokeChannel, SendChannel } from "../../shared/ipc-channels"
+ */
+
+/** @param {IpcMainEvent | IpcMainInvokeEvent} event */
 function isTrustedSender(event) {
   const frame = event.senderFrame;
-  return Boolean(frame) && frame.parent === null && isAppPage(frame.url);
+  return frame != null && frame.parent === null && isAppPage(frame.url);
 }
 
+/**
+ * @param {string} channel
+ * @param {IpcMainEvent | IpcMainInvokeEvent} event
+ */
 function reject(channel, event) {
   log.warn(
     `blocked "${channel}" from`,
@@ -20,6 +30,10 @@ function reject(channel, event) {
   );
 }
 
+/**
+ * @param {InvokeChannel} channel
+ * @param {(event: IpcMainInvokeEvent, ...args: any[]) => any} handler
+ */
 function handle(channel, handler) {
   ipcMain.handle(channel, (event, ...args) => {
     if (!isTrustedSender(event)) {
@@ -30,6 +44,10 @@ function handle(channel, handler) {
   });
 }
 
+/**
+ * @param {SendChannel} channel
+ * @param {(event: IpcMainEvent, ...args: any[]) => void} listener
+ */
 function on(channel, listener) {
   ipcMain.on(channel, (event, ...args) => {
     if (!isTrustedSender(event)) return reject(channel, event);
@@ -37,6 +55,10 @@ function on(channel, listener) {
   });
 }
 
+/**
+ * @param {SendChannel} channel
+ * @param {(event: IpcMainEvent, ...args: any[]) => void} listener
+ */
 function once(channel, listener) {
   ipcMain.once(channel, (event, ...args) => {
     if (!isTrustedSender(event)) return reject(channel, event);

@@ -1,6 +1,6 @@
 "use strict";
 
-const { t, getLanguage } = require("../core/i18n");
+const { t, getLanguage } = require("./i18n");
 
 function getGregorianDate(prayerData) {
   if (!prayerData?.date?.readable) return "";

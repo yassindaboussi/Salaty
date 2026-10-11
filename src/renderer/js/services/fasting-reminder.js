@@ -65,7 +65,7 @@ function _relativeWhen(gregorianDate) {
   today.setHours(0, 0, 0, 0);
   target.setHours(0, 0, 0, 0);
 
-  const diffDays = Math.round((target - today) / 86400000);
+  const diffDays = Math.round((target.getTime() - today.getTime()) / 86400000);
   if (diffDays <= 0) return t("today");
   if (diffDays === 1) return t("tomorrow");
   return t("inDays").replace("{days}", diffDays);

@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches: [main, develop, feature/**]
-    # Don't run on tag pushes (those are handled by version-release.yml)
+    # Don't run on tag pushes (releases are made by release.yml)
     tags-ignore:
       - "v*.*.*"
   pull_request:
@@ -48,8 +48,10 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24.x'
         run: npm run audit:check
 
-      - name: Build application (no publishing from CI)
-        run: npm run build -- --publish never
+      # Packaging check (the unpacked app, no installers), once per OS: the installers are built
+      # and install-tested by release.yml before every release.
+      - name: Package the app
+        if: matrix.node-version == '24.x'
+        run: npm run build -- --dir --publish never
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false

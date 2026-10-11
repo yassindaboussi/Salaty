@@ -27,8 +27,11 @@ const QUEUE_SAVE_DELAY_MS = 2_000;
 
 const GA4_ENDPOINT = `https://www.google-analytics.com/mp/collect?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`;
 
+/** @type {string | null} */
 let QUEUE_FILE = null;
+/** @type {string | null} */
 let CLIENT_ID_FILE = null;
+/** @type {() => any} returns the current settings */
 let getSettings = () => ({});
 
 function initPaths() {
@@ -41,20 +44,23 @@ function isEnabled() {
   return getSettings()?.analyticsEnabled === true;
 }
 
+/** @type {string | null} */
 let _clientId = null;
 
+/** @returns {string} */
 function getClientId() {
   if (_clientId) return _clientId;
+  const file = CLIENT_ID_FILE;
   try {
-    if (fs.existsSync(CLIENT_ID_FILE)) {
-      const stored = fs.readFileSync(CLIENT_ID_FILE, "utf8").trim();
+    if (file && fs.existsSync(file)) {
+      const stored = fs.readFileSync(file, "utf8").trim();
       if (stored && stored.length > 10) {
         _clientId = stored;
         return _clientId;
       }
     }
     _clientId = randomUUID();
-    fs.writeFileSync(CLIENT_ID_FILE, _clientId, "utf8");
+    if (file) fs.writeFileSync(file, _clientId, "utf8");
   } catch {
     _clientId = randomUUID();
   }
@@ -63,11 +69,20 @@ function getClientId() {
 
 const _sessionId = String(Date.now());
 
+/**
+ * @typedef {{ os_platform: string, os_arch: string, os_release: string, cpu_cores: number,
+ *   ram_gb: number, electron_ver: string, node_ver: string, app_version: string,
+ *   app_locale: string }} SystemInfo
+ */
+
+/** @type {SystemInfo | null} */
 let _systemInfo = null;
 
+/** @returns {SystemInfo} */
 function collectSystemInfo() {
   if (_systemInfo) return _systemInfo;
 
+  /** @type {Record<string, string>} */
   const platformMap = {
     win32: "Windows",
     darwin: "macOS",
@@ -100,8 +115,10 @@ function scrubPaths(text) {
     );
 }
 
+/** @type {object[]} events waiting to be sent */
 let _queue = [];
 let _queueDirty = false;
+/** @type {ReturnType<typeof setTimeout> | null} */
 let _saveTimer = null;
 
 function loadQueueFromDisk() {
@@ -118,7 +135,7 @@ function loadQueueFromDisk() {
 }
 
 function saveQueueToDisk() {
-  clearTimeout(_saveTimer);
+  if (_saveTimer) clearTimeout(_saveTimer);
   _saveTimer = null;
   if (!_queueDirty || !QUEUE_FILE) return;
   try {
@@ -148,12 +165,13 @@ function enqueueEvent(gaEvent) {
 function forgetAll() {
   _queue = [];
   _queueDirty = false;
-  clearTimeout(_saveTimer);
+  if (_saveTimer) clearTimeout(_saveTimer);
   _saveTimer = null;
   _clientId = null;
   for (const file of [QUEUE_FILE, CLIENT_ID_FILE]) {
+    if (!file) continue;
     try {
-      if (file) fs.rmSync(file, { force: true });
+      fs.rmSync(file, { force: true });
     } catch (err) {
       log.error("Failed to delete", path.basename(file), err.message);
     }
@@ -195,6 +213,7 @@ function sendBatchToGA4(events) {
   });
 }
 
+/** @type {ReturnType<typeof setInterval> | null} */
 let _flushTimer = null;
 let _backoffDelay = MIN_BACKOFF_MS;
 let _flushLocked = false;
@@ -344,8 +363,10 @@ function setupIpcHandlers() {
 
 let _initialized = false;
 
-// getSettingsFn: returns the current settings (read on every event, so the Settings switch
-// takes effect immediately).
+/**
+ * @param {() => any} getSettingsFn returns the current settings (read on every event, so the
+ *   Settings switch takes effect immediately)
+ */
 function init(getSettingsFn) {
   if (_initialized) return;
   _initialized = true;

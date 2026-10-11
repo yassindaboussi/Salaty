@@ -14,7 +14,7 @@ function escapeHtml(value) {
 }
 
 // A clickable element that is not a <button>: reachable with Tab and activated with Enter or
-// Space like a button (core/app-shell.js handles the keys).
+// Space like a button (app/app-shell.js handles the keys).
 function asButton(el) {
   el.setAttribute("role", "button");
   el.tabIndex = 0;

@@ -2,9 +2,10 @@
 const { ipcRenderer } = require("electron");
 const { state } = require("../core/store");
 const { t, getLocaleTag } = require("../core/i18n");
-const { hijriMonthName } = require("../utils/dates");
+const { hijriMonthName } = require("../core/dates");
 const { escapeHtml } = require("../utils/html");
 const { setupConnectionRecovery } = require("../services/connection-recovery");
+const { byId, queryAll } = require("../core/dom");
 
 const OCCASION_META = {
   whiteDays: {
@@ -44,7 +45,7 @@ function initFastingPage() {
 
 function _setupLeadSelector() {
   const select = document.getElementById("vfLeadSelect");
-  if (!select) return;
+  if (!(select instanceof HTMLSelectElement)) return;
 
   const fr = state.settings.fastingReminders || {};
   select.value = String(fr.leadDays || 1);
@@ -78,7 +79,7 @@ function _currentLeadLabel() {
 
 function _setupWeeklyToggle() {
   const toggle = document.getElementById("vfWeeklyToggle");
-  if (!toggle) return;
+  if (!(toggle instanceof HTMLInputElement)) return;
 
   const fr = state.settings.fastingReminders || {};
   toggle.checked = Boolean(fr.weeklyMonThu);
@@ -118,19 +119,19 @@ function _renderHero() {
   hero.classList.remove("hidden");
 
   const meta = OCCASION_META[next.type] || {};
-  document.getElementById("vfHeroIcon").innerHTML =
+  byId("vfHeroIcon", HTMLElement).innerHTML =
     `<i class="fas ${meta.icon || "fa-utensils"}" aria-hidden="true"></i>`;
-  document.getElementById("vfHeroTitle").textContent =
+  byId("vfHeroTitle", HTMLElement).textContent =
     (meta.titleKey && t(meta.titleKey)) || next.type;
-  document.getElementById("vfHeroDate").textContent = _formatDateLine(next);
-  document.getElementById("vfHeroCountdown").textContent = _relativeLabel(
+  byId("vfHeroDate", HTMLElement).textContent = _formatDateLine(next);
+  byId("vfHeroCountdown", HTMLElement).textContent = _relativeLabel(
     next.gregorianDate,
   );
-  document.getElementById("vfHeroDesc").textContent =
+  byId("vfHeroDesc", HTMLElement).textContent =
     (meta.descKey && t(meta.descKey)) || "";
 
-  const btn = document.getElementById("vfHeroToggle");
-  const label = document.getElementById("vfHeroToggleLabel");
+  const btn = byId("vfHeroToggle", HTMLButtonElement);
+  const label = byId("vfHeroToggleLabel", HTMLElement);
   const isOn = _isReminderOn(next.id);
   btn.classList.toggle("fasting-active", isOn);
   btn.title = _currentLeadLabel();
@@ -161,7 +162,7 @@ function _renderList() {
 
   listEl.innerHTML = rest.map((o) => _renderItem(o)).join("");
 
-  listEl.querySelectorAll("[data-occasion-id]").forEach((el) => {
+  queryAll("[data-occasion-id]", HTMLElement, listEl).forEach((el) => {
     el.addEventListener("click", () => {
       const id = el.dataset.occasionId;
       _toggleReminder(id);
@@ -244,7 +245,7 @@ function _relativeLabel(isoDate) {
   today.setHours(0, 0, 0, 0);
   target.setHours(0, 0, 0, 0);
 
-  const diffDays = Math.round((target - today) / 86400000);
+  const diffDays = Math.round((target.getTime() - today.getTime()) / 86400000);
   if (diffDays === 0) return t("today");
   if (diffDays === 1) return t("tomorrow");
   return t("inDays").replace("{days}", diffDays);

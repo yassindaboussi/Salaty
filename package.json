@@ -1,7 +1,12 @@
 {
   "name": "salaty",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Salaty Time Islamic Prayer Times Desktop App",
+  "homepage": "https://github.com/yassindaboussi/Salaty",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yassindaboussi/Salaty.git"
+  },
   "main": "src/main/index.js",
   "scripts": {
     "postinstall": "node scripts/fix-noble-hashes-esm.js",
@@ -17,15 +22,18 @@
     "predist": "npm run build:renderer",
     "dist": "electron-builder --publish=never",
     "clean": "rm -rf dist",
-    "lint": "eslint src/ scripts/ --max-warnings 0 && npm run lint:css && npm run lint:locales && npm run lint:csp && npm run format:check",
-    "format": "prettier --write \"src/**/*.{js,html,css,json}\" \"scripts/**/*.js\"",
+    "lint": "eslint src/ scripts/ --max-warnings 0 && npm run lint:types && npm run lint:architecture && npm run lint:css && npm run lint:locales && npm run lint:csp && npm run format:check",
+    "format": "prettier --write \"src/**/*.{js,ts,html,css,json}\" \"scripts/**/*.js\" \"tsconfig*.json\"",
     "lint:main": "eslint src/main/",
     "lint:renderer": "eslint src/renderer/",
     "lint:css": "stylelint \"src/renderer/css/**/*.css\" --max-warnings 0",
-    "format:check": "prettier --check \"src/**/*.{js,html,css,json}\" \"scripts/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.{js,ts,html,css,json}\" \"scripts/**/*.js\" \"tsconfig*.json\"",
     "lint:locales": "node scripts/check-locales.js",
     "lint:csp": "node scripts/check-csp.js",
-    "audit:check": "node scripts/check-audit.js"
+    "lint:types": "tsc -p tsconfig.json && tsc -p src/renderer/tsconfig.json",
+    "lint:architecture": "node scripts/check-architecture.js",
+    "audit:check": "node scripts/check-audit.js",
+    "assets:store": "electron scripts/make-store-assets.js"
   },
   "author": {
     "name": "Yassin Daboussi",
@@ -37,6 +45,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@types/howler": "^2.2.13",
+    "@types/node": "^24.19.2",
     "electron": "^44.7.0",
     "electron-builder": "^26.8.1",
     "esbuild": "^0.28.1",
@@ -46,7 +56,8 @@
     "salaty-qibla-map": "^1.0.2",
     "stylelint": "^17.16.0",
     "stylelint-config-standard": "^40.0.0",
-    "tom-select": "^2.4.3"
+    "tom-select": "^2.4.3",
+    "typescript": "7.0.2"
   },
   "build": {
     "appId": "com.yassindaboussi.salaty",
@@ -57,6 +68,9 @@
     },
     "files": [
       "src/**/*",
+      "!src/renderer/js/**",
+      "!src/assets/appx/**",
+      "!**/tsconfig.json",
       "package.json",
       "settings.json"
     ],
@@ -69,35 +83,71 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "src/assets/icons/app_icon.ico",
-      "artifactName": "Salaty-Time-Setup.exe"
+      "icon": "src/assets/icons/app_icon.ico"
     },
     "mac": {
-      "target": {
-        "target": "dmg",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
-      },
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
       "icon": "src/assets/icons/app_icon_512.png",
-      "identity": null,
+      "identity": "-",
       "hardenedRuntime": false,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "artifactName": "Salaty-Time-mac-${arch}.${ext}"
     },
     "linux": {
       "target": [
-        "tar.gz"
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
       "icon": "src/assets/icons/app_icon.png",
       "category": "Utility",
       "maintainer": "Yassin Daboussi <dev@salaty.app>",
-      "artifactName": "${productName}-linux-${arch}.${ext}"
+      "artifactName": "Salaty-Time-linux-${arch}.${ext}"
     },
     "nsis": {
+      "artifactName": "Salaty-Time-Setup.exe",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "include": "src/assets/installer.nsh"
+    },
+    "appx": {
+      "artifactName": "Salaty-Time-${version}-store.${ext}",
+      "applicationId": "SalatyTime",
+      "displayName": "Salaty Time",
+      "backgroundColor": "#060c18",
+      "languages": [
+        "en-US",
+        "ar",
+        "fr"
+      ],
+      "minVersion": "10.0.17763.0",
+      "maxVersionTested": "10.0.26100.0",
+      "addAutoLaunchExtension": true,
+      "showNameOnTiles": true
     },
     "compression": "maximum",
     "electronFuses": {
@@ -105,7 +155,9 @@
       "enableCookieEncryption": true,
       "enableNodeOptionsEnvironmentVariable": false,
       "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
       "onlyLoadAppFromAsar": true,
+      "grantFileProtocolExtraPrivileges": false,
       "resetAdHocDarwinSignature": true
     }
   },

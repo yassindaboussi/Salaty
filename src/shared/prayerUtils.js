@@ -120,6 +120,10 @@ function isFridayIn(timeZone, date) {
  * Key to use for the prayer's *display name* only. Anything keyed by prayer
  * (adhan toggles, stored settings, timings) must keep using the original key.
  */
+/**
+ * @param {string} key
+ * @param {{ isFriday?: boolean }} [options]
+ */
 function displayPrayerKey(key, { isFriday } = {}) {
   return key === "Dhuhr" && isFriday ? JUMUAH_KEY : key;
 }

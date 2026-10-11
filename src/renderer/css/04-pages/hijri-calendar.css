@@ -161,6 +161,15 @@
     gap: 0.5rem;
   }
 
+  /* shown instead of the days when a month is not available (offline, never loaded) */
+  .calendar-message {
+    grid-column: 1 / -1;
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
   .calendar-day {
     aspect-ratio: 1;
     display: flex;

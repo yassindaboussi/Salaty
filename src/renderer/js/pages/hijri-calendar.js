@@ -3,8 +3,10 @@
 const { t, getLocaleTag } = require("../core/i18n");
 const analytics = require("../services/analytics");
 const { setupConnectionRecovery } = require("../services/connection-recovery");
-const { ALADHAN_API } = require("../../../shared/aladhan");
-const { hijriMonthName } = require("../utils/dates");
+const { ipcRenderer } = require("electron");
+const { hijriMonthName } = require("../core/dates");
+const { escapeHtml } = require("../utils/html");
+const { byId } = require("../core/dom");
 
 // Special days shown on the calendar as { "month-day": name } in the UI language
 // (locales/<lang>/worship/calendar.json).
@@ -35,15 +37,17 @@ async function initHijriCalendar() {
 // Shows the Hijri month that contains today.
 async function _loadTodayAndRender() {
   try {
+    // Hijri dates come from the main process's cache, so the calendar also works offline
     const today = new Date();
-    const response = await fetch(
-      `${ALADHAN_API}/gToH/${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`,
+    const data = await ipcRenderer.invoke(
+      "gregorian-to-hijri",
+      today.getDate(),
+      today.getMonth() + 1,
+      today.getFullYear(),
     );
-    const data = await response.json();
-
-    if (data.code === 200 && data.data.hijri) {
-      currentHijriMonth = parseInt(data.data.hijri.month.number);
-      currentHijriYear = parseInt(data.data.hijri.year);
+    if (data?.hijri) {
+      currentHijriMonth = parseInt(data.hijri.month.number);
+      currentHijriYear = parseInt(data.hijri.year);
     }
 
     await renderCalendar();
@@ -88,14 +92,17 @@ let renderCalendarRequestId = 0;
 async function renderCalendar() {
   const myRequestId = ++renderCalendarRequestId;
 
-  document.getElementById("currentMonth").textContent =
+  byId("currentMonth", HTMLElement).textContent =
     hijriMonthName(currentHijriMonth);
-  document.getElementById("currentYear").textContent =
+  byId("currentYear", HTMLElement).textContent =
     `${currentHijriYear} ${t("ah")}`;
 
   const monthData = await getHijriMonthData();
   if (myRequestId !== renderCalendarRequestId) return;
-  if (!monthData) return;
+  if (!monthData) {
+    showMonthUnavailable();
+    return;
+  }
 
   renderCalendarDays(monthData);
 
@@ -112,43 +119,31 @@ async function getHijriMonthData() {
   }
 
   try {
-    const firstDayResponse = await fetch(
-      `${ALADHAN_API}/hToG/01-${currentHijriMonth}-${currentHijriYear}`,
+    // Every day of the Hijri month (29 or 30) with its Gregorian date, from the main process.
+    // The fasting reminders load the coming months the same way, so they are usually saved
+    // already, which also makes them available offline.
+    const calendar = await ipcRenderer.invoke(
+      "get-hijri-month",
+      currentHijriMonth,
+      currentHijriYear,
     );
-    const firstDayData = await firstDayResponse.json();
+    if (!Array.isArray(calendar) || !calendar.length) return null;
 
-    if (firstDayData.code !== 200) return null;
-
-    const firstDay = firstDayData.data.gregorian;
-    // A Hijri month has 29 or 30 days; the API says which (30 only if it is missing).
-    const monthLength = Number(firstDayData.data.hijri?.month?.days) || 30;
-    const firstDayDate = new Date(
-      firstDay.year,
-      firstDay.month.number - 1,
-      firstDay.day,
-    );
-
+    const [d, m, y] = calendar[0].gregorian.date.split("-").map(Number);
     const monthData = {
-      firstDayWeekday: firstDayDate.getDay(),
-      days: [],
-    };
-
-    for (let day = 1; day <= monthLength; day++) {
-      const gregorianDate = new Date(firstDayDate);
-      gregorianDate.setDate(firstDayDate.getDate() + (day - 1));
-
-      monthData.days.push({
-        hijriDay: day,
+      firstDayWeekday: new Date(y, m - 1, d).getDay(),
+      days: calendar.map((entry) => ({
+        hijriDay: Number(entry.hijri.day),
         gregorian: {
-          day: gregorianDate.getDate(),
+          day: Number(entry.gregorian.day),
           month: {
-            number: gregorianDate.getMonth() + 1,
-            en: gregorianDate.toLocaleString("en-US", { month: "long" }),
+            number: Number(entry.gregorian.month.number),
+            en: entry.gregorian.month.en,
           },
-          year: gregorianDate.getFullYear(),
+          year: Number(entry.gregorian.year),
         },
-      });
-    }
+      })),
+    };
 
     monthCache[cacheKey] = monthData;
     return monthData;
@@ -199,6 +194,17 @@ function renderCalendarDays(monthData) {
 
     daysContainer.appendChild(dayEl);
   });
+}
+
+// Offline and this month was never loaded: say so, instead of leaving the previous month's
+// days under this month's name.
+function showMonthUnavailable() {
+  const daysContainer = document.getElementById("calendarDays");
+  if (daysContainer) {
+    daysContainer.innerHTML = `<p class="calendar-message">${escapeHtml(t("calendarMonthUnavailable"))}</p>`;
+  }
+  const gregorianDisplay = document.getElementById("gregorianDateText");
+  if (gregorianDisplay) gregorianDisplay.textContent = "";
 }
 
 function updateGregorianDisplay(monthData) {

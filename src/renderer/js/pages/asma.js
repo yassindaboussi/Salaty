@@ -5,7 +5,9 @@ const { getNamesOfAllah } = require("../services/content");
 const analytics = require("../services/analytics");
 const { renderToast } = require("../core/toast");
 const { initSelectionCopy } = require("../components/selection-copy");
+const { byId, query } = require("../core/dom");
 
+/** @type {any[] | null} */
 let asmaData = null;
 let currentLanguage = "en";
 
@@ -56,6 +58,7 @@ function renderAsmaList() {
 
   const isArabic = currentLanguage === "ar";
 
+  if (!asmaData) return;
   asmaData.forEach((item) => {
     const card = document.createElement("div");
     card.className = "asma-card";
@@ -79,7 +82,7 @@ function renderAsmaList() {
         <div class="asma-desc">${desc}</div>
       `;
 
-      const copyBtn = card.querySelector(".asma-copy-btn");
+      const copyBtn = query(".asma-copy-btn", HTMLButtonElement, card);
       copyBtn.addEventListener("click", () =>
         copyAsmaArabic(item.name, meaning, desc),
       );
@@ -99,7 +102,7 @@ function renderAsmaList() {
         </button>
       `;
 
-      const copyBtn = card.querySelector(".asma-copy-btn");
+      const copyBtn = query(".asma-copy-btn", HTMLButtonElement, card);
       copyBtn.addEventListener("click", () => copyAsma(item, meaning, desc));
     }
 
@@ -160,9 +163,10 @@ function showError() {
         </button>
       </div>
     `;
-    document
-      .getElementById("retryAsma")
-      .addEventListener("click", loadAsmaData);
+    byId("retryAsma", HTMLButtonElement).addEventListener(
+      "click",
+      loadAsmaData,
+    );
   }
 }
 

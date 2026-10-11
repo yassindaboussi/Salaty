@@ -4,9 +4,10 @@
  * on every page, as the first tag after <meta charset>. Run by `npm run lint`;
  * `node scripts/check-csp.js --fix` writes it into the pages.
  *
- * Why a <meta> tag: the pages are local files (file://), so there are no response headers
- * to set it in. A meta CSP ignores frame-ancestors, report-uri and sandbox, so none are
- * used here (https://developer.mozilla.org/docs/Web/HTTP/Guides/CSP).
+ * Why a <meta> tag: every page carries its policy itself, whatever loads it (the app serves
+ * them from app://salaty, src/main/app/app-protocol.js; the tests open them directly). A meta
+ * CSP ignores frame-ancestors, report-uri and sandbox, so none are used here
+ * (https://developer.mozilla.org/docs/Web/HTTP/Guides/CSP). 'self' is app://salaty.
  *
  * To allow a new site, add it to the matching list below and run with --fix.
  */
@@ -20,14 +21,14 @@ const POLICY = {
   "default-src": ["'none'"],
   // only our own bundles: no inline <script>, no eval, no onclick="" attributes
   "script-src": ["'self'"],
-  "style-src": ["'self'", "https://fonts.googleapis.com"],
+  "style-src": ["'self'"], // web fonts are bundled (css/01-base/web-fonts.css)
   // style="" attributes in the markup and in JS templates
   "style-src-attr": ["'unsafe-inline'"],
   "img-src": ["'self'", "data:", "blob:", "https://*.tile.openstreetmap.org"],
-  "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
+  "font-src": ["'self'", "data:"],
   "connect-src": [
     "'self'", // ../../locales/*.json, ../../data/*.json
-    "https://api.aladhan.com",
+    // (no api.aladhan.com: pages get prayer times and Hijri dates from the main process)
     "https://api.alquran.cloud",
     "https://mp3quran.net",
     "https://www.mp3quran.net", // mp3quran.net/api redirects here

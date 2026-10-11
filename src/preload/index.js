@@ -7,94 +7,109 @@
 // full `electron` and Node module.
 //
 // Every channel is on an allow-list (Electron security checklist: "do not expose
-// Electron APIs to untrusted web content"). A new channel must be added here and
-// registered in the main process with ipc/secure-ipc.js.
+// Electron APIs to untrusted web content"). The lists must match src/shared/ipc-channels.d.ts
+// exactly (checked by `npm run lint:types`): a new channel goes there first, then here and
+// in the main process (ipc/secure-ipc.js).
 "use strict";
 
 const { contextBridge, ipcRenderer } = require("electron");
 
+/** @import { ElectronBridge, InvokeChannel, SendChannel, ReceiveChannel } from "../shared/ipc-channels" */
+
 // renderer -> main, with an answer
-const INVOKE_CHANNELS = new Set([
-  "add-location",
-  "check-connection",
-  "check-for-updates-manual",
-  "clipboard-write-text",
-  "close-window",
-  "delete-location",
-  "detect-location",
-  "get-adhan-audio-src",
-  "get-adhan-state",
-  "get-app-version",
-  "get-connection-status",
-  "get-fasting-occasions",
-  "get-locations",
-  "get-prayer-data",
-  "get-prayer-widget-state",
-  "get-settings",
-  "go-back",
-  "maximize-window",
-  "minimize-window",
-  "navigate-to",
-  "open-external",
-  "resize-window",
-  "save-settings",
-  "set-active-location",
-  "toggle-prayer-widget",
-  "toggle-travel-mode",
-  "unmaximize-window",
-  "update-location",
-]);
+/** @type {Record<InvokeChannel, true>} */
+const INVOKE = {
+  "add-location": true,
+  "check-connection": true,
+  "check-for-updates-manual": true,
+  "clipboard-write-text": true,
+  "close-window": true,
+  "delete-location": true,
+  "detect-location": true,
+  "get-adhan-audio-src": true,
+  "get-adhan-state": true,
+  "get-app-version": true,
+  "get-connection-status": true,
+  "get-fasting-occasions": true,
+  "get-locations": true,
+  "get-prayer-data": true,
+  "get-prayer-month": true,
+  "get-ramadan-calendar": true,
+  "get-hijri-month": true,
+  "gregorian-to-hijri": true,
+  "hijri-to-gregorian": true,
+  "get-prayer-widget-state": true,
+  "get-settings": true,
+  "get-update-mode": true,
+  "go-back": true,
+  "maximize-window": true,
+  "minimize-window": true,
+  "navigate-to": true,
+  "open-external": true,
+  "resize-window": true,
+  "save-settings": true,
+  "set-active-location": true,
+  "toggle-prayer-widget": true,
+  "toggle-travel-mode": true,
+  "unmaximize-window": true,
+  "update-location": true,
+};
+const INVOKE_CHANNELS = new Set(Object.keys(INVOKE));
 
 // renderer -> main, no answer
-const SEND_CHANNELS = new Set([
-  "analytics:error",
-  "analytics:feature-open",
-  "analytics:navigation",
-  "analytics:settings-saved",
-  "analytics:track",
-  "app-ready",
-  "close-mini-player",
-  "close-prayer-widget",
-  "close-themed-popup",
-  "install-update",
-  "player-command",
-  "player-update",
-  "prayer-data-updated",
-  "prayer-widget-ready",
-  "show-adhan-popup",
-  "show-athkar-popup",
-  "show-main-window",
-  "show-themed-popup-ready",
-  "start-download",
-  "stop-adhan",
-  "theme-changed",
-  "widget-set-always-on-top",
-]);
+/** @type {Record<SendChannel, true>} */
+const SEND = {
+  "analytics:error": true,
+  "analytics:feature-open": true,
+  "analytics:navigation": true,
+  "analytics:settings-saved": true,
+  "analytics:track": true,
+  "app-ready": true,
+  "close-mini-player": true,
+  "close-prayer-widget": true,
+  "close-themed-popup": true,
+  "install-update": true,
+  "player-command": true,
+  "player-update": true,
+  "prayer-widget-ready": true,
+  "show-adhan-popup": true,
+  "show-athkar-popup": true,
+  "show-main-window": true,
+  "show-themed-popup-ready": true,
+  "start-download": true,
+  "stop-adhan": true,
+  "theme-changed": true,
+  "widget-set-always-on-top": true,
+};
+const SEND_CHANNELS = new Set(Object.keys(SEND));
 
 // main -> renderer
-const RECEIVE_CHANNELS = new Set([
-  "apply-theme",
-  "connection-lost",
-  "connection-restored",
-  "download-progress",
-  "fasting-reminder-due",
-  "force-hide-tooltip",
-  "force-stop-adhan",
-  "init-themed-popup",
-  "location-changed",
-  "player-command",
-  "player-update",
-  "prayer-data-from-main",
-  "prayer-widget-state",
-  "show-pre-adhan-notification",
-  "theme-changed",
-  "trigger-adhan",
-  "update-available",
-  "update-downloaded",
-  "update-error",
-  "update-not-available",
-  "window-maximized-changed",
-]);
+/** @type {Record<ReceiveChannel, true>} */
+const RECEIVE = {
+  "apply-theme": true,
+  "connection-lost": true,
+  "connection-restored": true,
+  "download-progress": true,
+  "fasting-reminder-due": true,
+  "force-hide-tooltip": true,
+  "force-stop-adhan": true,
+  "init-themed-popup": true,
+  "location-changed": true,
+  "player-command": true,
+  "player-update": true,
+  "prayer-data-from-main": true,
+  "prayer-widget-state": true,
+  "show-pre-adhan-notification": true,
+  "theme-changed": true,
+  "trigger-adhan": true,
+  "update-available": true,
+  "update-downloaded": true,
+  "update-error": true,
+  "update-not-available": true,
+  "window-focus-changed": true,
+  "window-maximized-changed": true,
+};
+const RECEIVE_CHANNELS = new Set(Object.keys(RECEIVE));
 
 function assertAllowed(list, channel) {
   if (!list.has(channel)) {
@@ -120,7 +135,8 @@ function getChannelMap(channel) {
   return map;
 }
 
-contextBridge.exposeInMainWorld("electron", {
+/** @type {ElectronBridge} */
+const bridge = {
   ipcRenderer: {
     invoke: (channel, ...args) => {
       if (!INVOKE_CHANNELS.has(channel)) {
@@ -160,4 +176,6 @@ contextBridge.exposeInMainWorld("electron", {
       listenerMap.delete(channel);
     },
   },
-});
+};
+
+contextBridge.exposeInMainWorld("electron", bridge);

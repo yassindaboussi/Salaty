@@ -9,6 +9,25 @@ const path = require("path");
 const { ROOT_DIR } = require("../config/paths");
 const log = require("./logger").logger("Settings");
 
+/**
+ * @typedef {object} SavedLocation
+ * @property {string} id
+ * @property {string} name
+ * @property {string} city
+ * @property {string} country
+ * @property {boolean} isActive
+ * @property {boolean} isFavorite
+ * @property {string} createdAt ISO date
+ *
+ * The keys every part of the app relies on; the others (adhan, athkar, reminders...) are
+ * checked by ipc/validate.js when a page saves them.
+ * @typedef {{ city: string, country: string, theme: string, language: string,
+ *   position: { x: number, y: number }, bigScreen: boolean, locations: SavedLocation[],
+ *   openAtLogin: boolean, travelMode: boolean, analyticsEnabled: boolean,
+ *   [key: string]: any }} Settings
+ */
+
+/** @type {Settings} */
 let settingsData = {
   city: "Tunis",
   country: "Tunisia",
@@ -42,12 +61,13 @@ function syncActiveLocation() {
 
 // ── Saving ───────────────────────────────────────────────────────────────────
 
+/** @type {ReturnType<typeof setTimeout> | null} */
 let pendingSaveTimer = null;
 
 // Write to a temp file and rename it over settings.json, so a crash or power cut in the
 // middle of a write can never leave a half-written (unparseable) settings file.
 function save() {
-  clearTimeout(pendingSaveTimer);
+  if (pendingSaveTimer) clearTimeout(pendingSaveTimer);
   pendingSaveTimer = null;
   const file = getSettingsPath();
   const tmp = `${file}.tmp`;
@@ -62,7 +82,7 @@ function save() {
 // Window moves arrive many times per drag: keep the position in memory and write it once
 // the window has stopped moving.
 function saveSoon(delayMs = 1000) {
-  clearTimeout(pendingSaveTimer);
+  if (pendingSaveTimer) clearTimeout(pendingSaveTimer);
   pendingSaveTimer = setTimeout(save, delayMs);
 }
 
@@ -134,7 +154,9 @@ function get() {
 // Start with the OS. Only for the installed app: in development this would register the
 // Electron binary itself as a login item.
 function syncOpenAtLogin() {
-  if (!app.isPackaged) return;
+  // Microsoft Store (MSIX) builds start through their StartupTask instead, which the user
+  // manages in Windows Settings > Apps > Startup
+  if (!app.isPackaged || process.windowsStore) return;
   app.setLoginItemSettings({ openAtLogin: settingsData.openAtLogin !== false });
 }
 

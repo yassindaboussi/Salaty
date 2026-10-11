@@ -20,6 +20,9 @@
   --z-adhan-overlay: 99999; /* full-screen adhan player */
   --z-top: 100000; /* text-selection copy menu: above everything */
 
+  /* ── Window ──────────────────────────────────────────────────────────── */
+  --title-bar-inactive-opacity: 0.5; /* title bar while another window is active */
+
   /* ── Colours ──────────────────────────────────────────────────────────────
      Theme colours (accent, backgrounds, main text) live in themes.css. These are the
      shared colours used on top of every theme.

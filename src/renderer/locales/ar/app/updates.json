@@ -2,6 +2,8 @@
   "updateAvailable": "تحديث متوفر",
   "newVersionAvailable": "الإصدار {version} متوفر. هل تريد التحميل؟",
   "download": "تحميل",
+  "openDownloadPage": "فتح صفحة التحميل",
+  "updatesFromStore": "يتم تثبيت التحديثات عبر متجر مايكروسوفت",
   "updateReady": "التحديث جاهز",
   "updateDownloaded": "تم تحميل التحديث. هل تريد التثبيت الآن؟",
   "install": "تثبيت",

@@ -4,17 +4,27 @@ const { app } = require("electron");
 const secureIpc = require("../ipc/secure-ipc");
 const fs = require("fs");
 const path = require("path");
-const { ALADHAN_API } = require("../../shared/aladhan");
+// Hijri dates from the cached Aladhan client: the reminders also work offline
+const islamicCalendar = require("./islamic-calendar");
 const log = require("./logger").logger("Fasting");
 
+/** @import { BrowserWindow } from "electron" */
+
+/** @type {() => BrowserWindow | null} */
 let getMainWindow = () => null;
+/** @type {(() => any) | null} returns the current settings */
 let getSettingsData = null;
 
+/** @type {any[]} the coming fasting days (see _makeOccasion) */
 let occasions = [];
+/** @type {Promise<void> | null} the refresh in progress */
 let readyPromise = null;
 
+/** @type {ReturnType<typeof setInterval> | null} */
 let tickInterval = null;
+/** @type {ReturnType<typeof setTimeout> | null} */
 let midnightTimer = null;
+/** @type {Set<string>} */
 let firedTodayKeys = new Set();
 
 const FORWARD_HIJRI_MONTHS = 4;
@@ -22,14 +32,18 @@ const REMINDER_HOUR_START = 19;
 const REMINDER_HOUR_END = 22;
 const TICK_MS = 10 * 60 * 1000;
 
-// getMainWindowFn / settingsFn: return the main window and the settings when called.
+/**
+ * @param {() => BrowserWindow | null} getMainWindowFn returns the main window (or null)
+ * @param {() => any} settingsFn returns the current settings
+ */
 function init(getMainWindowFn, settingsFn) {
   getMainWindow = getMainWindowFn;
   getSettingsData = settingsFn;
   firedTodayKeys = _loadFiredLog();
   _registerIpcHandlers();
-  readyPromise = _refreshOccasions();
-  readyPromise.then(() => {
+  const refresh = _refreshOccasions();
+  readyPromise = refresh;
+  refresh.then(() => {
     _startTick();
     _scheduleMidnightRefresh();
   });
@@ -55,15 +69,17 @@ function _registerIpcHandlers() {
 
 async function _refreshOccasions() {
   try {
-    const todayStr = _toDDMMYYYY(new Date());
-    const res = await fetch(`${ALADHAN_API}/gToH?date=${todayStr}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    if (json?.code !== 200 || !json?.data?.hijri)
-      throw new Error("Invalid gToH response");
+    const now = new Date();
+    const today = await islamicCalendar.gregorianToHijri(
+      now.getDate(),
+      now.getMonth() + 1,
+      now.getFullYear(),
+    );
+    if (!today)
+      throw new Error("no Hijri date for today (offline, not cached)");
 
-    const startMonth = parseInt(json.data.hijri.month.number, 10);
-    const startYear = parseInt(json.data.hijri.year, 10);
+    const startMonth = parseInt(today.hijri.month.number, 10);
+    const startYear = parseInt(today.hijri.year, 10);
 
     const collected = [];
     for (let i = 0; i < FORWARD_HIJRI_MONTHS; i++) {
@@ -87,14 +103,14 @@ async function _fetchMonthOccasions(hijriMonth, hijriYear) {
   if (hijriMonth === 9) return [];
 
   try {
-    const url = `${ALADHAN_API}/hToGCalendar/${hijriMonth}/${hijriYear}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    if (json?.code !== 200 || !Array.isArray(json.data)) return [];
+    const days = await islamicCalendar.hijriMonthCalendar(
+      hijriMonth,
+      hijriYear,
+    );
+    if (!days) return [];
 
     const results = [];
-    for (const entry of json.data) {
+    for (const entry of days) {
       const hDay = parseInt(entry?.hijri?.day, 10);
       const gDateStr = entry?.gregorian?.date;
       if (!hDay || !gDateStr) continue;
@@ -218,6 +234,7 @@ function _checkReminders() {
   if (didFire) _persistFiredLog();
 }
 
+/** @returns {BrowserWindow | null} the main window while it exists */
 function _mainWindow() {
   const w = getMainWindow();
   return w && !w.isDestroyed() ? w : null;
@@ -232,12 +249,13 @@ function _scheduleMidnightRefresh() {
   const now = new Date();
   const midnight = new Date(now);
   midnight.setHours(24, 0, 45, 0);
-  const msLeft = midnight - now;
+  const msLeft = midnight.getTime() - now.getTime();
   midnightTimer = setTimeout(() => {
     firedTodayKeys = new Set();
     _persistFiredLog();
-    readyPromise = _refreshOccasions();
-    readyPromise.then(_scheduleMidnightRefresh);
+    const refresh = _refreshOccasions();
+    readyPromise = refresh;
+    refresh.then(_scheduleMidnightRefresh);
   }, msLeft);
 }
 
@@ -245,6 +263,7 @@ function _firedLogPath() {
   return path.join(app.getPath("userData"), "fasting-reminders-log.json");
 }
 
+/** @returns {Set<string>} */
 function _loadFiredLog() {
   try {
     const raw = fs.readFileSync(_firedLogPath(), "utf8");
@@ -279,24 +298,26 @@ function _pad2(n) {
   return String(n).padStart(2, "0");
 }
 
-function _toDDMMYYYY(date) {
-  return `${_pad2(date.getDate())}-${_pad2(date.getMonth() + 1)}-${date.getFullYear()}`;
-}
-
+/** @param {Date} date */
 function _toISODate(date) {
   return `${date.getFullYear()}-${_pad2(date.getMonth() + 1)}-${_pad2(date.getDate())}`;
 }
 
+/** @param {Date} date */
 function _midnight(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
+/**
+ * @param {Date} fromMidnight
+ * @param {string} isoDate "YYYY-MM-DD"
+ */
 function _daysBetween(fromMidnight, isoDate) {
   const [y, m, d] = String(isoDate)
     .split("-")
     .map((n) => parseInt(n, 10));
   const target = new Date(y, (m || 1) - 1, d || 1);
-  return Math.round((target - fromMidnight) / 86400000);
+  return Math.round((target.getTime() - fromMidnight.getTime()) / 86400000);
 }
 
 function _ddmmyyyyToISO(str) {

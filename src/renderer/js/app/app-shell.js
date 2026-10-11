@@ -4,12 +4,13 @@
 // saved settings, theme and text direction, the adhan overlay and fasting reminders, then the
 // page itself, the window buttons, the mini player and the tooltips.
 const { ipcRenderer } = require("electron");
-const { applyLanguageDirection, applyTranslations } = require("./i18n");
-const { loadSettings } = require("./bootstrap");
-const { state } = require("./store");
-const { applyTheme } = require("./theme");
-const screenSizeManager = require("./screen-size");
-const { initTooltipSystem } = require("./tooltips");
+const { applyLanguageDirection, applyTranslations } = require("../core/i18n");
+const { loadSettings } = require("../core/bootstrap");
+const { state } = require("../core/store");
+const { applyTheme } = require("../core/theme");
+const screenSizeManager = require("../core/screen-size");
+const { queryAll } = require("../core/dom");
+const { initTooltipSystem } = require("../core/tooltips");
 const { setupMiniPlayer } = require("../components/mini-player");
 const { renderPageHeaders } = require("../components/page-header");
 const { initAdhanPlayer } = require("../components/adhan-player");
@@ -26,13 +27,27 @@ function setupKeyboardActivation() {
     if (e.key !== "Enter" && e.key !== " ") return;
     const el = e.target;
     if (
-      el.getAttribute?.("role") !== "button" ||
+      !(el instanceof HTMLElement) ||
+      el.getAttribute("role") !== "button" ||
       el.matches("button, a, input, select, textarea")
     )
       return;
     e.preventDefault();
     el.click();
   });
+}
+
+// Windows fades the title bar of a window that is not the active one; ours does the same
+// (02-layout/window.css). The main process reports the changes, and the state as soon as the
+// page has loaded; until then document.hasFocus() is the best guess.
+function trackWindowFocus() {
+  /** @param {boolean} focused */
+  const show = (focused) =>
+    document.documentElement.classList.toggle("window-inactive", !focused);
+  show(document.hasFocus());
+  ipcRenderer.on("window-focus-changed", (_e, focused) =>
+    show(focused === true),
+  );
 }
 
 function setupScreenSizeToggle(container) {
@@ -47,12 +62,12 @@ function setupScreenSizeToggle(container) {
 // minimize / close the window, and back buttons that only open another page.
 function setupHeaderButtons() {
   const WINDOW_ACTIONS = { minimize: "minimize-window", close: "close-window" };
-  document.querySelectorAll("[data-window-action]").forEach((btn) => {
+  queryAll("[data-window-action]", HTMLElement).forEach((btn) => {
     btn.addEventListener("click", () =>
       ipcRenderer.invoke(WINDOW_ACTIONS[btn.dataset.windowAction]),
     );
   });
-  document.querySelectorAll("[data-back]").forEach((btn) => {
+  queryAll("[data-back]", HTMLElement).forEach((btn) => {
     const target = btn.dataset.back;
     btn.addEventListener("click", () =>
       target === "home"
@@ -81,6 +96,8 @@ async function startPage({
   miniPlayer = true,
 }) {
   try {
+    // before the first await: listening by the time the page finishes loading
+    trackWindowFocus();
     await loadSettings();
     applyTheme(state.settings.theme || "navy");
     applyLanguageDirection();

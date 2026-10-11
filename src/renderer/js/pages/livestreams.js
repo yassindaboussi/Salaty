@@ -36,14 +36,17 @@ function initLiveStreamsPage() {
 
 function loadStream(streamKey) {
   const iframe = document.getElementById(`iframe-${streamKey}`);
-  if (iframe && !iframe.src.includes(STREAM_SOURCES[streamKey])) {
+  if (
+    iframe instanceof HTMLIFrameElement &&
+    !iframe.src.includes(STREAM_SOURCES[streamKey])
+  ) {
     iframe.src = STREAM_SOURCES[streamKey];
   }
 }
 
 function stopStream(streamKey) {
   const iframe = document.getElementById(`iframe-${streamKey}`);
-  if (iframe) {
+  if (iframe instanceof HTMLIFrameElement) {
     iframe.src = "about:blank";
   }
 }

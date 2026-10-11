@@ -6,9 +6,15 @@ const { pages } = require("../../config/paths");
 const { secureWebPreferences } = require("../../config/window-options");
 const prayerTimerManager = require("../../services/prayer-timer-manager");
 
+/** @import { BrowserWindow as Window } from "electron" */
+
+/** @type {Window | null} */
 let athkarPopupWindow = null;
+/** @type {Window | null} */
 let adhanPopupWindow = null;
+/** @type {Window | null} */
 let prayerWidgetWindow = null;
+/** @type {() => Window | null} */
 let getMainWindow = () => null;
 
 const WIDGET_WIDTH = 360;
@@ -20,8 +26,15 @@ const POPUP_MARGIN = 16;
 const WIDGET_SHOW_FALLBACK_MS = 2000;
 let revealPrayerWidget = () => {};
 
+// The widget window while it is open, otherwise null.
+function openWidget() {
+  return prayerWidgetWindow && !prayerWidgetWindow.isDestroyed()
+    ? prayerWidgetWindow
+    : null;
+}
+
 function isPrayerWidgetOpen() {
-  return Boolean(prayerWidgetWindow && !prayerWidgetWindow.isDestroyed());
+  return openWidget() !== null;
 }
 
 // Main owns the widget's open/closed state; the main window's widget button follows it.
@@ -34,12 +47,13 @@ function sendPrayerWidgetState() {
 }
 
 function closePrayerWidget() {
-  if (isPrayerWidgetOpen()) prayerWidgetWindow.destroy();
+  openWidget()?.destroy();
 }
 
 function createPrayerWidget() {
-  if (isPrayerWidgetOpen()) {
-    prayerWidgetWindow.focus();
+  const existing = openWidget();
+  if (existing) {
+    existing.focus();
     return;
   }
   const { bounds, workArea } = screen.getPrimaryDisplay();
@@ -60,13 +74,12 @@ function createPrayerWidget() {
   });
   prayerWidgetWindow = widget;
   widget.setAlwaysOnTop(true, "pop-up-menu");
-  widget.loadFile(pages.prayerWidget);
+  widget.loadURL(pages.prayerWidget);
   // Shown when the page says it is ready ("prayer-widget-ready": theme, direction and times
   // in place), like the main window's "app-ready". Not on "ready-to-show": that fires before
   // the theme is applied, and on some opens a whole second late (it waits for a visible
   // paint, and the bar is invisible until the page reveals it).
   let shown = false;
-  let fallback = null;
   // bound to this window: a timer left from a closed widget can never show a newer one
   const reveal = () => {
     clearTimeout(fallback);
@@ -74,7 +87,7 @@ function createPrayerWidget() {
     shown = true;
     widget.show();
   };
-  fallback = setTimeout(reveal, WIDGET_SHOW_FALLBACK_MS);
+  const fallback = setTimeout(reveal, WIDGET_SHOW_FALLBACK_MS);
   revealPrayerWidget = reveal;
   widget.on("closed", () => {
     clearTimeout(fallback);
@@ -85,6 +98,11 @@ function createPrayerWidget() {
   sendPrayerWidgetState();
 }
 
+/**
+ * The athkar/adhan/fasting popup at the bottom corner of the screen.
+ * @param {object} data what the popup shows (see ipc/validate.js popupData)
+ * @param {"adhan" | "athkar"} type
+ */
 function showThemedPopup(data, type) {
   const existing = type === "adhan" ? adhanPopupWindow : athkarPopupWindow;
   if (existing && !existing.isDestroyed()) existing.destroy();
@@ -106,7 +124,7 @@ function showThemedPopup(data, type) {
     webPreferences: secureWebPreferences(),
   });
   win.setAlwaysOnTop(true, "pop-up-menu");
-  win.loadFile(pages.athkarPopup);
+  win.loadURL(pages.athkarPopup);
   win.once("ready-to-show", () =>
     win.webContents.send("init-themed-popup", { ...data, type }),
   );
@@ -120,8 +138,11 @@ function showThemedPopup(data, type) {
 
 let registered = false;
 
-// Popup windows (prayer widget, athkar/adhan popups) and their IPC; called once at start-up.
-// getMainWindowFn: returns the main window (or null), told when the widget opens or closes.
+/**
+ * Popup windows (prayer widget, athkar/adhan popups) and their IPC; called once at start-up.
+ * @param {{ getMainWindow?: () => Window | null }} [options] getMainWindow: told when the
+ *   widget opens or closes
+ */
 function registerPopupHandlers({ getMainWindow: getMainWindowFn } = {}) {
   if (registered) return;
   registered = true;
@@ -141,17 +162,17 @@ function registerPopupHandlers({ getMainWindow: getMainWindowFn } = {}) {
 
   // the widget page is ready to be seen; only the current widget may ask
   secureIpc.on("prayer-widget-ready", (event) => {
-    if (isPrayerWidgetOpen() && event.sender === prayerWidgetWindow.webContents)
-      revealPrayerWidget();
+    const widget = openWidget();
+    if (widget && event.sender === widget.webContents) revealPrayerWidget();
   });
 
   secureIpc.on("widget-set-always-on-top", (_e, value) => {
-    if (isPrayerWidgetOpen())
-      prayerWidgetWindow.setAlwaysOnTop(value === true, "pop-up-menu");
+    openWidget()?.setAlwaysOnTop(value === true, "pop-up-menu");
   });
 
-  secureIpc.handle("get-prayer-data", () => {
-    return prayerTimerManager.getPrayerData() || null;
+  // Today's prayer times for the home page and the widget (main is their only source).
+  secureIpc.handle("get-prayer-data", async () => {
+    return (await prayerTimerManager.getPrayerDataWhenReady()) ?? null;
   });
 
   secureIpc.on("show-athkar-popup", (_e, data) => {
@@ -185,13 +206,14 @@ function registerPopupHandlers({ getMainWindow: getMainWindowFn } = {}) {
   });
 }
 
+/** @param {string} theme */
 function broadcastThemeToPopups(theme) {
-  if (isPrayerWidgetOpen())
-    prayerWidgetWindow.webContents.send("theme-changed", theme);
+  openWidget()?.webContents.send("theme-changed", theme);
 }
 
+// The widget window while it is open, otherwise null.
 function getPrayerWidgetWindow() {
-  return prayerWidgetWindow;
+  return openWidget();
 }
 
 module.exports = {

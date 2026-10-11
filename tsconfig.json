@@ -1,0 +1,16 @@
+{
+  // Type checking of the app's JavaScript (JSDoc comments), no build: `npm run lint:types`
+  // runs `tsc` with noEmit, and nothing here changes how the app is bundled or run.
+  // This file: the main process, the preload and src/shared (Node). The pages have their
+  // own config, src/renderer/tsconfig.json (browser).
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // Electron 44 = Chromium + Node 24
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "NodeNext", // package.json has no "type": the .js files are CommonJS, as Node loads them
+    "moduleResolution": "NodeNext",
+    "types": ["node"]
+  },
+  "include": ["src/main/**/*.js", "src/preload/**/*.js", "src/shared/**/*.js"]
+}

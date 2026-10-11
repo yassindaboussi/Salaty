@@ -1,71 +1,291 @@
 name: Release
 
+# One pipeline publishes a release: when the version in package.json changes on main, or from the
+# Actions tab (Release -> Run workflow). Steps: verify (lint + audit) -> build every platform ->
+# install-test the Windows installer -> checksums + build provenance -> publish.
+#   - nothing is published unless every step passes: users never see a half-built release
+#   - an existing release is never rebuilt or overwritten: bump the version to release again
+#   - the release is created as a draft and published last, so the app's updater only ever sees
+#     a complete release
+# The Microsoft Store package (store.yml) is built alongside once the Store identity is set up;
+# uploading it to Partner Center is a manual step: RELEASING.md.
 on:
+  push:
+    branches: [main]
+    paths: ["package.json"]
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to release (e.g., v1.0.0)"
-        required: true
-  # Automatic releases are now handled by version-release.yml, which
-  # auto-tags from package.json on every push to main and builds +
-  # publishes the GitHub Release itself. This workflow is kept only
-  # as a manual fallback (Actions tab -> Release -> Run workflow) so
-  # the two pipelines never race to create the same tag/release.
+
+# never two releases at once; a running release is not cancelled
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
-# npm would download the Electron binary on install; lint and electron-builder don't need it
-# (electron-builder fetches its own copy). Replaces the old .npmrc setting.
+# npm would download the Electron binary on install; electron-builder fetches its own copy
 env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
+  prepare:
+    name: Version check
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      release: ${{ steps.check.outputs.release }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
+      - name: Read the version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Is this version already released?
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1 \
+            || git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null 2>&1; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::$TAG is already released. To publish a new release, bump the version in package.json."
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  verify:
+    name: Lint and audit
+    needs: prepare
+    if: needs.prepare.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
-          cache: "npm"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run audit:check
 
-      - name: Install dependencies
-        run: npm ci
+  build:
+    name: Build (${{ matrix.platform }})
+    needs: [prepare, verify]
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+          - os: macos-latest
+            platform: mac
+          - os: ubuntu-latest
+            platform: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build:renderer
 
-      - name: Bundle renderer scripts
-        run: npm run build:renderer
-
-      # electron-builder --publish always will:
-      #   1. Build the installer (.exe / .dmg / .tar.gz)
-      #   2. Generate latest.yml / latest-mac.yml / latest-linux.yml
-      #   3. Upload EVERYTHING to the GitHub Release in one step
-      # This is required for electron-updater to work in packaged apps.
-
-      - name: Build and publish (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: npx electron-builder --linux --publish always
+      # --publish never: this job only builds; the release job publishes everything at once
+      - name: Build the installers
+        run: npx electron-builder --${{ matrix.platform }} --publish never
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # no certificate: Windows unsigned, macOS ad-hoc signed (see RELEASING.md)
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
 
-      - name: Build and publish (Windows)
-        if: matrix.os == 'windows-latest'
-        run: npx electron-builder --win --publish always
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-${{ matrix.platform }}
+          if-no-files-found: error
+          path: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.zip
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.blockmap
+            dist/latest*.yml
 
-      - name: Build and publish (macOS)
-        if: matrix.os == 'macos-latest'
-        run: npx electron-builder --mac --publish always
+  # Not needed by the GitHub release: the two channels are independent.
+  store:
+    name: Microsoft Store
+    needs: [prepare, verify]
+    if: needs.prepare.outputs.release == 'true' && vars.MSSTORE_IDENTITY_NAME != ''
+    uses: ./.github/workflows/store.yml
+
+  # Every platform's download is installed and started on a clean machine before anything is
+  # published: the app starts on a throwaway profile, the test waits for its start-up line in the
+  # log (written once the window is on screen), then it is removed.
+  smoke-test:
+    name: Install test (${{ matrix.platform }})
+    needs: build
+    strategy:
+      fail-fast: false # one platform failing still shows the others' results
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+          - os: macos-latest # Apple silicon: runs the arm64 half of the universal app
+            platform: mac
+          - os: ubuntu-latest
+            platform: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist-${{ matrix.platform }}
+          path: dist
+
+      - name: Install, start, uninstall
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem dist -Filter *.exe | Select-Object -First 1
+          $dir = Join-Path $env:RUNNER_TEMP "SalatyTime"
+          $userData = Join-Path $env:RUNNER_TEMP "profile"
+          Start-Process $installer.FullName -ArgumentList "/S", "/D=$dir" -Wait
+          $exe = Join-Path $dir "Salaty Time.exe"
+          if (-not (Test-Path $exe)) { throw "Not installed: $exe" }
+
+          $app = Start-Process $exe -ArgumentList "--user-data-dir=$userData" -PassThru
+          $deadline = (Get-Date).AddSeconds(90)
+          do {
+            Start-Sleep -Seconds 2
+            $line = Get-ChildItem "$userData\logs" -Filter *.log -ErrorAction SilentlyContinue |
+              Get-Content | Select-String "start-up \(ms after launch\)"
+          } until ($line -or (Get-Date) -gt $deadline)
+          taskkill /PID $app.Id /T /F | Out-Null
+          if (-not $line) {
+            Get-ChildItem "$userData\logs" -Filter *.log -ErrorAction SilentlyContinue | Get-Content
+            throw "The installed app did not show its window"
+          }
+          Write-Output "Started: $line"
+
+          $uninstaller = Get-ChildItem $dir -Filter "Uninstall*.exe" | Select-Object -First 1
+          Start-Process $uninstaller.FullName -ArgumentList "/S" -Wait
+          $deadline = (Get-Date).AddSeconds(60)
+          while ((Test-Path $exe) -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 2 }
+          if (Test-Path $exe) { throw "The uninstaller left the app behind" }
+          Write-Output "Uninstalled"
+
+      # The app is ad-hoc signed (no Apple certificate): Apple silicon runs only signed code, so
+      # an invalid signature would stop it here.
+      - name: Open the disk image, check the signature, start
+        if: runner.os == 'macOS'
+        run: |
+          set -euo pipefail
+          mnt="$RUNNER_TEMP/dmg"
+          hdiutil attach dist/Salaty-Time-mac-universal.dmg -nobrowse -readonly -mountpoint "$mnt"
+          cp -R "$mnt/Salaty Time.app" "$RUNNER_TEMP/"
+          hdiutil detach "$mnt"
+          app="$RUNNER_TEMP/Salaty Time.app"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          archs=$(lipo -archs "$app/Contents/MacOS/Salaty Time")
+          [[ $archs == *x86_64* && $archs == *arm64* ]] || { echo "::error::Not universal: $archs"; exit 1; }
+
+          profile="$RUNNER_TEMP/profile"
+          "$app/Contents/MacOS/Salaty Time" --user-data-dir="$profile" > /dev/null 2>&1 &
+          logs=("$profile" "$HOME/Library/Logs/Salaty Time")
+          for _ in $(seq 45); do
+            sleep 2
+            grep -rqs --include=main.log "start-up (ms after launch)" "${logs[@]}" && break
+          done
+          pkill -f "Salaty Time.app/Contents/MacOS" || true
+          line=$(grep -rhs --include=main.log "start-up (ms after launch)" "${logs[@]}" || true)
+          [ -n "$line" ] || { echo "::error::The app did not show its window"; exit 1; }
+          echo "Started: $line"
+
+      # The .deb is installed with apt (as users do); its install script sets up the AppArmor
+      # profile Ubuntu 24.04+ needs for Electron's sandbox. xvfb gives the runner a screen.
+      - name: Install the .deb, start, remove
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb ./dist/Salaty-Time-linux-amd64.deb > /dev/null
+          dir="/opt/Salaty Time"
+          # how the app's updater knows it can install the next .deb itself ("auto" mode)
+          grep -qx deb "$dir/resources/package-type" || { echo "::error::No package-type marker"; exit 1; }
+
+          profile="$RUNNER_TEMP/profile"
+          xvfb-run -a "$dir/salaty" --user-data-dir="$profile" > /dev/null 2>&1 &
+          for _ in $(seq 45); do
+            sleep 2
+            grep -rqs --include=main.log "start-up (ms after launch)" "$profile" && break
+          done
+          pkill -f "$dir/salaty" || true
+          line=$(grep -rhs --include=main.log "start-up (ms after launch)" "$profile" || true)
+          [ -n "$line" ] || { echo "::error::The app did not show its window"; exit 1; }
+          echo "Started: $line"
+
+          sudo apt-get remove -y -qq salaty > /dev/null
+          [ ! -e "$dir/salaty" ] || { echo "::error::apt left the app behind"; exit 1; }
+          echo "Uninstalled"
+
+  release:
+    name: Publish
+    needs: [prepare, build, smoke-test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the release and its tag
+      id-token: write # build provenance (Sigstore)
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: dist-*
+          merge-multiple: true
+          path: release
+
+      - name: Checksums
+        working-directory: release
+        run: sha256sum -- * > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      # Proof, signed by GitHub, that each file was built by this workflow from this commit:
+      #   gh attestation verify <file> --repo <owner>/<repo>
+      - uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: release/*
+
+      - name: Release notes
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-          SKIP_CODE_SIGN: true
+          STORE_URL: ${{ vars.MSSTORE_URL }} # the Store listing, once the app is published there
+        run: |
+          store=""
+          if [ -n "$STORE_URL" ]; then
+            store=" Or get it from the [Microsoft Store]($STORE_URL): no warning, and the Store keeps it up to date."
+          fi
+          cat > notes.md << EOF
+          ## Download
+          - **Windows 10/11**: \`Salaty-Time-Setup.exe\`. It is not signed yet, so Windows may show "Windows protected your PC": click **More info**, then **Run anyway**.$store
+          - **macOS 13+** (Apple silicon and Intel): \`Salaty-Time-mac-universal.dmg\`. The app is not notarized by Apple: open it once, then in **System Settings > Privacy & Security** click **Open Anyway**.
+          - **Linux**: \`Salaty-Time-linux-amd64.deb\` for Ubuntu, Debian and Linux Mint (\`arm64\` too). Other distributions: the \`.AppImage\` (needs \`libfuse2\`).
+
+          The app finds new versions by itself: on Windows and Linux it installs them, on macOS it opens this page.
+
+          ## Verify your download
+          \`SHA256SUMS.txt\` lists every file's checksum, and every file has a build provenance attestation:
+          \`gh attestation verify <file> --repo ${GITHUB_REPOSITORY}\`
+          EOF
+
+      # created as a draft with every file, then published in one step: the updater never sees a
+      # release without its files
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+        run: |
+          gh release create "$TAG" release/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Salaty Time $TAG" --notes-file notes.md --generate-notes --draft
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest

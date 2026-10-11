@@ -8,8 +8,12 @@ const {
 const { pages } = require("../config/paths");
 const settingsStore = require("../services/settings-store");
 const playerManager = require("../services/player-manager");
+const startup = require("../app/startup-timing");
 
-// Builds the main window (settings must already be loaded; IPC is registered by bootstrap).
+/**
+ * Builds the main window (settings must already be loaded; IPC is registered by bootstrap).
+ * @param {{ onCloseToTray?: (event: Electron.Event) => void }} [options]
+ */
 function createMainWindow({ onCloseToTray } = {}) {
   const settings = settingsStore.get();
   const mainWindow = new BrowserWindow(createMainWindowOptions(settings));
@@ -43,6 +47,19 @@ function createMainWindow({ onCloseToTray } = {}) {
   // away from the top edge, Win+Up/Down, Snap. The saved setting and the page follow.
   mainWindow.on("maximize", () => syncWindowState(mainWindow));
   mainWindow.on("unmaximize", () => syncWindowState(mainWindow));
+
+  // The page fades its title bar while another window is active (core/app-shell.js). It
+  // cannot tell by itself: its "blur" also fires when focus moves into an embedded frame (the
+  // live streams). Sent on every change and to every page that loads.
+  /** @param {boolean} focused */
+  const sendFocus = (focused) =>
+    mainWindow.webContents.send("window-focus-changed", focused);
+  mainWindow.on("focus", () => sendFocus(true));
+  mainWindow.on("blur", () => sendFocus(false));
+  mainWindow.webContents.on("did-finish-load", () =>
+    sendFocus(mainWindow.isFocused()),
+  );
+  mainWindow.webContents.once("did-finish-load", () => startup.mark("page"));
   mainWindow.on("restore", () => playerManager.getPlayerWindow()?.hide());
   mainWindow.on("show", () => playerManager.getPlayerWindow()?.hide());
 
@@ -56,7 +73,7 @@ function createMainWindow({ onCloseToTray } = {}) {
 
   if (onCloseToTray) mainWindow.on("close", onCloseToTray);
 
-  mainWindow.loadFile(pages.index);
+  mainWindow.loadURL(pages.index);
 
   if (!settings.bigScreen) {
     mainWindow.once("ready-to-show", () => mainWindow.maximize());

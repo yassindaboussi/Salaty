@@ -31,5 +31,6 @@
     "10-1": "Aïd al-Fitr",
     "12-9": "Jour d'Arafat",
     "12-10": "Aïd al-Adha"
-  }
+  },
+  "calendarMonthUnavailable": "Ce mois n’est pas encore enregistré pour une utilisation hors ligne. Connectez-vous à Internet pour le charger."
 }

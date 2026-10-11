@@ -6,7 +6,9 @@
 const { ipcRenderer } = require("electron");
 const { t } = require("../core/i18n");
 const { setThemeClass } = require("../core/theme");
+const { byId } = require("../core/dom");
 
+/** @type {HTMLElement | null} */
 let bannerEl = null;
 
 function _create() {
@@ -29,7 +31,7 @@ function _create() {
   `;
   document.body.insertBefore(bannerEl, document.body.firstChild);
 
-  const retryBtn = document.getElementById("offlineBannerRetry");
+  const retryBtn = byId("offlineBannerRetry", HTMLButtonElement);
   retryBtn.addEventListener("click", async () => {
     retryBtn.disabled = true;
     retryBtn.innerHTML = '<div class="spinner-small"></div>';
@@ -44,9 +46,9 @@ function _create() {
     retryBtn.disabled = false;
     _applyText();
   });
-  document
-    .getElementById("offlineBannerClose")
-    .addEventListener("click", () => _setVisible(false));
+  byId("offlineBannerClose", HTMLButtonElement).addEventListener("click", () =>
+    _setVisible(false),
+  );
 }
 
 function _setVisible(visible) {

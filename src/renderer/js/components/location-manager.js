@@ -8,9 +8,12 @@ const locationManager = require("../services/locations");
 const { fetchCountries, fetchCities } = require("../services/api/countries");
 const analytics = require("../services/analytics");
 const { escapeHtml } = require("../utils/html");
+const { byId, queryAll } = require("../core/dom");
 
 let currentEditingLocationId = null;
+/** @type {InstanceType<typeof TomSelect> | null} */
 let locationCountrySelect = null;
+/** @type {InstanceType<typeof TomSelect> | null} */
 let locationCitySelect = null;
 
 function initLocationManagementUI() {
@@ -167,7 +170,7 @@ async function loadLocationsList() {
     )
     .join("");
 
-  locationsList.querySelectorAll(".action-btn").forEach((btn) => {
+  queryAll(".action-btn", HTMLElement, locationsList).forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       e.stopPropagation();
       const action = btn.dataset.action;
@@ -192,6 +195,8 @@ async function loadLocationsList() {
 }
 
 async function _loadCitiesForCountry(country) {
+  // Only called once initLocationSelects() has created the pickers.
+  if (!locationCitySelect) return;
   locationCitySelect.clear();
   locationCitySelect.clearOptions();
   locationCitySelect.disable();
@@ -213,7 +218,7 @@ function initLocationSelects() {
   const commonConfig = {
     valueField: "name",
     labelField: "name",
-    searchField: "name",
+    searchField: ["name"],
     maxOptions: 500,
   };
 
@@ -237,7 +242,7 @@ function initLocationSelects() {
 
   return fetchCountries()
     .then((countries) => {
-      locationCountrySelect.addOptions(countries);
+      locationCountrySelect?.addOptions(countries);
       return countries;
     })
     .catch((e) => {
@@ -254,9 +259,9 @@ async function editLocation(locationId) {
 
   currentEditingLocationId = locationId;
 
-  const nameInput = document.getElementById("locationNameInput");
-  const favoriteToggle = document.getElementById("locationFavoriteToggle");
-  const addEditModal = document.getElementById("addEditLocationModal");
+  const nameInput = byId("locationNameInput", HTMLInputElement);
+  const favoriteToggle = byId("locationFavoriteToggle", HTMLInputElement);
+  const addEditModal = byId("addEditLocationModal", HTMLElement);
 
   nameInput.value = location.name;
   favoriteToggle.checked = location.isFavorite;
@@ -267,17 +272,17 @@ async function editLocation(locationId) {
 
   try {
     await initLocationSelects();
-    locationCountrySelect.setValue(location.country);
+    locationCountrySelect?.setValue(location.country);
     await _loadCitiesForCountry(location.country);
-    locationCitySelect.setValue(location.city);
+    locationCitySelect?.setValue(location.city);
   } catch (e) {
     console.error("[LocationUI] editLocation: failed to pre-fill selects:", e);
   }
 }
 
 async function saveLocation() {
-  const nameInput = document.getElementById("locationNameInput");
-  const favoriteToggle = document.getElementById("locationFavoriteToggle");
+  const nameInput = byId("locationNameInput", HTMLInputElement);
+  const favoriteToggle = byId("locationFavoriteToggle", HTMLInputElement);
 
   const name = nameInput.value.trim();
   const country = locationCountrySelect ? locationCountrySelect.getValue() : "";
@@ -311,7 +316,7 @@ async function saveLocation() {
   }
 
   if (success) {
-    document.getElementById("addEditLocationModal").classList.remove("active");
+    byId("addEditLocationModal", HTMLElement).classList.remove("active");
     resetAddEditForm();
     await loadLocationsList();
   }
@@ -319,8 +324,8 @@ async function saveLocation() {
 
 function resetAddEditForm() {
   currentEditingLocationId = null;
-  document.getElementById("locationNameInput").value = "";
-  document.getElementById("locationFavoriteToggle").checked = true;
+  byId("locationNameInput", HTMLInputElement).value = "";
+  byId("locationFavoriteToggle", HTMLInputElement).checked = true;
 
   if (locationCountrySelect) {
     locationCountrySelect.clear();

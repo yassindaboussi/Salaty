@@ -6,9 +6,9 @@
 //   - every permission request (camera, microphone, location, notifications…) is refused
 //   - links leave the app only through openExternalSafely (https to known sites, mailto)
 const path = require("path");
-const { fileURLToPath } = require("url");
 const { app, session, shell } = require("electron");
 const { RENDERER_DIR } = require("../config/paths");
+const { resolveAppFile } = require("./app-protocol");
 const log = require("../services/logger").logger("Security");
 
 const PAGES_DIR = path.join(RENDERER_DIR, "pages");
@@ -19,17 +19,15 @@ const EXTERNAL_HOSTS = new Set(["github.com"]);
 // The only permission the app grants: the live-stream player's fullscreen button.
 const ALLOWED_PERMISSIONS = new Set(["fullscreen"]);
 
-// True for file:// URLs of our own HTML pages. Compares resolved paths (not string prefixes),
-// so "../" tricks or look-alike folders cannot pass.
+// True for the app:// URLs of our own HTML pages (app/app-protocol.js). Compares resolved
+// paths (not string prefixes), so "../" tricks or look-alike folders cannot pass; file://
+// is never an app page.
+/** @param {string} url */
 function isAppPage(url) {
-  try {
-    const u = new URL(url);
-    if (u.protocol !== "file:") return false;
-    const rel = path.relative(PAGES_DIR, fileURLToPath(u));
-    return Boolean(rel) && !rel.startsWith("..") && !path.isAbsolute(rel);
-  } catch {
-    return false;
-  }
+  const file = resolveAppFile(url);
+  if (!file || !file.endsWith(".html")) return false;
+  const rel = path.relative(PAGES_DIR, file);
+  return Boolean(rel) && !rel.startsWith("..") && !path.isAbsolute(rel);
 }
 
 function openExternalSafely(url) {
