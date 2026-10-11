@@ -2,164 +2,171 @@
 
 # 🕌 Salaty Time
 
-تطبيق سطح مكتب إسلامي شامل — مواقيت الصلاة، القرآن الكريم، الأذكار وأدوات أخرى، في تطبيق واحد خفيف
+A complete Islamic desktop app: prayer times, the Holy Quran, athkar and more, in one light app
 
 [![Version](https://img.shields.io/github/v/release/yassindaboussi/Salaty?label=version&color=yellow)](https://github.com/yassindaboussi/Salaty/releases/latest)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational)](#-التشغيل-والتطوير)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-informational)](#-download)
+
+**English** · [العربية](README.ar.md) · [Français](README.fr.md)
 
 </div>
 
 ---
 
-## 📑 المحتويات
+## 📑 Contents
 
-- [نظرة عامة](#-نظرة-عامة)
-- [التحميل](#-التحميل)
-- [لقطات من التطبيق](#-لقطات-من-التطبيق)
-- [المميزات](#-المميزات)
-- [التقنيات المستخدمة](#️-التقنيات-المستخدمة)
-- [هيكلة المشروع](#-هيكلة-المشروع)
-- [التشغيل والتطوير](#-التشغيل-والتطوير)
-- [المساهمة في المشروع](#-المساهمة-في-المشروع)
-- [الترخيص](#-الترخيص)
-
----
-
-## 🌙 نظرة عامة
-
-تطبيق سطح مكتب يجمع أهم الأشياء اللي يحتاجها المسلم يوميًا في مكان واحد: مواقيت الصلاة، قارئ قرآن، أرشيف صوتي فيه تلاوات وتدبر وتفاسير، أذكار، وأدوات إسلامية متنوعة. يدعم العربية والإنجليزية والفرنسية، وأغلب الميزات المهمة تشتغل حتى بدون إنترنت.
+- [Overview](#-overview)
+- [Download](#-download)
+- [Screenshots](#-screenshots)
+- [Features](#-features)
+- [Tech stack](#️-tech-stack)
+- [Project structure](#-project-structure)
+- [Development](#-development)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
-## 📥 التحميل
+## 🌙 Overview
 
-| النظام | الملف | ملاحظات |
+A desktop app that brings together what a Muslim needs every day: prayer times, a Quran reader, an audio archive of recitations, tadabbur and tafsir, athkar, and other Islamic tools. It is available in Arabic, English and French, and most important features work without an internet connection.
+
+---
+
+## 📥 Download
+
+| System | File | Notes |
 | --- | --- | --- |
 | Windows 10/11 | [Salaty-Time-Setup.exe](https://github.com/yassindaboussi/Salaty/releases/latest/download/Salaty-Time-Setup.exe) | 64-bit |
-| macOS 13+ | [Salaty-Time-mac-universal.dmg](https://github.com/yassindaboussi/Salaty/releases/latest/download/Salaty-Time-mac-universal.dmg) | Apple silicon وIntel |
-| Linux | [Salaty-Time-linux-amd64.deb](https://github.com/yassindaboussi/Salaty/releases/latest/download/Salaty-Time-linux-amd64.deb) | Ubuntu وDebian وLinux Mint. نسخ arm64 وAppImage للتوزيعات الأخرى في [صفحة الإصدارات](https://github.com/yassindaboussi/Salaty/releases/latest) |
+| macOS 13+ | [Salaty-Time-mac-universal.dmg](https://github.com/yassindaboussi/Salaty/releases/latest/download/Salaty-Time-mac-universal.dmg) | Apple silicon and Intel |
+| Linux | [Salaty-Time-linux-amd64.deb](https://github.com/yassindaboussi/Salaty/releases/latest/download/Salaty-Time-linux-amd64.deb) | Ubuntu, Debian, Linux Mint. arm64 and AppImage builds for other distributions are on the [releases page](https://github.com/yassindaboussi/Salaty/releases/latest) |
 
-- **Windows:** المثبّت مش موقّع رقميًا بعد، فممكن يظهر تحذير "Windows protected your PC" (SmartScreen): اضغط **More info** ثم **Run anyway**.
-- **macOS:** التطبيق مش موثّق من Apple: افتحه مرة، ثم من **System Settings ← Privacy & Security** اضغط **Open Anyway**.
-- **التحديثات:** التطبيق يلقى الإصدارات الجديدة وحده: على Windows وLinux يثبّتها، وعلى macOS يفتح صفحة التحميل.
-- **التحقق من الملف:** كل إصدار فيه `SHA256SUMS.txt`، وكل ملف عنده شهادة بناء من GitHub: `gh attestation verify <الملف> --repo yassindaboussi/Salaty`
+- **Windows:** the installer is not digitally signed yet, so Windows may show "Windows protected your PC" (SmartScreen): click **More info**, then **Run anyway**.
+- **macOS:** the app is not notarized by Apple: open it once, then in **System Settings → Privacy & Security** click **Open Anyway**.
+- **Updates:** the app finds new versions by itself. On Windows and Linux it installs them; on macOS it opens the download page.
+- **Verify your download:** every release includes `SHA256SUMS.txt`, and every file has a GitHub build attestation: `gh attestation verify <file> --repo yassindaboussi/Salaty`
 
 ---
 
-## 📸 لقطات من التطبيق
+## 📸 Screenshots
 
 <div align="center">
-<img src="screenshots/quran-surah-list.png" width="45%" />
-<img src="screenshots/quran-reader.png" width="45%" />
+<img src="docs/screenshots/en/index.webp" width="49%" alt="Prayer times" />
+<img src="docs/screenshots/en/features.webp" width="49%" alt="All features" />
 <br/>
-<img src="screenshots/audio-archive.png" width="45%" />
-<img src="screenshots/audio-archive-tafsir.png" width="45%" />
+<img src="docs/screenshots/en/quran.webp" width="49%" alt="Holy Quran" />
+<img src="docs/screenshots/en/athkar.webp" width="49%" alt="Athkar" />
 <br/>
-<img src="screenshots/settings-about.png" width="45%" />
-<img src="screenshots/settings-appearance.png" width="45%" />
+<img src="docs/screenshots/en/albums.webp" width="49%" alt="Audio archive" />
+<img src="docs/screenshots/en/settings.webp" width="49%" alt="Settings" />
 </div>
 
 ---
 
-## ✨ المميزات
+## ✨ Features
 
-### 🕌 مواقيت الصلاة
-- كشف تلقائي للموقع عند بدء التشغيل (يمكن تعطيله)، مع دعم حفظ أكثر من موقع
-- تنبيه صوتي (أذان) عند دخول الوقت، وتنبيه اختياري قبل الأذان بعدد دقائق تختاره
-- ودجت صغير على سطح المكتب يعرض الوقت المتبقي للصلاة القادمة
+### 🕌 Prayer times
+- Detects your location at start-up (can be turned off), and keeps several saved locations
+- Adhan when the prayer time comes in, and an optional reminder a chosen number of minutes before
+- A small desktop widget showing the time left until the next prayer
 
-### 📖 القرآن الكريم
-- قارئ يعرض الآيات بشكل متصل بخط المصحف، بدل بطاقة لكل آية
-- ترجمات إنجليزية وفرنسية، مع خيار عرض الترجمة فقط بدون النص العربي
-- نسخة كاملة من القرآن محفوظة داخل التطبيق، تُستخدم تلقائيًا لو ما كان عندك إنترنت
-- تحكم في حجم الخط ووضع ملء الشاشة
+### 📖 Holy Quran
+- A reader that shows the verses as continuous Mushaf text, not one card per verse
+- English and French translations, with an option to show only the translation
+- A complete copy of the Quran inside the app, used automatically when you are offline
+- Font size control and full-screen mode
 
-### 🎧 أرشيف الصوتيات
-- تلاوة القرآن: أكثر من 200 قارئ، مرتبين أبجديًا مع فهرس للتنقل السريع
-- تدبر: وقفات تدبرية صوتية لكل سورة
-- تفاسير: كتب تفسير صوتية (زي تفسير الطبري) مرتبة حسب السورة
+### 🎧 Audio archive
+- Quran recitation: more than 200 reciters, sorted alphabetically with an index for quick navigation
+- Tadabbur: audio reflections for every surah
+- Tafsir: audio books of tafsir (such as Tafsir al-Tabari), organised by surah
 
-### 🤲 عبادات وأدوات إسلامية
-- أذكار الصباح والمساء مع تنبيهات دورية 📿
-- سبحة إلكترونية 🔢
-- أسماء الله الحسنى 🌟
-- التقويم الهجري 🗓️
-- اتجاه القبلة 🧭
-- أدوات خاصة برمضان 🌙
-- راديو إسلامي وبث مباشر 📻
+### 🤲 Worship and Islamic tools
+- Morning and evening athkar with periodic reminders 📿
+- Digital tasbih 🔢
+- The 99 Names of Allah 🌟
+- Hijri calendar 🗓️
+- Qibla direction 🧭
+- Ramadan tools 🌙
+- Islamic radio and live streams 📻
 
-### ⚙️ إعدادات
-- 12 سمة ألوان
-- 3 لغات (عربي، إنجليزي، فرنسي)
-- حفظ تلقائي لكل التغييرات بدون زر "حفظ"
-- تحقق من التحديثات داخل التطبيق
-
----
-
-## 🛠️ التقنيات المستخدمة
-
-| الفئة | التقنية |
-|---|---|
-| تطبيق سطح المكتب | Electron |
-| الواجهة | HTML / CSS / JavaScript (بدون framework) |
-| بيانات القرآن | AlQuran Cloud API + نسخة محلية احتياطية |
-| الصوتيات | mp3quran.net API |
-| البناء والتوزيع | electron-builder |
+### ⚙️ Settings
+- 12 colour themes
+- 3 languages (Arabic, English, French)
+- Every change is saved automatically, with no "Save" button
+- Automatic updates
 
 ---
 
-## 📂 هيكلة المشروع
+## 🛠️ Tech stack
+
+| Area | Technology |
+| --- | --- |
+| Desktop app | Electron |
+| Interface | HTML / CSS / JavaScript (no framework) |
+| Prayer times | Aladhan API, cached for offline use |
+| Quran data | AlQuran Cloud API + bundled offline copy |
+| Audio | mp3quran.net API |
+| Build and distribution | electron-builder, GitHub Actions |
+| Code quality | ESLint, Stylelint, Prettier, TypeScript type checks (JSDoc) |
+
+---
+
+## 📂 Project structure
 
 ```
 src/
-├── main/            # عملية Electron الرئيسية (النوافذ، IPC، الإعدادات)
-├── preload/          # سكربتات الجسر بين الواجهة والنظام
+├── main/            # Electron main process (windows, IPC, settings, services)
+├── preload/         # bridge between the pages and the system
+├── shared/          # shared by both sides (list of IPC channels)
+├── assets/          # icons, images, adhan sound, Microsoft Store tiles
 └── renderer/
-    ├── pages/         # صفحات HTML
-    ├── js/            # منطق كل صفحة وميزة
-    ├── css/           # الأنماط
-    ├── data/           # بيانات محلية (القرآن، الأذكار...)
-    ├── locales/        # ملفات الترجمة (ar / en / fr)
-    └── fonts/          # الخطوط المرفقة
+    ├── pages/       # HTML pages
+    ├── js/          # logic of each page and feature (see src/renderer/js/README.md)
+    ├── css/         # styles
+    ├── data/        # bundled data (Quran, athkar...)
+    ├── locales/     # translations (ar / en / fr)
+    └── fonts/       # bundled fonts
+docs/                # website (GitHub Pages) and screenshots
 ```
 
 ---
 
-## 🚀 التشغيل والتطوير
+## 🚀 Development
 
 ```bash
-npm install            # تثبيت الاعتماديات
-npm run dev              # تشغيل التطبيق في وضع التطوير
-npm run build             # بناء نسخة التثبيت
-npm run build:linux         # بناء نسخة Linux فقط
-npm run lint               # فحص الكود
-npm run lint:types         # فحص الأنواع (TypeScript على كود JavaScript، جزء من lint)
-npm run format              # تنسيق الكود تلقائيًا
-npm run audit:check          # فحص الثغرات الأمنية في الحزم
-npm run assets:store         # صور متجر Microsoft (بعد تغيير أيقونة التطبيق)
+npm install            # install dependencies
+npm run dev            # run the app in development mode
+npm run build          # build the installer
+npm run build:linux    # build the Linux packages only
+npm run lint           # all checks: code, types, architecture, CSS, translations, formatting
+npm run lint:types     # type checks only (TypeScript on the JavaScript code)
+npm run format         # format the code
+npm run audit:check    # check dependencies for security advisories
+npm run assets:store   # Microsoft Store images (after changing the app icon)
 ```
 
-**نشر إصدار جديد:** راجع [RELEASING.md](RELEASING.md).
+**Publishing a new version:** see [RELEASING.md](RELEASING.md).
 
-**متطلبات النظام:** Windows 10 أو أحدث (64-bit)، macOS 13 أو أحدث، Linux (x64 أو arm64).
-**للتطوير:** Node.js 22.12 أو أحدث.
-
----
-
-## 🤝 المساهمة في المشروع
-
-1. 🍴 Fork → branch جديد → عدّل الكود → Pull Request
-2. 🐛 عندك bug أو فكرة؟ افتح [Issue](https://github.com/yassindaboussi/Salaty/issues) أو ناقشها في [Discussions](https://github.com/yassindaboussi/Salaty/discussions)
+**System requirements:** Windows 10 or later (64-bit), macOS 13 or later, Linux (x64 or arm64).
+**For development:** Node.js 22.12 or later.
 
 ---
 
-## 📄 الترخيص
+## 🤝 Contributing
 
-مرخّص تحت MIT — راجع ملف [LICENSE](LICENSE).
+1. 🍴 Fork the project, create a branch, make your change, then open a Pull Request
+2. 🐛 Found a bug or have an idea? Open an [issue](https://github.com/yassindaboussi/Salaty/issues) or start a [discussion](https://github.com/yassindaboussi/Salaty/discussions)
+
+---
+
+## 📄 License
+
+Released under the MIT license: see [LICENSE](LICENSE).
 
 <div align="center">
 
-صُنع بـ ❤️ من طرف [Yassin Daboussi](mailto:salatytime@gmail.com)
+Made with ❤️ by [Yassin Daboussi](mailto:salatytime@gmail.com)
 
 </div>
