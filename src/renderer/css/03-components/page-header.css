@@ -34,6 +34,24 @@
   -webkit-app-region: drag;
 }
 
+/* For a page whose container has no padding of its own (e.g. live streams, where the video
+   panel spaces itself): the same inset the other pages get from their container. */
+.page-header--inset {
+  margin: 16px 16px 0;
+}
+
+@media (width <= 768px) {
+  .page-header--inset {
+    margin: 12px 12px 0;
+  }
+}
+
+@media (width <= 480px) {
+  .page-header--inset {
+    margin: 8px 8px 0;
+  }
+}
+
 /* Buttons stay clickable inside the drag area */
 .page-header button {
   -webkit-app-region: no-drag;
