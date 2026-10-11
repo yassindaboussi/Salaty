@@ -90,7 +90,7 @@ jobs:
           Start-Process "shell:AppsFolder\$($pkg.PackageFamilyName)!SalatyTime"
 
           # a packaged app's AppData writes land in its own folder under Packages
-          $logDirs = @("$env:LOCALAPPDATA\Packages\$($pkg.PackageFamilyName)", "$env:APPDATA\Salaty Time")
+          $logDirs = @("$env:LOCALAPPDATA\Packages\$($pkg.PackageFamilyName)", "$env:APPDATA\salaty")
           $deadline = (Get-Date).AddSeconds(90)
           do {
             Start-Sleep -Seconds 2

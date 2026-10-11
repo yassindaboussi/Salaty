@@ -1,7 +1,8 @@
 "use strict";
 
 // One logger for the main process (electron-log). Messages go to the console and to a log
-// file in the OS logs folder (Windows: %APPDATA%\Salaty Time\logs\main.log), so a user can
+// file in the OS logs folder (Windows: %APPDATA%\salaty\logs\main.log, macOS:
+// ~/Library/Logs/salaty/main.log, Linux: ~/.config/salaty/logs/main.log), so a user can
 // send that file when reporting a problem. The file is capped at 1 MB (older lines rotate out).
 const log = require("electron-log/main");
 

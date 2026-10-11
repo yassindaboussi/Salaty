@@ -12,7 +12,9 @@ name: Release
 on:
   push:
     branches: [main]
-    paths: ["package.json"]
+    # a version bump, or a change to this pipeline (finishes a release a failed run left
+    # unpublished; does nothing if the version is already released)
+    paths: ["package.json", ".github/workflows/release.yml"]
   workflow_dispatch:
 
 # never two releases at once; a running release is not cancelled
@@ -153,7 +155,7 @@ jobs:
         run: |
           $installer = Get-ChildItem dist -Filter *.exe | Select-Object -First 1
           $dir = Join-Path $env:RUNNER_TEMP "SalatyTime"
-          $userData = Join-Path $env:RUNNER_TEMP "profile"
+          $userData = Join-Path $env:RUNNER_TEMP "smoke-logs\profile"
           Start-Process $installer.FullName -ArgumentList "/S", "/D=$dir" -Wait
           $exe = Join-Path $dir "Salaty Time.exe"
           if (-not (Test-Path $exe)) { throw "Not installed: $exe" }
@@ -194,16 +196,27 @@ jobs:
           archs=$(lipo -archs "$app/Contents/MacOS/Salaty Time")
           [[ $archs == *x86_64* && $archs == *arm64* ]] || { echo "::error::Not universal: $archs"; exit 1; }
 
-          profile="$RUNNER_TEMP/profile"
-          "$app/Contents/MacOS/Salaty Time" --user-data-dir="$profile" > /dev/null 2>&1 &
-          logs=("$profile" "$HOME/Library/Logs/Salaty Time")
+          # macOS keeps logs in ~/Library/Logs/<app name> ("salaty", the package name), not in
+          # the profile
+          mkdir -p "$RUNNER_TEMP/smoke-logs"
+          profile="$RUNNER_TEMP/smoke-logs/profile"
+          out="$RUNNER_TEMP/smoke-logs/app-output.txt"
+          "$app/Contents/MacOS/Salaty Time" --user-data-dir="$profile" --enable-logging > "$out" 2>&1 &
+          logs=("$profile" "$HOME/Library/Logs")
           for _ in $(seq 45); do
             sleep 2
             grep -rqs --include=main.log "start-up (ms after launch)" "${logs[@]}" && break
           done
           pkill -f "Salaty Time.app/Contents/MacOS" || true
           line=$(grep -rhs --include=main.log "start-up (ms after launch)" "${logs[@]}" || true)
-          [ -n "$line" ] || { echo "::error::The app did not show its window"; exit 1; }
+          if [ -z "$line" ]; then
+            cp -R "$HOME/Library/Logs/salaty" "$RUNNER_TEMP/smoke-logs/" 2> /dev/null || true
+            # the app's own output, also as an annotation (readable without the full log)
+            cat "$out"
+            echo "::error title=App output::$(tail -15 "$out" | awk '{gsub(/%/,"%25"); gsub(/\r/,""); printf "%s%%0A", $0}')"
+            echo "::error::The app did not show its window"
+            exit 1
+          fi
           echo "Started: $line"
 
       # The .deb is installed with apt (as users do); its install script sets up the AppArmor
@@ -218,20 +231,38 @@ jobs:
           # how the app's updater knows it can install the next .deb itself ("auto" mode)
           grep -qx deb "$dir/resources/package-type" || { echo "::error::No package-type marker"; exit 1; }
 
-          profile="$RUNNER_TEMP/profile"
-          xvfb-run -a "$dir/salaty" --user-data-dir="$profile" > /dev/null 2>&1 &
+          mkdir -p "$RUNNER_TEMP/smoke-logs"
+          profile="$RUNNER_TEMP/smoke-logs/profile"
+          out="$RUNNER_TEMP/smoke-logs/app-output.txt"
+          xvfb-run -a "$dir/salaty" --user-data-dir="$profile" --enable-logging > "$out" 2>&1 &
           for _ in $(seq 45); do
             sleep 2
             grep -rqs --include=main.log "start-up (ms after launch)" "$profile" && break
           done
           pkill -f "$dir/salaty" || true
           line=$(grep -rhs --include=main.log "start-up (ms after launch)" "$profile" || true)
-          [ -n "$line" ] || { echo "::error::The app did not show its window"; exit 1; }
+          if [ -z "$line" ]; then
+            cat "$out"
+            echo "::error title=App output::$(tail -15 "$out" | awk '{gsub(/%/,"%25"); gsub(/\r/,""); printf "%s%%0A", $0}')"
+            echo "::error::The app did not show its window"
+            exit 1
+          fi
           echo "Started: $line"
 
           sudo apt-get remove -y -qq salaty > /dev/null
           [ ! -e "$dir/salaty" ] || { echo "::error::apt left the app behind"; exit 1; }
           echo "Uninstalled"
+
+      # On failure: the app's output and log files, downloadable from the run's page
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: smoke-test-logs-${{ matrix.platform }}
+          path: |
+            ${{ runner.temp }}/smoke-logs/**/*.log
+            ${{ runner.temp }}/smoke-logs/**/*.txt
+          if-no-files-found: ignore
+          retention-days: 7
 
   release:
     name: Publish
