@@ -152,7 +152,7 @@ npm run assets:store   # صور متجر Microsoft (بعد تغيير أيقون
 **نشر إصدار جديد:** راجع [RELEASING.md](RELEASING.md) (بالإنجليزية).
 
 **متطلبات النظام:** Windows 10 أو أحدث (64-bit)، macOS 13 أو أحدث، Linux (x64 أو arm64).
-**للتطوير:** Node.js 22.12 أو أحدث.
+**للتطوير:** Node.js 22.13 أو أحدث.
 
 ---
 

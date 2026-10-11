@@ -5,7 +5,7 @@
 const { ipcRenderer } = require("electron");
 const mp3quranApi = require("../../services/api/mp3quran");
 const { t } = require("../../core/i18n");
-const { escapeHtml, asButton } = require("../../utils/html");
+const { html, setHtml, asButton } = require("../../utils/html");
 /** @typedef {import("./index").AlbumsPage} AlbumsPage */
 
 const mp3quranLang = mp3quranApi.apiLanguage;
@@ -13,7 +13,10 @@ const mp3quranLang = mp3quranApi.apiLanguage;
 /** @param {AlbumsPage} page */
 async function ensureTadaborLoaded(page) {
   if (page.tadaborBySura) return;
-  page.tadaborGrid.innerHTML = `<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingTadabor")}</div>`;
+  setHtml(
+    page.tadaborGrid,
+    html`<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingTadabor")}</div>`,
+  );
   try {
     const [bySura, surahs] = await Promise.all([
       mp3quranApi.getTadabor(mp3quranLang()),
@@ -24,12 +27,15 @@ async function ensureTadaborLoaded(page) {
     page.renderTadabor();
   } catch (error) {
     console.error("Failed to load tadabor:", error);
-    page.tadaborGrid.innerHTML = `
+    setHtml(
+      page.tadaborGrid,
+      html`
         <div class="error-message">
           <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
           <div>${t("errorLoadingTadabor")}</div>
           <button type="button" class="retry-button" id="retryLoadTadabor">${t("retry")}</button>
-        </div>`;
+        </div>`,
+    );
     document
       .getElementById("retryLoadTadabor")
       ?.addEventListener("click", () => {
@@ -60,7 +66,10 @@ function renderTadabor(page, query = "") {
   page.tadaborGrid.innerHTML = "";
 
   if (suraIds.length === 0) {
-    page.tadaborGrid.innerHTML = `<div class="empty-state"><i class="fas fa-search" aria-hidden="true"></i><p>${t("noTracksFound")}</p></div>`;
+    setHtml(
+      page.tadaborGrid,
+      html`<div class="empty-state"><i class="fas fa-search" aria-hidden="true"></i><p>${t("noTracksFound")}</p></div>`,
+    );
     return;
   }
 
@@ -80,12 +89,15 @@ function renderTadabor(page, query = "") {
 function createTadaborCard(page, suraId, suraName, entries) {
   const card = asButton(document.createElement("div"));
   card.className = "reciter-card";
-  card.innerHTML = `
+  setHtml(
+    card,
+    html`
       <span class="reciter-card-badge">${entries.length}</span>
       <div class="reciter-card-avatar"><i class="fas fa-lightbulb" aria-hidden="true"></i></div>
-      <span class="reciter-card-name">${escapeHtml(suraName)}</span>
+      <span class="reciter-card-name">${suraName}</span>
       <span class="reciter-card-meta">${t("reflections").replace("{count}", entries.length)}</span>
-    `;
+    `,
+  );
 
   card.addEventListener("click", () => page.openTadabor(suraName, entries));
   return card;

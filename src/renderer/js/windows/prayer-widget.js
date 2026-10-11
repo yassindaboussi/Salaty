@@ -13,7 +13,7 @@ const {
 const { t } = require("../core/i18n");
 const { loadSettings } = require("../core/bootstrap");
 const { setThemeClass } = require("../core/theme");
-const { escapeHtml } = require("../utils/html");
+const { html, setHtml } = require("../utils/html");
 const { byId } = require("../core/dom");
 
 const PRAYER_ICONS = {
@@ -96,18 +96,19 @@ function renderList() {
     return t(shownKey, "prayerNames");
   };
 
-  prayerListEl.innerHTML = ordered
-    .map((p) => {
+  setHtml(
+    prayerListEl,
+    html`${ordered.map((p) => {
       const isActive = p.key === activePrayer.key;
       const isNext = p.key === nextPrayer.key && !isActive;
       const name = prayerName(p.key);
-      return `<div class="tb-col${isActive ? " active" : ""}${isNext ? " next" : ""}" data-tip="${name}" aria-label="${name}">
+      return html`<div class="tb-col${isActive ? " active" : ""}${isNext ? " next" : ""}" data-tip="${name}" aria-label="${name}">
       <i class="fas ${PRAYER_ICONS[p.key] ?? "fa-clock"} tb-col-icon" aria-hidden="true"></i>
-      <span class="tb-col-time">${escapeHtml(p.time)}</span>
+      <span class="tb-col-time">${p.time}</span>
       <div class="tb-col-dot"></div>
     </div>`;
-    })
-    .join("");
+    })}`,
+  );
 }
 
 function tick() {

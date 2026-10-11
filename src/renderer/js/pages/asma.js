@@ -6,6 +6,7 @@ const analytics = require("../services/analytics");
 const { renderToast } = require("../core/toast");
 const { initSelectionCopy } = require("../components/selection-copy");
 const { byId, query } = require("../core/dom");
+const { html, setHtml } = require("../utils/html");
 
 /** @type {any[] | null} */
 let asmaData = null;
@@ -68,7 +69,9 @@ function renderAsmaList() {
       const meaning = langData ? decodeUnicode(langData.meaning) : "";
       const desc = langData ? decodeUnicode(langData.desc) : "";
 
-      card.innerHTML = `
+      setHtml(
+        card,
+        html`
         <div class="asma-header-row">
           <div class="asma-name-group">
             <div class="asma-number">${item.number}</div>
@@ -80,7 +83,8 @@ function renderAsmaList() {
         </div>
         <div class="asma-meaning">${meaning}</div>
         <div class="asma-desc">${desc}</div>
-      `;
+      `,
+      );
 
       const copyBtn = query(".asma-copy-btn", HTMLButtonElement, card);
       copyBtn.addEventListener("click", () =>
@@ -91,7 +95,9 @@ function renderAsmaList() {
       const meaning = decodeUnicode(langData.meaning);
       const desc = decodeUnicode(langData.desc);
 
-      card.innerHTML = `
+      setHtml(
+        card,
+        html`
         <div class="asma-number">${item.number}</div>
         <div class="asma-name">${item.name}</div>
         <div class="asma-translit">${item.transliteration}</div>
@@ -100,7 +106,8 @@ function renderAsmaList() {
         <button type="button" class="asma-copy-btn" aria-label="${t("copy")}">
           <i class="fas fa-copy" aria-hidden="true"></i>
         </button>
-      `;
+      `,
+      );
 
       const copyBtn = query(".asma-copy-btn", HTMLButtonElement, card);
       copyBtn.addEventListener("click", () => copyAsma(item, meaning, desc));
@@ -146,7 +153,7 @@ function copyAsmaArabic(name, meaning, desc) {
 function showSuccessToast(message, isError = false) {
   renderToast(
     `asma-toast ${isError ? "error" : ""}`,
-    `<i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}" aria-hidden="true"></i><span>${message}</span>`,
+    html`<i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}" aria-hidden="true"></i><span>${message}</span>`,
     { duration: 3000, removeDelay: 500 },
   );
 }
@@ -154,7 +161,9 @@ function showSuccessToast(message, isError = false) {
 function showError() {
   const content = document.getElementById("asmaContent");
   if (content) {
-    content.innerHTML = `
+    setHtml(
+      content,
+      html`
       <div class="error-message">
         <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
         <div>${t("errorLoading")}</div>
@@ -162,7 +171,8 @@ function showError() {
           <i class="fas fa-redo" aria-hidden="true"></i> ${t("retry")}
         </button>
       </div>
-    `;
+    `,
+    );
     byId("retryAsma", HTMLButtonElement).addEventListener(
       "click",
       loadAsmaData,

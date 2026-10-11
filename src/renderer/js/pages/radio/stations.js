@@ -2,7 +2,7 @@
 
 // The station cards; a click on a card or its button plays the station (or pauses it).
 const { t, getLanguage } = require("../../core/i18n");
-const { escapeHtml } = require("../../utils/html");
+const { html, setHtml } = require("../../utils/html");
 const { queryAll } = require("../../core/dom");
 const { radioStations, resolveStationImagePath } = require("./state");
 const { playStation } = require("./playback");
@@ -22,18 +22,21 @@ function createStationCard(station, lang) {
   const card = document.createElement("div");
   card.className = "station-card";
   card.dataset.station = station.id;
-  const name = escapeHtml(station.name[lang] || station.name.en);
-  const country = escapeHtml(station.country[lang] || station.country.en);
-  card.innerHTML = `
-    <div class="station-card-image"><img src="${escapeHtml(resolveStationImagePath(station.image))}" alt="${name}" loading="lazy"></div>
+  const name = station.name[lang] || station.name.en;
+  const country = station.country[lang] || station.country.en;
+  setHtml(
+    card,
+    html`
+    <div class="station-card-image"><img src="${resolveStationImagePath(station.image)}" alt="${name}" loading="lazy"></div>
     <div class="station-card-info">
       <div class="station-card-name">${name}</div>
       <div class="station-card-location">${country}</div>
     </div>
     <div class="station-card-bars"><span></span><span></span><span></span></div>
-    <button type="button" class="station-play-btn" data-station="${escapeHtml(station.id)}" aria-label="${t("tooltipPlayPause")}: ${name}">
+    <button type="button" class="station-play-btn" data-station="${station.id}" aria-label="${t("tooltipPlayPause")}: ${name}">
       <i class="fas fa-play" aria-hidden="true"></i>
-    </button>`;
+    </button>`,
+  );
   return card;
 }
 

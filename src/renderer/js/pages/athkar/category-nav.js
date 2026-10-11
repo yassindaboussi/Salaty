@@ -4,7 +4,7 @@
 // category shows its adhkar.
 const { t } = require("../../core/i18n");
 const analytics = require("../../services/analytics");
-const { asButton } = require("../../utils/html");
+const { asButton, html, setHtml } = require("../../utils/html");
 const { queryAll } = require("../../core/dom");
 const { state } = require("./state");
 const {
@@ -65,7 +65,10 @@ function populateCategoryNav() {
   if (query && categoryNav.children.length === 0) {
     const empty = document.createElement("div");
     empty.className = "category-nav-empty";
-    empty.innerHTML = `<i class="fas fa-magnifying-glass" aria-hidden="true"></i><span>${t("noAthkarFound")}</span>`;
+    setHtml(
+      empty,
+      html`<i class="fas fa-magnifying-glass" aria-hidden="true"></i><span>${t("noAthkarFound")}</span>`,
+    );
     categoryNav.appendChild(empty);
   }
 
@@ -82,12 +85,15 @@ function buildGroupSection(labelKey, icon, categories, totalInGroup) {
   const header = document.createElement("button");
   header.className = "category-group-header";
   header.dataset.tipName = t(labelKey);
-  header.innerHTML = `
+  setHtml(
+    header,
+    html`
     <i class="fas ${icon} category-group-icon" aria-hidden="true"></i>
     <span class="category-group-label">${t(labelKey)}</span>
     <span class="category-group-total">${totalInGroup}</span>
     <i class="fas fa-chevron-down category-group-chevron" aria-hidden="true"></i>
-  `;
+  `,
+  );
   header.addEventListener("click", (e) => {
     e.stopPropagation();
     // In the icon rail the group label is hidden, so clicking its icon opens the sidebar.

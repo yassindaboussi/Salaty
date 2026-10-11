@@ -4,6 +4,7 @@
 // sound bars, the play/pause icons, the active station card, the loading overlay and toasts.
 const { t, getLanguage } = require("../../core/i18n");
 const { renderToast } = require("../../core/toast");
+const { html } = require("../../utils/html");
 const { queryAll } = require("../../core/dom");
 const { state, resolveStationImagePath } = require("./state");
 
@@ -115,7 +116,7 @@ function showLoading(show) {
 function showToast(message, type = "info") {
   renderToast(
     `radio-toast ${type}`,
-    `<i class="fas fa-${type === "error" ? "exclamation-circle" : "info-circle"}" aria-hidden="true"></i> ${message}`,
+    html`<i class="fas fa-${type === "error" ? "exclamation-circle" : "info-circle"}" aria-hidden="true"></i> ${message}`,
     { duration: 3000, removeDelay: 300 },
   );
 }

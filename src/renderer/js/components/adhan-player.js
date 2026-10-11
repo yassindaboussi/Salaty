@@ -4,6 +4,7 @@ const { ipcRenderer } = require("electron");
 
 const { t } = require("../core/i18n");
 const { state } = require("../core/store");
+const { html, setHtml } = require("../utils/html");
 
 /** @type {HTMLAudioElement | null} */
 let adhanAudio = null;
@@ -52,7 +53,9 @@ function _injectOverlay() {
   overlayEl = document.createElement("div");
   overlayEl.id = "__adhan-overlay__";
   overlayEl.className = "adhan-player-overlay adhan-player-overlay--hidden";
-  overlayEl.innerHTML = `
+  setHtml(
+    overlayEl,
+    html`
     <div class="adhan-player-bar">
       <div class="adhan-player-bar__icon-wrap">
         <i class="fas fa-mosque adhan-player-bar__mosque-icon" aria-hidden="true"></i>
@@ -69,7 +72,8 @@ function _injectOverlay() {
         <span id="__adhan-stop-label__">${t("stopAdhan")}</span>
       </button>
     </div>
-  `;
+  `,
+  );
 
   document.body.appendChild(overlayEl);
 

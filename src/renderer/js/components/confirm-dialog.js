@@ -1,7 +1,7 @@
 "use strict";
 
 const { t } = require("../core/i18n");
-const { escapeHtml } = require("../utils/html");
+const { html, setHtml } = require("../utils/html");
 const { queryAll } = require("../core/dom");
 
 function _showDialog(message, { icon, iconClass = "", buttons }) {
@@ -18,22 +18,23 @@ function _showDialog(message, { icon, iconClass = "", buttons }) {
     dialog.setAttribute("aria-describedby", "customDialogMessage");
     dialog.setAttribute("tabindex", "-1");
 
-    const buttonsHtml = buttons
-      .map(
-        (b) =>
-          `<button type="button" class="custom-dialog-btn ${b.className}" data-action="${b.action}">${escapeHtml(b.text)}</button>`,
-      )
-      .join("\n");
+    const buttonsHtml = buttons.map(
+      (b) =>
+        html`<button type="button" class="custom-dialog-btn ${b.className}" data-action="${b.action}">${b.text}</button>`,
+    );
 
-    dialog.innerHTML = `
+    setHtml(
+      dialog,
+      html`
       <div class="custom-dialog-icon ${iconClass}">
         <i class="fas ${icon}" aria-hidden="true"></i>
       </div>
-      <div class="custom-dialog-message" id="customDialogMessage">${escapeHtml(message)}</div>
+      <div class="custom-dialog-message" id="customDialogMessage">${message}</div>
       <div class="custom-dialog-actions">
         ${buttonsHtml}
       </div>
-    `;
+    `,
+    );
 
     overlay.appendChild(dialog);
     const parent = document.getElementById("app") || document.body;

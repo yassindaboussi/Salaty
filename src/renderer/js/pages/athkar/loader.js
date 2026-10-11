@@ -3,6 +3,7 @@
 // Loads the bundled adhkar (data/adkar.json), fills the sidebar and opens the first category; on
 // failure shows an error with a retry button.
 const { t } = require("../../core/i18n");
+const { html, setHtml } = require("../../utils/html");
 const { getAdkar } = require("../../services/content");
 const analytics = require("../../services/analytics");
 const { state } = require("./state");
@@ -37,7 +38,9 @@ async function loadAthkarData() {
     console.error("Error loading athkar data:", error);
     analytics.error("athkar_load", error.message || String(error));
     if (athkarLoading) {
-      athkarLoading.innerHTML = `
+      setHtml(
+        athkarLoading,
+        html`
         <div class="athkar-loading-content">
           <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
           <span>${t("athkarError")}</span>
@@ -45,7 +48,8 @@ async function loadAthkarData() {
             <i class="fas fa-sync-alt" aria-hidden="true"></i> ${t("retry")}
           </button>
         </div>
-      `;
+      `,
+      );
 
       const retryBtn = document.getElementById("retryAthkarBtn");
       if (retryBtn) {

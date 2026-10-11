@@ -1,6 +1,6 @@
 "use strict";
 
-const { escapeHtml } = require("../utils/html");
+const { html, setHtml } = require("../utils/html");
 
 const ICONS = {
   success: "check-circle",
@@ -9,7 +9,12 @@ const ICONS = {
 };
 const ERROR_BG = "rgba(244,67,54,0.92)";
 
-function renderToast(className, innerHTML, opts = {}) {
+/**
+ * @param {string} className
+ * @param {import("../utils/html").HtmlFragment} content html`` fragment
+ * @param {{ duration?: number, removeDelay?: number, replaceExisting?: boolean }} [opts]
+ */
+function renderToast(className, content, opts = {}) {
   const { duration = 2500, removeDelay, replaceExisting = true } = opts;
 
   if (replaceExisting) {
@@ -20,7 +25,7 @@ function renderToast(className, innerHTML, opts = {}) {
 
   const toast = document.createElement("div");
   toast.className = className;
-  toast.innerHTML = innerHTML;
+  setHtml(toast, content);
   toast.setAttribute("role", "status");
   toast.setAttribute("aria-live", "polite");
   document.body.appendChild(toast);
@@ -44,7 +49,7 @@ function renderToast(className, innerHTML, opts = {}) {
 function showToast(message, type = "info") {
   const toast = renderToast(
     `toast ${type}`,
-    `<i class="fas fa-${ICONS[type] ?? ICONS.info}" aria-hidden="true"></i><span>${escapeHtml(message)}</span>`,
+    html`<i class="fas fa-${ICONS[type] ?? ICONS.info}" aria-hidden="true"></i><span>${message}</span>`,
     { duration: 2500 },
   );
   if (type === "error") toast.style.background = ERROR_BG;

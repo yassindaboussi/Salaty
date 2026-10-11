@@ -3,6 +3,7 @@
 // What the page tells the user: the success toast and the reset confirmation dialog.
 const { t } = require("../../core/i18n");
 const { renderToast } = require("../../core/toast");
+const { html } = require("../../utils/html");
 const { query } = require("../../core/dom");
 
 function showResetConfirm(callback) {
@@ -59,7 +60,7 @@ function _showConfirmDialog({
 function showSuccessToast(message, isError = false, duration = 2000) {
   renderToast(
     `success-toast ${isError ? "error" : ""}`,
-    `<i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}" aria-hidden="true"></i><span>${message}</span>`,
+    html`<i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}" aria-hidden="true"></i><span>${message}</span>`,
     { duration, removeDelay: 200 },
   );
 }

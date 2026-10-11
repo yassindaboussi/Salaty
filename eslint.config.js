@@ -3,6 +3,7 @@
 // JavaScript linting: `npm run lint` (also run in CI).
 const js = require("@eslint/js");
 const globals = require("globals");
+const noUnsanitized = require("eslint-plugin-no-unsanitized");
 
 // Shared code-quality rules for every part of the app.
 const quality = {
@@ -63,15 +64,32 @@ module.exports = [
     rules: quality,
   },
 
-  // Renderer modules stay small and focused (src/renderer/js/README.md): a file that grows past
-  // this is split into a feature folder.
+  // Modules stay small and focused (src/renderer/js/README.md): a file that grows past this is
+  // split (renderer: into a feature folder).
   {
-    files: ["src/renderer/js/**/*.js"],
+    files: [
+      "src/renderer/js/**/*.js",
+      "src/main/**/*.js",
+      "src/preload/**/*.js",
+      "src/shared/**/*.js",
+    ],
     rules: {
       "max-lines": [
         "error",
         { max: 300, skipBlankLines: true, skipComments: true },
       ],
+    },
+  },
+
+  // HTML reaches the page only through utils/html.js (setHtml / insertHtml with html`` fragments,
+  // which escape every value): innerHTML, outerHTML, insertAdjacentHTML or document.write with
+  // anything but a constant string is an error (cross-site scripting from downloaded or typed text).
+  {
+    files: ["src/renderer/**/*.js"],
+    plugins: { "no-unsanitized": noUnsanitized },
+    rules: {
+      "no-unsanitized/property": "error",
+      "no-unsanitized/method": "error",
     },
   },
 

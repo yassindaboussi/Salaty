@@ -4,7 +4,7 @@
 const { t } = require("../../core/i18n");
 const analytics = require("../../services/analytics");
 const { fetchQuranSurah } = require("../../services/api/alquran-cloud");
-const { escapeHtml } = require("../../utils/html");
+const { html, setHtml } = require("../../utils/html");
 const { byId } = require("../../core/dom");
 const { state, fmt, revelationPlace, SURAH_META } = require("./state");
 
@@ -84,7 +84,9 @@ async function loadAyahs(surahNum) {
     if (myRequestId !== loadAyahsRequestId) return;
     console.error("Error loading Quran surah:", err);
     loading.style.display = "none";
-    ayahList.innerHTML = `
+    setHtml(
+      ayahList,
+      html`
       <div class="quran-error">
         <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
         <p>${t("quranError")}</p>
@@ -92,7 +94,8 @@ async function loadAyahs(surahNum) {
           <i class="fas fa-sync-alt" aria-hidden="true"></i> ${t("retry")}
         </button>
       </div>
-    `;
+    `,
+    );
     document
       .getElementById("retryBtn")
       ?.addEventListener("click", () => loadAyahs(surahNum));
@@ -105,28 +108,23 @@ function renderAyahs(ayahs) {
   const showingTranslation =
     state.translationId !== "none" && withTranslation.length > 0;
 
-  let html = "";
+  let content;
 
   if (!showingTranslation) {
-    const flowHtml = ayahs
-      .map(
-        (a) =>
-          `${escapeHtml(a.arabic)} <span class="ayah-number-inline" data-ayah="${escapeHtml(a.number)}">﴿${escapeHtml(fmt(a.number))}﴾</span>`,
-      )
-      .join(" ");
-    html += `<div class="surah-flow-text" id="surahFlowText" style="font-size:${state.fontSize}px">${flowHtml}</div>`;
+    // one space between the ayahs (running text, as in the Mushaf)
+    const flowHtml = ayahs.map(
+      (a, i) =>
+        html`${i ? " " : ""}${a.arabic} <span class="ayah-number-inline" data-ayah="${a.number}">﴿${fmt(a.number)}﴾</span>`,
+    );
+    content = html`<div class="surah-flow-text" id="surahFlowText" style="font-size:${state.fontSize}px">${flowHtml}</div>`;
+  } else {
+    content = html`<div class="ayah-translation-list" id="ayahTranslationList" style="font-size:${state.fontSize}px">${withTranslation.map(
+      (a) =>
+        html`<div class="ayah-translation-row"><span class="ayah-translation-num">${fmt(a.number)}.</span> ${a.translation}</div>`,
+    )}</div>`;
   }
 
-  if (showingTranslation) {
-    html += `<div class="ayah-translation-list" id="ayahTranslationList" style="font-size:${state.fontSize}px">${withTranslation
-      .map(
-        (a) =>
-          `<div class="ayah-translation-row"><span class="ayah-translation-num">${escapeHtml(fmt(a.number))}.</span> ${escapeHtml(a.translation)}</div>`,
-      )
-      .join("")}</div>`;
-  }
-
-  list.innerHTML = html;
+  setHtml(list, content);
 }
 
 function showSurahList() {

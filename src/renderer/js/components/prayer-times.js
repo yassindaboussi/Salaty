@@ -19,7 +19,7 @@ const {
 const { state, prayerIcons } = require("../core/store");
 const { updateRamadanCountdown } = require("./ramadan-countdown");
 const screenSizeManager = require("../core/screen-size");
-const { escapeHtml } = require("../utils/html");
+const { html, setHtml } = require("../utils/html");
 
 /** @type {any} */
 let prayerData = null;
@@ -90,13 +90,17 @@ function _renderPrayerUI() {
         const desc = isObj ? ev.description : "";
         const note = isObj ? ev.note : "";
         const prefix = t("tomorrowIs", "islamicEvents").split(":")[0];
-        let html = `<div class="event-title">${prefix}: ${name}</div>`;
+        const parts = [html`<div class="event-title">${prefix}: ${name}</div>`];
         if (date)
-          html += `<div class="event-date"><i class="far fa-calendar-alt" aria-hidden="true"></i> ${date}</div>`;
-        if (desc) html += `<div class="event-desc">${desc}</div>`;
+          parts.push(
+            html`<div class="event-date"><i class="far fa-calendar-alt" aria-hidden="true"></i> ${date}</div>`,
+          );
+        if (desc) parts.push(html`<div class="event-desc">${desc}</div>`);
         if (note)
-          html += `<div class="event-note"><i class="fas fa-info-circle" aria-hidden="true"></i> ${note}</div>`;
-        textEl.innerHTML = html;
+          parts.push(
+            html`<div class="event-note"><i class="fas fa-info-circle" aria-hidden="true"></i> ${note}</div>`,
+          );
+        setHtml(textEl, html`${parts}`);
         banner.style.display = "flex";
         screenSizeManager.setBannerVisible(true);
       } else {
@@ -120,8 +124,9 @@ function _renderPrayerUI() {
   const listEl = document.getElementById("prayerList");
   if (!listEl) return;
 
-  listEl.innerHTML = prayerKeys
-    .map((key) => {
+  setHtml(
+    listEl,
+    html`${prayerKeys.map((key) => {
       const name = prayerDisplayName(key);
       const time = prayerData.timings[key];
       const icon = prayerIcons[key] ?? "clock";
@@ -133,16 +138,16 @@ function _renderPrayerUI() {
           : state_ === "silent"
             ? ["bell", `${t("silentAdhan")} – ${t("disableAdhan")}`]
             : ["volume-mute", `${t("disableAdhan")} – ${t("enableAdhan")}`];
-      return `<div class="prayer-item${cur ? " current-prayer" : ""}" data-prayer="${key}">
+      return html`<div class="prayer-item${cur ? " current-prayer" : ""}" data-prayer="${key}">
       <i class="fas fa-${icon}" aria-hidden="true"></i>
       <span class="prayer-name">${name}</span>
-      <span class="prayer-time">${escapeHtml(time)}${cur ? ` <span class="current-indicator">${t("now")}</span>` : ""}</span>
+      <span class="prayer-time">${time}${cur ? html` <span class="current-indicator">${t("now")}</span>` : ""}</span>
       <button type="button" class="adhan-toggle-btn" data-prayer="${key}" title="${btnTitle}">
         <i class="fas fa-${btnIcon} adhan-toggle-icon" aria-hidden="true"></i>
       </button>
     </div>`;
-    })
-    .join("");
+    })}`,
+  );
 
   listEl.onclick = (e) => {
     if (!(e.target instanceof Element)) return;
@@ -167,19 +172,22 @@ function updateCurrentAndNextPrayer() {
     const cardsEl = document.getElementById("prayerCards");
     if (cardsEl) {
       if (currentActivePrayer !== currentPrayer.key) {
-        cardsEl.innerHTML = `
+        setHtml(
+          cardsEl,
+          html`
           <div class="prayer-card current">
             <div class="prayer-label">${t("currentPrayer")}</div>
             <div class="prayer-name">${currentPrayer.name}</div>
-            <div class="prayer-time">${escapeHtml(currentPrayer.time)}</div>
-            <div class="time-remaining">${t("endTime")} – ${escapeHtml(nextPrayer.time)}</div>
+            <div class="prayer-time">${currentPrayer.time}</div>
+            <div class="time-remaining">${t("endTime")} – ${nextPrayer.time}</div>
           </div>
           <div class="prayer-card next">
             <div class="prayer-label">${t("nextPrayer")}</div>
             <div class="prayer-name">${nextPrayer.name}</div>
-            <div class="prayer-time">${escapeHtml(nextPrayer.time)}</div>
+            <div class="prayer-time">${nextPrayer.time}</div>
             <div class="countdown" id="countdown">${formatTime(timeRemaining)}</div>
-          </div>`;
+          </div>`,
+        );
       } else {
         const el = document.getElementById("countdown");
         if (el) el.textContent = formatTime(timeRemaining);

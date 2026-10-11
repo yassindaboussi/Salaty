@@ -51,7 +51,8 @@ async function fetchJson(url) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
-    if (err.name === "AbortError") throw new Error("Request timed out");
+    if (err.name === "AbortError")
+      throw new Error("Request timed out", { cause: err });
     throw err;
   } finally {
     clearTimeout(timeoutId);

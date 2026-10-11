@@ -12,7 +12,7 @@ const {
 } = require("../../../shared/prayerUtils");
 const { ipcRenderer } = require("electron");
 const { locationQuery } = require("../../../shared/aladhan");
-const { escapeHtml } = require("../utils/html");
+const { html, setHtml } = require("../utils/html");
 
 let viewYear = 0;
 let viewMonth = 0;
@@ -166,18 +166,19 @@ function _renderTodayCard(days) {
   const nameOpts = {
     isFriday: _isFridayEntry(todayEntry, gDate),
   };
-  rowEl.innerHTML = PRAYER_KEYS.map((key) => {
+  const cells = PRAYER_KEYS.map((key) => {
     const time = cleanTime(todayEntry.timings[key]);
     const isNext = key === nextKey;
     const nameKey = displayPrayerKey(key, nameOpts);
-    return `
+    return html`
       <div class="monthly-today-cell${isNext ? " monthly-today-cell--next" : ""}">
         <i class="fas fa-${prayerIcons[key] || "clock"}" aria-hidden="true"></i>
         <div class="monthly-today-cell-name">${t(nameKey, "prayerNames")}</div>
-        <div class="monthly-today-cell-time">${escapeHtml(time)}</div>
+        <div class="monthly-today-cell-time">${time}</div>
       </div>
     `;
-  }).join("");
+  });
+  setHtml(rowEl, html`${cells}`);
 }
 
 function _renderTable(days) {
@@ -187,35 +188,34 @@ function _renderTable(days) {
 
   const langTag = getLocaleTag();
 
-  head.innerHTML = `<th>${t("date", "common")}</th>${PRAYER_KEYS.map(
-    (k) => `<th>${t(k, "prayerNames")}</th>`,
-  ).join("")}`;
+  setHtml(
+    head,
+    html`<th>${t("date", "common")}</th>${PRAYER_KEYS.map(
+      (k) => html`<th>${t(k, "prayerNames")}</th>`,
+    )}`,
+  );
 
   // The header has one Dhuhr column for the whole month, so Friday rows get a small
   // "Jumu'ah" badge in their Dhuhr cell instead (same time, only the name differs).
   const jumuahLabel = t(JUMUAH_KEY, "prayerNames");
 
-  body.innerHTML = days
-    .map((entry) => {
-      const day = parseInt(entry.date.gregorian.day, 10);
-      const gDate = new Date(viewYear, viewMonth - 1, day);
-      const weekday = gDate.toLocaleDateString(langTag, { weekday: "short" });
-      const iso = _entryIso(entry);
-      const isToday = iso === todayIso;
-      const jumuah = _isFridayEntry(entry, gDate);
+  const rows = days.map((entry) => {
+    const day = parseInt(entry.date.gregorian.day, 10);
+    const gDate = new Date(viewYear, viewMonth - 1, day);
+    const weekday = gDate.toLocaleDateString(langTag, { weekday: "short" });
+    const iso = _entryIso(entry);
+    const isToday = iso === todayIso;
+    const jumuah = _isFridayEntry(entry, gDate);
 
-      const cells = PRAYER_KEYS.map((key) => {
-        const time = cleanTime(entry.timings[key]);
-        if (
-          jumuah &&
-          displayPrayerKey(key, { isFriday: true }) === JUMUAH_KEY
-        ) {
-          return `<td class="monthly-jumuah">${escapeHtml(time)}<span class="monthly-jumuah-badge">${jumuahLabel}</span></td>`;
-        }
-        return `<td>${escapeHtml(time)}</td>`;
-      }).join("");
+    const cells = PRAYER_KEYS.map((key) => {
+      const time = cleanTime(entry.timings[key]);
+      if (jumuah && displayPrayerKey(key, { isFriday: true }) === JUMUAH_KEY) {
+        return html`<td class="monthly-jumuah">${time}<span class="monthly-jumuah-badge">${jumuahLabel}</span></td>`;
+      }
+      return html`<td>${time}</td>`;
+    });
 
-      return `
+    return html`
         <tr class="${isToday ? "monthly-today-row-highlight" : ""}">
           <td class="monthly-date-cell">
             <span class="monthly-date-day">${day}</span>
@@ -224,8 +224,8 @@ function _renderTable(days) {
           ${cells}
         </tr>
       `;
-    })
-    .join("");
+  });
+  setHtml(body, html`${rows}`);
 }
 
 function _scrollToTodayRow(instant = false) {

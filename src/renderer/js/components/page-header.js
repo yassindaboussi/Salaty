@@ -16,15 +16,16 @@
 // Buttons written inside the header with data-header-control (e.g. Athkar's "reset all") go
 // first in the buttons group. The buttons get their translated names from their tooltips.
 
-const MINIMIZE_ICON =
-  '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M19 13H5v-2h14v2z" /></svg>';
-const FULLSCREEN_ICON = '<i class="fas fa-expand" aria-hidden="true"></i>';
-const CLOSE_ICON =
-  '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" /></svg>';
-const BACK_ICON = '<i class="fas fa-arrow-left" aria-hidden="true"></i>';
+const { html, insertHtml } = require("../utils/html");
 
-function buttonHtml({ id, className, tooltip, icon, attrs = "" }) {
-  return `<button type="button" class="${className}" id="${id}" data-tooltip="${tooltip}"${attrs}>${icon}</button>`;
+const MINIMIZE_ICON = html`<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M19 13H5v-2h14v2z" /></svg>`;
+const FULLSCREEN_ICON = html`<i class="fas fa-expand" aria-hidden="true"></i>`;
+const CLOSE_ICON = html`<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" /></svg>`;
+const BACK_ICON = html`<i class="fas fa-arrow-left" aria-hidden="true"></i>`;
+
+// icon and attrs (extra attributes, e.g. html` data-back="home"`) are html`` fragments
+function buttonHtml({ id, className, tooltip, icon, attrs = html`` }) {
+  return html`<button type="button" class="${className}" id="${id}" data-tooltip="${tooltip}"${attrs}>${icon}</button>`;
 }
 
 function renderPageHeader(header) {
@@ -32,14 +33,15 @@ function renderPageHeader(header) {
   const id = (name) =>
     idPrefix ? idPrefix + name[0].toUpperCase() + name.slice(1) : name;
 
-  header.insertAdjacentHTML(
+  insertHtml(
+    header,
     "afterbegin",
     buttonHtml({
       id: id("backBtn"),
       className: "back-btn",
       tooltip: "tooltipBack",
       icon: BACK_ICON,
-      attrs: back ? ` data-back="${back}"` : "",
+      attrs: back ? html` data-back="${back}"` : undefined,
     }),
   );
 
@@ -48,28 +50,27 @@ function renderPageHeader(header) {
     .filter(Boolean)
     .join(" ");
   controls.append(...header.querySelectorAll("[data-header-control]"));
-  controls.insertAdjacentHTML(
+  insertHtml(
+    controls,
     "beforeend",
-    buttonHtml({
+    html`${buttonHtml({
       id: id("minimizeBtn"),
       className: "control-btn minimize-btn",
       tooltip: "tooltipMinimize",
       icon: MINIMIZE_ICON,
-      attrs: ' data-window-action="minimize"',
-    }) +
-      buttonHtml({
-        id: id("fullscreenBtn"),
-        className: "control-btn",
-        tooltip: "tooltipExpand",
-        icon: FULLSCREEN_ICON,
-      }) +
-      buttonHtml({
-        id: id("closeBtn"),
-        className: "control-btn close-btn",
-        tooltip: "tooltipClose",
-        icon: CLOSE_ICON,
-        attrs: ' data-window-action="close"',
-      }),
+      attrs: html` data-window-action="minimize"`,
+    })}${buttonHtml({
+      id: id("fullscreenBtn"),
+      className: "control-btn",
+      tooltip: "tooltipExpand",
+      icon: FULLSCREEN_ICON,
+    })}${buttonHtml({
+      id: id("closeBtn"),
+      className: "control-btn close-btn",
+      tooltip: "tooltipClose",
+      icon: CLOSE_ICON,
+      attrs: html` data-window-action="close"`,
+    })}`,
   );
   header.append(controls);
 

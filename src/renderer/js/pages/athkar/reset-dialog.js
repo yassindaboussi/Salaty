@@ -2,6 +2,7 @@
 
 // The "reset all counts" confirmation dialog.
 const { t } = require("../../core/i18n");
+const { html, setHtml } = require("../../utils/html");
 const { state, saveAthkarState } = require("./state");
 const { renderAthkarList } = require("./athkar-list");
 const { showSuccessToast } = require("./feedback");
@@ -9,7 +10,9 @@ const { showSuccessToast } = require("./feedback");
 function showResetConfirm() {
   const dialog = document.createElement("div");
   dialog.className = "athkar-confirm-dialog";
-  dialog.innerHTML = `
+  setHtml(
+    dialog,
+    html`
     <div class="athkar-confirm-box">
       <div class="athkar-confirm-title">${t("resetAllConfirmTitle")}</div>
       <div class="athkar-confirm-message">${t("resetAllConfirmMessage")}</div>
@@ -18,7 +21,8 @@ function showResetConfirm() {
         <button type="button" class="athkar-confirm-btn athkar-confirm-reset">${t("resetAllConfirm")}</button>
       </div>
     </div>
-  `;
+  `,
+  );
 
   document.body.appendChild(dialog);
 

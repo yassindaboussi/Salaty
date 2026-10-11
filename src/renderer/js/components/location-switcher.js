@@ -4,7 +4,7 @@ const locationManager = require("../services/locations");
 const { t } = require("../core/i18n");
 const { showConfirmDialog } = require("./confirm-dialog");
 const { state } = require("../core/store");
-const { escapeHtml } = require("../utils/html");
+const { html, setHtml } = require("../utils/html");
 const { queryAll } = require("../core/dom");
 
 let isDropdownOpen = false;
@@ -162,7 +162,7 @@ async function updateLocationSwitcher() {
     return;
   }
 
-  const detectLocationItem = `
+  const detectLocationItem = html`
     <div class="location-switcher-item detect-location-item" data-action="detect" role="button" tabindex="0">
       <div class="switcher-item-info">
         <div class="switcher-item-name">
@@ -173,22 +173,20 @@ async function updateLocationSwitcher() {
     </div>
   `;
 
-  const locationItems = favoriteLocations
-    .map(
-      (location) => `
+  const locationItems = favoriteLocations.map(
+    (location) => html`
     <div class="location-switcher-item ${location.isActive ? "active" : ""}"
-         data-location-id="${escapeHtml(location.id)}" role="button" tabindex="0">
+         data-location-id="${location.id}" role="button" tabindex="0">
       <div class="switcher-item-info">
-        <div class="switcher-item-name">${escapeHtml(location.name)}</div>
-        <div class="switcher-item-details">${escapeHtml(location.city)}, ${escapeHtml(location.country)}</div>
+        <div class="switcher-item-name">${location.name}</div>
+        <div class="switcher-item-details">${location.city}, ${location.country}</div>
       </div>
-      ${location.isActive ? '<i class="fas fa-check switcher-check" aria-hidden="true"></i>' : ""}
+      ${location.isActive ? html`<i class="fas fa-check switcher-check" aria-hidden="true"></i>` : ""}
     </div>
   `,
-    )
-    .join("");
+  );
 
-  dropdown.innerHTML = detectLocationItem + locationItems;
+  setHtml(dropdown, html`${detectLocationItem}${locationItems}`);
 
   const items = queryAll(".location-switcher-item", HTMLElement, dropdown);
 

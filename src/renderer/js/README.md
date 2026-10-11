@@ -37,7 +37,10 @@ together (see `pages/quran/`):
 ## Enforced by `npm run lint` (and CI)
 
 - `lint:architecture` (`scripts/check-architecture.js`): the layers, independent pages, no cycles
-- ESLint `max-lines`: at most **300 code lines** per file (blank lines and comments not counted)
+- ESLint `max-lines`: at most **300 code lines** per file (blank lines and comments not counted),
+  in the main process too
+- ESLint `no-unsanitized` (Mozilla): no `innerHTML` / `insertAdjacentHTML` / `outerHTML` with
+  anything but a constant string (see HTML below)
 - `lint:types`: TypeScript checks the JSDoc types (`src/renderer/tsconfig.json`), including every
   IPC channel name (`src/shared/ipc-channels.d.ts`)
 - `lint:csp` / `lint:locales`: every page's Content-Security-Policy, the translation files
@@ -49,7 +52,16 @@ together (see `pages/quran/`):
   `document.getElementById()` and a null check.
 - Text: `data-i18n` attributes in the HTML, `t("key")` in code (`core/i18n.js`); keys in
   `src/renderer/locales/{en,ar,fr}`.
-- Text inserted as HTML goes through `escapeHtml()` (`utils/html.js`).
+- HTML: build it with the `` html`...` `` tag and put it on the page with `setHtml(el, fragment)`
+  or `insertHtml(el, position, fragment)` (`utils/html.js`). Every `${value}` is escaped, nested
+  `` html`...` `` fragments and arrays of them go in as they are, `false`/`null` add nothing:
+
+  ```js
+  setHtml(list, html`<ul>${items.map((item) => html`<li>${item.name}</li>`)}</ul>`);
+  ```
+
+  So text from the network, the user or a translation never becomes markup. (Prettier leaves
+  the template contents alone: `embeddedLanguageFormatting` is off.)
 - Prayer times and Hijri dates come from the main process (offline cache), never from Aladhan
   directly.
 

@@ -6,7 +6,7 @@ const { t } = require("../core/i18n");
 const analytics = require("../services/analytics");
 const { ipcRenderer } = require("electron");
 const { cleanTime } = require("../../../shared/prayerUtils");
-const { escapeHtml, asButton } = require("../utils/html");
+const { html, setHtml, insertHtml, asButton } = require("../utils/html");
 const { byId, query, queryAll } = require("../core/dom");
 
 let ramadanData = [];
@@ -32,11 +32,17 @@ function initRamadanPage() {
 
   const modalLabelSuhoor = document.getElementById("modalLabelSuhoor");
   if (modalLabelSuhoor)
-    modalLabelSuhoor.innerHTML = `<i class="fas fa-utensils" aria-hidden="true"></i> ${t("suhoor")} (${t("Fajr", "prayerNames")})`;
+    setHtml(
+      modalLabelSuhoor,
+      html`<i class="fas fa-utensils" aria-hidden="true"></i> ${t("suhoor")} (${t("Fajr", "prayerNames")})`,
+    );
 
   const modalLabelIftar = document.getElementById("modalLabelIftar");
   if (modalLabelIftar)
-    modalLabelIftar.innerHTML = `<i class="fas fa-glass-water" aria-hidden="true"></i> ${t("iftar")} (${t("Maghrib", "prayerNames")})`;
+    setHtml(
+      modalLabelIftar,
+      html`<i class="fas fa-glass-water" aria-hidden="true"></i> ${t("iftar")} (${t("Maghrib", "prayerNames")})`,
+    );
 
   fetchRamadanData();
 }
@@ -44,8 +50,10 @@ function initRamadanPage() {
 async function fetchRamadanData() {
   const { city, country } = state.settings;
   if (!city || !country) {
-    byId("trackerGrid", HTMLElement).innerHTML =
-      `<p class="ramadan-message">${t("locationNotSet")}</p>`;
+    setHtml(
+      byId("trackerGrid", HTMLElement),
+      html`<p class="ramadan-message">${t("locationNotSet")}</p>`,
+    );
     return;
   }
 
@@ -82,8 +90,10 @@ async function fetchRamadanData() {
   } catch (error) {
     console.error("Error fetching Ramadan data:", error);
     analytics.error("ramadan_fetch", error.message || String(error));
-    byId("trackerGrid", HTMLElement).innerHTML =
-      `<p class="ramadan-message">${t("ramadanError")}</p>`;
+    setHtml(
+      byId("trackerGrid", HTMLElement),
+      html`<p class="ramadan-message">${t("ramadanError")}</p>`,
+    );
   }
 }
 
@@ -134,10 +144,14 @@ function renderCalendar(data) {
       el.classList.add("completed");
     }
 
-    el.innerHTML += `
-            <span class="hijri-day">${escapeHtml(hijriDay)}</span>
+    insertHtml(
+      el,
+      "beforeend",
+      html`
+            <span class="hijri-day">${hijriDay}</span>
             <span class="gregorian-date">${gDay} ${monthName}</span>
-        `;
+        `,
+    );
 
     el.addEventListener("click", () => openDayModal(dayData, el));
 
@@ -228,9 +242,12 @@ function openDayModal(dayData, element) {
   trackBtn.id = "trackBtn";
   trackBtn.className = "control-btn ramadan-track-btn";
   trackBtn.classList.toggle("is-tracked", isTracked);
-  trackBtn.innerHTML = isTracked
-    ? `<i class="fas fa-check" aria-hidden="true"></i> ${t("fastingCompleted")}`
-    : t("markAsCompleted");
+  setHtml(
+    trackBtn,
+    isTracked
+      ? html`<i class="fas fa-check" aria-hidden="true"></i> ${t("fastingCompleted")}`
+      : html`${t("markAsCompleted")}`,
+  );
 
   trackBtn.onclick = () => {
     toggleDayTracking(hijriDay, element, trackBtn);
@@ -250,13 +267,16 @@ function toggleDayTracking(hijriDay, dayElement, btn) {
     trackedDays = trackedDays.filter((d) => d !== hijriDay);
     dayElement.classList.remove("completed");
     btn.classList.remove("is-tracked");
-    btn.innerHTML = t("markAsCompleted");
+    setHtml(btn, html`${t("markAsCompleted")}`);
     analytics.ramadanDayTracked(hijriDay, "unmark");
   } else {
     trackedDays.push(hijriDay);
     dayElement.classList.add("completed");
     btn.classList.add("is-tracked");
-    btn.innerHTML = `<i class="fas fa-check" aria-hidden="true"></i> ${t("fastingCompleted")}`;
+    setHtml(
+      btn,
+      html`<i class="fas fa-check" aria-hidden="true"></i> ${t("fastingCompleted")}`,
+    );
     analytics.ramadanDayTracked(hijriDay, "mark");
   }
   localStorage.setItem(
@@ -323,12 +343,15 @@ function renderTable(data) {
       row.classList.add("current-day-row");
     }
 
-    row.innerHTML = `
-            <td>${escapeHtml(hijriDay)}</td>
+    setHtml(
+      row,
+      html`
+            <td>${hijriDay}</td>
             <td>${gDay} ${monthName}</td>
-            <td>${escapeHtml(cleanTime(dayData.timings.Fajr))}</td>
-            <td>${escapeHtml(cleanTime(dayData.timings.Maghrib))}</td>
-        `;
+            <td>${cleanTime(dayData.timings.Fajr)}</td>
+            <td>${cleanTime(dayData.timings.Maghrib)}</td>
+        `,
+    );
 
     tableBody.appendChild(row);
   });

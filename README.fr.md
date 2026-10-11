@@ -150,7 +150,7 @@ npm run assets:store   # images du Microsoft Store (après un changement d'icôn
 **Publier une nouvelle version :** voir [RELEASING.md](RELEASING.md) (en anglais).
 
 **Configuration requise :** Windows 10 ou plus récent (64 bits), macOS 13 ou plus récent, Linux (x64 ou arm64).
-**Pour le développement :** Node.js 22.12 ou plus récent.
+**Pour le développement :** Node.js 22.13 ou plus récent.
 
 ---
 

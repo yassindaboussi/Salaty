@@ -3,7 +3,7 @@ const { ipcRenderer } = require("electron");
 const { state } = require("../core/store");
 const { t, getLocaleTag } = require("../core/i18n");
 const { hijriMonthName } = require("../core/dates");
-const { escapeHtml } = require("../utils/html");
+const { html, setHtml } = require("../utils/html");
 const { setupConnectionRecovery } = require("../services/connection-recovery");
 const { byId, queryAll } = require("../core/dom");
 
@@ -119,8 +119,10 @@ function _renderHero() {
   hero.classList.remove("hidden");
 
   const meta = OCCASION_META[next.type] || {};
-  byId("vfHeroIcon", HTMLElement).innerHTML =
-    `<i class="fas ${meta.icon || "fa-utensils"}" aria-hidden="true"></i>`;
+  setHtml(
+    byId("vfHeroIcon", HTMLElement),
+    html`<i class="fas ${meta.icon || "fa-utensils"}" aria-hidden="true"></i>`,
+  );
   byId("vfHeroTitle", HTMLElement).textContent =
     (meta.titleKey && t(meta.titleKey)) || next.type;
   byId("vfHeroDate", HTMLElement).textContent = _formatDateLine(next);
@@ -152,7 +154,10 @@ function _renderList() {
   const rest = occasionsCache.slice(1);
 
   if (rest.length === 0 && occasionsCache.length === 0) {
-    listEl.innerHTML = `<div class="fasting-empty">${escapeHtml(t("noUpcomingFastingDays"))}</div>`;
+    setHtml(
+      listEl,
+      html`<div class="fasting-empty">${t("noUpcomingFastingDays")}</div>`,
+    );
     return;
   }
   if (rest.length === 0) {
@@ -160,7 +165,7 @@ function _renderList() {
     return;
   }
 
-  listEl.innerHTML = rest.map((o) => _renderItem(o)).join("");
+  setHtml(listEl, html`${rest.map((o) => _renderItem(o))}`);
 
   queryAll("[data-occasion-id]", HTMLElement, listEl).forEach((el) => {
     el.addEventListener("click", () => {
@@ -178,24 +183,24 @@ function _renderItem(o) {
   const desc = (meta.descKey && t(meta.descKey)) || "";
   const isOn = _isReminderOn(o.id);
 
-  return `
+  return html`
     <div class="fasting-item">
       <div class="fasting-item-icon"><i class="fas ${meta.icon || "fa-utensils"}" aria-hidden="true"></i></div>
       <div class="fasting-item-info">
-        <div class="fasting-item-title">${escapeHtml(title)}</div>
+        <div class="fasting-item-title">${title}</div>
         <div class="fasting-item-meta">
-          <span class="fasting-item-date-chip">${escapeHtml(_relativeLabel(o.gregorianDate))}</span>
+          <span class="fasting-item-date-chip">${_relativeLabel(o.gregorianDate)}</span>
           <span>•</span>
-          <span>${escapeHtml(_formatDateLine(o))}</span>
+          <span>${_formatDateLine(o)}</span>
         </div>
-        <div class="fasting-item-desc">${escapeHtml(desc)}</div>
+        <div class="fasting-item-desc">${desc}</div>
       </div>
       <button
         type="button"
         class="fasting-bell-btn${isOn ? " fasting-active" : ""}"
-        data-occasion-id="${escapeHtml(o.id)}"
-        aria-label="${escapeHtml(t("remindMe"))}"
-        title="${escapeHtml(_currentLeadLabel())}"
+        data-occasion-id="${o.id}"
+        aria-label="${t("remindMe")}"
+        title="${_currentLeadLabel()}"
       >
         <i class="fas fa-bell" aria-hidden="true"></i>
       </button>

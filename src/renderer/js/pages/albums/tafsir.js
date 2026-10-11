@@ -5,7 +5,7 @@
 const { ipcRenderer } = require("electron");
 const mp3quranApi = require("../../services/api/mp3quran");
 const { t } = require("../../core/i18n");
-const { escapeHtml, asButton } = require("../../utils/html");
+const { html, setHtml, asButton } = require("../../utils/html");
 /** @typedef {import("./index").AlbumsPage} AlbumsPage */
 
 const mp3quranLang = mp3quranApi.apiLanguage;
@@ -16,18 +16,24 @@ async function ensureTafsirBooksLoaded(page) {
     page.renderTafsir();
     return;
   }
-  page.tafsirGrid.innerHTML = `<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingTafasir")}</div>`;
+  setHtml(
+    page.tafsirGrid,
+    html`<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingTafasir")}</div>`,
+  );
   try {
     page.tafsirBooks = await mp3quranApi.getTafasirBooks(mp3quranLang());
     page.renderTafsir();
   } catch (error) {
     console.error("Failed to load tafsir books:", error);
-    page.tafsirGrid.innerHTML = `
+    setHtml(
+      page.tafsirGrid,
+      html`
         <div class="error-message">
           <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
           <div>${t("errorLoadingTafasir")}</div>
           <button type="button" class="retry-button" id="retryLoadTafsir">${t("retry")}</button>
-        </div>`;
+        </div>`,
+    );
     document
       .getElementById("retryLoadTafsir")
       ?.addEventListener("click", () => {
@@ -39,7 +45,10 @@ async function ensureTafsirBooksLoaded(page) {
 
 /** @param {AlbumsPage} page */
 async function openTafsirBook(page, book) {
-  page.tafsirGrid.innerHTML = `<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingTafasir")}</div>`;
+  setHtml(
+    page.tafsirGrid,
+    html`<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingTafasir")}</div>`,
+  );
   try {
     const { bookName, bySura } = await mp3quranApi.getTafsirSurahs(
       book.id,
@@ -58,12 +67,15 @@ async function openTafsirBook(page, book) {
     page.renderTafsir();
   } catch (error) {
     console.error("Failed to load tafsir surahs:", error);
-    page.tafsirGrid.innerHTML = `
+    setHtml(
+      page.tafsirGrid,
+      html`
         <div class="error-message">
           <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
           <div>${t("errorLoadingTafasir")}</div>
           <button type="button" class="retry-button" id="retryLoadTafsirBook">${t("retry")}</button>
-        </div>`;
+        </div>`,
+    );
     document
       .getElementById("retryLoadTafsirBook")
       ?.addEventListener("click", () => page.openTafsirBook(book));
@@ -95,7 +107,10 @@ function renderTafsirBooks(page, query) {
 
   page.tafsirGrid.innerHTML = "";
   if (books.length === 0) {
-    page.tafsirGrid.innerHTML = `<div class="empty-state"><i class="fas fa-search" aria-hidden="true"></i><p>${t("noTracksFound")}</p></div>`;
+    setHtml(
+      page.tafsirGrid,
+      html`<div class="empty-state"><i class="fas fa-search" aria-hidden="true"></i><p>${t("noTracksFound")}</p></div>`,
+    );
     return;
   }
 
@@ -104,10 +119,13 @@ function renderTafsirBooks(page, query) {
   books.forEach((book) => {
     const card = asButton(document.createElement("div"));
     card.className = "reciter-card";
-    card.innerHTML = `
+    setHtml(
+      card,
+      html`
         <div class="reciter-card-avatar"><i class="fas fa-book-open" aria-hidden="true"></i></div>
-        <span class="reciter-card-name">${escapeHtml(book.displayName || book.name)}</span>
-      `;
+        <span class="reciter-card-name">${book.displayName || book.name}</span>
+      `,
+    );
     card.addEventListener("click", () => page.openTafsirBook(book));
     grid.appendChild(card);
   });
@@ -136,7 +154,10 @@ function renderTafsirSurahs(page, query) {
 
   page.tafsirGrid.innerHTML = "";
   if (suraIds.length === 0) {
-    page.tafsirGrid.innerHTML = `<div class="empty-state"><i class="fas fa-search" aria-hidden="true"></i><p>${t("noTracksFound")}</p></div>`;
+    setHtml(
+      page.tafsirGrid,
+      html`<div class="empty-state"><i class="fas fa-search" aria-hidden="true"></i><p>${t("noTracksFound")}</p></div>`,
+    );
     return;
   }
 
@@ -147,11 +168,14 @@ function renderTafsirSurahs(page, query) {
     const suraName = surahNameMap[id] || `${t("surah")} ${id}`;
     const card = asButton(document.createElement("div"));
     card.className = "reciter-card";
-    card.innerHTML = `
+    setHtml(
+      card,
+      html`
         <span class="reciter-card-badge">${entries.length}</span>
         <div class="reciter-card-avatar"><i class="fas fa-book-open" aria-hidden="true"></i></div>
-        <span class="reciter-card-name">${escapeHtml(suraName)}</span>
-      `;
+        <span class="reciter-card-name">${suraName}</span>
+      `,
+    );
     card.addEventListener("click", () =>
       page.openTafsirSurah(suraName, entries),
     );

@@ -2,6 +2,7 @@
 
 const { t } = require("../core/i18n");
 const { query } = require("../core/dom");
+const { html, setHtml } = require("../utils/html");
 
 // The application menu is removed (Menu.setApplicationMenu(null)), so there is no Edit
 // menu and no default right-click menu. This module restores "copy the selected text"
@@ -33,7 +34,10 @@ function openMenu(x, y, text) {
   const menu = document.createElement("div");
   menu.className = "selection-copy-menu";
   menu.setAttribute("role", "menu");
-  menu.innerHTML = `<button type="button" role="menuitem"><i class="fas fa-copy" aria-hidden="true"></i>${t("copy")}</button>`;
+  setHtml(
+    menu,
+    html`<button type="button" role="menuitem"><i class="fas fa-copy" aria-hidden="true"></i>${t("copy")}</button>`,
+  );
   // Keep the text selected while the menu is used.
   menu.addEventListener("mousedown", (e) => e.preventDefault());
   query("button", HTMLButtonElement, menu).addEventListener("click", () => {

@@ -2,7 +2,7 @@
 
 // The chosen category's adhkar, one card each: the text, its note, the counter and the reference.
 const { t, getLanguage } = require("../../core/i18n");
-const { escapeHtml } = require("../../utils/html");
+const { html, setHtml } = require("../../utils/html");
 const { state } = require("./state");
 const { categoryLabel } = require("./categories");
 const { incrementCount, decrementCount, resetCount } = require("./counter");
@@ -30,12 +30,15 @@ function renderAthkarList() {
 
   const athkarItems = state.athkarData[state.currentCategory] || [];
   if (athkarItems.length === 0) {
-    athkarList.innerHTML = `
+    setHtml(
+      athkarList,
+      html`
       <div class="athkar-empty">
         <i class="fas fa-book-open" aria-hidden="true"></i>
         <span>${t("noAthkarInCategory")}</span>
       </div>
-    `;
+    `,
+    );
     return;
   }
 
@@ -66,7 +69,9 @@ function createAthkarCard(item, index) {
     card.classList.add("completed");
   }
 
-  card.innerHTML = `
+  setHtml(
+    card,
+    html`
     <div class="athkar-card-header">
       <div class="athkar-category">
         <i class="fas fa-hashtag" aria-hidden="true"></i>
@@ -83,7 +88,7 @@ function createAthkarCard(item, index) {
     
     ${
       item.description
-        ? `
+        ? html`
       <div class="athkar-description">
         ${descriptionFor(item)}
       </div>
@@ -95,7 +100,7 @@ function createAthkarCard(item, index) {
       <div class="count-info">
         <div class="count-label">${t("recitations")}</div>
         <div class="count-display">
-          <div class="count-value">${escapeHtml(currentCount)}</div>
+          <div class="count-value">${currentCount}</div>
           <div class="count-target">/${isUnlimited ? "∞" : targetCount}</div>
         </div>
       </div>
@@ -119,15 +124,16 @@ function createAthkarCard(item, index) {
     
     ${
       item.reference
-        ? `
+        ? html`
       <div class="athkar-reference">
-        ${item.grade ? `<span class="athkar-grade athkar-grade-${item.grade}">${t(`grade_${item.grade}`)}</span>` : ""}
+        ${item.grade ? html`<span class="athkar-grade athkar-grade-${item.grade}">${t(`grade_${item.grade}`)}</span>` : ""}
         <bdi>${referenceFor(item)}</bdi>
       </div>
     `
         : ""
     }
-  `;
+  `,
+  );
 
   const decrementBtn = card.querySelector(".decrement-btn");
   const incrementBtn = card.querySelector(".increment-btn");

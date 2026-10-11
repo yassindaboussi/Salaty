@@ -5,7 +5,7 @@ const analytics = require("../services/analytics");
 const { setupConnectionRecovery } = require("../services/connection-recovery");
 const { ipcRenderer } = require("electron");
 const { hijriMonthName } = require("../core/dates");
-const { escapeHtml } = require("../utils/html");
+const { html, setHtml } = require("../utils/html");
 const { byId } = require("../core/dom");
 
 // Special days shown on the calendar as { "month-day": name } in the UI language
@@ -187,10 +187,13 @@ function renderCalendarDays(monthData) {
       dayEl.classList.add("special-day");
     }
 
-    dayEl.innerHTML = `
+    setHtml(
+      dayEl,
+      html`
             <div class="day-number">${dayInfo.hijriDay}</div>
             <div class="day-gregorian">${dayInfo.gregorian.day}</div>
-        `;
+        `,
+    );
 
     daysContainer.appendChild(dayEl);
   });
@@ -201,7 +204,10 @@ function renderCalendarDays(monthData) {
 function showMonthUnavailable() {
   const daysContainer = document.getElementById("calendarDays");
   if (daysContainer) {
-    daysContainer.innerHTML = `<p class="calendar-message">${escapeHtml(t("calendarMonthUnavailable"))}</p>`;
+    setHtml(
+      daysContainer,
+      html`<p class="calendar-message">${t("calendarMonthUnavailable")}</p>`,
+    );
   }
   const gregorianDisplay = document.getElementById("gregorianDateText");
   if (gregorianDisplay) gregorianDisplay.textContent = "";
@@ -232,7 +238,10 @@ function renderIslamicEvents() {
     });
 
   if (monthEvents.length === 0) {
-    eventsList.innerHTML = `<p class="no-events">${t("noEventsThisMonth")}</p>`;
+    setHtml(
+      eventsList,
+      html`<p class="no-events">${t("noEventsThisMonth")}</p>`,
+    );
     return;
   }
 
@@ -241,10 +250,13 @@ function renderIslamicEvents() {
     const eventEl = document.createElement("div");
     eventEl.className = "event-item";
 
-    eventEl.innerHTML = `
+    setHtml(
+      eventEl,
+      html`
             <div class="event-date">${day}</div>
             <div class="event-name">${eventName}</div>
-        `;
+        `,
+    );
     eventsList.appendChild(eventEl);
   });
 }

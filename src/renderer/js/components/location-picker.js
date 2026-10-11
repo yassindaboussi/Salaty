@@ -82,7 +82,7 @@ async function initSelectLocation(onChange) {
     if (!value) return;
 
     /** @type {string | null} */
-    let defaultCity = null;
+    let defaultCity;
     if (detectedLocationTarget && detectedLocationTarget.country === value) {
       defaultCity = detectedLocationTarget.city;
       detectedLocationTarget = null;

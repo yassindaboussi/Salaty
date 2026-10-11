@@ -4,6 +4,7 @@
 const { t } = require("../../core/i18n");
 const { toWestern } = require("../../utils/numerals");
 const { byId, queryAll } = require("../../core/dom");
+const { html, setHtml } = require("../../utils/html");
 const {
   state,
   fmt,
@@ -46,13 +47,17 @@ function renderSurahGrid(surahs) {
   if (loading) loading.style.display = "none";
 
   if (!surahs.length) {
-    grid.innerHTML = `<div class="no-results" style="grid-column:1/-1">${t("noResults")}</div>`;
+    setHtml(
+      grid,
+      html`<div class="no-results" style="grid-column:1/-1">${t("noResults")}</div>`,
+    );
     return;
   }
 
-  grid.innerHTML = surahs
-    .map(
-      (s) => `
+  setHtml(
+    grid,
+    html`${surahs.map(
+      (s) => html`
     <div class="surah-card" data-surah="${s.n}" role="button" tabindex="0">
       <div class="surah-number-badge">${fmt(s.n)}</div>
       <div class="surah-card-info">
@@ -62,8 +67,8 @@ function renderSurahGrid(surahs) {
       </div>
     </div>
   `,
-    )
-    .join("");
+    )}`,
+  );
 
   queryAll(".surah-card", HTMLElement, grid).forEach((card) => {
     card.addEventListener("click", () => openSurah(Number(card.dataset.surah)));
@@ -72,8 +77,10 @@ function renderSurahGrid(surahs) {
 
 function renderJuzList() {
   const list = byId("juzList", HTMLElement);
-  list.innerHTML = JUZ_META.map(
-    (j) => `
+  setHtml(
+    list,
+    html`${JUZ_META.map(
+      (j) => html`
     <div class="juz-card" data-juz="${j.n}" role="button" tabindex="0">
       <div class="juz-badge">${fmt(j.n)}</div>
       <div class="juz-info">
@@ -83,7 +90,8 @@ function renderJuzList() {
       <i class="fas fa-chevron-left juz-arrow" aria-hidden="true"></i>
     </div>
   `,
-  ).join("");
+    )}`,
+  );
 
   const JUZ_TO_SURAH = [
     1, 2, 2, 3, 4, 4, 5, 6, 7, 8, 9, 11, 12, 15, 17, 18, 21, 23, 25, 27, 29, 33,

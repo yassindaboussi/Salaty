@@ -5,7 +5,7 @@
 const { ipcRenderer } = require("electron");
 const mp3quranApi = require("../../services/api/mp3quran");
 const { t, getLanguage } = require("../../core/i18n");
-const { escapeHtml, asButton } = require("../../utils/html");
+const { html, setHtml, asButton } = require("../../utils/html");
 const {
   ARABIC_ALPHABET,
   LATIN_ALPHABET,
@@ -18,7 +18,10 @@ const mp3quranLang = mp3quranApi.apiLanguage;
 /** @param {AlbumsPage} page */
 async function ensureRecitersLoaded(page) {
   if (page.reciters.length > 0) return;
-  page.albumsGrid.innerHTML = `<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingReciters")}</div>`;
+  setHtml(
+    page.albumsGrid,
+    html`<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingReciters")}</div>`,
+  );
   try {
     const reciters = await mp3quranApi.getReciters(mp3quranLang());
     page.reciters = reciters
@@ -27,12 +30,15 @@ async function ensureRecitersLoaded(page) {
     page.renderReciters();
   } catch (error) {
     console.error("Failed to load reciters:", error);
-    page.albumsGrid.innerHTML = `
+    setHtml(
+      page.albumsGrid,
+      html`
         <div class="error-message">
           <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
           <div>${t("errorLoadingReciters")}</div>
           <button type="button" class="retry-button" id="retryLoadReciters">${t("retry")}</button>
-        </div>`;
+        </div>`,
+    );
     document
       .getElementById("retryLoadReciters")
       ?.addEventListener("click", () => {
@@ -54,7 +60,10 @@ function renderReciters(page, query = "") {
   page.azIndex.innerHTML = "";
 
   if (list.length === 0) {
-    page.albumsGrid.innerHTML = `<div class="empty-state"><i class="fas fa-search" aria-hidden="true"></i><p>${t("noTracksFound")}</p></div>`;
+    setHtml(
+      page.albumsGrid,
+      html`<div class="empty-state"><i class="fas fa-search" aria-hidden="true"></i><p>${t("noTracksFound")}</p></div>`,
+    );
     return;
   }
 
@@ -103,19 +112,22 @@ function createReciterCard(page, reciter) {
 
   const singleMoshaf = reciter.moshaf.length === 1;
   const subtitle = singleMoshaf
-    ? escapeHtml(reciter.moshaf[0].name)
+    ? reciter.moshaf[0].name
     : t("recitationsAvailable").replace("{count}", reciter.moshaf.length);
 
-  card.innerHTML = `
+  setHtml(
+    card,
+    html`
       ${
         singleMoshaf
           ? ""
-          : `<span class="reciter-card-badge">${reciter.moshaf.length}</span>`
+          : html`<span class="reciter-card-badge">${reciter.moshaf.length}</span>`
       }
       <div class="reciter-card-avatar"><i class="fas fa-microphone-lines" aria-hidden="true"></i></div>
-      <span class="reciter-card-name">${escapeHtml(reciter.name)}</span>
+      <span class="reciter-card-name">${reciter.name}</span>
       <span class="reciter-card-meta">${subtitle}</span>
-    `;
+    `,
+  );
 
   card.addEventListener("click", () => {
     if (singleMoshaf) {

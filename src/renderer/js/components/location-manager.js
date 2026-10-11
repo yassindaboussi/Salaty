@@ -7,7 +7,7 @@ const { showConfirmDialog } = require("./confirm-dialog");
 const locationManager = require("../services/locations");
 const { fetchCountries, fetchCities } = require("../services/api/countries");
 const analytics = require("../services/analytics");
-const { escapeHtml } = require("../utils/html");
+const { html, setHtml } = require("../utils/html");
 const { byId, queryAll } = require("../core/dom");
 
 let currentEditingLocationId = null;
@@ -119,46 +119,50 @@ async function loadLocationsList() {
   const locations = await locationManager.getLocations();
 
   if (locations.length === 0) {
-    locationsList.innerHTML = `
+    setHtml(
+      locationsList,
+      html`
       <div class="empty-state">
         <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
         <p>${t("noLocations")}</p>
       </div>
-    `;
+    `,
+    );
     return;
   }
 
-  locationsList.innerHTML = locations
-    .map(
-      (location) => `
-    <div class="location-item ${location.isActive ? "active" : ""}" data-location-id="${escapeHtml(location.id)}">
+  setHtml(
+    locationsList,
+    html`${locations.map(
+      (location) => html`
+    <div class="location-item ${location.isActive ? "active" : ""}" data-location-id="${location.id}">
       <div>
         <div class="location-item-title">
-          <span class="location-item-name">${escapeHtml(location.name)}</span>
-          ${location.isActive ? `<span class="location-item-badge">${t("active")}</span>` : ""}
-          ${location.isFavorite ? '<i class="fas fa-star location-item-star" aria-hidden="true"></i>' : ""}
+          <span class="location-item-name">${location.name}</span>
+          ${location.isActive ? html`<span class="location-item-badge">${t("active")}</span>` : ""}
+          ${location.isFavorite ? html`<i class="fas fa-star location-item-star" aria-hidden="true"></i>` : ""}
         </div>
         <div class="location-item-place">
-          <i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${escapeHtml(location.city)}, ${escapeHtml(location.country)}
+          <i class="fas fa-map-marker-alt" aria-hidden="true"></i> ${location.city}, ${location.country}
         </div>
       </div>
       <div class="location-actions">
         ${
           !location.isActive
-            ? `
-          <button type="button" class="action-btn activate-btn" data-action="activate" data-id="${escapeHtml(location.id)}" title="${t("activate")}">
+            ? html`
+          <button type="button" class="action-btn activate-btn" data-action="activate" data-id="${location.id}" title="${t("activate")}">
             <i class="fas fa-check-circle" aria-hidden="true"></i>
           </button>
         `
             : ""
         }
-        <button type="button" class="action-btn edit-btn" data-action="edit" data-id="${escapeHtml(location.id)}" title="${t("edit")}">
+        <button type="button" class="action-btn edit-btn" data-action="edit" data-id="${location.id}" title="${t("edit")}">
           <i class="fas fa-edit" aria-hidden="true"></i>
         </button>
         ${
           locations.length > 1
-            ? `
-          <button type="button" class="action-btn delete-btn" data-action="delete" data-id="${escapeHtml(location.id)}" title="${t("delete")}">
+            ? html`
+          <button type="button" class="action-btn delete-btn" data-action="delete" data-id="${location.id}" title="${t("delete")}">
             <i class="fas fa-trash" aria-hidden="true"></i>
           </button>
         `
@@ -167,8 +171,8 @@ async function loadLocationsList() {
       </div>
     </div>
   `,
-    )
-    .join("");
+    )}`,
+  );
 
   queryAll(".action-btn", HTMLElement, locationsList).forEach((btn) => {
     btn.addEventListener("click", async (e) => {
@@ -300,7 +304,7 @@ async function saveLocation() {
   }
 
   const locationData = { name, country, city, isFavorite };
-  let success = false;
+  let success;
 
   if (currentEditingLocationId) {
     const updated = await locationManager.updateLocation(

@@ -5,7 +5,7 @@ const screenSizeManager = require("../core/screen-size");
 const mp3quranApi = require("../services/api/mp3quran");
 const { t, getLanguage } = require("../core/i18n");
 const analytics = require("../services/analytics");
-const { escapeHtml, asButton } = require("../utils/html");
+const { html, setHtml, asButton } = require("../utils/html");
 // (query renamed: this file uses "query" for search text)
 const { byId, query: queryOne, queryAll } = require("../core/dom");
 
@@ -53,15 +53,24 @@ class PlaylistManager {
         await this.loadTracks(album);
       } catch (e) {
         console.error("Error parsing stored album", e);
-        this.resultsList.innerHTML = `<div class="error"><p>${t("errorLoadingAlbums")}</p></div>`;
+        setHtml(
+          this.resultsList,
+          html`<div class="error"><p>${t("errorLoadingAlbums")}</p></div>`,
+        );
       }
     } else {
-      this.resultsList.innerHTML = `<div class="empty-state"><p>${t("noAlbumSelected")}</p></div>`;
+      setHtml(
+        this.resultsList,
+        html`<div class="empty-state"><p>${t("noAlbumSelected")}</p></div>`,
+      );
     }
   }
 
   async loadTracks(album) {
-    this.resultsList.innerHTML = `<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingTracks")}</div>`;
+    setHtml(
+      this.resultsList,
+      html`<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingTracks")}</div>`,
+    );
     try {
       if (album.source === "mp3quran") {
         this.originalTracks = await mp3quranApi.getReciterTracks(
@@ -79,14 +88,17 @@ class PlaylistManager {
     } catch (error) {
       console.error("Error loading tracks:", error);
       analytics.error("playlist_load_tracks", error.message || String(error));
-      const albumName = escapeHtml(getLocalized(album.title) || album.id);
+      const albumName = (getLocalized(album.title) || album.id) ?? "";
       let errorMsg = t("errorLoadingTracks");
       if (errorMsg.includes("{album}")) {
         errorMsg = errorMsg.replace("{album}", () => albumName);
       } else {
         errorMsg += ` ${albumName}`;
       }
-      this.resultsList.innerHTML = `<div class="error"><i class="fas fa-exclamation-circle" aria-hidden="true"></i>${errorMsg}</div>`;
+      setHtml(
+        this.resultsList,
+        html`<div class="error"><i class="fas fa-exclamation-circle" aria-hidden="true"></i>${errorMsg}</div>`,
+      );
     }
   }
 
@@ -107,7 +119,10 @@ class PlaylistManager {
   displayTracks() {
     this.resultsList.innerHTML = "";
     if (this.tracks.length === 0) {
-      this.resultsList.innerHTML = `<div class="empty-state"><p>${t("noTracksFound")}</p></div>`;
+      setHtml(
+        this.resultsList,
+        html`<div class="empty-state"><p>${t("noTracksFound")}</p></div>`,
+      );
       return;
     }
 
@@ -121,13 +136,16 @@ class PlaylistManager {
         el.classList.add("active");
       }
 
-      el.innerHTML = `
+      setHtml(
+        el,
+        html`
             <div class="track-info">
-                <span class="track-title">${escapeHtml(track.title)}</span>
-                <span class="track-meta">${escapeHtml(track.artist)}</span>
+                <span class="track-title">${track.title}</span>
+                <span class="track-meta">${track.artist}</span>
             </div>
             <i class="fas fa-play-circle start-track-btn" aria-hidden="true"></i>
-            `;
+            `,
+      );
 
       el.addEventListener("click", () => this.playTrack(index));
       container.appendChild(el);
@@ -302,9 +320,12 @@ class PlaylistManager {
   }
 
   updatePlayBtn() {
-    this.playPauseBtn.innerHTML = this.isPlaying
-      ? '<i class="fas fa-pause" aria-hidden="true"></i>'
-      : '<i class="fas fa-play" aria-hidden="true"></i>';
+    setHtml(
+      this.playPauseBtn,
+      this.isPlaying
+        ? html`<i class="fas fa-pause" aria-hidden="true"></i>`
+        : html`<i class="fas fa-play" aria-hidden="true"></i>`,
+    );
   }
 
   updateVolumeFill() {

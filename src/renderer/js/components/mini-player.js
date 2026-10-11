@@ -1,6 +1,7 @@
 "use strict";
 const { ipcRenderer } = require("electron");
 const { hideTooltip } = require("../core/tooltips");
+const { html, setHtml } = require("../utils/html");
 
 function setupMiniPlayer() {
   const wrap = document.createElement("div");
@@ -28,7 +29,7 @@ function setupMiniPlayer() {
     b.id = id;
     b.className = `mini-btn ${cls}`.trim();
     b.dataset.tooltip = tooltip;
-    b.innerHTML = `<i class="fas fa-${icon}" aria-hidden="true"></i>`;
+    setHtml(b, html`<i class="fas fa-${icon}" aria-hidden="true"></i>`);
     return b;
   };
   const prevBtn = mkBtn(
