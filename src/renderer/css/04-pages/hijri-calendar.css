@@ -1,5 +1,8 @@
 @layer pages {
-  /* Hijri Calendar Styles */
+  /* Hijri calendar: the month on one side, the selected day and the month's occasions on the
+     other (mirrored in Arabic), the panel under the month in a narrow window.
+     "Today" and "selected" are drawn in white, not the theme's accent: on several themes the
+     accent is close to the background (pink, gold, green), and these two must always show. */
 
   .calendar-container {
     display: flex;
@@ -17,522 +20,585 @@
     z-index: 2;
   }
 
-  /* Calendar Content */
-  .calendar-content {
+  .hc-layout {
     flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 244px;
+    gap: 12px;
+    -webkit-app-region: no-drag;
+  }
+
+  /* ── The month ─────────────────────────────────────────────────────────── */
+
+  .hc-month {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+  }
+
+  .hc-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hc-heading {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hc-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hc-title-year {
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .hc-range {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  .hc-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .hc-today-btn,
+  .hc-nav-btn {
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-1);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .hc-today-btn {
+    padding: 0 12px;
+  }
+
+  .hc-nav-btn {
+    width: 32px;
+    font-size: 12px;
+  }
+
+  .hc-today-btn:hover,
+  .hc-nav-btn:hover {
+    background: var(--surface-3);
+    border-color: var(--white-a30);
+  }
+
+  /* ── Grid: weekday names, then the weeks sharing the height ─────────────── */
+
+  .hc-grid {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .hc-weekdays,
+  .hc-week {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .hc-weeks {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-auto-rows: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .hc-weekday {
+    padding: 2px 0 4px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Friday (Jumu'ah): its name a little brighter, its days a little lighter */
+  .hc-weekday.is-friday {
+    color: var(--text-primary);
+  }
+
+  .hc-weekday-narrow {
+    display: none;
+  }
+
+  /* a size container: a day too short for both numbers (small window) keeps the Hijri one */
+  .hc-cell {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    container-type: size;
+  }
+
+  .hc-day {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 4px 2px;
+    background: var(--surface-1);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: var(--text-primary);
+    font: inherit;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .hc-day.is-friday {
+    background: var(--surface-2);
+  }
+
+  .hc-day:hover {
+    background: var(--surface-3);
+  }
+
+  /* Hijri day: the main number; today's sits in a white circle */
+  .hc-day-hijri {
+    min-width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hc-day-greg {
+    max-width: 100%;
+    font-size: 11px;
+    line-height: 1.25;
+    color: var(--text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hc-day.is-today .hc-day-hijri {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    font-weight: 700;
+  }
+
+  .hc-day.is-today .hc-day-greg {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .hc-day.is-selected {
+    background: var(--surface-hover);
+    border-color: var(--white-a50);
+  }
+
+  /* an occasion: a dot; a White Day (recommended fast): a ring. Drawn with borders, so a
+     Windows contrast theme keeps them (it drops backgrounds). */
+  .hc-dot {
+    position: absolute;
+    top: 6px;
+    inset-inline-end: 6px;
+    width: 0;
+    height: 0;
+    border: 3.5px solid var(--text-primary);
+    border-radius: 50%;
+  }
+
+  .hc-dot--white {
+    width: 4px;
+    height: 4px;
+    border-width: 1.5px;
+    border-color: var(--text-muted);
+  }
+
+  @container (height < 54px) {
+    .hc-day-greg {
+      display: none;
+    }
+  }
+
+  .hc-message {
+    align-self: center;
+    padding: 24px 16px;
+    text-align: center;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* ── Side panel ────────────────────────────────────────────────────────── */
+
+  .hc-panel {
+    min-width: 0;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 12px;
     overflow: hidden auto;
-    padding: 6px 0;
-    min-height: 0;
-    -webkit-app-region: no-drag;
     scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-    direction: ltr; /* Force LTR for scrollbar on right */
+    scrollbar-color: var(--white-a20) transparent;
   }
 
-  .calendar-content::-webkit-scrollbar {
-    width: 5px;
+  .hc-card {
+    padding: 14px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
   }
 
-  .calendar-content::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 3px;
-  }
-
-  .calendar-content::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 3px;
-  }
-
-  .calendar-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(var(--accent-rgb, 0, 122, 255), 0.8);
-  }
-
-  /* Month and Year Navigation */
-  .calendar-nav {
+  .hc-card-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px;
-    background: var(--card-bg, rgba(255, 255, 255, 0.05));
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-    flex-shrink: 0;
+    gap: 8px;
   }
 
-  .nav-btn {
-    background: var(--surface-3);
-    border: 1px solid var(--border-medium);
-    border-radius: 8px;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-color, #fff);
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .nav-btn:hover {
-    background: var(--surface-hover);
-    border-color: var(--accent-color);
-    transform: scale(1.05);
-  }
-
-  .calendar-month-year {
-    text-align: center;
-  }
-
-  .current-month {
-    font-size: 1.25rem;
+  .hc-card-weekday {
+    font-size: 12px;
     font-weight: 600;
-    color: var(--text-color, #fff);
-    margin: 0 0 0.25rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
   }
 
-  .current-year {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin: 0;
-  }
-
-  /* Quick Actions */
-  .calendar-actions {
-    display: flex;
-    gap: 0.75rem;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .action-btn {
-    background: var(--surface-1);
-    border: 1px solid var(--border-medium);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--text-color, #fff);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .action-btn:hover {
-    background: var(--surface-3);
-    border-color: var(--accent-color);
-    transform: translateY(-2px);
-  }
-
-  .action-btn i {
-    font-size: 0.9rem;
-  }
-
-  /* Calendar Grid */
-  .calendar-grid-container {
-    background: var(--card-bg, rgba(255, 255, 255, 0.05));
-    border-radius: 12px;
-    padding: 0.75rem;
-    backdrop-filter: blur(10px);
-    flex-shrink: 0;
-  }
-
-  .calendar-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .weekday {
-    text-align: center;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    padding: 0.5rem;
-  }
-
-  .calendar-days {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 0.5rem;
-  }
-
-  /* shown instead of the days when a month is not available (offline, never loaded) */
-  .calendar-message {
-    grid-column: 1 / -1;
-    padding: 2rem 1rem;
-    text-align: center;
-    color: var(--text-muted);
-    line-height: 1.6;
-  }
-
-  .calendar-day {
-    aspect-ratio: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: var(--surface-subtle);
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    min-height: 45px;
-  }
-
-  .calendar-day.empty {
-    background: transparent;
-    cursor: default;
-  }
-
-  .calendar-day:not(.empty):hover {
-    background: var(--surface-3);
-    border-color: var(--accent-color);
-    transform: scale(1.05);
-  }
-
-  .calendar-day.today {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    font-weight: 600;
-  }
-
-  .calendar-day.special-day {
-    background: rgba(255, 193, 7, 0.2);
-    border-color: #ffc107;
-  }
-
-  .calendar-day.special-day.today {
-    background: linear-gradient(
-      135deg,
-      var(--accent-color),
-      rgba(255, 193, 7, 0.3)
-    );
-    border-color: var(--accent-color);
-  }
-
-  .day-number {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-color, #fff);
-    margin-bottom: 0.125rem;
-  }
-
-  .day-gregorian {
-    font-size: 0.7rem;
-    color: var(--text-dim);
-  }
-
-  /* Gregorian Date Display */
-  .gregorian-date-display {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    background: var(--surface-1);
-    border-radius: 8px;
-    color: var(--text-color, #fff);
-    font-size: 0.9rem;
-    flex-shrink: 0;
-  }
-
-  .gregorian-date-display i {
-    color: var(--accent-color);
-  }
-
-  /* Islamic Events */
-  .islamic-events {
-    background: var(--surface-1);
-    border-radius: 12px;
-    padding: 1rem;
-    backdrop-filter: blur(10px);
-    flex-shrink: 0;
-  }
-
-  .events-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-color, #fff);
-    margin: 0 0 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border-medium);
-  }
-
-  .events-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .event-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem;
-    background: var(--surface-subtle);
-    border-radius: 8px;
-    border-left: 3px solid var(--accent-color);
-    transition: all 0.3s ease;
-  }
-
-  .event-item:hover {
-    background: var(--surface-2);
-    transform: translateX(4px);
-  }
-
-  .event-date {
-    font-size: 1.5rem;
+  .hc-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    font-size: 11px;
     font-weight: 700;
-    color: var(--accent-color);
-    min-width: 40px;
+  }
+
+  .hc-card-hijri {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0 10px;
+  }
+
+  .hc-card-day {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hc-card-month {
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-primary);
+  }
+
+  .hc-card-year {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .hc-card-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 6px 0 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--text-muted);
+  }
+
+  .hc-card-line i {
+    width: 14px;
+    margin-top: 2px;
     text-align: center;
+    color: var(--text-faint);
   }
 
-  .event-name {
-    flex: 1;
-    font-size: 0.95rem;
-    color: var(--text-color, #fff);
+  .hc-card-line.is-event,
+  .hc-card-line.is-white {
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    color: var(--text-primary);
   }
 
-  .no-events {
-    text-align: center;
-    color: var(--text-dim);
-    font-style: italic;
-    padding: 1.5rem;
+  .hc-card-line.is-event i,
+  .hc-card-line.is-white i {
+    color: var(--text-primary);
   }
 
-  /* Responsive Design */
-  @media (width <= 768px) {
-    .calendar-container {
-      padding: 16px;
+  .hc-occasions {
+    padding: 12px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+  }
+
+  .hc-panel-title {
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .hc-occasion-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .hc-occasion {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .hc-occasion:hover {
+    background: var(--surface-2);
+  }
+
+  .hc-occasion-days {
+    flex-shrink: 0;
+    min-width: 34px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hc-occasion.is-white .hc-occasion-days {
+    background: transparent;
+    border: 1px solid var(--white-a30);
+  }
+
+  .hc-occasion-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .hc-occasion-name {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .hc-occasion-when {
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  .hc-occasion-none {
+    padding: 6px;
+    font-size: 13px;
+    color: var(--text-faint);
+  }
+
+  .hc-note {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0 4px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--text-faint);
+  }
+
+  .hc-note[hidden] {
+    display: none;
+  }
+
+  .hc-note-icon {
+    margin-top: 2px;
+  }
+
+  .hc-today-btn:focus-visible,
+  .hc-nav-btn:focus-visible,
+  .hc-day:focus-visible,
+  .hc-occasion:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+  }
+
+  /* the arrows point the way the months go: mirrored right to left */
+  [dir="rtl"] .hc-nav-btn i {
+    transform: scaleX(-1);
+  }
+
+  /* ── Maximized window: more room, bigger numbers ───────────────────────── */
+
+  .fullscreen-mode .hc-layout {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 16px;
+  }
+
+  .fullscreen-mode .hc-title {
+    font-size: 22px;
+  }
+
+  .fullscreen-mode .hc-weeks,
+  .fullscreen-mode .hc-week {
+    gap: 6px;
+  }
+
+  .fullscreen-mode .hc-day .hc-day-hijri {
+    min-width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    font-size: 22px;
+  }
+
+  .fullscreen-mode .hc-day .hc-day-greg {
+    font-size: 13px;
+  }
+
+  .fullscreen-mode .hc-dot {
+    top: 10px;
+    inset-inline-end: 10px;
+  }
+
+  /* ── Narrow window: the panel goes under the month, the page scrolls ────── */
+
+  @media (width <= 700px) {
+    .hc-layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-rows: max-content;
+      overflow: hidden auto;
     }
 
-    .calendar-content {
-      gap: 12px;
+    /* the month takes its full height here (no longer shares the window's) */
+    .hc-grid,
+    .hc-weeks {
+      flex: none;
     }
 
-    .calendar-nav {
-      padding: 12px;
+    .hc-weeks {
+      grid-auto-rows: 54px;
     }
 
-    .current-month {
-      font-size: 1rem;
-    }
-
-    .current-year {
-      font-size: 0.8rem;
-    }
-
-    .action-btn span {
-      display: none;
-    }
-
-    .calendar-grid-container {
-      padding: 0.5rem;
-    }
-
-    .calendar-weekdays {
-      gap: 0.25rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .weekday {
-      font-size: 0.75rem;
-      padding: 0.25rem;
-    }
-
-    .calendar-days {
-      gap: 0.25rem;
-    }
-
-    .calendar-day {
-      min-height: 40px;
-      border-radius: 4px;
-    }
-
-    .day-number {
-      font-size: 0.9rem;
-    }
-
-    .day-gregorian {
-      font-size: 0.6rem;
-    }
-
-    .islamic-events {
-      padding: 0.75rem;
-    }
-
-    .events-title {
-      font-size: 1rem;
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.5rem;
-    }
-
-    .event-item {
-      padding: 0.5rem;
-      gap: 0.75rem;
-    }
-
-    .event-date {
-      font-size: 1.25rem;
-      min-width: 35px;
-    }
-
-    .event-name {
-      font-size: 0.85rem;
+    .hc-panel {
+      overflow: visible;
     }
   }
 
-  /* Big Screen Mode */
-  .big-screen .calendar-container {
-    padding: 20px;
-  }
-
-  .big-screen .calendar-title {
-    font-size: 20px;
-  }
-
-  .big-screen .current-month {
-    font-size: 1.5rem;
-  }
-
-  .big-screen .day-number {
-    font-size: 1.3rem;
-  }
-
-  .big-screen .day-gregorian {
-    font-size: 0.8rem;
-  }
-
-  .big-screen .event-date {
-    font-size: 1.8rem;
-  }
-
-  .big-screen .event-name {
-    font-size: 1.1rem;
-  }
-
-  /* ========== RESPONSIVE DESIGN ========== */
-
-  /* Tablet (768px and below) */
-  @media (width <= 768px) {
-    .calendar-container {
-      padding: 12px;
-      gap: 8px;
-    }
-
-    .calendar-content {
-      padding: 4px 0;
-      gap: 10px;
-    }
-
-    .calendar-nav {
-      padding: 10px;
-    }
-
-    .nav-btn {
-      width: 32px;
-      height: 32px;
-    }
-
-    .current-month {
-      font-size: 1.1rem;
-    }
-
-    .current-year {
-      font-size: 0.85rem;
-    }
-
-    .action-btn span {
-      display: none;
-    }
-
-    .calendar-day {
-      min-height: 40px;
-    }
-
-    .day-number {
-      font-size: 1rem;
-    }
-
-    .day-gregorian {
-      font-size: 0.65rem;
-    }
-  }
-
-  /* Mobile (480px and below) */
   @media (width <= 480px) {
     .calendar-container {
       padding: 8px;
-      gap: 6px;
-    }
-
-    .calendar-content {
       gap: 8px;
     }
 
-    .calendar-nav {
+    .hc-month {
       padding: 8px;
     }
 
-    .nav-btn {
-      width: 28px;
-      height: 28px;
-      font-size: 0.9rem;
+    .hc-title {
+      font-size: 16px;
     }
 
-    .current-month {
-      font-size: 1rem;
+    .hc-today-btn {
+      padding: 0 8px;
     }
 
-    .current-year {
-      font-size: 0.8rem;
+    .hc-weekday-short {
+      display: none;
     }
 
-    .calendar-grid-container {
-      padding: 0.4rem;
+    .hc-weekday-narrow {
+      display: inline;
     }
 
-    .calendar-weekdays {
-      gap: 0.2rem;
-      margin-bottom: 0.4rem;
+    .hc-weeks {
+      grid-auto-rows: 56px;
     }
 
-    .weekday {
-      font-size: 0.7rem;
-      padding: 0.2rem 0;
+    .hc-day-hijri {
+      min-width: 24px;
+      height: 24px;
+      font-size: 15px;
     }
 
-    .calendar-days {
-      gap: 0.2rem;
-    }
-
-    .calendar-day {
-      min-height: 35px;
-    }
-
-    .day-number {
-      font-size: 0.9rem;
-    }
-
-    .day-gregorian {
-      font-size: 0.6rem;
+    .hc-day-greg {
+      font-size: 10px;
     }
   }
 
-  @media (width <= 320px) {
-    .calendar-day {
-      min-height: 30px;
-    }
-
-    .day-number {
-      font-size: 0.85rem;
-    }
+  /* a month still loading: the shown one dims, after a moment so a quick load does not flash */
+  .hc-grid[aria-busy="true"] .hc-weeks {
+    opacity: 0.4;
+    transition: opacity 0.2s ease 0.15s;
   }
 }

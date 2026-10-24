@@ -11,12 +11,16 @@ let registered = false;
 /**
  * @param {object} callbacks  what to do when a saved setting changes
  * @param {Function} [callbacks.onLocationChange]
+ * @param {Function} [callbacks.onHijriAdjustmentChange]
+ * @param {Function} [callbacks.onFastingRemindersChange]
  * @param {Function} [callbacks.onThemeChange]     (theme)
  * @param {Function} [callbacks.onLanguageChange]  (language)
  * @param {Function} [callbacks.onAnalyticsChange] (enabled)
  */
 function registerSettingsHandlers({
   onLocationChange,
+  onHijriAdjustmentChange,
+  onFastingRemindersChange,
   onThemeChange,
   onLanguageChange,
   onAnalyticsChange,
@@ -30,6 +34,9 @@ function registerSettingsHandlers({
     const changed = store.update(check.settingsChanges(changes, store.get()));
     const settings = store.get();
     if (changed.location) onLocationChange?.();
+    // a new location reloads the prayer times already, with the correction
+    else if (changed.hijriAdjustment) onHijriAdjustmentChange?.();
+    if (changed.fastingReminders) onFastingRemindersChange?.();
     if (changed.theme) onThemeChange?.(settings.theme);
     if (changed.language) onLanguageChange?.(settings.language);
     if (changed.analytics)

@@ -4,6 +4,7 @@
 //   steppers.js     the − / + buttons of the number inputs
 //   appearance.js   theme, language and window size (and the page text after a language switch)
 //   alerts.js       athkar alerts and the notification before the adhan
+//   hijri.js        the Hijri calendar's first day of the week and the Hijri date correction
 //   toggles.js      travel mode and usage statistics (opt-in)
 //   about.js        app version, contact, update check and install
 //   persist.js      saving the settings (right away or after a short pause)
@@ -27,6 +28,7 @@ const {
   initScreenSizeSetting,
 } = require("./appearance");
 const { initAthkarAlerts, initPreAdhanNotification } = require("./alerts");
+const { initHijriSettings, updateHijriText } = require("./hijri");
 const { initTravelModeToggle, initAnalyticsToggle } = require("./toggles");
 const { initAboutSection } = require("./about");
 
@@ -38,6 +40,7 @@ function initSettingsPage() {
     state.settings.country = location.country;
     state.settings.city = location.city;
     persistSettings();
+    updateHijriText(); // the automatic first day of the week follows the country
   });
   // Only the country/city lists come from the network. Re-running the whole init here would
   // add every listener twice and fail on the already-created Tom Select pickers.
@@ -55,6 +58,7 @@ function initSettingsPage() {
   initLanguageSelection();
   initAthkarAlerts();
   initPreAdhanNotification();
+  initHijriSettings();
   initTravelModeToggle();
   initAnalyticsToggle();
   initScreenSizeSetting();

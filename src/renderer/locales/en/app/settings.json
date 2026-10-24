@@ -24,5 +24,13 @@
   "fullScreen": "Full Screen",
   "privacySectionTitle": "Privacy",
   "analyticsLabel": "Anonymous usage statistics",
-  "analyticsDescription": "Share which features are used and app errors to help improve Salaty Time. Your location and what you listen to are never sent."
+  "analyticsDescription": "Share which features are used and app errors to help improve Salaty Time. Your location and what you listen to are never sent.",
+  "weekStartLabel": "First day of the week",
+  "weekStartAuto": "Auto",
+  "weekStartAutoDesc": "Automatic: {day}, as in your country",
+  "weekStartFixedDesc": "The first column of the Hijri calendar",
+  "hijriAdjustmentLabel": "Correct the Hijri date",
+  "hijriAdjustmentDesc": "Leave at 0. Change it only if the date below is a day off from your country’s official date. Example: the app shows 1 Ramadan, but your country starts Ramadan tomorrow → choose −1.",
+  "hijriAdjustmentUnit": "days",
+  "hijriTodayPreview": "Today: {date}"
 }
