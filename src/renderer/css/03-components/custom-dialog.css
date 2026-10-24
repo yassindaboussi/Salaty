@@ -64,6 +64,7 @@
     color: var(--text-primary);
     margin-bottom: 28px;
     white-space: pre-line;
+    overflow-wrap: anywhere; /* a long word (a name, a link) wraps instead of leaving the box */
   }
 
   .custom-dialog-actions {
@@ -97,6 +98,22 @@
   }
 
   .custom-dialog-btn.btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* a destructive action (delete): red, so it is never confirmed by habit */
+  .custom-dialog-btn.btn-danger {
+    background: var(--color-danger);
+    color: var(--text-bright);
+    box-shadow: var(--shadow-danger-sm);
+  }
+
+  .custom-dialog-btn.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-danger-md);
+  }
+
+  .custom-dialog-btn.btn-danger:active {
     transform: translateY(0);
   }
 

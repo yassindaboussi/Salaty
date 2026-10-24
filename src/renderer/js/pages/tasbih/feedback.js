@@ -1,61 +1,9 @@
 "use strict";
 
-// What the page tells the user: the success toast and the reset confirmation dialog.
-const { t } = require("../../core/i18n");
+// What the page tells the user: a short toast, and the same for screen readers (a polite live
+// region, used only at a target, never on every count).
 const { renderToast } = require("../../core/toast");
 const { html } = require("../../utils/html");
-const { query } = require("../../core/dom");
-
-function showResetConfirm(callback) {
-  _showConfirmDialog({
-    title: t("resetConfirmTitle"),
-    message: t("resetConfirmMessage"),
-    cancelLabel: t("cancel"),
-    confirmLabel: t("reset"),
-    onConfirm: callback,
-  });
-}
-
-function _showConfirmDialog({
-  title,
-  message,
-  cancelLabel,
-  confirmLabel,
-  onConfirm,
-}) {
-  const dialog = document.createElement("div");
-  dialog.className = "tasbih-confirm-dialog";
-  dialog.innerHTML = `<div class="tasbih-confirm-box">
-    <div class="tasbih-confirm-title"></div>
-    <div class="tasbih-confirm-message"></div>
-    <div class="tasbih-confirm-buttons">
-      <button type="button" class="tasbih-confirm-btn tasbih-confirm-cancel"></button>
-      <button type="button" class="tasbih-confirm-btn tasbih-confirm-reset"></button>
-    </div></div>`;
-  query(".tasbih-confirm-title", HTMLElement, dialog).textContent = title || "";
-  query(".tasbih-confirm-message", HTMLElement, dialog).textContent =
-    message || "";
-  query(".tasbih-confirm-cancel", HTMLButtonElement, dialog).textContent =
-    cancelLabel || "";
-  query(".tasbih-confirm-reset", HTMLButtonElement, dialog).textContent =
-    confirmLabel || "";
-
-  document.body.appendChild(dialog);
-  query(".tasbih-confirm-cancel", HTMLButtonElement, dialog).addEventListener(
-    "click",
-    () => dialog.remove(),
-  );
-  query(".tasbih-confirm-reset", HTMLButtonElement, dialog).addEventListener(
-    "click",
-    () => {
-      onConfirm?.();
-      dialog.remove();
-    },
-  );
-  dialog.addEventListener("click", (e) => {
-    if (e.target === dialog) dialog.remove();
-  });
-}
 
 function showSuccessToast(message, isError = false, duration = 2000) {
   renderToast(
@@ -65,4 +13,14 @@ function showSuccessToast(message, isError = false, duration = 2000) {
   );
 }
 
-module.exports = { showResetConfirm, showSuccessToast };
+/** @param {string} message */
+function announce(message) {
+  const live = document.getElementById("tbLive");
+  if (!live) return;
+  live.textContent = "";
+  setTimeout(() => {
+    live.textContent = message;
+  }, 50);
+}
+
+module.exports = { showSuccessToast, announce };
