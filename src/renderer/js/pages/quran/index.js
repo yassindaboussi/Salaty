@@ -10,6 +10,7 @@
 const { t } = require("../../core/i18n");
 const screenSizeManager = require("../../core/screen-size");
 const { showToast } = require("../../core/toast");
+const { copyText } = require("../../core/clipboard");
 const { initSelectionCopy } = require("../../components/selection-copy");
 const {
   setupConnectionRecovery,
@@ -61,11 +62,12 @@ function refreshNumbers() {
 }
 
 // Copies the part of the reader the user highlighted (Ctrl/Cmd+C or right-click > Copy).
-function copySelectedText(text) {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => showToast(t("copiedToClipboard"), "success"))
-    .catch(() => showToast(t("failedToCopy"), "error"));
+async function copySelectedText(text) {
+  const ok = await copyText(text);
+  showToast(
+    t(ok ? "copiedToClipboard" : "failedToCopy"),
+    ok ? "success" : "error",
+  );
 }
 
 function initQuranPage() {
