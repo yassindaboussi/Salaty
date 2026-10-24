@@ -4,6 +4,7 @@
 // sender and the arguments of every IPC message"). Main never trusts the shape of a message:
 // a check returns the cleaned value, or `undefined` when the value is not acceptable.
 const log = require("../services/logger").logger("IPC");
+const { TYPES: FAST_TYPES } = require("../../shared/fasting-rules");
 
 const THEMES = new Set([
   "brown",
@@ -20,6 +21,7 @@ const THEMES = new Set([
   "royal",
 ]);
 const LANGUAGES = new Set(["en", "ar", "fr"]);
+const WEEK_STARTS = new Set(["auto", "sat", "sun", "mon"]);
 const PRAYERS = new Set(["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"]);
 
 const MAX_TEXT = 200; // a city, a country, a location name
@@ -60,15 +62,18 @@ function adhanByPrayer(v) {
   return out;
 }
 
+// Sunnah fasting reminders: the kinds of fast (shared/fasting-rules.js), the evening before,
+// and N minutes before Fajr.
 function fastingReminders(v) {
   if (!isPlainObject(v)) return undefined;
-  const occasions = Array.isArray(v.occasions)
-    ? v.occasions.map((id) => text(id, 100)).filter(Boolean)
+  const types = Array.isArray(v.types)
+    ? [...new Set(v.types.filter((x) => FAST_TYPES.includes(x)))]
     : [];
   return {
-    occasions: occasions.slice(0, 500),
-    weeklyMonThu: v.weeklyMonThu === true,
-    leadDays: int(v.leadDays, 1, 30) ?? 1,
+    types,
+    evening: v.evening !== false,
+    suhoor: v.suhoor === true,
+    suhoorMinutes: int(v.suhoorMinutes, 5, 120) ?? 30,
   };
 }
 
@@ -120,6 +125,8 @@ const SETTINGS_SCHEMA = {
   preAdhanMinutes: (v) => int(v, 1, 60),
   adhanEnabledByPrayer: adhanByPrayer,
   fastingReminders,
+  hijriAdjustment: (v) => int(v, -2, 2),
+  weekStart: oneOf(WEEK_STARTS),
   position,
   locations,
 };

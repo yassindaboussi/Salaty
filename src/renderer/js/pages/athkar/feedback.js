@@ -4,17 +4,11 @@
 const { t } = require("../../core/i18n");
 const { renderToast } = require("../../core/toast");
 const { html } = require("../../utils/html");
+const { copyText } = require("../../core/clipboard");
 
-function copyAthkar(text) {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      showSuccessToast(t("copiedToClipboard"));
-    })
-    .catch((err) => {
-      console.error("Failed to copy:", err);
-      showSuccessToast(t("failedToCopy"), true);
-    });
+async function copyAthkar(text) {
+  const ok = await copyText(text);
+  showSuccessToast(t(ok ? "copiedToClipboard" : "failedToCopy"), !ok);
 }
 
 function showSuccessToast(message, isError = false) {

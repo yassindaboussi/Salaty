@@ -4,6 +4,7 @@ const { t } = require("../core/i18n");
 const { getNamesOfAllah } = require("../services/content");
 const analytics = require("../services/analytics");
 const { renderToast } = require("../core/toast");
+const { copyText } = require("../core/clipboard");
 const { initSelectionCopy } = require("../components/selection-copy");
 const { byId, query } = require("../core/dom");
 const { html, setHtml } = require("../utils/html");
@@ -117,37 +118,26 @@ function renderAsmaList() {
   });
 }
 
+async function copy(text) {
+  if (await copyText(text)) {
+    analytics.asmaCopied();
+    showSuccessToast(t("copiedToClipboard"));
+  } else {
+    showSuccessToast(t("failedToCopy"), true);
+  }
+}
+
 // Copies the part of a card the user highlighted (Ctrl/Cmd+C or right-click > Copy).
 function copySelectedText(text) {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      analytics.asmaCopied();
-      showSuccessToast(t("copiedToClipboard"));
-    })
-    .catch(() => showSuccessToast(t("failedToCopy"), true));
+  copy(text);
 }
 
 function copyAsma(item, meaning, desc) {
-  const text = `${item.name} - ${item.transliteration} - ${meaning}\n${desc}`;
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      analytics.asmaCopied();
-      showSuccessToast(t("copiedToClipboard"));
-    })
-    .catch(() => showSuccessToast(t("failedToCopy"), true));
+  copy(`${item.name} - ${item.transliteration} - ${meaning}\n${desc}`);
 }
 
 function copyAsmaArabic(name, meaning, desc) {
-  const text = meaning ? `${name} — ${meaning}\n${desc}` : name;
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      analytics.asmaCopied();
-      showSuccessToast(t("copiedToClipboard"));
-    })
-    .catch(() => showSuccessToast(t("failedToCopy"), true));
+  copy(meaning ? `${name} — ${meaning}\n${desc}` : name);
 }
 
 function showSuccessToast(message, isError = false) {

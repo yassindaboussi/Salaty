@@ -69,6 +69,15 @@ function tasbihCompleted(dhikrName) {
   });
 }
 
+// "added" / "edited" / "deleted": never the words themselves
+function tasbihCustomDhikr(action) {
+  track("tasbih_custom_dhikr", { action });
+}
+
+function tasbihSequenceCompleted() {
+  track("tasbih_sequence_completed");
+}
+
 function athkarCategoryView(categoryName) {
   track("athkar_category_view", {
     category_name: String(categoryName || "").substring(0, 50),
@@ -104,6 +113,15 @@ function calendarMonthNavigated(direction) {
   track("calendar_month_navigated", { direction });
 }
 
+// The kind of fast ("monThu", "whiteDays"…), never a date.
+function fastingReminderToggled(type, enabled) {
+  track("fasting_reminder_toggled", { type, enabled });
+}
+
+function sunnahFastMarked(action) {
+  track("sunnah_fast_marked", { action });
+}
+
 function asmaCopied() {
   track("asma_name_copied");
 }
@@ -129,6 +147,8 @@ module.exports = {
   radioStop,
 
   tasbihCompleted,
+  tasbihCustomDhikr,
+  tasbihSequenceCompleted,
 
   athkarCategoryView,
   athkarCategoryCompleted,
@@ -136,6 +156,9 @@ module.exports = {
   livestreamSwitch,
 
   qiblaLocationResolved,
+
+  fastingReminderToggled,
+  sunnahFastMarked,
 
   ramadanTabSwitch,
   ramadanDayTracked,

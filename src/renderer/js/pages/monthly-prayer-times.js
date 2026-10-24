@@ -4,7 +4,6 @@ const { state, prayerIcons } = require("../core/store");
 const { setupConnectionRecovery } = require("../services/connection-recovery");
 const {
   PRAYER_KEYS,
-  JUMUAH_KEY,
   displayPrayerKey,
   cleanTime,
   secondsFromTime,
@@ -195,25 +194,18 @@ function _renderTable(days) {
     )}`,
   );
 
-  // The header has one Dhuhr column for the whole month, so Friday rows get a small
-  // "Jumu'ah" badge in their Dhuhr cell instead (same time, only the name differs).
-  const jumuahLabel = t(JUMUAH_KEY, "prayerNames");
-
+  // Friday rows need no "Jumu'ah" mark: the date column already shows the weekday (the
+  // "today" cards above and the home page do name Friday's Dhuhr "Jumu'ah").
   const rows = days.map((entry) => {
     const day = parseInt(entry.date.gregorian.day, 10);
     const gDate = new Date(viewYear, viewMonth - 1, day);
     const weekday = gDate.toLocaleDateString(langTag, { weekday: "short" });
     const iso = _entryIso(entry);
     const isToday = iso === todayIso;
-    const jumuah = _isFridayEntry(entry, gDate);
 
-    const cells = PRAYER_KEYS.map((key) => {
-      const time = cleanTime(entry.timings[key]);
-      if (jumuah && displayPrayerKey(key, { isFriday: true }) === JUMUAH_KEY) {
-        return html`<td class="monthly-jumuah">${time}<span class="monthly-jumuah-badge">${jumuahLabel}</span></td>`;
-      }
-      return html`<td>${time}</td>`;
-    });
+    const cells = PRAYER_KEYS.map(
+      (key) => html`<td>${cleanTime(entry.timings[key])}</td>`,
+    );
 
     return html`
         <tr class="${isToday ? "monthly-today-row-highlight" : ""}">

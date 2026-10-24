@@ -24,5 +24,13 @@
   "fullScreen": "Plein Écran",
   "privacySectionTitle": "Confidentialité",
   "analyticsLabel": "Statistiques d'utilisation anonymes",
-  "analyticsDescription": "Partager les fonctionnalités utilisées et les erreurs de l'application pour aider à améliorer Salaty Time. Votre position et ce que vous écoutez ne sont jamais envoyés."
+  "analyticsDescription": "Partager les fonctionnalités utilisées et les erreurs de l'application pour aider à améliorer Salaty Time. Votre position et ce que vous écoutez ne sont jamais envoyés.",
+  "weekStartLabel": "Premier jour de la semaine",
+  "weekStartAuto": "Auto",
+  "weekStartAutoDesc": "Automatique : {day}, comme dans votre pays",
+  "weekStartFixedDesc": "La première colonne du calendrier hégirien",
+  "hijriAdjustmentLabel": "Corriger la date hégirienne",
+  "hijriAdjustmentDesc": "Laissez sur 0. Changez-la seulement si la date ci-dessous diffère d’un jour de la date officielle de votre pays. Exemple : l’application affiche 1 Ramadan, mais votre pays commence le Ramadan demain → choisissez −1.",
+  "hijriAdjustmentUnit": "jours",
+  "hijriTodayPreview": "Aujourd’hui : {date}"
 }

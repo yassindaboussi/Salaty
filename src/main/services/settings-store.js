@@ -24,7 +24,7 @@ const log = require("./logger").logger("Settings");
  * @typedef {{ city: string, country: string, theme: string, language: string,
  *   position: { x: number, y: number }, bigScreen: boolean, locations: SavedLocation[],
  *   openAtLogin: boolean, travelMode: boolean, analyticsEnabled: boolean,
- *   [key: string]: any }} Settings
+ *   hijriAdjustment: number, weekStart: string, [key: string]: any }} Settings
  */
 
 /** @type {Settings} */
@@ -38,7 +38,16 @@ let settingsData = {
   locations: [],
   openAtLogin: true,
   travelMode: false,
-  fastingReminders: { occasions: [], weeklyMonThu: false, leadDays: 1 },
+  // Sunnah fasting reminders (services/fasting-reminders.js): the kinds of fast, the evening
+  // before and/or N minutes before Fajr
+  fastingReminders: {
+    types: [],
+    evening: true,
+    suhoor: false,
+    suhoorMinutes: 30,
+  },
+  hijriAdjustment: 0, // days added to the Hijri date (-2…+2), see services/islamic-calendar.js
+  weekStart: "auto", // first day of the calendar's week: "auto" (by country), "sat", "sun", "mon"
   analyticsEnabled: false, // opt-in, see PRIVACY.md
 };
 
@@ -112,6 +121,7 @@ function load() {
     }
 
     migrateToMultiLocation();
+    migrateFastingReminders();
   } catch (err) {
     log.error("loading failed, using the defaults:", err);
   }
@@ -145,6 +155,34 @@ function migrateToMultiLocation() {
   syncActiveLocation();
 }
 
+// Fasting reminders before version 1.1.8: one reminder per date ("whiteDays-1448-5-13"), the
+// Monday/Thursday switch and "N days before". They become reminders by kind, each evening before.
+const OLD_FASTING_TYPES = {
+  whiteDays: "whiteDays",
+  tasua: "ashura",
+  ashura: "ashura",
+  dhulHijjahFirst9: "dhulHijjah",
+  arafah: "arafah",
+  shawwal6: "shawwal6",
+};
+function migrateFastingReminders() {
+  const old = settingsData.fastingReminders;
+  if (!old || Array.isArray(old.types)) return;
+  const types = new Set(
+    (Array.isArray(old.occasions) ? old.occasions : [])
+      .map((id) => OLD_FASTING_TYPES[String(id).split("-")[0]])
+      .filter(Boolean),
+  );
+  if (old.weeklyMonThu === true) types.add("monThu");
+  settingsData.fastingReminders = {
+    types: [...types],
+    evening: true,
+    suhoor: false,
+    suhoorMinutes: 30,
+  };
+  save();
+}
+
 // ── Reading / changing ───────────────────────────────────────────────────────
 
 function get() {
@@ -172,6 +210,11 @@ function update(changes) {
     location:
       settingsData.city !== before.city ||
       settingsData.country !== before.country,
+    hijriAdjustment:
+      (settingsData.hijriAdjustment ?? 0) !== (before.hijriAdjustment ?? 0),
+    fastingReminders:
+      JSON.stringify(settingsData.fastingReminders) !==
+      JSON.stringify(before.fastingReminders),
     theme: Boolean(changes.theme) && changes.theme !== before.theme,
     language: Boolean(changes.language) && changes.language !== before.language,
     analytics:

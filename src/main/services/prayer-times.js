@@ -8,13 +8,17 @@
 // single-day endpoint. Refreshed in the background once a day; from the 20th the next month
 // is downloaded ahead of time, so offline the cache covers the rest of the month and the next
 // one (~5 weeks).
+//
+// The days' Hijri dates follow the Settings correction (islamic-calendar.js, -2…+2 days).
 const aladhan = require("./aladhan");
+const islamicCalendar = require("./islamic-calendar");
 const { locationQuery } = require("../../shared/aladhan");
 
 /**
  * One day for the location, in the shape of Aladhan's single-day endpoint.
  * @typedef {{ timings: Record<string, string>, date: any, meta: any }} PrayerDay
- * @typedef {{ city?: string, country?: string }} LocationSettings the saved settings (city, country)
+ * @typedef {{ city?: string, country?: string, hijriAdjustment?: number }} LocationSettings
+ *   the saved settings (city, country, Hijri date correction)
  */
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -89,11 +93,38 @@ function getMonth(settings, year, month) {
  * @param {number} hijriMonth 1-12
  * @returns {Promise<PrayerDay[] | null>} null when offline with nothing cached
  */
-function getHijriMonth(settings, hijriYear, hijriMonth) {
-  if (!settings?.city || !settings?.country) return Promise.resolve(null);
-  return timetable(
-    `/hijriCalendarByCity/${hijriYear}/${hijriMonth}?${locationQuery(settings)}`,
+async function getHijriMonth(settings, hijriYear, hijriMonth) {
+  if (!settings?.city || !settings?.country) return null;
+  const adjustment = islamicCalendar.adjustmentOf(settings);
+  if (!adjustment) {
+    return timetable(
+      `/hijriCalendarByCity/${hijriYear}/${hijriMonth}?${locationQuery(settings)}`,
+    );
+  }
+  // A corrected month starts on other Gregorian days than Aladhan's: take those days from
+  // the Gregorian months they fall in (one or two, usually cached already).
+  const days = await islamicCalendar.hijriMonthCalendar(
+    hijriMonth,
+    hijriYear,
+    adjustment,
   );
+  if (!days) return null;
+  /** @type {Map<string, PrayerDay[] | null>} */
+  const months = new Map();
+  /** @type {PrayerDay[]} */
+  const result = [];
+  for (const entry of days) {
+    const [, month, year] = entry.gregorian.date.split("-").map(Number);
+    const key = `${year}-${month}`;
+    if (!months.has(key))
+      months.set(key, await getMonth(settings, year, month));
+    const day = months
+      .get(key)
+      ?.find((d) => d.date.gregorian.date === entry.gregorian.date);
+    if (!day) return null;
+    result.push({ ...day, date: { ...day.date, hijri: entry.hijri } });
+  }
+  return result;
 }
 
 /**
@@ -139,7 +170,21 @@ async function getToday(settings, at = new Date()) {
     // the location is already in another month than the PC (time zones)
     days = (await getMonth(settings, today.year, today.month)) ?? days;
   }
-  const day = days.find((d) => d.date.gregorian.date === today.iso) ?? null;
+  let day = days.find((d) => d.date.gregorian.date === today.iso) ?? null;
+
+  const adjustment = islamicCalendar.adjustmentOf(settings);
+  if (day && adjustment) {
+    const [d, m, y] = today.iso.split("-").map(Number);
+    const corrected = await islamicCalendar.gregorianToHijri(
+      d,
+      m,
+      y,
+      adjustment,
+    );
+    if (corrected?.hijri) {
+      day = { ...day, date: { ...day.date, hijri: corrected.hijri } };
+    }
+  }
 
   // download next month ahead, so the first days of next month also work offline
   if (Number(today.iso.slice(0, 2)) >= PREFETCH_FROM_DAY) {

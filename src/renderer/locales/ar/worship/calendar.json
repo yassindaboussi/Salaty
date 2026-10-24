@@ -1,6 +1,5 @@
 {
   "hijriCalendar": "التقويم الهجري",
-  "importantIslamicDates": "المناسبات الإسلامية المهمة",
   "noEventsThisMonth": "لا توجد مناسبات هذا الشهر",
   "prayerTimesMonthly": "مواقيت الصلاة الشهرية",
   "prayerTimesMonthlyDesc": "جميع أوقات الصلاة خلال الشهر",
@@ -32,5 +31,9 @@
     "12-9": "يوم عرفة",
     "12-10": "عيد الأضحى"
   },
-  "calendarMonthUnavailable": "هذا الشهر غير محفوظ للاستخدام دون اتصال بعد. اتصل بالإنترنت لتحميله."
+  "calendarMonthUnavailable": "تعذّر عرض هذا الشهر.",
+  "calendarThisMonth": "هذا الشهر",
+  "calendarWhiteDays": "الأيام البيض",
+  "calendarWhiteDaysNote": "الأيام البيض: يُستحب صيام الثالث عشر والرابع عشر والخامس عشر",
+  "calendarCalculatedNote": "حُسب على هذا الجهاز دون اتصال: قد يختلف بيوم عن الإعلان الرسمي."
 }

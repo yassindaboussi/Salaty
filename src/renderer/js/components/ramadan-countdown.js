@@ -3,6 +3,7 @@
 const { t } = require("../core/i18n");
 const { applyTheme } = require("../core/theme");
 const { state } = require("../core/store");
+const { daysBetween, parseDmy } = require("../core/date-format");
 const { ipcRenderer } = require("electron");
 
 /** @type {{ year: number, gregorian: any } | null} */
@@ -57,15 +58,11 @@ async function updateRamadanCountdown(prayerData) {
   }
 
   if (ramadanDateCache) {
-    const goalDateStr = ramadanDateCache.gregorian.date;
-    const [d, m, y] = goalDateStr.split("-");
-    const goalDate = new Date(y, m - 1, d);
-
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-
-    const diffTime = goalDate.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    // calendar days: a daylight-saving change in between does not count as one more day
+    const diffDays = daysBetween(
+      new Date(),
+      parseDmy(ramadanDateCache.gregorian.date),
+    );
 
     if (diffDays > 0 && diffDays <= 60) {
       countdownEl.textContent = t("daysUntilRamadan").replace(

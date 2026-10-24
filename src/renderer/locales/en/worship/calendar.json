@@ -1,6 +1,5 @@
 {
   "hijriCalendar": "Hijri Calendar",
-  "importantIslamicDates": "Important Islamic Dates",
   "noEventsThisMonth": "No special events this month",
   "prayerTimesMonthly": "Monthly Prayer Times",
   "prayerTimesMonthlyDesc": "All prayer times for the month",
@@ -32,5 +31,9 @@
     "12-9": "Day of Arafah",
     "12-10": "Eid al-Adha"
   },
-  "calendarMonthUnavailable": "This month isn’t saved for offline use yet. Connect to the internet to load it."
+  "calendarMonthUnavailable": "This month can’t be shown.",
+  "calendarThisMonth": "This month",
+  "calendarWhiteDays": "White Days",
+  "calendarWhiteDaysNote": "White Days: fasting the 13th, 14th and 15th is recommended",
+  "calendarCalculatedNote": "Calculated on this computer while offline: it may differ by a day from the official announcement."
 }

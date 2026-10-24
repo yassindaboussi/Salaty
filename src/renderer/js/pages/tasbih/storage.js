@@ -1,12 +1,13 @@
 "use strict";
 
-// The saved state (localStorage): each dhikr's count, the last dhikr used and the "no limit"
-// choices, and the move of counts saved under the old keys (dhikr names) to ids.
-const { pageState, DEFAULT_DHIKR_LIST } = require("./state");
-
-const DEFAULT_UNLIMITED_IDS = DEFAULT_DHIKR_LIST.filter(
-  (d) => d.noFixedCount,
-).map((d) => d.id);
+// The saved state, in this computer's page storage (localStorage):
+//   tasbihState         each dhikr's count               (since the first version)
+//   tasbihUnlimitedMap  the "no limit" choices
+//   lastDhikrId         the dhikr counted last
+//   tasbihCustom        the user's own dhikr: [{ id, name, meaning, count }]
+//   tasbihSequence      the after-prayer tasbih in progress
+// Counts saved by old versions under the dhikr's Arabic text move to its id.
+const { pageState, SUNNAH_DHIKR, AFTER_PRAYER, findDhikr } = require("./state");
 
 const LEGACY_NAME_TO_ID = {
   "سُبْحَانَ اللَّهِ": "subhanallah",
@@ -19,72 +20,107 @@ const LEGACY_NAME_TO_ID = {
   "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ": "subhanallahiWaBihamdihi",
 };
 
-function loadTasbihState() {
-  try {
-    const saved = localStorage.getItem("tasbihState");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      pageState.tasbihHistory = _migrateLegacyKeys(parsed);
-    }
-    const savedUnlimited = localStorage.getItem("tasbihUnlimitedMap");
-    if (savedUnlimited) {
-      pageState.unlimitedMap = JSON.parse(savedUnlimited) || {};
-    } else {
-      // First run: default the dhikr with no fixed hadith count to "no limit"
-      DEFAULT_UNLIMITED_IDS.forEach((id) => {
-        pageState.unlimitedMap[id] = true;
-      });
-      saveUnlimitedMap();
-    }
+const MAX_CUSTOM = 100;
 
-    const lastDhikrId = localStorage.getItem("lastDhikrId");
-    const found = DEFAULT_DHIKR_LIST.find((d) => d.id === lastDhikrId);
-    const dhikr = found || DEFAULT_DHIKR_LIST[0];
-    pageState.currentDhikr = {
-      id: dhikr.id,
-      name: dhikr.name,
-      count: dhikr.count,
-      current: pageState.tasbihHistory[dhikr.id] || 0,
-    };
+/** @param {string} key @param {any} fallback */
+function readJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw == null ? fallback : (JSON.parse(raw) ?? fallback);
+  } catch {
+    return fallback;
+  }
+}
+
+/** @param {string} key @param {any} value */
+function writeJson(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
   } catch (err) {
-    console.error("Error loading tasbih state:", err);
-    pageState.tasbihHistory = {};
-    pageState.unlimitedMap = {};
+    console.error(`Error saving ${key}:`, err);
   }
 }
 
-function _migrateLegacyKeys(parsed) {
-  const migrated = {};
-  for (const [key, value] of Object.entries(parsed || {})) {
-    const mappedId = LEGACY_NAME_TO_ID[key];
-    migrated[mappedId || key] = value;
-  }
-  return migrated;
+/** A whole number in a range, or the fallback. */
+const whole = (/** @type {any} */ v, min, max, fallback) =>
+  Number.isInteger(v) && v >= min && v <= max ? v : fallback;
+
+/** @param {any} list */
+function cleanCustom(list) {
+  return (Array.isArray(list) ? list : [])
+    .filter(
+      (d) =>
+        d &&
+        typeof d.id === "string" &&
+        typeof d.name === "string" &&
+        d.name.trim(),
+    )
+    .slice(0, MAX_CUSTOM)
+    .map((d) => ({
+      id: d.id,
+      name: d.name.trim().slice(0, 300),
+      meaning:
+        typeof d.meaning === "string" ? d.meaning.trim().slice(0, 300) : "",
+      count: whole(d.count, 1, 100_000, 33),
+      custom: true,
+    }));
 }
 
-function saveTasbihState() {
-  try {
-    pageState.tasbihHistory[pageState.currentDhikr.id] =
-      pageState.currentDhikr.current;
-    localStorage.setItem(
-      "tasbihState",
-      JSON.stringify(pageState.tasbihHistory),
+function loadState() {
+  const counts = {};
+  for (const [key, value] of Object.entries(readJson("tasbihState", {}))) {
+    counts[LEGACY_NAME_TO_ID[key] ?? key] = whole(value, 0, 10_000_000, 0);
+  }
+  pageState.counts = counts;
+  pageState.custom = cleanCustom(readJson("tasbihCustom", []));
+
+  const unlimited = readJson("tasbihUnlimitedMap", null);
+  if (unlimited && typeof unlimited === "object") {
+    pageState.unlimited = unlimited;
+  } else {
+    // first time: the dhikr with no count fixed in a hadith start on "no limit"
+    pageState.unlimited = Object.fromEntries(
+      SUNNAH_DHIKR.filter((d) => d.noFixedCount).map((d) => [d.id, true]),
     );
-    localStorage.setItem("lastDhikrId", pageState.currentDhikr.id);
-  } catch (err) {
-    console.error("Error saving tasbih state:", err);
+    writeJson("tasbihUnlimitedMap", pageState.unlimited);
   }
+
+  const last = localStorage.getItem("lastDhikrId");
+  pageState.currentId = last && findDhikr(last) ? last : SUNNAH_DHIKR[0].id;
+
+  const seq = readJson("tasbihSequence", null);
+  pageState.sequence =
+    seq &&
+    Array.isArray(seq.counts) &&
+    seq.counts.length === AFTER_PRAYER.length
+      ? {
+          step: whole(seq.step, 0, AFTER_PRAYER.length - 1, 0),
+          counts: seq.counts.map((c, i) =>
+            whole(c, 0, AFTER_PRAYER[i].count, 0),
+          ),
+          done: seq.done === true,
+        }
+      : null;
 }
 
-function saveUnlimitedMap() {
+function saveCounts() {
+  writeJson("tasbihState", pageState.counts);
   try {
-    localStorage.setItem(
-      "tasbihUnlimitedMap",
-      JSON.stringify(pageState.unlimitedMap),
-    );
-  } catch (err) {
-    console.error("Error saving unlimited map:", err);
+    localStorage.setItem("lastDhikrId", pageState.currentId);
+  } catch {
+    // storage unavailable: nothing to do
   }
 }
 
-module.exports = { loadTasbihState, saveTasbihState, saveUnlimitedMap };
+const saveUnlimited = () =>
+  writeJson("tasbihUnlimitedMap", pageState.unlimited);
+const saveCustom = () => writeJson("tasbihCustom", pageState.custom);
+const saveSequence = () => writeJson("tasbihSequence", pageState.sequence);
+
+module.exports = {
+  loadState,
+  saveCounts,
+  saveUnlimited,
+  saveCustom,
+  saveSequence,
+};

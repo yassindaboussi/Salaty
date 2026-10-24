@@ -1,13 +1,19 @@
 @layer pages {
-  /* Tasbih Container */
+  /* Tasbih: the counter on one side, the dhikr to count on the other (mirrored in
+     Arabic), one column in a narrow window. As on the calendar, Ramadan and fasting pages, the
+     states that must always show (the progress, the dhikr counted) are white: the theme's
+     accent can be close to its background. */
+
   .tasbih-container {
+    position: relative;
+    z-index: var(--z-page);
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 16px;
     gap: 12px;
-    position: relative;
-    z-index: var(--z-page);
+    padding: 16px;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   /* Header: layout comes from the shared .page-header component
@@ -20,763 +26,1115 @@
     z-index: var(--z-page-header-controls);
   }
 
-  /* ========== MAIN CONTENT ========== */
-  .tasbih-content {
+  .tb-layout {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    overflow-y: auto;
-    padding: 8px 4px;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 12px;
     -webkit-app-region: no-drag;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-    direction: ltr; /* keep the scrollbar on the right (start side in RTL) */
+    transition: grid-template-columns 0.25s ease;
   }
 
-  .tasbih-content::-webkit-scrollbar {
-    width: 5px;
+  .tb-counter,
+  .tb-panel {
+    min-width: 0;
+    min-height: 0;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
   }
 
-  .tasbih-content::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  /* ── The counter ───────────────────────────────────────────────────────── */
 
-  .tasbih-content::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 3px;
-  }
-
-  /* Re-apply RTL to the actual content so Arabic still reads correctly —
-     only the scroll container itself is forced LTR, for the scrollbar. */
-  [dir="rtl"] .tasbih-content > *,
-  [lang="ar"] .tasbih-content > *,
-  [lang="fa"] .tasbih-content > *,
-  [lang="ur"] .tasbih-content > *,
-  [lang="he"] .tasbih-content > * {
-    direction: rtl;
-  }
-
-  /* ========== Active dhikr panel ========== */
-  .tasbih-active-dhikr {
-    text-align: center;
-    padding: 2px 12px 0;
-  }
-
-  .tasbih-active-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.5;
-  }
-
-  .tasbih-active-meaning {
-    font-size: 12.5px;
-    color: var(--text-secondary);
-    font-style: italic;
-    margin-top: 2px;
-    opacity: 0.85;
-  }
-
-  .tasbih-active-source {
-    font-size: 10.5px;
-    color: var(--text-secondary);
-    margin-top: 3px;
-    opacity: 0.6;
-    letter-spacing: 0.2px;
-  }
-
-  /* ========== Ring row — dial centered, actions flanking it left/right ==========
-     Same layout idea as a timer dial: the counter sits in the middle, a
-     secondary action sits to one side, the primary action to the other.
-     Deliberately NOT mirrored for RTL — like the header controls, this row
-     stays physically LTR so the Count button is always on the same side,
-     building spatial muscle memory regardless of language. */
-  .tasbih-ring-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(10px, 3vw, 28px);
-    width: 100%;
-    direction: ltr;
-  }
-
-  .tasbih-side {
+  .tb-counter {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    flex: 0 0 auto;
-    width: 92px;
-    order: 1;
+    padding: 14px 16px;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
   }
 
-  .tasbih-side-right {
-    order: 3;
-  }
-
-  .tasbih-ring-wrap {
-    position: relative;
-    width: min(200px, 46vw);
-    aspect-ratio: 1 / 1;
-    flex: 0 0 auto;
-    order: 2;
-  }
-
-  .tasbih-ring-svg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-
-  .tasbih-ring-track {
-    fill: none;
-    stroke: var(--white-a08);
-    stroke-width: 10;
-  }
-
-  .tasbih-ring-progress {
-    fill: none;
-    stroke: var(--accent-color);
-    stroke-width: 10;
-    stroke-linecap: round;
-    transform: rotate(-90deg);
-    transform-origin: 110px 110px;
-    filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.5));
-    transition:
-      stroke-dashoffset 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-      stroke 0.2s ease;
-  }
-
-  /* The "bead" — a small glowing marker riding the tip of the progress arc,
-     echoing the single bead you'd move along a physical tasbih string. */
-  .tasbih-ring-bead {
-    fill: var(--text-bright);
-    filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.9));
-    transition:
-      cx 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-      cy 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-      opacity 0.2s ease;
-  }
-
-  .tasbih-ring-tap {
-    position: absolute;
-    inset: 14px;
-    border-radius: 50%;
-    border: none;
-    background: radial-gradient(
-      circle at 50% 40%,
-      var(--white-a06),
-      var(--white-a01)
-    );
+  .tb-sequence {
+    align-self: stretch;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    -webkit-app-region: no-drag;
-    transition: transform 0.08s ease;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
   }
 
-  .tasbih-ring-tap:active {
-    transform: scale(0.96);
+  .tb-sequence[hidden] {
+    display: none;
   }
 
-  @keyframes tasbih-ring-pulse {
-    0% {
-      box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.35);
-    }
-
-    100% {
-      box-shadow: 0 0 0 18px rgba(var(--accent-rgb), 0);
-    }
-  }
-
-  .tasbih-ring-tap--pulse {
-    animation: tasbih-ring-pulse 0.5s ease-out;
-  }
-
-  .tasbih-round-badge {
-    position: absolute;
-    top: 14%;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--text-bright);
-    background: var(--accent-color);
-    padding: 3px 10px;
-    border-radius: 999px;
-    text-transform: uppercase;
-  }
-
-  .tasbih-count-value {
-    font-size: 3.6rem;
-    font-weight: 800;
-    color: var(--accent-color);
-    line-height: 1.1;
-    font-feature-settings:
-      "tnum" on,
-      "lnum" on;
-    text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.3);
-  }
-
-  .tasbih-count-target {
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin-top: 2px;
-    font-feature-settings:
-      "tnum" on,
-      "lnum" on;
-  }
-
-  /* ── Side columns ─────────────────────────────────────────────────────────── */
-
-  /* The two round "dial flank" buttons — Reset (secondary, muted) on the
-     left, Count (primary, accent) on the right. Same visual weight as a
-     timer's Cancel/Start pair, just vertical instead of side-by-side. */
-  .tasbih-side-btn {
-    width: 100%;
-    padding: 14px 6px;
-    border-radius: 16px;
-    border: none;
-    font-size: 12.5px;
+  .tb-seq-label {
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
     font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-    -webkit-app-region: no-drag;
-  }
-
-  .tasbih-side-btn i {
-    font-size: 16px;
-  }
-
-  .tasbih-side-btn--primary {
-    background: linear-gradient(
-      160deg,
-      var(--accent-color),
-      rgba(var(--accent-rgb), 0.8)
-    );
-    color: var(--text-bright);
-    box-shadow: 0 4px 14px rgba(var(--accent-rgb), 0.35);
-  }
-
-  .tasbih-side-btn--primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(var(--accent-rgb), 0.45);
-  }
-
-  .tasbih-side-btn--primary:active {
-    transform: translateY(0) scale(0.97);
-  }
-
-  .tasbih-side-btn--secondary {
-    background: var(--white-a06);
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
   }
 
-  .tasbih-side-btn--secondary:hover {
-    background: var(--surface-3);
-    transform: translateY(-2px);
-  }
-
-  .tasbih-side-btn--secondary:active {
-    transform: translateY(0);
-  }
-
-  /* Small square icon-only button for Undo — deliberately lighter-weight
-     than Reset since it's a quick, reversible correction, not a destructive
-     action, so it shouldn't visually compete with the labeled buttons. */
-  .tasbih-icon-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background: var(--surface-1);
-    color: var(--text-secondary);
+  .tb-seq-steps {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    -webkit-app-region: no-drag;
-  }
-
-  .tasbih-icon-btn:hover {
-    background: var(--surface-3);
-    color: var(--text-primary);
-    border-color: rgba(var(--accent-rgb), 0.4);
-  }
-
-  .tasbih-icon-btn:active {
-    transform: scale(0.95);
-  }
-
-  /* No-limit chip — sits under the Count button in the right column.
-     Stacked (icon above text) with wrapping text, not a single-line pill —
-     a 92px-wide column is too narrow for "Stop at 100" / "التوقف عند 100"
-     on one line, and truncating a setting's own label defeats the point of
-     showing it. */
-  .tasbih-limit-chip {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     gap: 4px;
-    width: 100%;
-    padding: 8px 6px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background: var(--surface-1);
-    color: var(--text-secondary);
-    font-size: 10.5px;
-    font-weight: 600;
-    line-height: 1.3;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    -webkit-app-region: no-drag;
+  }
+
+  .tb-seq-step {
+    width: 22px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--white-a15);
+  }
+
+  .tb-seq-step.is-now {
+    background: var(--white-a50);
+  }
+
+  .tb-seq-step.is-done {
+    background: var(--text-primary);
+  }
+
+  .tb-dhikr {
+    max-width: 100%;
     text-align: center;
   }
 
-  .tasbih-limit-chip:hover {
-    border-color: rgba(var(--accent-rgb), 0.5);
+  .tb-dhikr-text {
+    margin: 0;
+    font-family: var(--font-arabic);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.5;
     color: var(--text-primary);
-  }
-
-  .tasbih-limit-chip i {
-    font-size: 13px;
-    flex: 0 0 auto;
-  }
-
-  .tasbih-limit-chip-text {
-    white-space: normal;
-    overflow: visible;
     overflow-wrap: anywhere;
   }
 
-  .tasbih-limit-chip--unlimited {
-    background: rgba(var(--accent-rgb), 0.18);
-    border-color: var(--accent-color);
-    color: var(--text-primary);
+  .tb-dhikr-text.is-long {
+    font-size: 20px;
   }
 
-  .tasbih-limit-chip--unlimited i {
-    color: var(--accent-color);
-  }
-
-  /* Spacebar indicator — small hint tucked under the limit chip */
-  .spacebar-indicator {
-    font-size: 9.5px;
-    color: var(--text-secondary);
-    opacity: 0.7;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: var(--black-a25);
-    padding: 3px 8px;
-    border-radius: 16px;
-    border: 1px solid var(--border-medium);
-    pointer-events: none;
-  }
-
-  .spacebar-indicator i {
-    font-size: 9px;
-    color: var(--accent-color);
-  }
-
-  .spacebar-indicator kbd {
-    background: var(--surface-hover);
-    border-radius: 4px;
-    padding: 1px 5px;
-    font-family: monospace;
-    font-size: 9px;
-    font-weight: 600;
-    color: var(--text-bright);
-    border: 1px solid var(--white-a20);
-  }
-
-  /* ========== Dhikr Selection ========== */
-  .tasbih-dhikr-section {
-    width: 100%;
-    background: var(--black-a20);
-    border-radius: 16px;
-    padding: 14px 12px;
-    border: 1px solid var(--border-color);
-  }
-
-  .section-label {
+  .tb-dhikr-meaning {
+    margin: 2px 0 0;
     font-size: 13px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 10px;
-    text-align: center;
-    opacity: 0.9;
-    letter-spacing: 0.3px;
+    line-height: 1.4;
+    color: var(--text-muted);
   }
 
-  .dhikr-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+  .tb-dhikr-meaning[hidden] {
+    display: none;
   }
 
-  .dhikr-card {
-    background: var(--white-a04);
-    border: 1px solid var(--border-soft);
-    border-radius: 12px;
-    padding: 12px 6px;
+  .tb-dhikr-source {
+    margin: 4px 0 0;
+    font-size: 11.5px;
+    color: var(--text-faint);
+  }
+
+  .tb-source {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 11px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+
+  .tb-source + .tb-source {
+    margin-inline-start: 6px;
+  }
+
+  /* the ring: a big round button to count on */
+  .tb-ring-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: min(210px, 36vh);
+    aspect-ratio: 1;
+  }
+
+  .tb-ring-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .tb-ring-track,
+  .tb-ring-progress {
+    fill: none;
+    stroke-width: 9;
+  }
+
+  .tb-ring-track {
+    stroke: var(--white-a10);
+  }
+
+  .tb-ring-progress {
+    stroke: var(--text-primary);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.25s ease;
+  }
+
+  .tb-ring-bead {
+    fill: var(--text-primary);
+    transition: opacity 0.2s ease;
+  }
+
+  /* turns round the ring's centre, in step with the arc */
+  .tb-ring-bead-turn {
+    transform-box: view-box;
+    transform-origin: 50% 50%;
+    transition: transform 0.25s ease;
+  }
+
+  .tb-ring-progress.no-move,
+  .tb-ring-bead-turn.no-move {
+    transition: none;
+  }
+
+  .tb-ring-tap {
+    position: absolute;
+    inset: 16%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: center;
-    font-family: inherit;
-    position: relative;
-  }
-
-  .dhikr-card:hover {
-    transform: translateY(-2px);
-    background: var(--surface-2);
-    border-color: var(--accent-color);
-  }
-
-  .dhikr-card.active {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-  }
-
-  .dhikr-card.active::after {
-    content: "\f00c";
-    font-family: var(--font-icons);
-    font-weight: 900;
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    font-size: 9px;
-    color: var(--white-a85);
-  }
-
-  .dhikr-name {
-    font-size: 13px;
-    font-weight: 600;
+    justify-content: center;
+    gap: 2px;
+    border: 1px solid var(--border-medium);
+    border-radius: 50%;
+    background: var(--surface-1);
     color: var(--text-primary);
-    line-height: 1.4;
+    font: inherit;
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background 0.15s ease,
+      transform 0.1s ease;
   }
 
-  .dhikr-meaning {
-    font-size: 9.5px;
-    color: var(--text-secondary);
-    opacity: 0.8;
-    line-height: 1.3;
+  .tb-ring-tap:hover {
+    background: var(--surface-2);
   }
 
-  .dhikr-count {
-    font-size: 10px;
-    color: var(--text-secondary);
+  .tb-ring-tap.is-pulse {
+    animation: tb-pulse 0.18s ease;
+  }
+
+  .tb-ring-tap.is-done {
+    border-color: var(--text-primary);
+  }
+
+  @keyframes tb-pulse {
+    50% {
+      transform: scale(0.96);
+    }
+  }
+
+  .tb-count-value {
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tb-count-target {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tb-round-badge {
+    padding: 1px 8px;
+    border-radius: 10px;
     background: var(--surface-3);
-    padding: 2px 6px;
-    border-radius: 12px;
-    font-weight: 600;
-    margin-top: 2px;
-  }
-
-  .dhikr-card.active .dhikr-name,
-  .dhikr-card.active .dhikr-meaning,
-  .dhikr-card.active .dhikr-count {
-    color: var(--text-bright);
-  }
-
-  .dhikr-card.active .dhikr-count {
-    background: var(--white-a25);
-  }
-
-  /* ========== Footer ========== */
-  .tasbih-footer {
-    padding-top: 8px;
-    border-top: 1px solid var(--border-color);
-    text-align: center;
-  }
-
-  .tasbih-footer-text {
     font-size: 11px;
-    color: var(--text-secondary);
-    font-style: italic;
-    opacity: 0.8;
-    line-height: 1.4;
+    font-weight: 600;
   }
 
-  /* ========== Confirm Dialog ========== */
-  .tasbih-confirm-dialog {
-    position: fixed;
-    inset: 0;
-    background: var(--black-a70);
-    backdrop-filter: blur(5px);
+  .tb-round-badge[hidden] {
+    display: none;
+  }
+
+  .tb-controls {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .tb-icon-btn,
+  .tb-chip-btn {
+    height: 34px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    z-index: var(--z-dialog);
-    padding: 20px;
-  }
-
-  .tasbih-confirm-box {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
-    max-width: 300px;
-    width: 100%;
-    box-shadow: 0 8px 32px var(--black-a30);
-    animation: fade-in-scale 0.2s ease;
-  }
-
-  .tasbih-confirm-title {
-    font-size: 16px;
+    gap: 6px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 12.5px;
     font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 12px;
-    text-align: center;
-  }
-
-  .tasbih-confirm-message {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-bottom: 20px;
-    text-align: center;
-    line-height: 1.5;
-  }
-
-  .tasbih-confirm-buttons {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-  }
-
-  .tasbih-confirm-btn {
-    padding: 8px 20px;
-    border-radius: 8px;
-    border: none;
-    font-size: 13px;
-    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 80px;
   }
 
-  .tasbih-confirm-cancel {
-    background: var(--surface-3);
+  .tb-icon-btn {
+    width: 34px;
+  }
+
+  .tb-chip-btn {
+    padding: 0 12px;
+  }
+
+  .tb-chip-btn.is-quiet {
+    border-color: transparent;
+    background: transparent;
+    color: var(--text-muted);
+  }
+
+  .tb-icon-btn[aria-pressed="false"] {
+    color: var(--text-faint);
+  }
+
+  .tb-hint {
+    margin: 0;
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  .tb-hint kbd {
+    padding: 1px 5px;
+    border: 1px solid var(--white-a20);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 10.5px;
+  }
+
+  .tb-quote {
+    margin: auto 0 0;
+    max-width: 420px;
+    font-size: 11.5px;
+    font-style: italic;
+    line-height: 1.5;
+    text-align: center;
+    color: var(--text-faint);
+  }
+
+  /* read to screen readers only */
+  .tb-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* ── Side panel ────────────────────────────────────────────────────────── */
+
+  .tb-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .tb-panel-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  /* groups that fold (like the Athkar page's categories): icon, name, count, chevron */
+  .tb-group + .tb-group {
+    padding-top: 4px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .tb-group-heading {
+    margin: 0;
+  }
+
+  .tb-group-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 6px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-align: start;
+    cursor: pointer;
+    transition: background 0.15s ease;
   }
 
-  .tasbih-confirm-cancel:hover {
+  .tb-group-header:hover {
+    background: var(--surface-1);
+  }
+
+  .tb-group-icon {
+    flex-shrink: 0;
+    width: 16px;
+    font-size: 12px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .tb-group-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tb-group-total {
+    flex-shrink: 0;
+    min-width: 20px;
+    padding: 1px 6px;
+    border-radius: 9px;
+    background: var(--surface-2);
+    font-size: 10.5px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .tb-group-chevron {
+    flex-shrink: 0;
+    font-size: 10px;
+    color: var(--text-faint);
+    transition: transform 0.2s ease;
+  }
+
+  /* open: the body takes its height; folded: 0, and its content leaves the Tab order */
+  .tb-group-body {
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+
+  .tb-group-inner {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 6px;
+    overflow: hidden;
+  }
+
+  .tb-group.is-collapsed .tb-group-body {
+    grid-template-rows: 0fr;
+  }
+
+  .tb-group.is-collapsed .tb-group-inner {
+    padding-bottom: 0;
+    visibility: hidden;
+  }
+
+  .tb-group.is-collapsed .tb-group-chevron {
+    transform: rotate(-90deg);
+  }
+
+  [dir="rtl"] .tb-group.is-collapsed .tb-group-chevron {
+    transform: rotate(90deg);
+  }
+
+  .tb-panel.is-ready .tb-group-body {
+    transition: grid-template-rows 0.25s ease;
+  }
+
+  .tb-panel.is-ready .tb-group-inner {
+    transition: visibility 0s;
+  }
+
+  .tb-panel.is-ready .tb-group.is-collapsed .tb-group-inner {
+    transition: visibility 0s 0.25s;
+  }
+
+  .tb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tb-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+  }
+
+  .tb-item.is-active {
+    border-color: var(--white-a40);
     background: var(--surface-hover);
   }
 
-  .tasbih-confirm-reset {
-    background: linear-gradient(
-      135deg,
-      var(--color-danger),
-      var(--color-danger-strong)
-    );
+  .tb-item-main,
+  .tb-seq-card {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .tb-item-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .tb-item-name,
+  .tb-item-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  /* dir="auto" words (Arabic in an English page) still line up with the page's start */
+  .tb-item-name,
+  .tb-item-meaning {
+    text-align: left;
+  }
+
+  [dir="rtl"] :is(.tb-item-name, .tb-item-meaning) {
+    text-align: right;
+  }
+
+  .tb-item-name.is-arabic {
+    font-family: var(--font-arabic);
+    font-size: 17px;
+    line-height: 1.4;
+  }
+
+  .tb-item-meaning {
+    font-size: 11.5px;
+    line-height: 1.35;
+    color: var(--text-faint);
+  }
+
+  .tb-item-count {
+    flex-shrink: 0;
+    font-size: 11.5px;
+    white-space: nowrap;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tb-item-edit {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-faint);
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .tb-item-edit.is-delete:hover {
+    color: var(--color-danger);
+  }
+
+  .tb-seq-card {
+    width: 100%;
+    border: 1px solid var(--border-medium);
+    background: var(--surface-1);
+  }
+
+  .tb-seq-card.is-active {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
+  }
+
+  .tb-seq-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    background: var(--surface-3);
+    font-size: 14px;
+  }
+
+  .tb-seq-source {
+    margin: 4px 2px 0;
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--text-faint);
+  }
+
+  .tb-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 8px;
+    border: 1px dashed var(--white-a30);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .tb-empty {
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-faint);
+  }
+
+  /* ── The editor (a native <dialog>), drawn like the Settings dialogs (Add Location) ── */
+
+  /* reset.css removes every element's margin, and a <dialog> is centred by its auto margin */
+  .tb-editor {
+    width: 90%;
+    max-width: 450px;
+    max-height: 85vh;
+    margin: auto;
+    padding: 24px;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    box-shadow: 0 20px 60px var(--black-a50);
+    overflow: hidden auto;
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  @starting-style {
+    .tb-editor[open] {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+  }
+
+  .tb-editor::backdrop {
+    background: var(--black-a60);
+    backdrop-filter: blur(3px);
+  }
+
+  .tb-editor-form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tb-editor-close {
+    position: absolute;
+    top: -8px;
+    inset-inline-end: -8px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: 8px;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .tb-editor-close:hover {
+    background: var(--surface-3);
+    transform: rotate(90deg);
+  }
+
+  .tb-editor-title {
+    margin: 0 0 24px;
+    padding-inline-end: 36px;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .tb-form-field {
+    margin: 0 0 16px;
+  }
+
+  .tb-field-label {
+    display: block;
+    margin-bottom: 6px;
+    padding: 0;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .tb-field {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 14px;
+    resize: vertical;
+    transition: all 0.2s ease;
+  }
+
+  .tb-field:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: var(--surface-2);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
+  }
+
+  .tb-field::placeholder {
+    color: var(--white-a30);
+  }
+
+  textarea.tb-field {
+    font-family: var(--font-arabic), var(--font-ui);
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  .tb-targets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    border: none;
+  }
+
+  .tb-targets legend {
+    width: 100%;
+  }
+
+  .tb-target {
+    position: relative;
+  }
+
+  /* the real radio button covers the option, invisible: clicks and arrow keys work natively */
+  .tb-target input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .tb-target span {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-1);
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .tb-target input:checked + span {
+    border-color: var(--accent-color);
+    background: rgba(var(--accent-rgb), 0.2);
+  }
+
+  .tb-target input:focus-visible + span {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+  }
+
+  /* the "Other" choice is the stepper itself: its radio stays for keyboards and screen
+     readers, without a chip of its own */
+  .tb-target-other {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  /* "Other": − / + around the number, like the Settings steppers; dimmed until chosen */
+  .tb-stepper {
+    display: inline-flex;
+    align-items: stretch;
+    height: 36px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-1);
+    overflow: hidden;
+    opacity: 0.6;
+    transition:
+      opacity 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .tb-stepper.is-on {
+    opacity: 1;
+    border-color: var(--accent-color);
+  }
+
+  .tb-stepper:focus-within {
+    opacity: 1;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
+  }
+
+  .tb-stepper-btn {
+    width: 34px;
+    display: grid;
+    place-items: center;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    touch-action: none;
+    transition:
+      background 0.15s,
+      color 0.15s;
+  }
+
+  .tb-stepper-btn svg {
+    width: 13px;
+    height: 13px;
+    pointer-events: none;
+  }
+
+  .tb-stepper-btn:hover {
+    background: rgba(var(--accent-rgb), 0.15);
+    color: var(--accent-color);
+  }
+
+  .tb-stepper-btn:active {
+    background: rgba(var(--accent-rgb), 0.28);
+  }
+
+  .tb-stepper-btn:first-child {
+    border-inline-end: 1px solid var(--border-color);
+  }
+
+  .tb-stepper-btn:last-child {
+    border-inline-start: 1px solid var(--border-color);
+  }
+
+  .tb-stepper-input {
+    width: 64px;
+    padding: 0 4px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tb-editor-error {
+    margin: -6px 0 14px;
+    font-size: 12.5px;
+    color: var(--color-danger);
+  }
+
+  .tb-editor-error[hidden] {
+    display: none;
+  }
+
+  .tb-editor-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .tb-btn-primary,
+  .tb-btn-secondary {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .tb-btn-primary {
+    background: var(--accent-color);
     color: var(--text-bright);
-    box-shadow: var(--shadow-danger-sm);
+    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
   }
 
-  .tasbih-confirm-reset:hover {
-    background: linear-gradient(135deg, var(--color-danger-strong), #ff3838);
-    box-shadow: var(--shadow-danger-md);
+  .tb-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.4);
   }
 
-  /* ========== Reduced motion ========== */
-  /* stylelint-disable declaration-no-important -- users who turn off animations in Windows must win over every animation */
+  .tb-btn-secondary {
+    border: 1px solid var(--border-color);
+    background: var(--surface-1);
+    color: var(--text-primary);
+  }
+
+  .tb-btn-secondary:hover {
+    background: var(--surface-2);
+    transform: translateY(-1px);
+  }
+
+  .tb-ring-tap:focus-visible,
+  .tb-icon-btn:focus-visible,
+  .tb-chip-btn:focus-visible,
+  .tb-btn-primary:focus-visible,
+  .tb-btn-secondary:focus-visible,
+  .tb-editor-close:focus-visible,
+  .tb-item-main:focus-visible,
+  .tb-item-edit:focus-visible,
+  .tb-seq-card:focus-visible,
+  .tb-add-btn:focus-visible,
+  .tb-group-header:focus-visible,
+  .tb-source:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+  }
+
+  .tb-icon-btn:hover,
+  .tb-chip-btn:hover,
+  .tb-item-main:hover,
+  .tb-item-edit:hover,
+  .tb-seq-card:hover,
+  .tb-add-btn:hover {
+    background: var(--surface-3);
+  }
+
+  .tb-source:hover {
+    color: var(--text-primary);
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .tasbih-ring-progress,
-    .tasbih-ring-bead,
-    .tasbih-ring-tap,
-    .dhikr-card {
-      transition: none !important;
-      animation: none !important;
-    }
-  }
-  /* stylelint-enable declaration-no-important */
-
-  /* ========== RESPONSIVE ========== */
-
-  /* Below this width there isn't enough room for two 92px side columns plus
-     the ring — collapse the flanking layout into the previous stacked one
-     (ring first, then the two side columns as a row each) rather than
-     letting things get cramped or overflow. */
-  @media (width <= 560px) {
-    .tasbih-ring-row {
-      flex-direction: column;
-      gap: 14px;
+    .tb-ring-tap.is-pulse {
+      animation: none;
     }
 
-    .tasbih-ring-wrap {
-      order: 1;
-      width: min(200px, 62vw);
-    }
-
-    .tasbih-side {
-      order: 2;
-      flex-direction: row;
-      width: auto;
-      max-width: 340px;
-    }
-
-    .tasbih-side-left {
-      order: 2;
-    }
-
-    .tasbih-side-right {
-      order: 3;
-    }
-
-    .tasbih-side-btn {
-      flex: 1;
-      flex-direction: row;
-      padding: 12px 10px;
-    }
-
-    .tasbih-limit-chip,
-    .spacebar-indicator {
-      display: none; /* shown for the currently-selected dhikr only; avoid clutter once stacked */
-    }
-
-    .tasbih-side-right .tasbih-limit-chip {
-      display: flex;
-      flex: 0 0 auto;
-      width: auto;
-      max-width: 120px;
-      padding: 8px 10px;
+    .tb-ring-progress,
+    .tb-ring-bead-turn,
+    .tb-panel.is-ready .tb-group-body,
+    .tb-group-chevron {
+      transition: none;
     }
   }
 
-  @media (width <= 768px) {
-    .tasbih-container {
-      padding: 12px;
-      gap: 8px;
+  /* ── Maximized window ──────────────────────────────────────────────────── */
+
+  .fullscreen-mode .tb-layout {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 16px;
+  }
+
+  .fullscreen-mode .tb-ring-wrap {
+    width: min(320px, 42vh);
+  }
+
+  .fullscreen-mode .tb-count-value {
+    font-size: 60px;
+  }
+
+  .fullscreen-mode .tb-dhikr-text {
+    font-size: 38px;
+  }
+
+  /* ── Narrow window: one column, the page scrolls ───────────────────────── */
+
+  @media (width <= 700px) {
+    .tb-layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-rows: max-content;
+      overflow: hidden auto;
     }
 
-    .tasbih-active-name {
-      font-size: 1.3rem;
+    .tb-counter,
+    .tb-panel-body {
+      overflow: visible;
     }
 
-    .tasbih-count-value {
-      font-size: 3.2rem;
-    }
-
-    .dhikr-name {
-      font-size: 12px;
-    }
-
-    .dhikr-meaning {
-      font-size: 9px;
-    }
-
-    .tasbih-side-btn {
-      padding: 11px 6px;
-      font-size: 12px;
+    .tb-ring-wrap {
+      width: 200px;
     }
   }
 
   @media (width <= 480px) {
     .tasbih-container {
       padding: 8px;
-      gap: 6px;
-    }
-
-    .tasbih-active-name {
-      font-size: 1.15rem;
-    }
-
-    .tasbih-active-meaning {
-      font-size: 11px;
-    }
-
-    .tasbih-count-value {
-      font-size: 2.7rem;
-    }
-
-    .tasbih-count-target {
-      font-size: 0.85rem;
-    }
-
-    .tasbih-side-right .tasbih-limit-chip {
-      font-size: 11px;
-      padding: 8px 10px;
-    }
-
-    .section-label {
-      font-size: 12px;
-      margin-bottom: 8px;
-    }
-
-    .dhikr-name {
-      font-size: 11.5px;
-    }
-
-    .dhikr-meaning {
-      display: none; /* keep cards compact on very narrow screens */
-    }
-
-    .tasbih-side-btn {
-      padding: 10px 5px;
-      font-size: 11.5px;
-    }
-
-    .tasbih-side-btn i {
-      font-size: 14px;
-    }
-
-    .tasbih-icon-btn {
-      width: 36px;
-      height: 36px;
-      font-size: 13px;
-    }
-
-    .tasbih-footer-text {
-      font-size: 10px;
+      gap: 8px;
     }
   }
 
-  @media (width <= 320px) {
-    .tasbih-ring-wrap {
-      width: 150px;
+  /* ── The side panel folded to the edge: a strip of the groups' icons ───── */
+
+  .tb-panel-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tb-panel-heading {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding-inline-start: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .tb-panel-toggle,
+  .tb-rail-btn {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .tb-panel-toggle:hover,
+  .tb-rail-btn:hover {
+    background: var(--surface-3);
+  }
+
+  .tb-panel-toggle:focus-visible,
+  .tb-rail-btn:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+  }
+
+  /* the arrows point to the edge the panel folds to (mirrored in Arabic) */
+  .tb-panel-toggle i {
+    transition: transform 0.25s ease;
+  }
+
+  [dir="rtl"] .tb-panel-toggle i {
+    transform: scaleX(-1);
+  }
+
+  .tb-rail {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tb-layout.is-panel-folded,
+  .fullscreen-mode .tb-layout.is-panel-folded {
+    grid-template-columns: minmax(0, 1fr) 58px;
+  }
+
+  .tb-layout.is-panel-folded .tb-panel {
+    align-items: center;
+    padding: 12px 0;
+  }
+
+  .tb-layout.is-panel-folded .tb-panel-heading,
+  .tb-layout.is-panel-folded .tb-panel-body {
+    display: none;
+  }
+
+  .tb-layout.is-panel-folded .tb-rail {
+    display: flex;
+  }
+
+  .tb-layout.is-panel-folded .tb-panel-toggle i {
+    transform: rotate(180deg);
+  }
+
+  [dir="rtl"] .tb-layout.is-panel-folded .tb-panel-toggle i {
+    transform: none;
+  }
+
+  /* more room for the counter */
+  .tb-layout.is-panel-folded .tb-ring-wrap {
+    width: min(250px, 40vh);
+  }
+
+  /* a narrow window has one column: nothing to fold */
+  @media (width <= 700px) {
+    .tb-layout.is-panel-folded {
+      grid-template-columns: minmax(0, 1fr);
     }
 
-    .tasbih-count-value {
-      font-size: 2.3rem;
-    }
-
-    .tasbih-active-name {
-      font-size: 1rem;
-    }
-
-    .spacebar-indicator {
+    .tb-panel-toggle,
+    .tb-layout.is-panel-folded .tb-rail {
       display: none;
     }
 
-    .dhikr-grid {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
+    .tb-layout.is-panel-folded .tb-panel {
+      align-items: stretch;
+      padding: 12px;
     }
 
-    .dhikr-name {
-      font-size: 11px;
+    .tb-layout.is-panel-folded .tb-panel-heading,
+    .tb-layout.is-panel-folded .tb-panel-body {
+      display: flex;
     }
+  }
 
-    .tasbih-side {
-      gap: 6px;
+  @media (prefers-reduced-motion: reduce) {
+    .tb-layout,
+    .tb-panel-toggle i {
+      transition: none;
     }
   }
 }

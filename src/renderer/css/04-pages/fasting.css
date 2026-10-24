@@ -1,445 +1,634 @@
 @layer pages {
-  /* Sunnah Fasting Page Styles */
+  /* Sunnah fasting: the next fast and the lists on one side, the reminders, make-up, your fasts
+     and the days not to fast on the other (mirrored in Arabic), one column in a narrow window.
+     Like the Hijri calendar and Ramadan pages, the states that must always show (the next
+     fast's date, "fasted") are white: the theme's accent can be close to its background. */
+
   .fasting-container {
-    height: 100%;
     display: flex;
     flex-direction: column;
+    height: 100%;
     padding: 16px;
     gap: 12px;
-    position: relative;
+    box-sizing: border-box;
     overflow: hidden;
   }
 
   /* Header: layout comes from the shared .page-header component
      (03-components/page-header.css). Only what is specific to this page is here. */
   .fasting-controls {
-    z-index: var(--z-page-header-controls);
+    z-index: 2;
   }
 
-  .fasting-content {
+  .vf-layout {
     flex: 1;
-    overflow-y: auto;
-    padding: 6px 2px;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 290px;
+    gap: 12px;
+    -webkit-app-region: no-drag;
+  }
+
+  .vf-main {
+    min-width: 0;
+    min-height: 0;
     display: flex;
     flex-direction: column;
+    gap: 12px;
+  }
+
+  .vf-hero,
+  .vf-card,
+  .vf-box {
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+  }
+
+  .vf-message {
+    width: 100%;
+    margin: 0;
+    padding: 18px 8px;
+    text-align: center;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* ── The next fast ─────────────────────────────────────────────────────── */
+
+  .vf-hero {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
     gap: 16px;
-    -webkit-app-region: no-drag;
+    padding: 14px 16px;
+  }
+
+  .vf-hero-main {
+    min-width: 0;
+    display: flex;
+    gap: 14px;
+  }
+
+  .vf-date-block {
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 0;
+    border-radius: var(--radius-md);
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .vf-date-weekday,
+  .vf-date-month {
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .vf-date-day {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  .vf-hero-text {
+    min-width: 0;
+  }
+
+  .vf-kicker {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-faint);
+  }
+
+  .vf-kicker-when {
+    color: var(--text-primary);
+  }
+
+  .vf-hero-title {
+    margin: 2px 0 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text-primary);
+  }
+
+  .vf-hero-hijri {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .vf-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .vf-chip {
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: var(--surface-3);
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .vf-hero-note {
+    margin: 6px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-faint);
+  }
+
+  .vf-hero-side {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .vf-tiles {
+    display: flex;
+    gap: 8px;
+  }
+
+  .vf-tile {
+    min-width: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+  }
+
+  .vf-tile.is-iftar {
+    background: var(--surface-3);
+  }
+
+  .vf-tile-label {
+    font-size: 11px;
+    white-space: nowrap;
+    color: var(--text-faint);
+  }
+
+  .vf-tile-time {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Lists ─────────────────────────────────────────────────────────────── */
+
+  .vf-card {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+    overflow: hidden auto;
     scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-    direction: ltr; /* Force LTR so the scrollbar stays on the right (start side in RTL) */
+    scrollbar-color: var(--white-a20) transparent;
   }
 
-  .fasting-content::-webkit-scrollbar {
-    width: 5px;
+  .vf-card-title,
+  .vf-box-title {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-faint);
   }
 
-  .fasting-content::-webkit-scrollbar-track {
+  .vf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .vf-card-title + .vf-list {
+    margin-bottom: 8px;
+  }
+
+  .vf-row,
+  .vf-season {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 8px;
+    border-radius: var(--radius-md);
+  }
+
+  .vf-row.is-today {
+    background: var(--surface-hover);
+  }
+
+  .vf-row-date {
+    flex-shrink: 0;
+    width: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .vf-row-weekday {
+    font-size: 10.5px;
+    color: var(--text-faint);
+  }
+
+  .vf-row-day {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-primary);
+  }
+
+  .vf-row-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .vf-row-title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text-primary);
+  }
+
+  .vf-row.is-past .vf-row-title {
+    color: var(--text-muted);
+  }
+
+  .vf-row-sub {
+    font-size: 11.5px;
+    color: var(--text-faint);
+  }
+
+  .vf-row-end {
+    flex-shrink: 0;
+  }
+
+  .vf-when {
+    flex-shrink: 0;
+    font-size: 12px;
+    white-space: nowrap;
+    color: var(--text-muted);
+  }
+
+  .vf-season-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    font-size: 14px;
+  }
+
+  /* a day not to fast: calm, not alarming, but unmistakable */
+  .vf-season.is-forbidden .vf-season-icon {
     background: transparent;
+    border: 1px dashed var(--white-a40);
+    color: var(--text-muted);
   }
 
-  .fasting-content::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 3px;
+  .vf-row.is-forbidden .vf-row-title,
+  .vf-season.is-forbidden .vf-row-title {
+    color: var(--text-muted);
   }
 
-  /* The container above is forced LTR only to pin the scrollbar — re-apply
-     RTL to the actual cards so Arabic (and other RTL languages) text/layout
-     still reads correctly. Same convention used on the Ramadan page. */
-  [dir="rtl"] .fasting-content > *,
-  [lang="ar"] .fasting-content > *,
-  [lang="fa"] .fasting-content > *,
-  [lang="ur"] .fasting-content > *,
-  [lang="he"] .fasting-content > * {
-    direction: rtl;
+  .vf-empty {
+    padding: 8px;
+    font-size: 13px;
+    color: var(--text-faint);
   }
 
-  /* ========== Reminder lead-time selector ========== */
-  .fasting-lead-row {
+  .vf-card-note {
+    display: flex;
+    gap: 8px;
+    margin: 4px 0 0;
+    padding: 0 8px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--text-faint);
+  }
+
+  .vf-card-note[hidden] {
+    display: none;
+  }
+
+  /* ── Buttons ───────────────────────────────────────────────────────────── */
+
+  .vf-done-btn,
+  .vf-action-btn {
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 12px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .vf-done-btn.is-big {
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .vf-done-btn.is-on {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    color: var(--bg-primary);
+  }
+
+  .vf-action-btn {
+    margin-top: 10px;
+  }
+
+  .vf-action-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .vf-source {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 11px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+
+  .vf-source + .vf-source {
+    margin-inline-start: 6px;
+  }
+
+  .vf-source:hover {
+    color: var(--text-primary);
+  }
+
+  /* ── Side panel ────────────────────────────────────────────────────────── */
+
+  .vf-panel {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .vf-box {
+    flex-shrink: 0;
+    padding: 14px;
+  }
+
+  .vf-box[hidden] {
+    display: none;
+  }
+
+  .vf-box-subtitle {
+    margin: 12px 0 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-faint);
+  }
+
+  .vf-types {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .vf-type,
+  .vf-when-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 10px 14px;
+    padding: 8px 0;
   }
 
-  .fasting-lead-label {
+  .vf-type + .vf-type,
+  .vf-when-row + .vf-when-row {
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .vf-type-text,
+  .vf-when-text {
+    min-width: 0;
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .vf-type-name {
     font-size: 13px;
     font-weight: 600;
     color: var(--text-primary);
-  }
-
-  .fasting-lead-label i {
-    color: var(--accent-color);
-    font-size: 13px;
-  }
-
-  .fasting-lead-select {
-    background: var(--surface-1);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 7px 10px;
-    font-size: 13px;
-    color: var(--text-primary);
-    font-family: inherit;
     cursor: pointer;
-    transition: all 0.2s ease;
   }
 
-  .fasting-lead-select:hover {
-    border-color: rgba(var(--accent-rgb), 0.5);
+  .vf-type-why {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--text-faint);
   }
 
-  .fasting-lead-select:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
-  }
-
-  .fasting-lead-select option {
-    background: #14213d;
-    color: var(--text-bright);
-  }
-
-  /* ========== Hero card — next upcoming occasion ========== */
-  .fasting-hero {
-    background: linear-gradient(
-      135deg,
-      rgba(var(--accent-rgb), 0.22),
-      rgba(var(--accent-rgb), 0.06)
-    );
-    border: 1px solid rgba(var(--accent-rgb), 0.35);
-    border-radius: 14px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition:
-      opacity 0.25s ease,
-      transform 0.25s ease;
-  }
-
-  .fasting-hero-label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--accent-color);
-  }
-
-  .fasting-hero-main {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .fasting-hero-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: rgba(var(--accent-rgb), 0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    color: var(--accent-color);
-    flex: 0 0 auto;
-  }
-
-  .fasting-hero-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .fasting-hero-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .fasting-hero-date {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-  }
-
-  .fasting-hero-countdown {
-    flex: 0 0 auto;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--accent-color);
-    background: rgba(var(--accent-rgb), 0.15);
-    padding: 4px 10px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-
-  .fasting-hero-desc {
-    margin: 0;
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--text-secondary);
-  }
-
-  .fasting-toggle-btn {
+  .vf-select {
     align-self: flex-start;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(var(--accent-rgb), 0.4);
-    background: rgba(var(--accent-rgb), 0.12);
+    margin-top: 4px;
+    padding: 4px 8px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-sm);
+    background: var(--surface-1);
     color: var(--text-primary);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .fasting-toggle-btn:hover {
-    background: rgba(var(--accent-rgb), 0.22);
-  }
-
-  .fasting-toggle-btn.fasting-active {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    color: var(--text-bright);
-  }
-
-  .fasting-toggle-btn i {
-    font-size: 14px;
-  }
-
-  /* ========== Sections ========== */
-  .fasting-section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .fasting-section-title {
-    margin: 0;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  /* ========== Weekly Sunnah card ========== */
-  .fasting-weekly-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 12px 14px;
-  }
-
-  .fasting-weekly-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    background: rgba(var(--accent-rgb), 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--accent-color);
-    font-size: 16px;
-    flex: 0 0 auto;
-  }
-
-  .fasting-weekly-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .fasting-weekly-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-primary);
-  }
-
-  .fasting-weekly-desc {
+    font: inherit;
     font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 2px;
   }
 
-  /* ========== List of upcoming occasions ========== */
-  .fasting-list {
+  .vf-select:disabled {
+    opacity: 0.5;
+  }
+
+  .vf-select option {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+  }
+
+  .vf-done-btn:focus-visible,
+  .vf-action-btn:focus-visible,
+  .vf-source:focus-visible,
+  .vf-select:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+  }
+
+  .vf-done-btn:hover:not(.is-on),
+  .vf-action-btn:hover:not(:disabled) {
+    background: var(--surface-3);
+  }
+
+  .vf-box-note {
+    margin: 8px 0 0;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--text-faint);
+  }
+
+  .vf-big-number {
+    margin: 6px 0 2px;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text-primary);
+  }
+
+  .vf-stat,
+  .vf-shawwal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .vf-stat-label {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .vf-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .vf-dots {
+    display: flex;
+    gap: 4px;
+  }
+
+  /* drawn with borders, so a Windows contrast theme keeps them */
+  .vf-dot {
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid var(--white-a40);
+    border-radius: 50%;
+  }
+
+  .vf-dot.is-on {
+    border: 5px solid var(--text-primary);
+  }
+
+  .vf-rules {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-muted);
   }
 
-  .fasting-item {
+  .vf-rules li {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 10px 14px;
-    transition: border-color 0.2s ease;
-  }
-
-  .fasting-item:hover {
-    border-color: rgba(var(--accent-rgb), 0.4);
-  }
-
-  .fasting-item-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
-    background: rgba(var(--accent-rgb), 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--accent-color);
-    font-size: 14px;
-    flex: 0 0 auto;
-  }
-
-  .fasting-item-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .fasting-item-title {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .fasting-item-meta {
-    font-size: 11.5px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .fasting-item-date-chip {
-    white-space: nowrap;
-  }
-
-  .fasting-item-desc {
-    font-size: 11.5px;
-    color: var(--text-secondary);
-    opacity: 0.85;
-    margin-top: 3px;
-    line-height: 1.4;
-  }
-
-  /* Bell toggle used per list item */
-  .fasting-bell-btn {
-    flex: 0 0 auto;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 1px solid var(--border-color);
-    background: transparent;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
-  }
-
-  .fasting-bell-btn:hover {
-    border-color: rgba(var(--accent-rgb), 0.5);
-    color: var(--text-primary);
-  }
-
-  .fasting-bell-btn.fasting-active {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    color: var(--text-bright);
-  }
-
-  /* ========== iOS-style switch (weekly toggle) ========== */
-  .fasting-switch {
-    position: relative;
-    display: inline-block;
-    width: 42px;
-    height: 24px;
-    flex: 0 0 auto;
-  }
-
-  .fasting-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .fasting-switch-slider {
-    position: absolute;
-    cursor: pointer;
-    inset: 0;
-    background: var(--surface-hover);
-    border-radius: 999px;
-    transition: background 0.2s ease;
-  }
-
-  .fasting-switch-slider::before {
-    content: "";
-    position: absolute;
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background: var(--white);
-    border-radius: 50%;
-    transition: transform 0.2s ease;
-  }
-
-  .fasting-switch input:checked + .fasting-switch-slider {
-    background: var(--accent-color);
-  }
-
-  .fasting-switch input:checked + .fasting-switch-slider::before {
-    transform: translateX(18px);
-  }
-
-  /* ========== Loading / empty states ========== */
-  .fasting-loading,
-  .fasting-empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     gap: 8px;
-    padding: 24px 12px;
-    color: var(--text-secondary);
-    font-size: 13px;
   }
 
-  /* ========== Footer note ========== */
-  .fasting-ramadan-note {
-    margin: 4px 2px 8px;
-    font-size: 11.5px;
-    text-align: center;
-    color: var(--text-secondary);
-    opacity: 0.75;
-    font-style: italic;
+  .vf-rules i {
+    margin-top: 3px;
+    color: var(--text-faint);
   }
 
-  /* RTL: keep bell/switch on the correct visual side automatically via flex */
+  /* ── Maximized window ──────────────────────────────────────────────────── */
+
+  .fullscreen-mode .vf-layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 16px;
+  }
+
+  .fullscreen-mode .vf-hero-title {
+    font-size: 24px;
+  }
+
+  /* ── Narrow window: one column, the page scrolls ───────────────────────── */
+
+  @media (width <= 700px) {
+    .vf-layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-rows: max-content;
+      overflow: hidden auto;
+    }
+
+    .vf-hero {
+      flex-wrap: wrap;
+    }
+
+    .vf-card,
+    .vf-panel {
+      flex: none;
+      overflow: visible;
+    }
+  }
+
+  @media (width <= 480px) {
+    .fasting-container {
+      padding: 8px;
+      gap: 8px;
+    }
+
+    .vf-hero-title {
+      font-size: 17px;
+    }
+  }
+
+  /* loading, or nothing to show: only the top card, with the message */
+  .vf-layout.is-loading {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+  }
+
+  .vf-layout.is-loading .vf-card,
+  .vf-layout.is-loading .vf-panel {
+    display: none;
+  }
 }

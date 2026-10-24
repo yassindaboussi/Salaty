@@ -1,9 +1,9 @@
 "use strict";
 
-// The counter display: the count, the target, the round badge, the progress ring with its bead
-// and the "stop at N / no limit" chip.
+// The counter display: the count and its target, the round badge (no limit), the progress ring
+// with its bead, the limit chip and the counter's accessible name.
 const { t } = require("../../core/i18n");
-const { pageState, isUnlimited } = require("./state");
+const { counting } = require("./state");
 
 const RING_RADIUS = 96;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
@@ -11,94 +11,98 @@ const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 function pulseRing() {
   const ring = document.getElementById("tbRingTap");
   if (!ring) return;
-  ring.classList.remove("tasbih-ring-tap--pulse");
-  void ring.offsetWidth;
-  ring.classList.add("tasbih-ring-tap--pulse");
+  ring.classList.remove("is-pulse");
+  void ring.offsetWidth; // restart the animation
+  ring.classList.add("is-pulse");
 }
 
-function computeRingState() {
-  const target = pageState.currentDhikr.count || 1;
-  const current = pageState.currentDhikr.current;
-  const unlimited = isUnlimited(pageState.currentDhikr.id);
-
-  let fraction;
-  let lapLocalCount;
-  let lapNumber;
-
-  if (unlimited && current > target) {
-    const mod = current % target;
-    lapLocalCount = mod === 0 ? target : mod;
-    fraction = lapLocalCount / target;
-    lapNumber = Math.ceil(current / target);
-  } else {
-    lapLocalCount = current;
-    fraction = target > 0 ? Math.min(current / target, 1) : 0;
-    lapNumber = current > 0 ? 1 : 0;
+function ringState() {
+  const { target, current, unlimited } = counting();
+  const size = target || 1;
+  if (unlimited && current > size) {
+    const inLap = current % size === 0 ? size : current % size;
+    return {
+      target: size,
+      current,
+      unlimited,
+      fraction: inLap / size,
+      inLap,
+      lap: Math.ceil(current / size),
+    };
   }
-
-  return { target, current, unlimited, fraction, lapLocalCount, lapNumber };
+  return {
+    target: size,
+    current,
+    unlimited,
+    fraction: Math.min(current / size, 1),
+    inLap: current,
+    lap: current > 0 ? 1 : 0,
+  };
 }
 
 function updateCounterDisplay() {
-  const state = computeRingState();
-
-  const cv = document.getElementById("counterValue");
+  const s = ringState();
+  const value = document.getElementById("counterValue");
   const targetLine = document.getElementById("targetLine");
-  const roundBadge = document.getElementById("tbRoundBadge");
-
-  if (cv) cv.textContent = String(state.current);
-
+  const badge = document.getElementById("tbRoundBadge");
+  if (value) value.textContent = String(s.current);
   if (targetLine) {
     targetLine.textContent =
-      state.unlimited && state.lapNumber >= 2
-        ? `${state.lapLocalCount} / ${state.target}`
-        : `/ ${state.target}`;
+      s.unlimited && s.lap >= 2
+        ? `${s.inLap} / ${s.target}`
+        : s.unlimited
+          ? "∞"
+          : `/ ${s.target}`;
   }
-
-  if (roundBadge) {
-    if (state.unlimited && state.lapNumber >= 2) {
-      roundBadge.textContent = t("roundLabel").replace("{n}", state.lapNumber);
-      roundBadge.classList.remove("hidden");
-    } else {
-      roundBadge.classList.add("hidden");
-    }
+  if (badge) {
+    const show = s.unlimited && s.lap >= 2;
+    badge.hidden = !show;
+    if (show) badge.textContent = t("roundLabel").replace("{n}", String(s.lap));
   }
-
-  updateRing(state.fraction);
-  updateLimitChip(state.unlimited);
+  const tap = document.getElementById("tbRingTap");
+  if (tap) {
+    tap.setAttribute(
+      "aria-label",
+      `${t("countBtn")}: ${s.current}${s.unlimited ? "" : ` / ${s.target}`}`,
+    );
+    tap.classList.toggle("is-done", !s.unlimited && s.current >= s.target);
+  }
+  updateRing(s.fraction);
+  updateLimitChip(s.unlimited, s.target);
 }
 
+let shownFraction = 0;
+
+/**
+ * The arc from the top, clockwise, and the bead at its end. The SVG is turned a quarter back
+ * (CSS), so the arc and the bead both start at the top. Both move with the same transition;
+ * going back (a new lap, a reset) they jump instead of running backwards round the ring.
+ * @param {number} fraction 0-1
+ */
 function updateRing(fraction) {
-  const progressEl = document.getElementById("tbRingProgress");
-  const beadEl = document.getElementById("tbRingBead");
-  if (!progressEl) return;
-
-  const offset = RING_CIRCUMFERENCE * (1 - fraction);
-  progressEl.style.strokeDasharray = `${RING_CIRCUMFERENCE}`;
-  progressEl.style.strokeDashoffset = `${offset}`;
-
-  if (beadEl) {
-    const angleDeg = fraction * 360 - 90;
-    const angleRad = (angleDeg * Math.PI) / 180;
-    const cx = 110 + RING_RADIUS * Math.cos(angleRad);
-    const cy = 110 + RING_RADIUS * Math.sin(angleRad);
-    beadEl.setAttribute("cx", cx.toFixed(2));
-    beadEl.setAttribute("cy", cy.toFixed(2));
-    beadEl.style.opacity = fraction > 0.01 ? "1" : "0";
-  }
+  const progress = document.getElementById("tbRingProgress");
+  const turn = document.getElementById("tbRingBeadTurn");
+  const bead = document.getElementById("tbRingBead");
+  if (!progress || !turn || !bead) return;
+  const jump = fraction < shownFraction - 0.5;
+  shownFraction = fraction;
+  for (const el of [progress, turn]) el.classList.toggle("no-move", jump);
+  if (jump) void progress.getBoundingClientRect(); // apply the jump before the next move
+  progress.style.strokeDasharray = `${RING_CIRCUMFERENCE}`;
+  progress.style.strokeDashoffset = `${RING_CIRCUMFERENCE * (1 - fraction)}`;
+  turn.style.transform = `rotate(${fraction * 360}deg)`;
+  bead.style.opacity = fraction > 0.01 ? "1" : "0";
 }
 
-function updateLimitChip(unlimited) {
+/** @param {boolean} unlimited @param {number} target */
+function updateLimitChip(unlimited, target) {
   const chip = document.getElementById("tbLimitChip");
-  const chipText = document.getElementById("tbLimitChipText");
-  if (!chip || !chipText) return;
-
-  chip.classList.toggle("tasbih-limit-chip--unlimited", unlimited);
+  const text = document.getElementById("tbLimitChipText");
+  if (!chip || !text) return;
   chip.setAttribute("aria-pressed", String(unlimited));
-  chipText.textContent = unlimited
+  text.textContent = unlimited
     ? t("noLimit")
-    : t("stopAtCount").replace("{count}", pageState.currentDhikr.count);
-
+    : t("stopAtCount").replace("{count}", String(target));
   const icon = chip.querySelector("i");
   if (icon)
     icon.className = unlimited ? "fas fa-infinity" : "fas fa-flag-checkered";

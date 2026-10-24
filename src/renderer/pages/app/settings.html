@@ -601,6 +601,127 @@
             </div>
           </div>
 
+          <!-- Hijri calendar: first day of the week, and the Hijri date correction -->
+          <div class="settings-section">
+            <div class="section-header">
+              <div class="section-icon">
+                <i class="fas fa-moon" aria-hidden="true"></i>
+              </div>
+              <h3 class="section-title" data-i18n="hijriCalendar">
+                Hijri Calendar
+              </h3>
+            </div>
+
+            <div class="notif-list">
+              <div class="notif-row">
+                <div class="toggle-info">
+                  <span
+                    class="subsection-label"
+                    id="weekStartLabel"
+                    data-i18n="weekStartLabel"
+                    >First day of the week</span
+                  >
+                  <span class="toggle-description" id="weekStartDesc"></span>
+                </div>
+                <div
+                  class="segmented"
+                  role="radiogroup"
+                  aria-labelledby="weekStartLabel"
+                >
+                  <label class="segmented-option">
+                    <input type="radio" name="weekStart" value="auto" />
+                    <span class="segmented-label" data-i18n="weekStartAuto"
+                      >Auto</span
+                    >
+                  </label>
+                  <label class="segmented-option">
+                    <input type="radio" name="weekStart" value="sat" />
+                    <span class="segmented-label" data-weekday="6">Sat</span>
+                  </label>
+                  <label class="segmented-option">
+                    <input type="radio" name="weekStart" value="sun" />
+                    <span class="segmented-label" data-weekday="0">Sun</span>
+                  </label>
+                  <label class="segmented-option">
+                    <input type="radio" name="weekStart" value="mon" />
+                    <span class="segmented-label" data-weekday="1">Mon</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="notif-row">
+                <div class="toggle-info">
+                  <label
+                    class="subsection-label"
+                    for="hijriAdjustmentInput"
+                    data-i18n="hijriAdjustmentLabel"
+                    >Correct the Hijri date</label
+                  >
+                  <span
+                    class="toggle-description"
+                    data-i18n="hijriAdjustmentDesc"
+                    >Leave at 0. Change it only if the date below is a day off
+                    from your country’s official date.</span
+                  >
+                  <span
+                    class="toggle-description hijri-today-preview"
+                    id="hijriTodayPreview"
+                  ></span>
+                </div>
+                <div class="num-spinner-wrap compact">
+                  <button
+                    type="button"
+                    class="num-spinner-btn"
+                    data-target="hijriAdjustmentInput"
+                    data-delta="-1"
+                    tabindex="-1"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      aria-hidden="true"
+                    >
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                  </button>
+                  <input
+                    type="number"
+                    id="hijriAdjustmentInput"
+                    class="num-spinner-input"
+                    min="-2"
+                    max="2"
+                    value="0"
+                  />
+                  <button
+                    type="button"
+                    class="num-spinner-btn"
+                    data-target="hijriAdjustmentInput"
+                    data-delta="1"
+                    tabindex="-1"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      aria-hidden="true"
+                    >
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                  </button>
+                  <span class="num-spinner-unit" data-i18n="hijriAdjustmentUnit"
+                    >days</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Privacy Section: analytics are opt-in (off until the user turns them on) -->
           <div class="settings-section">
             <div class="section-header">

@@ -21,7 +21,7 @@ const startup = require("./startup-timing");
 const settingsStore = require("../services/settings-store");
 const analytics = require("../services/analytics-manager");
 const prayerTimerManager = require("../services/prayer-timer-manager");
-const fastingCalendarManager = require("../services/fasting-calendar-manager");
+const fastingReminders = require("../services/fasting-reminders");
 const connectionManager = require("../services/connection-manager");
 const athkarAlertManager = require("../services/athkar-alert-manager");
 const feedback = require("./feedback");
@@ -95,7 +95,9 @@ function startApplication() {
       // feedback written while offline
       connectionManager.onRestored(() => feedback.flushQueue());
       setTimeout(() => feedback.flushQueue(), 30_000);
-      fastingCalendarManager.init(getMainWindow, settingsStore.get);
+      fastingReminders.init(settingsStore.get);
+      // back online: Hijri dates calculated offline are replaced by Aladhan's
+      connectionManager.onRestored(() => fastingReminders.reload());
       athkarAlertManager.init(settingsStore.get);
 
       settingsStore.syncOpenAtLogin();
@@ -123,7 +125,7 @@ function startApplication() {
     settingsStore.flush();
     connectionManager.cleanup();
     prayerTimerManager.cleanup();
-    fastingCalendarManager.cleanup();
+    fastingReminders.cleanup();
     athkarAlertManager.cleanup();
   });
 }

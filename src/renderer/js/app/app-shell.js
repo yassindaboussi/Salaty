@@ -15,7 +15,6 @@ const { initTooltipSystem } = require("../core/tooltips");
 const { setupMiniPlayer } = require("../components/mini-player");
 const { renderPageHeaders } = require("../components/page-header");
 const { initAdhanPlayer } = require("../components/adhan-player");
-const { initFastingReminderListener } = require("../services/fasting-reminder");
 const analytics = require("../services/analytics");
 
 const revealPage = () => document.body.classList.remove("page-loading");
@@ -105,7 +104,6 @@ async function startPage({
     applyTranslations();
 
     initAdhanPlayer();
-    initFastingReminderListener();
 
     renderPageHeaders();
     setupHeaderButtons();

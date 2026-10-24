@@ -1,0 +1,62 @@
+/*
+  On / off switch, a real checkbox underneath (keyboard, screen readers):
+    <label class="toggle-switch">
+      <input type="checkbox" role="switch" />
+      <span class="toggle-slider"></span>
+    </label>
+  Used by Settings and the Sunnah fasting page. Mirrored in Arabic: "on" is on the left there.
+  Windows contrast themes: 06-utilities/forced-colors.css.
+*/
+.toggle-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 26px;
+}
+
+.toggle-switch input {
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--surface-3);
+  border: 1px solid var(--white-a20);
+  border-radius: 26px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 3px;
+  bottom: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 2px 4px var(--black-a20);
+  transition: all 0.3s ease;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(22px);
+}
+
+[dir="rtl"] .toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(-22px);
+}
+
+.toggle-switch input:focus-visible + .toggle-slider {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}

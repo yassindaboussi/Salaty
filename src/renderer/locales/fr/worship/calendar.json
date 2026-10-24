@@ -1,6 +1,5 @@
 {
   "hijriCalendar": "Calendrier Hégirien",
-  "importantIslamicDates": "Dates Islamiques Importantes",
   "noEventsThisMonth": "Aucun événement ce mois-ci",
   "prayerTimesMonthly": "Horaires mensuels",
   "prayerTimesMonthlyDesc": "Tous les horaires de prière du mois",
@@ -32,5 +31,9 @@
     "12-9": "Jour d'Arafat",
     "12-10": "Aïd al-Adha"
   },
-  "calendarMonthUnavailable": "Ce mois n’est pas encore enregistré pour une utilisation hors ligne. Connectez-vous à Internet pour le charger."
+  "calendarMonthUnavailable": "Impossible d’afficher ce mois.",
+  "calendarThisMonth": "Ce mois-ci",
+  "calendarWhiteDays": "Jours blancs",
+  "calendarWhiteDaysNote": "Jours blancs : le jeûne des 13, 14 et 15 est recommandé",
+  "calendarCalculatedNote": "Calculé sur cet ordinateur hors ligne : peut différer d’un jour de l’annonce officielle."
 }

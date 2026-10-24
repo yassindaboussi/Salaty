@@ -9,8 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="tasbih">Tasbih - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
-    <link rel="stylesheet" href="../../css/04-pages/tasbih.css" />
+    <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
     <link rel="stylesheet" href="../../css/03-components/success-toast.css" />
+    <link rel="stylesheet" href="../../css/04-pages/tasbih.css" />
   </head>
   <body class="page-loading">
     <div class="app-container" id="app">
@@ -28,124 +29,358 @@
           </h1>
         </header>
 
-        <main class="tasbih-content">
-          <!-- Active dhikr name + meaning -->
-          <div class="tasbih-active-dhikr">
-            <div class="tasbih-active-name" id="activeDhikrName">
-              سُبْحَانَ اللَّهِ
-            </div>
-            <div class="tasbih-active-meaning" id="activeDhikrMeaning">
-              Glory be to Allah
-            </div>
-            <div class="tasbih-active-source" id="activeDhikrSource"></div>
-          </div>
+        <main class="tb-layout" id="tbLayout">
+          <!-- The counter -->
+          <section class="tb-counter" aria-labelledby="activeDhikrName">
+            <div class="tb-sequence" id="tbSequence" hidden></div>
 
-          <!-- Ring counter, flanked left/right by actions — same pattern as
-               a dial-timer screen: dial in the middle, a secondary action
-               to one side, the primary action to the other. -->
-          <div class="tasbih-ring-row">
-            <div class="tasbih-side tasbih-side-left">
-              <button
-                type="button"
-                class="tasbih-side-btn tasbih-side-btn--secondary"
-                id="resetBtn"
-                data-tooltip="tooltipReset"
-              >
-                <i class="fas fa-broom" aria-hidden="true"></i>
-                <span id="resetLabel" data-i18n="resetBtn">Reset</span>
-              </button>
-              <button
-                type="button"
-                class="tasbih-icon-btn"
-                id="undoBtn"
-                data-tooltip="tooltipUndo"
-              >
-                <i class="fas fa-rotate-left" aria-hidden="true"></i>
-              </button>
+            <div class="tb-dhikr">
+              <h2 class="tb-dhikr-text" id="activeDhikrName" dir="auto">
+                سُبْحَانَ اللَّهِ
+              </h2>
+              <p
+                class="tb-dhikr-meaning"
+                id="activeDhikrMeaning"
+                dir="auto"
+              ></p>
+              <p class="tb-dhikr-source" id="activeDhikrSource"></p>
             </div>
 
-            <div class="tasbih-ring-wrap">
-              <svg
-                class="tasbih-ring-svg"
-                viewBox="0 0 220 220"
-                aria-hidden="true"
-              >
-                <circle class="tasbih-ring-track" cx="110" cy="110" r="96" />
+            <div class="tb-ring-wrap">
+              <svg class="tb-ring-svg" viewBox="0 0 220 220" aria-hidden="true">
+                <circle class="tb-ring-track" cx="110" cy="110" r="96" />
                 <circle
-                  class="tasbih-ring-progress"
+                  class="tb-ring-progress"
                   id="tbRingProgress"
                   cx="110"
                   cy="110"
                   r="96"
                 />
-                <circle
-                  class="tasbih-ring-bead"
-                  id="tbRingBead"
-                  cx="110"
-                  cy="14"
-                  r="6"
-                />
+                <!-- the bead at the arc's end: it turns with the arc (ring.js) -->
+                <g class="tb-ring-bead-turn" id="tbRingBeadTurn">
+                  <circle
+                    class="tb-ring-bead"
+                    id="tbRingBead"
+                    cx="206"
+                    cy="110"
+                    r="6"
+                  />
+                </g>
               </svg>
-              <button
-                type="button"
-                class="tasbih-ring-tap"
-                id="tbRingTap"
-                data-tooltip="tooltipCount"
-              >
-                <span
-                  class="tasbih-round-badge hidden"
-                  id="tbRoundBadge"
-                ></span>
-                <span class="tasbih-count-value" id="counterValue">0</span>
-                <span class="tasbih-count-target" id="targetLine">/ 33</span>
+              <button type="button" class="tb-ring-tap" id="tbRingTap">
+                <span class="tb-round-badge" id="tbRoundBadge" hidden></span>
+                <span class="tb-count-value" id="counterValue">0</span>
+                <span class="tb-count-target" id="targetLine">/ 33</span>
               </button>
             </div>
 
-            <div class="tasbih-side tasbih-side-right">
+            <div class="tb-controls">
               <button
                 type="button"
-                class="tasbih-side-btn tasbih-side-btn--primary"
-                id="incrementBtn"
-                data-tooltip="tooltipCount"
+                class="tb-icon-btn"
+                id="undoBtn"
+                data-tooltip="tooltipUndo"
               >
-                <i class="fas fa-plus" aria-hidden="true"></i>
-                <span id="incrementLabel" data-i18n="countBtn">Count</span>
+                <i class="fas fa-rotate-left" aria-hidden="true"></i>
               </button>
               <button
                 type="button"
-                class="tasbih-limit-chip"
+                class="tb-icon-btn"
+                id="resetBtn"
+                data-tooltip="tooltipReset"
+              >
+                <i class="fas fa-arrows-rotate" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                class="tb-chip-btn"
                 id="tbLimitChip"
                 aria-pressed="false"
               >
                 <i class="fas fa-flag-checkered" aria-hidden="true"></i>
-                <span class="tasbih-limit-chip-text" id="tbLimitChipText"
-                  >Stop at 33</span
-                >
+                <span id="tbLimitChipText">Stop at 33</span>
               </button>
-              <div class="spacebar-indicator">
-                <i class="fas fa-keyboard" aria-hidden="true"></i><kbd>␣</kbd
-                ><span id="spacebarText" data-i18n="spacebarHint">Space</span>
-              </div>
             </div>
-          </div>
 
-          <!-- Dhikr Selection -->
-          <div class="tasbih-dhikr-section">
-            <div class="section-label" id="dhikrLabel" data-i18n="selectDhikr">
-              Select Dhikr
+            <p class="tb-hint">
+              <kbd>Space</kbd> <span data-i18n="tbHintCount">count</span> ·
+              <kbd>⌫</kbd> <span data-i18n="tbHintUndo">undo</span>
+            </p>
+            <p class="tb-quote" id="tasbihFooterText"></p>
+            <p class="tb-live" id="tbLive" aria-live="polite"></p>
+          </section>
+
+          <!-- What to count -->
+          <aside class="tb-panel">
+            <div class="tb-panel-head">
+              <h2 class="tb-panel-heading" data-i18n="tbPanelTitle">Dhikr</h2>
+              <button
+                type="button"
+                class="tb-panel-toggle"
+                id="tbPanelToggle"
+                aria-controls="tbPanelList"
+                aria-expanded="true"
+                data-tooltip="tbPanelHide"
+              >
+                <i class="fas fa-angles-right" aria-hidden="true"></i>
+              </button>
             </div>
-            <div class="dhikr-grid" id="dhikrGrid">
-              <!-- Dhikr cards injected via JS -->
+
+            <!-- folded: a strip of the groups' icons; one opens the list on its group -->
+            <div class="tb-rail">
+              <button
+                type="button"
+                class="tb-rail-btn"
+                data-rail="prayer"
+                data-tooltip="tbGroupAfterPrayer"
+              >
+                <i class="fas fa-mosque" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                class="tb-rail-btn"
+                data-rail="sunnah"
+                data-tooltip="tbFromSunnah"
+              >
+                <i class="fas fa-book-open" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                class="tb-rail-btn"
+                data-rail="mine"
+                data-tooltip="tbMyDhikr"
+              >
+                <i class="fas fa-heart" aria-hidden="true"></i>
+              </button>
             </div>
-          </div>
+
+            <div class="tb-panel-body" id="tbPanelList">
+              <section class="tb-group" data-group="prayer">
+                <h3 class="tb-group-heading">
+                  <button
+                    type="button"
+                    class="tb-group-header"
+                    aria-expanded="true"
+                    aria-controls="tbGroupPrayer"
+                  >
+                    <i
+                      class="fas fa-mosque tb-group-icon"
+                      aria-hidden="true"
+                    ></i>
+                    <span class="tb-group-label" data-i18n="tbGroupAfterPrayer"
+                      >After prayer</span
+                    >
+                    <i
+                      class="fas fa-chevron-down tb-group-chevron"
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                </h3>
+                <div class="tb-group-body" id="tbGroupPrayer">
+                  <div class="tb-group-inner">
+                    <div id="tbSequenceCard"></div>
+                  </div>
+                </div>
+              </section>
+              <section class="tb-group" data-group="sunnah">
+                <h3 class="tb-group-heading">
+                  <button
+                    type="button"
+                    class="tb-group-header"
+                    aria-expanded="true"
+                    aria-controls="tbGroupSunnah"
+                  >
+                    <i
+                      class="fas fa-book-open tb-group-icon"
+                      aria-hidden="true"
+                    ></i>
+                    <span class="tb-group-label" data-i18n="tbFromSunnah"
+                      >From the Sunnah</span
+                    >
+                    <span class="tb-group-total" id="tbTotalSunnah"></span>
+                    <i
+                      class="fas fa-chevron-down tb-group-chevron"
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                </h3>
+                <div class="tb-group-body" id="tbGroupSunnah">
+                  <div class="tb-group-inner">
+                    <ul class="tb-list" id="tbSunnahList"></ul>
+                  </div>
+                </div>
+              </section>
+              <section class="tb-group" data-group="mine">
+                <h3 class="tb-group-heading">
+                  <button
+                    type="button"
+                    class="tb-group-header"
+                    aria-expanded="true"
+                    aria-controls="tbGroupMine"
+                  >
+                    <i
+                      class="fas fa-heart tb-group-icon"
+                      aria-hidden="true"
+                    ></i>
+                    <span class="tb-group-label" data-i18n="tbMyDhikr"
+                      >My dhikr</span
+                    >
+                    <span class="tb-group-total" id="tbTotalMine"></span>
+                    <i
+                      class="fas fa-chevron-down tb-group-chevron"
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                </h3>
+                <div class="tb-group-body" id="tbGroupMine">
+                  <div class="tb-group-inner">
+                    <ul class="tb-list" id="tbCustomList"></ul>
+                    <button type="button" class="tb-add-btn" id="tbAddBtn">
+                      <i class="fas fa-plus" aria-hidden="true"></i>
+                      <span data-i18n="tbAdd">Add your own dhikr</span>
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </aside>
         </main>
-
-        <footer class="tasbih-footer">
-          <div class="tasbih-footer-text" id="tasbihFooterText">
-            "So remember Me; I will remember you" [Quran 2:152]
-          </div>
-        </footer>
       </div>
+
+      <!-- Adding / editing the user's own dhikr -->
+      <dialog class="tb-editor" id="tbEditor" aria-labelledby="tbEditorTitle">
+        <form class="tb-editor-form" id="tbEditorForm" novalidate>
+          <button
+            type="button"
+            class="tb-editor-close"
+            id="tbEditorClose"
+            data-i18n-aria-label="cancel"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+          <h2 class="tb-editor-title" id="tbEditorTitle">Add your own dhikr</h2>
+
+          <div class="tb-form-field">
+            <label
+              class="tb-field-label"
+              for="tbFieldText"
+              data-i18n="tbFieldText"
+              >Dhikr</label
+            >
+            <textarea
+              class="tb-field"
+              id="tbFieldText"
+              rows="2"
+              maxlength="300"
+              dir="auto"
+              data-i18n-placeholder="tbFieldTextPlaceholder"
+            ></textarea>
+          </div>
+
+          <div class="tb-form-field">
+            <label
+              class="tb-field-label"
+              for="tbFieldMeaning"
+              data-i18n="tbFieldMeaning"
+              >Meaning (optional)</label
+            >
+            <input
+              class="tb-field"
+              id="tbFieldMeaning"
+              type="text"
+              maxlength="300"
+              dir="auto"
+            />
+          </div>
+
+          <fieldset class="tb-form-field tb-targets">
+            <legend class="tb-field-label" data-i18n="tbFieldTarget">
+              Target
+            </legend>
+            <label class="tb-target"
+              ><input type="radio" name="tbTarget" value="33" /><span
+                >33</span
+              ></label
+            >
+            <label class="tb-target"
+              ><input type="radio" name="tbTarget" value="100" /><span
+                >100</span
+              ></label
+            >
+            <label class="tb-target"
+              ><input type="radio" name="tbTarget" value="none" /><span
+                data-i18n="tbTargetNoLimit"
+                >No limit</span
+              ></label
+            >
+            <label class="tb-target tb-target-other"
+              ><input type="radio" name="tbTarget" value="other" /><span
+                data-i18n="tbTargetOther"
+                >Other</span
+              ></label
+            >
+            <div class="tb-stepper" id="tbOtherStepper">
+              <button
+                type="button"
+                class="tb-stepper-btn"
+                data-step="-1"
+                tabindex="-1"
+                aria-hidden="true"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+              <input
+                class="tb-stepper-input"
+                id="tbFieldOther"
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                data-i18n-aria-label="tbTargetOther"
+              />
+              <button
+                type="button"
+                class="tb-stepper-btn"
+                data-step="1"
+                tabindex="-1"
+                aria-hidden="true"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+            </div>
+          </fieldset>
+
+          <p class="tb-editor-error" id="tbEditorError" role="alert" hidden></p>
+
+          <div class="tb-editor-actions">
+            <button type="button" class="tb-btn-secondary" id="tbEditorCancel">
+              <span data-i18n="cancel">Cancel</span>
+            </button>
+            <button type="submit" class="tb-btn-primary">
+              <i class="fas fa-check" aria-hidden="true"></i>
+              <span data-i18n="tbSave">Save</span>
+            </button>
+          </div>
+        </form>
+      </dialog>
     </div>
 
     <script src="../../js-bundled/tasbih.bundle.js"></script>

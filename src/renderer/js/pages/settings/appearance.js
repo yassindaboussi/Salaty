@@ -14,9 +14,11 @@ const screenSizeManager = require("../../core/screen-size");
 const { queryAll } = require("../../core/dom");
 const { pageState } = require("./state");
 const { persistSettings } = require("./persist");
+const { updateHijriText } = require("./hijri");
 
 function updateAllText() {
   applyTranslations(); // every [data-i18n] text on the page (they follow the language switch)
+  updateHijriText(); // weekday names and today's Hijri date
 
   const aboutStatusEl = document.getElementById("aboutStatusText");
   const aboutIconEl = document.getElementById("aboutStatusIcon");

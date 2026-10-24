@@ -6,5 +6,17 @@
   "crashTitle": "Erreur inattendue",
   "crashMessage": "Une erreur est survenue et l’application doit se fermer.",
   "crashClose": "Fermer",
-  "reportProblem": "Signaler un problème"
+  "reportProblem": "Signaler un problème",
+  "fastingEveningTitle": "Jeûne surérogatoire demain",
+  "fastingEveningText": "Demain, {date} : {reasons}. Formulez votre intention ce soir et prévoyez votre suhoor.",
+  "fastingSuhoorTitle": "L’heure du suhoor",
+  "fastingSuhoorText": "Le Fajr est à {time}. Aujourd’hui : {reasons}.",
+  "fastReasonMonday": "Jeûne du lundi",
+  "fastReasonThursday": "Jeûne du jeudi",
+  "fastReasonWhiteDays": "Jour blanc",
+  "fastReasonTasua": "Tâsû‘â’",
+  "fastReasonAshura": "Achoura",
+  "fastReasonArafah": "Jour d’Arafat",
+  "fastReasonDhulHijjah": "Neuf premiers jours de Dhou al-Hijja",
+  "fastReasonShawwal6": "Début des six jours de Chawwal"
 }

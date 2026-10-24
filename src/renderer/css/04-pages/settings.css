@@ -337,6 +337,68 @@
     padding: 0 8px 0 2px;
   }
 
+  /* ── Segmented choice: radio buttons drawn as one bar (Hijri calendar's first day) ── */
+  .segmented {
+    display: inline-flex;
+    flex-shrink: 0;
+    gap: 2px;
+    padding: 2px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+  }
+
+  .segmented-option {
+    position: relative;
+    cursor: pointer;
+  }
+
+  /* the real radio button covers the option, invisible: clicks and arrow keys work natively */
+  .segmented-option input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .segmented-label {
+    display: block;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    transition:
+      background 0.15s,
+      color 0.15s;
+  }
+
+  .segmented-option:hover .segmented-label {
+    background: var(--surface-2);
+  }
+
+  .segmented-option input:checked + .segmented-label {
+    background: rgba(var(--accent-rgb), 0.2);
+    border-color: var(--accent-color);
+    color: var(--text-primary);
+  }
+
+  .segmented-option input:focus-visible + .segmented-label {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 1px;
+  }
+
+  /* "Today: 8 Jumada al-Awwal 1448 AH" under the Hijri date adjustment */
+  .hijri-today-preview {
+    margin-top: 4px;
+    color: var(--text-primary);
+    opacity: 1;
+    font-weight: 600;
+  }
+
   @media (width <= 400px) {
     .notif-row {
       flex-wrap: wrap;
@@ -870,55 +932,7 @@
     opacity: 0.8;
   }
 
-  /* Toggle Switch */
-  .toggle-switch {
-    position: relative;
-    width: 48px;
-    height: 26px;
-    flex-shrink: 0;
-  }
-
-  .toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    inset: 0;
-    background: var(--surface-3);
-    border: 1px solid var(--white-a20);
-    border-radius: 26px;
-    transition: all 0.3s ease;
-  }
-
-  .toggle-slider::before {
-    content: "";
-    position: absolute;
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background: var(--white);
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px var(--black-a20);
-  }
-
-  .toggle-switch input:checked + .toggle-slider {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-  }
-
-  .toggle-switch input:checked + .toggle-slider::before {
-    transform: translateX(22px);
-  }
-
-  .toggle-switch input:focus + .toggle-slider {
-    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
-  }
+  /* Toggle switch: the shared component, 03-components/switch.css */
 
   /* Conditional Fields */
   .conditional-field {

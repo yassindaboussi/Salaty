@@ -340,25 +340,6 @@
     color: var(--accent-color);
   }
 
-  /* Friday: the Dhuhr cell carries a small "Jumu'ah" tag (same time, different name) */
-  .monthly-jumuah {
-    white-space: nowrap;
-  }
-
-  .monthly-jumuah-badge {
-    display: inline-block;
-    margin-inline-start: 5px;
-    padding: 1px 5px;
-    border-radius: 4px;
-    background: rgba(var(--accent-rgb), 0.22);
-    border: 1px solid rgba(var(--accent-rgb), 0.45);
-    color: var(--text-primary);
-    font-size: 9px;
-    font-weight: 700;
-    line-height: 1.4;
-    vertical-align: middle;
-  }
-
   /* ========== Footer ========== */
   .monthly-footer {
     padding-top: 8px;
