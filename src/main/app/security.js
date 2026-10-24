@@ -14,7 +14,8 @@ const log = require("../services/logger").logger("Security");
 const PAGES_DIR = path.join(RENDERER_DIR, "pages");
 
 // Sites a link inside the app may open in the user's browser.
-const EXTERNAL_HOSTS = new Set(["github.com"]);
+// github.com: the project; sunnah.com: the hadith references of the Sunnah fasting page
+const EXTERNAL_HOSTS = new Set(["github.com", "sunnah.com"]);
 
 // The only permission the app grants: the live-stream player's fullscreen button.
 const ALLOWED_PERMISSIONS = new Set(["fullscreen"]);

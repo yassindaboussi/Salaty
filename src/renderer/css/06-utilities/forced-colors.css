@@ -43,10 +43,16 @@
     .category-card.active,
     .quran-tab.active,
     .numerals-btn.active,
-    .ramadan-tab.active,
-    .ramadan-table .current-day-row td,
-    .day-tracker.completed,
-    .calendar-day.today,
+    .rm-tab[aria-selected="true"],
+    .rm-table tr.is-today > *,
+    .rm-day.is-selected,
+    .rm-status-btn.is-on,
+    .vf-done-btn.is-on,
+    .tb-item.is-active,
+    .tb-chip-btn[aria-pressed="true"],
+    .vf-date-block,
+    .hc-day.is-selected,
+    .segmented-option input:checked + .segmented-label,
     .channel-tab.active,
     .az-index-letter.active,
     .track-item.active,
@@ -71,10 +77,15 @@
       .category-card.active,
       .quran-tab.active,
       .numerals-btn.active,
-      .ramadan-tab.active,
-      .ramadan-table .current-day-row td,
-      .day-tracker.completed,
-      .calendar-day.today,
+      .rm-tab[aria-selected="true"],
+      .rm-table tr.is-today > *,
+      .rm-day.is-selected,
+      .rm-status-btn.is-on,
+      .vf-done-btn.is-on,
+      .tb-item.is-active,
+      .tb-chip-btn[aria-pressed="true"],
+      .vf-date-block,
+      .hc-day.is-selected,
       .channel-tab.active,
       .az-index-letter.active,
       .track-item.active,
@@ -94,38 +105,41 @@
     background: HighlightText;
   }
 
+  /* the Hijri calendar's today: its number in a circle (drawn with a background) */
+  .hc-day.is-today .hc-day-hijri,
+  .rm-day.is-today .rm-day-num {
+    forced-color-adjust: none;
+    background: CanvasText;
+    color: Canvas;
+  }
+
   /* a card whose count is complete keeps its contents as they are: marked by its outline */
   .athkar-card.completed {
     outline: 3px solid Highlight;
     outline-offset: -1px;
   }
 
-  /* ── Switches (Settings travel mode, Sunnah fasting weekly reminder) ── */
-  .toggle-slider,
-  .fasting-switch-slider {
+  /* ── Switches (03-components/switch.css: Settings, Sunnah fasting) ── */
+  .toggle-slider {
     background-color: ButtonFace;
     border: 1px solid ButtonText;
   }
 
-  .toggle-slider::before,
-  .fasting-switch-slider::before {
+  .toggle-slider::before {
     background-color: ButtonText;
   }
 
-  .toggle-switch input:checked + .toggle-slider,
-  .fasting-switch input:checked + .fasting-switch-slider {
+  .toggle-switch input:checked + .toggle-slider {
     background-color: Highlight;
     border-color: Highlight;
   }
 
-  .toggle-switch input:checked + .toggle-slider::before,
-  .fasting-switch input:checked + .fasting-switch-slider::before {
+  .toggle-switch input:checked + .toggle-slider::before {
     background-color: HighlightText;
   }
 
   /* the checkbox itself is invisible, and its normal focus ring is a box-shadow */
-  .toggle-switch input:focus-visible + .toggle-slider,
-  .fasting-switch input:focus-visible + .fasting-switch-slider {
+  .toggle-switch input:focus-visible + .toggle-slider {
     outline: 2px solid Highlight;
     outline-offset: 2px;
   }
@@ -142,16 +156,22 @@
     background-color: Highlight;
   }
 
-  .tasbih-ring-track {
+  .tb-ring-track {
     stroke: GrayText;
   }
 
-  .tasbih-ring-progress {
+  .tb-ring-progress {
     stroke: Highlight;
   }
 
-  .tasbih-ring-bead {
+  .tb-ring-bead {
     fill: CanvasText;
+  }
+
+  /* the tasbih after-prayer steps are drawn with backgrounds */
+  .tb-seq-step.is-done {
+    forced-color-adjust: none;
+    background: CanvasText;
   }
 
   /* ── Sliders: the native control, which follows the contrast theme ──── */

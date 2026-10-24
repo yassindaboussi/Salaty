@@ -1,6 +1,7 @@
 "use strict";
 
 const { t, getLanguage } = require("./i18n");
+const { reasonsOn } = require("../../../shared/fasting-rules");
 
 function getGregorianDate(prayerData) {
   if (!prayerData?.date?.readable) return "";
@@ -104,13 +105,14 @@ function checkUpcomingEvent(hijriDay, hijriMonth, dayOfWeek = -1) {
     }
   }
 
-  if ([12, 13, 14].includes(day)) {
-    return "whiteDays";
+  // Tomorrow's Sunnah fasts (shared/fasting-rules.js): never on a day not to fast (Eid,
+  // Tashreeq) nor in Ramadan. At the end of a month tomorrow may already be the next month.
+  if (day >= 29) return null;
+  const tomorrow = reasonsOn(month, day + 1, (dayOfWeek + 8) % 7);
+  if (tomorrow.includes("whiteDays")) return "whiteDays";
+  if (dayOfWeek >= 0 && tomorrow.includes("monThu")) {
+    return dayOfWeek === 0 ? "fastingMonday" : "fastingThursday";
   }
-
-  if (dayOfWeek === 0) return "fastingMonday";
-  if (dayOfWeek === 3) return "fastingThursday";
-
   return null;
 }
 

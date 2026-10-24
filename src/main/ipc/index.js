@@ -9,6 +9,7 @@ const playerManager = require("../services/player-manager");
 const prayerTimerManager = require("../services/prayer-timer-manager");
 const prayerTimes = require("../services/prayer-times");
 const islamicCalendar = require("../services/islamic-calendar");
+const fastingReminders = require("../services/fasting-reminders");
 const settingsStore = require("../services/settings-store");
 const check = require("./validate");
 const secureIpc = require("./secure-ipc");
@@ -47,26 +48,29 @@ function registerIpcHandlers({ getMainWindow }) {
     if (y === undefined) return null;
     return prayerTimes.getHijriMonth(settingsStore.get(), y, 9);
   });
+  // Hijri dates with the user's correction (Settings, -2…+2 days).
+  const hijriAdjustment = () =>
+    islamicCalendar.adjustmentOf(settingsStore.get());
   secureIpc.handle("gregorian-to-hijri", (_e, day, month, year) => {
     const d = check.int(day, 1, 31);
     const m = check.int(month, 1, 12);
     const y = check.int(year, 2000, 2100);
     if (d === undefined || m === undefined || y === undefined) return null;
-    return islamicCalendar.gregorianToHijri(d, m, y);
+    return islamicCalendar.gregorianToHijri(d, m, y, hijriAdjustment());
   });
   // Every day of a Hijri month with its Gregorian date (the Hijri calendar page).
   secureIpc.handle("get-hijri-month", (_e, month, year) => {
     const m = check.int(month, 1, 12);
     const y = check.int(year, 1400, 1600);
     if (m === undefined || y === undefined) return null;
-    return islamicCalendar.hijriMonthCalendar(m, y);
+    return islamicCalendar.hijriMonthCalendar(m, y, hijriAdjustment());
   });
   secureIpc.handle("hijri-to-gregorian", (_e, day, month, year) => {
     const d = check.int(day, 1, 30);
     const m = check.int(month, 1, 12);
     const y = check.int(year, 1400, 1600);
     if (d === undefined || m === undefined || y === undefined) return null;
-    return islamicCalendar.hijriToGregorian(d, m, y);
+    return islamicCalendar.hijriToGregorian(d, m, y, hijriAdjustment());
   });
 
   registerSettingsHandlers({
@@ -75,13 +79,22 @@ function registerIpcHandlers({ getMainWindow }) {
         .reloadPrayerData()
         .catch((err) => log.error("reloading prayer times failed:", err))
         .finally(() => sendToMain("location-changed"));
+      fastingReminders.replan(); // Isha and Fajr of the new location
     },
+    onFastingRemindersChange: () => fastingReminders.replan(),
     onThemeChange: (theme) => {
       sendToMain("theme-changed", theme);
       const playerWindow = playerManager.getPlayerWindow();
       if (playerWindow && !playerWindow.isDestroyed())
         playerWindow.webContents.send("theme-changed", theme);
       popupHandlers.broadcastThemeToPopups(theme);
+    },
+    // Today's Hijri date (home page, widget) and the fasting days move with the correction
+    onHijriAdjustmentChange: () => {
+      prayerTimerManager
+        .reloadPrayerData()
+        .catch((err) => log.error("reloading prayer times failed:", err));
+      fastingReminders.reload();
     },
     onLanguageChange: () => refreshTrayMenu(),
     onAnalyticsChange: (enabled) => analytics.applyConsent(enabled),

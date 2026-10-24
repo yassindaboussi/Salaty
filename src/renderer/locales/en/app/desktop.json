@@ -6,5 +6,17 @@
   "crashTitle": "Unexpected error",
   "crashMessage": "Something went wrong and the app needs to close.",
   "crashClose": "Close",
-  "reportProblem": "Report a problem"
+  "reportProblem": "Report a problem",
+  "fastingEveningTitle": "Sunnah fast tomorrow",
+  "fastingEveningText": "Tomorrow, {date}: {reasons}. Make your intention tonight and plan your suhoor.",
+  "fastingSuhoorTitle": "Suhoor time",
+  "fastingSuhoorText": "Fajr is at {time}. Today: {reasons}.",
+  "fastReasonMonday": "Monday fast",
+  "fastReasonThursday": "Thursday fast",
+  "fastReasonWhiteDays": "White Day",
+  "fastReasonTasua": "Tasu'a",
+  "fastReasonAshura": "Ashura",
+  "fastReasonArafah": "Day of Arafah",
+  "fastReasonDhulHijjah": "First nine days of Dhul-Hijjah",
+  "fastReasonShawwal6": "The six days of Shawwal begin"
 }
