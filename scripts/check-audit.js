@@ -12,12 +12,8 @@
 
 const { execSync } = require("child_process");
 
-const ACCEPTED = {
-  // braces <=3.0.3, no patched version exists. Only used by stylelint (via micromatch /
-  // fast-glob) to expand our own glob "src/renderer/css/**/*.css"; never ships in the app
-  // and never sees outside input. npm's suggested "fix" is a downgrade to stylelint 7 (2017).
-  "GHSA-vfj7-8cjw-p6xm": "braces: dev-only, our own glob patterns",
-};
+/** @type {Record<string, string>} advisory id -> why it is accepted */
+const ACCEPTED = {};
 
 const BLOCKING = new Set(["moderate", "high", "critical"]);
 
