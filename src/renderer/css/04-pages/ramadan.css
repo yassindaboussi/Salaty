@@ -1,466 +1,830 @@
 @layer pages {
-  /* Ramadan Page Styles */
+  /* Ramadan: the top card (countdown) and the tracker / timetable on one side, the selected
+     day, the summary, the fasts to make up and Eid on the other (mirrored in Arabic), all in
+     one column in a narrow window. Like the Hijri calendar, "today", "fasted" and "selected"
+     are drawn in white: on several themes the accent is close to the background. */
+
   .ramadan-container {
-    height: 100%;
     display: flex;
     flex-direction: column;
+    height: 100%;
     padding: 16px;
     gap: 12px;
-    position: relative;
+    box-sizing: border-box;
     overflow: hidden;
   }
 
   /* Header: layout comes from the shared .page-header component
      (03-components/page-header.css). Only what is specific to this page is here. */
   .ramadan-controls {
-    z-index: var(--z-page-header-controls);
+    z-index: 2;
   }
 
-  .ramadan-content {
+  .rm-layout {
     flex: 1;
-    overflow-y: auto;
-    padding: 6px 0;
-    display: flex;
-    flex-direction: column;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
     gap: 12px;
     -webkit-app-region: no-drag;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-    direction: ltr; /* Force LTR for scrollbar on right */
   }
 
-  .ramadan-content::-webkit-scrollbar {
-    width: 5px;
+  /* loading, no location or offline with nothing saved: only the top card, with the message */
+  .rm-layout.is-empty {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
   }
 
-  .ramadan-content::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 3px;
-  }
-
-  .ramadan-content::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 3px;
-  }
-
-  /* For Arabic text inside content */
-
-  .fasting-card {
-    background: var(--bg-surface);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 4px 15px var(--black-a10);
-  }
-
-  [dir="rtl"] .ramadan-content .fasting-card,
-  [lang="ar"] .ramadan-content .fasting-card,
-  [lang="fa"] .ramadan-content .fasting-card,
-  [lang="ur"] .ramadan-content .fasting-card,
-  [lang="he"] .ramadan-content .fasting-card {
-    direction: rtl; /* Arabic text remains RTL */
-  }
-
-  .fasting-card h3 {
-    margin: 0 0 15px;
-    color: var(--accent-color);
-    font-size: 1.1rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 8px;
-  }
-
-  /* Grid for the calendar */
-  .tracker-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  .rm-main {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
   }
 
-  .day-tracker {
-    background-color: var(--surface-1);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 8px;
+  .rm-hero,
+  .rm-card,
+  .rm-box {
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+  }
+
+  /* ── Top card ──────────────────────────────────────────────────────────── */
+
+  .rm-hero {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+  }
+
+  .rm-hero-main {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .rm-hero-icon {
+    flex-shrink: 0;
+    width: 56px;
+    font-size: 28px;
     text-align: center;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    color: var(--text-primary);
+  }
+
+  .rm-hero-text {
+    min-width: 0;
+  }
+
+  .rm-hero-kicker {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .rm-hero-label {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .rm-hero-big {
+    margin: 2px 0 0;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rm-hero-note {
+    margin: 4px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-faint);
+  }
+
+  /* how much of today's fast is done (Fajr → Maghrib) */
+  .rm-fast-bar {
+    width: 220px;
+    max-width: 100%;
+    height: 6px;
+    margin-top: 8px;
+    border-radius: 3px;
+    background: var(--white-a10);
+    overflow: hidden;
+  }
+
+  .rm-fast-bar span {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--text-primary);
+  }
+
+  .rm-hero-times {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+  }
+
+  .rm-tile {
+    min-width: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+  }
+
+  .rm-tile.is-iftar {
+    background: var(--surface-3);
+  }
+
+  .rm-tile-label {
+    font-size: 11px;
+    white-space: nowrap;
+    color: var(--text-faint);
+  }
+
+  .rm-tile-time {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* the day of the month as a ring */
+  .rm-ring {
     position: relative;
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+  }
+
+  .rm-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .rm-ring-track,
+  .rm-ring-fill {
+    fill: none;
+    stroke-width: 5;
+  }
+
+  .rm-ring-track {
+    stroke: var(--white-a15);
+  }
+
+  .rm-ring-fill {
+    stroke: var(--text-primary);
+    stroke-linecap: round;
+  }
+
+  .rm-ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+    direction: ltr; /* "12/29" in Arabic too */
+  }
+
+  .rm-ring-text strong {
+    font-size: 16px;
+    color: var(--text-primary);
+  }
+
+  .rm-message {
+    width: 100%;
+    margin: 0;
+    padding: 20px 8px;
+    text-align: center;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* ── Tabs ──────────────────────────────────────────────────────────────── */
+
+  .rm-card {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .rm-tabs {
+    align-self: flex-start;
+    display: flex;
+    gap: 4px;
+    padding: 3px;
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+  }
+
+  .rm-tab {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .rm-tab:hover {
+    color: var(--text-primary);
+  }
+
+  .rm-tab[aria-selected="true"] {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+  }
+
+  .rm-tabpanel {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rm-tabpanel[hidden] {
+    display: none;
+  }
+
+  /* ── Tracker: three tens, the last ten banded ──────────────────────────── */
+
+  .rm-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-auto-rows: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .rm-ten {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 4px;
+    padding: 2px;
+    border-radius: 10px;
+  }
+
+  .rm-ten.is-last-ten {
+    background: var(--white-a05);
+  }
+
+  /* a size container: a day too short for its date (small window) keeps its number */
+  .rm-cell {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    container-type: size;
+  }
+
+  .rm-day {
+    position: relative;
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 70px;
-  }
-
-  .day-tracker:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px var(--black-a20);
-    border-color: var(--accent-color);
-    background-color: var(--surface-3);
-  }
-
-  .day-tracker.completed {
-    background-color: var(--accent-color);
-    color: var(--text-bright);
-    border-color: var(--accent-color);
-  }
-
-  .day-tracker .gregorian-date {
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    opacity: 0.8;
-  }
-
-  .day-tracker.completed .gregorian-date {
-    color: var(--white-a80);
-  }
-
-  /* Typography Enhancements */
-  .day-tracker .hijri-day {
-    font-family: Poppins, sans-serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 2px;
+    gap: 3px;
+    padding: 4px 2px;
+    background: var(--surface-1);
+    border: 1px solid transparent;
+    border-radius: 10px;
     color: var(--text-primary);
-  }
-
-  /* Special Days Styling */
-  .day-tracker.special-day {
-    border: 2px solid #ffd700; /* Gold */
-    box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.1);
-    background: linear-gradient(
-      135deg,
-      rgba(255, 215, 0, 0.05),
-      var(--black-a10)
-    );
-  }
-
-  .day-tracker.laylat-al-qadr {
-    border: 2px solid #ff9f43; /* Orange/Gold */
-    box-shadow: 0 0 15px rgba(255, 159, 67, 0.2);
-    background: linear-gradient(
-      135deg,
-      rgba(255, 159, 67, 0.1),
-      var(--black-a20)
-    );
-    animation: glow 3s infinite alternate;
-  }
-
-  @keyframes glow {
-    from {
-      box-shadow: 0 0 5px rgba(255, 159, 67, 0.2);
-    }
-
-    to {
-      box-shadow: 0 0 15px rgba(255, 159, 67, 0.5);
-    }
-  }
-
-  /* Indicator for special days */
-  .special-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    color: #ffd700;
-    font-size: 12px;
-    filter: drop-shadow(0 2px 2px var(--black-a50));
-  }
-
-  /* Modal Popup */
-  .cal-modal {
-    display: none;
-    position: fixed;
-    z-index: var(--z-above-chrome);
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--black-a70);
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(5px);
-    -webkit-app-region: no-drag; /* Clicks must work inside the modal */
-  }
-
-  .cal-modal.show {
-    display: flex;
-    animation: fade-in 0.3s;
-  }
-
-  /* Modal Styling Improvements */
-  .cal-modal-content {
-    background: var(--bg-surface);
-    backdrop-filter: blur(15px);
-    border: 1px solid var(--border-medium);
-    box-shadow: 0 20px 40px var(--black-a40);
-    padding: 25px;
-    border-radius: 15px;
-    width: 80%;
-    max-width: 300px;
-    text-align: center;
-    position: relative;
-    animation: slide-up 0.3s;
-  }
-
-  .cal-modal-close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    color: var(--text-secondary);
-    font-size: 24px;
+    font: inherit;
     cursor: pointer;
-    transition: color 0.2s;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
   }
 
-  .cal-modal-close:hover {
-    color: var(--accent-color);
+  .rm-day:hover {
+    background: var(--surface-3);
   }
 
-  .cal-modal-title {
-    font-size: 1.2rem;
-    margin-bottom: 20px;
+  .rm-day.is-future {
+    background: var(--surface-subtle);
+  }
+
+  .rm-day.is-fasted {
+    background: var(--surface-3);
+  }
+
+  /* missed: shown calmly, as a fast to make up (not an error) */
+  .rm-day.is-missed {
+    border-style: dashed;
+    border-color: var(--white-a35);
+  }
+
+  .rm-day.is-selected {
+    border-style: solid;
+    border-color: var(--white-a60);
+    background: var(--surface-hover);
+  }
+
+  .rm-day-num {
+    min-width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    border-radius: 13px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rm-day-date {
+    max-width: 100%;
+    font-size: 10.5px;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-faint);
+  }
+
+  .rm-day.is-today .rm-day-num {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    font-weight: 700;
+  }
+
+  @container (height < 50px) {
+    .rm-day-date {
+      display: none;
+    }
+  }
+
+  /* the marks: fasted (a filled check), missed (a ring), an odd night of the last ten */
+  .rm-day-mark,
+  .rm-legend-mark {
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+  }
+
+  .rm-day-mark {
+    position: absolute;
+    top: 4px;
+    inset-inline-end: 4px;
+    width: 16px;
+    height: 16px;
+    font-size: 9px;
+  }
+
+  .rm-legend-mark {
+    width: 14px;
+    height: 14px;
+    font-size: 8px;
+  }
+
+  .rm-day-mark.is-missed,
+  .rm-legend-mark.is-missed {
+    background: transparent;
+    border: 1px solid var(--white-a50);
+    color: var(--text-muted);
+  }
+
+  .rm-night {
+    position: absolute;
+    top: 4px;
+    inset-inline-start: 6px;
+    font-size: 9px;
+    color: var(--text-muted);
+  }
+
+  .rm-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  .rm-legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .rm-legend-night {
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* ── Timetable ─────────────────────────────────────────────────────────── */
+
+  .rm-table-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    border-radius: var(--radius-md);
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .rm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rm-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 8px 10px;
+    background: var(--bg-primary);
+    color: var(--text-faint);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-align: start;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .rm-table tbody th,
+  .rm-table td {
+    padding: 7px 10px;
+    border-top: 1px solid var(--border-subtle);
     color: var(--text-primary);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
+    font-weight: 400;
+    text-align: start;
+    white-space: nowrap;
   }
 
-  .prayer-time-row {
+  .rm-table tbody th {
+    font-weight: 700;
+    border-inline-start: 3px solid transparent;
+  }
+
+  .rm-table tr.is-last-ten {
+    background: var(--white-a03);
+  }
+
+  .rm-table tr.is-today {
+    background: var(--surface-hover);
+  }
+
+  .rm-table tr.is-today th {
+    border-inline-start-color: var(--text-primary);
+  }
+
+  .rm-table .rm-muted {
+    color: var(--text-muted);
+  }
+
+  .rm-table .rm-strong {
+    font-weight: 700;
+  }
+
+  .rm-table-night {
+    margin-inline-start: 4px;
+    font-size: 9px;
+    color: var(--text-muted);
+  }
+
+  /* ── Side panel ────────────────────────────────────────────────────────── */
+
+  .rm-panel {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .rm-box {
+    flex-shrink: 0;
+    padding: 14px;
+  }
+
+  .rm-box[hidden] {
+    display: none;
+  }
+
+  .rm-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .rm-kicker,
+  .rm-box-title {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .rm-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .rm-card-date {
+    margin: 6px 0 10px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text-primary);
+  }
+
+  .rm-times {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+  }
+
+  .rm-row {
     display: flex;
     justify-content: space-between;
-    margin: 15px 0;
-    padding: 12px 15px;
-    background: var(--surface-1);
-    border-radius: 10px;
-    transition: transform 0.2s;
-  }
-
-  .prayer-time-row:hover {
-    transform: scale(1.02);
-    background: var(--surface-2);
-  }
-
-  .prayer-time-label {
-    display: flex;
-    align-items: center;
     gap: 8px;
-    color: var(--text-secondary);
+    font-size: 13px;
   }
 
-  .prayer-time-value {
-    font-weight: bold;
+  .rm-row dt {
+    color: var(--text-muted);
+  }
+
+  .rm-row dd {
+    margin: 0;
+    font-weight: 700;
     color: var(--text-primary);
-    font-size: 1.1rem;
+    font-variant-numeric: tabular-nums;
   }
 
-  @keyframes slide-up {
-    from {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+  .rm-night-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 10px 0 0;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-primary);
   }
 
-  /* ========== RESPONSIVE DESIGN ========== */
-  @media (width <= 768px) {
-    .ramadan-container {
-      padding: 12px;
-      gap: 8px;
+  .rm-ask {
+    margin: 12px 0 6px;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  .rm-status {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .rm-status-btn,
+  .rm-action-btn {
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 12px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .rm-status-btn:disabled,
+  .rm-action-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .rm-tab:focus-visible,
+  .rm-day:focus-visible,
+  .rm-status-btn:focus-visible,
+  .rm-action-btn:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+  }
+
+  .rm-status-btn:hover:not(:disabled),
+  .rm-action-btn:hover:not(:disabled) {
+    background: var(--surface-3);
+  }
+
+  .rm-status-btn.is-on {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    color: var(--bg-primary);
+  }
+
+  .rm-action-btn.is-quiet {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-muted);
+  }
+
+  /* summary: fasted, then missed, on one bar */
+  .rm-bar {
+    display: flex;
+    height: 8px;
+    margin: 10px 0;
+    border-radius: 4px;
+    background: var(--white-a10);
+    overflow: hidden;
+  }
+
+  .rm-bar-fasted {
+    background: var(--text-primary);
+  }
+
+  .rm-bar-missed {
+    background: repeating-linear-gradient(
+      45deg,
+      var(--white-a50) 0 3px,
+      transparent 3px 6px
+    );
+  }
+
+  .rm-counts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .rm-counts dt {
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  .rm-counts dd {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rm-makeup-count {
+    margin: 6px 0 2px;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text-primary);
+  }
+
+  .rm-box-note {
+    margin: 4px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-faint);
+  }
+
+  .rm-makeup-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .rm-eid-date {
+    margin: 6px 0 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* ── Maximized window: more room, bigger numbers ───────────────────────── */
+
+  .fullscreen-mode .rm-layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 16px;
+  }
+
+  .fullscreen-mode .rm-hero-big {
+    font-size: 36px;
+  }
+
+  .fullscreen-mode .rm-day .rm-day-num {
+    min-width: 34px;
+    height: 34px;
+    border-radius: 17px;
+    font-size: 21px;
+  }
+
+  .fullscreen-mode .rm-day .rm-day-date {
+    font-size: 13px;
+  }
+
+  /* ── Narrow window: one column, the page scrolls ───────────────────────── */
+
+  @media (width <= 700px) {
+    .rm-layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-rows: max-content;
+      overflow: hidden auto;
     }
 
-    .ramadan-content {
-      padding: 4px 0;
+    .rm-hero {
+      flex-wrap: wrap;
     }
 
-    .fasting-card {
-      padding: 16px;
+    /* the month takes its full height here (no longer shares the window's) */
+    .rm-card,
+    .rm-tabpanel,
+    .rm-grid {
+      flex: none;
     }
 
-    .tracker-grid {
-      gap: 8px;
+    .rm-grid {
+      grid-auto-rows: auto;
     }
 
-    .day-tracker {
-      min-height: 60px;
-      padding: 6px;
+    .rm-ten {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-auto-rows: 54px;
     }
 
-    .day-tracker .hijri-day {
-      font-size: 1.3rem;
+    .rm-table-wrap {
+      flex: none;
+      max-height: 360px;
     }
 
-    .day-tracker .gregorian-date {
-      font-size: 0.6rem;
-    }
-
-    .cal-modal-content {
-      width: 85%;
-      padding: 20px;
+    .rm-panel {
+      overflow: visible;
     }
   }
 
   @media (width <= 480px) {
     .ramadan-container {
       padding: 8px;
-      gap: 6px;
+      gap: 8px;
     }
 
-    .fasting-card {
-      padding: 12px;
+    .rm-hero-big {
+      font-size: 24px;
     }
 
-    .tracker-grid {
-      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-      gap: 6px;
-    }
-
-    .day-tracker {
-      min-height: 55px;
-    }
-
-    .day-tracker .hijri-day {
-      font-size: 1.2rem;
+    .rm-tile {
+      min-width: 56px;
+      padding: 6px 8px;
     }
   }
 
-  @media (width <= 320px) {
-    .tracker-grid {
-      grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
-    }
-  }
-
-  /* Tabs */
-  .ramadan-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 15px;
-  }
-
-  .ramadan-tab {
-    flex: 1;
-    padding: 10px;
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 0.9em;
-    font-weight: 600;
-    transition: all 0.2s;
-    border-bottom: 2px solid transparent;
-  }
-
-  .ramadan-tab.active {
-    color: var(--accent-color);
-    border-bottom-color: var(--accent-color);
-  }
-
-  .ramadan-tab:hover:not(.active) {
-    color: var(--text-primary);
-    background: var(--surface-1);
-  }
-
-  /* Table */
-  .table-responsive {
-    overflow-x: auto;
-    max-height: 400px;
-    scrollbar-width: thin;
-  }
-
-  .ramadan-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-  }
-
-  .ramadan-table th,
-  .ramadan-table td {
-    padding: 10px;
-    text-align: center;
-    border-bottom: 1px solid var(--border-medium);
-  }
-
-  .ramadan-table th {
-    background: var(--black);
-    color: var(--text-primary);
-    position: sticky;
-    top: 0;
-    font-weight: 600;
-  }
-
-  .ramadan-table td {
-    color: var(--text-secondary);
-  }
-
-  .ramadan-table .current-day-row td {
-    background: rgba(var(--accent-rgb), 0.15);
-    color: var(--text-bright);
-  }
-
-  .ramadan-table tr:hover td {
-    background: var(--surface-1);
-  }
-
-  /* Today's card: suhoor | iftar */
-  .ramadan-today-times {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    text-align: center;
-  }
-
-  .ramadan-today-icon {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-  }
-
-  .ramadan-today-label {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-  }
-
-  .ramadan-today-time {
-    font-size: 1.2rem;
-    font-weight: bold;
-  }
-
-  .ramadan-today--suhoor {
-    color: #a5b1c2;
-  }
-
-  .ramadan-today--iftar {
-    color: #f7b731;
-  }
-
-  .ramadan-today-divider {
-    height: 40px;
-    width: 1px;
-    background: var(--border-color);
-  }
-
-  /* "Mark as completed" button of the day dialog */
-  .ramadan-track-btn {
-    margin-top: 15px;
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid var(--border-color);
-  }
-
-  .ramadan-track-btn.is-tracked {
-    background: var(--accent-color);
-  }
-
-  /* Location missing / loading failed, in place of the days grid */
-  .ramadan-message {
-    text-align: center;
-    color: white;
-    width: 100%;
+  /* loading, no location or offline with nothing saved: only the top card */
+  .rm-layout.is-empty .rm-card,
+  .rm-layout.is-empty .rm-panel {
+    display: none;
   }
 }

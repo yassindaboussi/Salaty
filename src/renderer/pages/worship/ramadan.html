@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/ramadan.css" />
   </head>
+
   <body class="page-loading">
     <div class="app-container" id="app">
       <div class="drag-area"></div>
@@ -27,128 +28,115 @@
           </h1>
         </header>
 
-        <main class="ramadan-content">
-          <!-- Today's Overview -->
-          <div class="fasting-card" id="todayCard">
-            <h3 id="todayFastingTitle" data-i18n="todayFasting">
-              Today's Fasting
-            </h3>
-            <div>
-              <div class="ramadan-today-times">
-                <div>
-                  <i
-                    class="fas fa-moon ramadan-today-icon ramadan-today--suhoor"
-                    aria-hidden="true"
-                  ></i>
-                  <div
-                    class="ramadan-today-label"
-                    id="labelTodaySuhoor"
-                    data-i18n="suhoor"
-                  >
-                    Suhoor
-                  </div>
-                  <div
-                    class="ramadan-today-time ramadan-today--suhoor"
-                    id="todaySuhoor"
-                  >
-                    --:--
-                  </div>
-                </div>
-                <div class="ramadan-today-divider"></div>
-                <div>
-                  <i
-                    class="fas fa-sun ramadan-today-icon ramadan-today--iftar"
-                    aria-hidden="true"
-                  ></i>
-                  <div
-                    class="ramadan-today-label"
-                    id="labelTodayIftar"
-                    data-i18n="iftar"
-                  >
-                    Iftar
-                  </div>
-                  <div
-                    class="ramadan-today-time ramadan-today--iftar"
-                    id="todayIftar"
-                  >
-                    --:--
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <main class="rm-layout is-empty" id="rmLayout">
+          <div class="rm-main">
+            <!-- Days until Ramadan, or the live iftar / suhoor countdown -->
+            <section class="rm-hero" id="rmHero"></section>
 
-          <div class="fasting-card">
-            <!-- Tabs header -->
-            <div class="ramadan-tabs">
-              <button
-                type="button"
-                class="ramadan-tab active"
-                data-tab="tracker"
+            <section class="rm-card">
+              <div class="rm-tabs" role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  class="rm-tab"
+                  id="rmTabTracker"
+                  data-tab="tracker"
+                  aria-controls="rmPanelTracker"
+                  aria-selected="true"
+                >
+                  <span data-i18n="fastingTracker">Fasting Tracker</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  class="rm-tab"
+                  id="rmTabTable"
+                  data-tab="table"
+                  aria-controls="rmPanelTable"
+                  aria-selected="false"
+                  tabindex="-1"
+                >
+                  <span data-i18n="common:timetable">Timetable</span>
+                </button>
+              </div>
+
+              <div
+                class="rm-tabpanel"
+                id="rmPanelTracker"
+                role="tabpanel"
+                aria-labelledby="rmTabTracker"
               >
-                <span id="trackerTitle" data-i18n="fastingTracker"
-                  >Fasting Tracker</span
-                >
-              </button>
-              <button type="button" class="ramadan-tab" data-tab="table">
-                <span id="tableTitle" data-i18n="common:timetable"
-                  >Timetable</span
-                >
-              </button>
-            </div>
+                <div
+                  class="rm-grid"
+                  id="rmGrid"
+                  role="grid"
+                  aria-labelledby="rmTabTracker"
+                ></div>
+                <ul class="rm-legend">
+                  <li>
+                    <span class="rm-legend-mark" aria-hidden="true"
+                      ><i class="fas fa-check"></i
+                    ></span>
+                    <span data-i18n="ramadanFasted">Fasted</span>
+                  </li>
+                  <li>
+                    <span class="rm-legend-mark is-missed" aria-hidden="true"
+                      ><i class="fas fa-rotate-left"></i
+                    ></span>
+                    <span data-i18n="ramadanLegendMissed"
+                      >Missed (to make up)</span
+                    >
+                  </li>
+                  <li>
+                    <i
+                      class="fas fa-moon rm-legend-night"
+                      aria-hidden="true"
+                    ></i>
+                    <span data-i18n="ramadanLegendOddNights"
+                      >Odd nights of the last ten</span
+                    >
+                  </li>
+                </ul>
+              </div>
 
-            <div class="tab-content" id="contentTracker">
-              <div class="tracker-grid" id="trackerGrid">
-                <!-- Days will be injected here via JS -->
-                <div class="day-tracker">
-                  <span class="hijri-day">1</span>
-                  <span class="gregorian-date">...</span>
+              <div
+                class="rm-tabpanel"
+                id="rmPanelTable"
+                role="tabpanel"
+                aria-labelledby="rmTabTable"
+                hidden
+              >
+                <div class="rm-table-wrap">
+                  <table class="rm-table">
+                    <thead>
+                      <tr>
+                        <th scope="col" data-i18n="common:day">Day</th>
+                        <th scope="col" data-i18n="common:date">Date</th>
+                        <th scope="col" data-i18n="ramadanImsak">Imsak</th>
+                        <th scope="col" data-i18n="ramadanSuhoorEnds">
+                          Suhoor ends
+                        </th>
+                        <th scope="col" data-i18n="iftar">Iftar</th>
+                        <th scope="col" data-i18n="ramadanFastLength">
+                          Fast length
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="rmTableBody"></tbody>
+                  </table>
                 </div>
               </div>
-            </div>
-
-            <div class="tab-content" id="contentTable" style="display: none">
-              <div class="table-responsive">
-                <table class="ramadan-table" id="ramadanTable">
-                  <thead>
-                    <tr>
-                      <th id="thDay" data-i18n="common:day">Day</th>
-                      <th id="thDate" data-i18n="common:date">Date</th>
-                      <th id="thSuhoor" data-i18n="suhoor">Suhoor</th>
-                      <th id="thIftar" data-i18n="iftar">Iftar</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <!-- Rows injected via JS -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            </section>
           </div>
+
+          <!-- The selected day, the summary, the fasts to make up, Eid -->
+          <aside class="rm-panel" id="rmPanel">
+            <section class="rm-box" id="rmDayCard"></section>
+            <section class="rm-box" id="rmSummary" hidden></section>
+            <section class="rm-box" id="rmMakeUp" hidden></section>
+            <section class="rm-box" id="rmEid" hidden></section>
+          </aside>
         </main>
-      </div>
-
-      <!-- Modal for Daily Times -->
-      <div id="dayModal" class="cal-modal">
-        <div class="cal-modal-content">
-          <span class="cal-modal-close" id="modalClose">&times;</span>
-          <div class="cal-modal-title" id="modalTitle"></div>
-
-          <div class="prayer-time-row">
-            <div class="prayer-time-label" id="modalLabelSuhoor">
-              <i class="fas fa-utensils" aria-hidden="true"></i> Suhoor (Fajr)
-            </div>
-            <div class="prayer-time-value" id="modalSuhoor">--:--</div>
-          </div>
-
-          <div class="prayer-time-row">
-            <div class="prayer-time-label" id="modalLabelIftar">
-              <i class="fas fa-glass-water" aria-hidden="true"></i> Iftar
-              (Maghrib)
-            </div>
-            <div class="prayer-time-value" id="modalIftar">--:--</div>
-          </div>
-        </div>
       </div>
     </div>
 
