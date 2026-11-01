@@ -1,662 +1,468 @@
 @layer pages {
-  /* Asma Container */
+  /* The 99 Names of Allah: the grid of the names on one side, the chosen name in full on the
+     other (mirrored in Arabic), one column in a narrow window with the chosen name first. As
+     on the calendar, fasting and tasbih pages, the chosen state is white, not the accent: the
+     theme's accent can be close to its background. */
+
   .asma-container {
+    position: relative;
+    z-index: var(--z-page);
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 16px;
     gap: 12px;
-    position: relative;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   /* Header: layout comes from the shared .page-header component
      (03-components/page-header.css). Only what is specific to this page is here. */
+  .asma-header {
+    z-index: var(--z-page-header);
+  }
+
   .asma-controls {
-    z-index: 2;
+    z-index: var(--z-page-header-controls);
   }
 
-  /* Asma Content - Compact */
-  .asma-content {
+  .an-layout {
     flex: 1;
-    overflow: hidden auto;
-    padding: 6px 0;
-    -webkit-app-region: no-drag;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-    direction: ltr; /* Force LTR for scrollbar on right */
-  }
-
-  .asma-content::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  .asma-content::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 3px;
-  }
-
-  .asma-content::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 3px;
-  }
-
-  /* Loading */
-  .asma-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: var(--text-secondary);
-  }
-
-  .asma-loading-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
     gap: 12px;
+    -webkit-app-region: no-drag;
+  }
+
+  .an-main,
+  .an-detail {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+  }
+
+  /* ── The main column ───────────────────────────────────────────────── */
+
+  .an-main {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .an-intro {
     text-align: center;
   }
 
-  .asma-loading i {
-    font-size: 32px;
-    animation: pulse 2s ease-in-out infinite;
-    color: var(--accent-color);
+  .an-hadith {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text-muted);
   }
 
-  /* ========== DEFAULT LAYOUT - SINGLE COLUMN ========== */
-  .asma-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 0 4px;
-    direction: ltr;
+  .an-sources {
+    margin: 2px 0 0;
+    font-size: 11px;
+    color: var(--text-faint);
   }
 
-  /* ========== ARABIC MODE - SINGLE COLUMN, FULL EXPLANATIONS ========== */
+  .an-source {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--text-faint);
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
 
-  /* Asma Card - Compact redesign */
-  .asma-card {
-    background: var(--surface-subtle);
-    border: 1px solid var(--white-a07);
-    border-radius: 12px;
-    padding: 12px;
+  .an-source:hover {
+    color: var(--text-primary);
+  }
+
+  /* The search */
+  .an-search {
     position: relative;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px var(--black-a10);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
   }
 
-  [lang="ar"] .asma-card {
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    direction: rtl; /* RTL inside cards */
+  .an-search-icon {
+    position: absolute;
+    inset-inline-start: 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  .an-search-input {
+    width: 100%;
+    padding-block: 7px;
+    padding-inline: 30px 96px; /* the icon; the clear button and the count */
+    border: 1px solid var(--border-medium);
+    border-radius: 10px;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    outline: none;
     box-sizing: border-box;
   }
 
-  .asma-card:hover {
-    background: var(--surface-1);
-    border-color: var(--white-a12);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px var(--black-a15);
+  .an-search-input::placeholder {
+    color: var(--text-faint);
   }
 
-  /* Number Badge - Compact */
-  .asma-number {
+  .an-search-input:focus-visible {
+    border-color: var(--white-a40);
+  }
+
+  /* the native clear cross: our own button replaces it */
+  .an-search-input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .an-search-clear {
     position: absolute;
-    top: 8px;
-    left: 8px;
-    background: rgba(var(--accent-rgb, 0, 122, 255), 0.15);
-    border: 1px solid rgba(var(--accent-rgb, 0, 122, 255), 0.2);
-    border-radius: 6px;
+    inset-inline-end: 6px;
     width: 24px;
     height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--accent-color);
-    z-index: 1;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
   }
 
-  /* Selectable text. The app is user-select:none so clicks and drags on controls never
-     highlight anything; the name, transliteration, meaning and explanation opt back in.
-     The number badge and the copy button stay unselectable. */
-  .asma-name,
-  .asma-translit,
-  .asma-meaning,
-  .asma-desc {
+  .an-search-clear[hidden] {
+    display: none;
+  }
+
+  .an-search-clear:hover {
+    background: var(--surface-3);
+    color: var(--text-primary);
+  }
+
+  .an-search-count {
+    position: absolute;
+    inset-inline-end: 36px;
+    font-size: 11px;
+    color: var(--text-faint);
+    pointer-events: none;
+  }
+
+  /* The grid of the names */
+  .an-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-auto-rows: max-content;
+    gap: 6px;
+    padding: 2px;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .an-grid[hidden] {
+    display: none;
+  }
+
+  .an-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    min-width: 0;
+    padding: 8px 6px 7px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .an-tile:hover {
+    background: var(--surface-3);
+  }
+
+  .an-tile[aria-pressed="true"] {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
+  }
+
+  .an-tile-num {
+    position: absolute;
+    inset-block-start: 5px;
+    inset-inline-start: 7px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .an-tile-name {
+    font-family: var(--font-arabic);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.6;
+  }
+
+  .an-tile-translit,
+  .an-tile-meaning {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .an-tile-translit {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .an-tile-meaning {
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  [lang="ar"] .an-tile-meaning {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .an-empty {
+    margin: 0;
+    padding: 24px 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .an-empty[hidden] {
+    display: none;
+  }
+
+  /* ── The chosen name ───────────────────────────────────────────────── */
+
+  .an-detail {
+    padding: 12px;
+    gap: 6px;
+  }
+
+  .an-detail-head,
+  .an-detail-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .an-detail-head {
+    justify-content: flex-end;
+    min-height: 30px;
+  }
+
+  .an-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .an-icon-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .an-icon-btn:hover:not(:disabled) {
+    background: var(--surface-3);
+    color: var(--text-primary);
+  }
+
+  [dir="rtl"] .an-step i {
+    transform: scaleX(-1);
+  }
+
+  .an-detail-body {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden auto;
+    text-align: center;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .an-name {
+    margin: 0;
+    font-family: var(--font-arabic);
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  .an-translit {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .an-translit[hidden],
+  .an-desc[hidden],
+  .an-verses-title[hidden] {
+    display: none;
+  }
+
+  .an-meaning {
+    margin: 4px 0 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .an-desc {
+    margin: 10px 0 0;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-muted);
+    text-align: start;
+    overflow-wrap: anywhere;
+  }
+
+  /* the text of the chosen name can be selected and copied (the app is user-select: none) */
+  .an-name,
+  .an-translit,
+  .an-meaning,
+  .an-desc {
     user-select: text;
     cursor: text;
   }
 
-  .asma-name::selection,
-  .asma-translit::selection,
-  .asma-meaning::selection,
-  .asma-desc::selection {
+  :is(.an-name, .an-translit, .an-meaning, .an-desc)::selection {
     background: rgba(var(--accent-rgb), 0.45);
     color: var(--text-bright);
   }
 
-  /* Arabic Name */
-  .asma-name {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text-bright);
-    text-align: right;
-    direction: rtl;
-    margin: 0 0 8px 32px; /* Space for number badge */
-    line-height: 1.3;
-    min-height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    /* stylelint-disable-next-line property-disallowed-list -- the Arabic name is always laid out right-to-left (also in the English UI), so this side must not flip with the page language */
-    padding-right: 4px;
-  }
-
-  /* ========== ARABIC CARD STYLES — full name, meaning & explanation ========== */
-
-  /* Transliteration - Compact */
-  .asma-translit {
-    font-size: 14px;
-    color: var(--accent-color);
-    margin-bottom: 6px;
-    text-align: left;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-  }
-
-  [lang="ar"] .asma-card .asma-translit {
-    display: none; /* redundant transliteration for native Arabic readers */
-  }
-
-  /* Header row: number + name grouped at the start (right), copy button alone at the end (left) */
-  [lang="ar"] .asma-card .asma-header-row {
-    display: flex;
-    direction: rtl;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-
-  [lang="ar"] .asma-card .asma-name-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-  }
-
-  [lang="ar"] .asma-card .asma-name {
-    font-family: var(--font-arabic);
-    font-size: 26px;
-    font-weight: 700;
-    margin: 0;
-    text-align: right;
-    justify-content: flex-end;
-    min-height: auto;
-    line-height: 1.5;
-    /* stylelint-disable-next-line property-disallowed-list -- the Arabic name is always laid out right-to-left (also in the English UI), so this side must not flip with the page language */
-    padding-right: 0;
-  }
-
-  /* Meaning - Compact */
-  .asma-meaning {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-bright);
-    margin-bottom: 6px;
-    text-align: left;
-    line-height: 1.4;
-  }
-
-  [lang="ar"] .asma-card .asma-meaning {
-    display: block;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--accent-color);
-    text-align: right;
-    direction: rtl;
-    line-height: 1.6;
-    margin: 0 0 6px;
-  }
-
-  /* Description - Compact with better typography */
-  .asma-desc {
-    font-size: 12px;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    text-align: left;
-    opacity: 0.85;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-
-  [lang="ar"] .asma-card .asma-desc {
-    display: block;
-    font-size: 14.5px;
-    color: var(--text-secondary);
-    text-align: right;
-    direction: rtl;
-    line-height: 1.75;
-    opacity: 0.9;
-    overflow: visible;
-    margin: 0;
-  }
-
-  /* Number + copy button now sit inline in the header row, not floating corners */
-
-  [dir="rtl"] .asma-number {
-    left: auto;
-    right: 12px;
-  }
-
-  [lang="ar"] .asma-card .asma-number {
-    position: static;
-    width: 26px;
-    height: 26px;
-    font-size: 11px;
-    margin: 0;
-  }
-
-  /* Copy Button - Compact (for non-Arabic) */
-  .asma-copy-btn {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    background: var(--surface-1);
-    border: 1px solid var(--border-medium);
-    border-radius: 6px;
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    color: var(--text-secondary);
-  }
-
-  .asma-copy-btn:hover {
-    background: var(--surface-3);
-    border-color: var(--accent-color);
-    color: var(--accent-color);
-  }
-
-  [dir="rtl"] .asma-copy-btn {
-    right: auto;
-    left: 12px;
-  }
-
-  [lang="ar"] .asma-card .asma-copy-btn {
-    position: static;
-    margin: 0;
-    width: 26px;
-    height: 26px;
-  }
-
-  /* ========== END ARABIC MODE ========== */
-
-  .asma-copy-btn i {
-    font-size: 12px;
-  }
-
-  /* ========== DYNAMIC FOOTER ========== */
-
-  /* Footer base styles */
-  .asma-footer {
-    padding-top: 12px;
-    border-top: 1px solid var(--border-color);
-    text-align: center;
-  }
-
-  .asma-footer-text {
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-style: italic;
-    opacity: 0.8;
-    background: linear-gradient(
-      135deg,
-      var(--text-secondary),
-      rgba(var(--accent-rgb), 0.8)
-    );
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Arabic footer uses a font with better Arabic glyphs */
-  [lang="ar"] .asma-footer {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  }
-
-  /* ========== END OF FOOTER ========== */
-
-  /* ========== FULLSCREEN MODE ========== */
-
-  /* Fullscreen Mode - Base styles */
-  .asma-container.fullscreen .asma-card {
-    padding: 16px;
-    margin-bottom: 12px;
-  }
-
-  .asma-container.fullscreen .asma-name {
-    font-size: 22px;
-    /* stylelint-disable-next-line property-disallowed-list -- the Arabic name is always laid out right-to-left (also in the English UI), so this side must not flip with the page language */
-    margin-left: 40px;
-  }
-
-  .asma-container.fullscreen .asma-translit {
-    font-size: 16px;
-  }
-
-  .asma-container.fullscreen .asma-meaning {
-    font-size: 15px;
-  }
-
-  .asma-container.fullscreen .asma-desc {
-    font-size: 14px;
-    -webkit-line-clamp: 4;
-  }
-
-  .asma-container.fullscreen .asma-number {
-    width: 32px;
-    height: 32px;
-    font-size: 13px;
-  }
-
-  .asma-container.fullscreen .asma-list {
-    gap: 12px;
-  }
-
-  /* Fullscreen mode for Arabic — single column so the full explanation stays readable */
-  .asma-container.fullscreen[lang="ar"] .asma-list,
-  [lang="ar"] .asma-container.fullscreen .asma-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 0 8px;
-  }
-
-  .asma-container.fullscreen[lang="ar"] .asma-card,
-  [lang="ar"] .asma-container.fullscreen .asma-card {
-    padding: 18px 20px;
-  }
-
-  .asma-container.fullscreen[lang="ar"] .asma-name,
-  [lang="ar"] .asma-container.fullscreen .asma-name {
-    font-size: 30px;
-  }
-
-  .asma-container.fullscreen[lang="ar"] .asma-meaning,
-  [lang="ar"] .asma-container.fullscreen .asma-meaning {
+  [lang="ar"] .an-meaning {
     font-size: 17px;
   }
 
-  .asma-container.fullscreen[lang="ar"] .asma-desc,
-  [lang="ar"] .asma-container.fullscreen .asma-desc {
-    font-size: 16px;
+  [lang="ar"] .an-desc {
+    font-size: 14.5px;
+    line-height: 1.8;
   }
 
-  .asma-container.fullscreen[lang="ar"] .asma-number,
-  [lang="ar"] .asma-container.fullscreen .asma-number {
-    width: 28px;
-    height: 28px;
+  .an-verses-title {
+    margin: 14px 0 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+    text-align: start;
+  }
+
+  [lang="ar"] .an-verses-title {
     font-size: 12px;
+    text-transform: none;
+    letter-spacing: 0;
   }
 
-  .asma-container.fullscreen[lang="ar"] .asma-copy-btn,
-  [lang="ar"] .asma-container.fullscreen .asma-copy-btn {
-    width: 28px;
-    height: 28px;
-  }
-
-  /* ========== END FULLSCREEN MODE ========== */
-
-  /* Success Toast */
-  .asma-toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-
-    /* Follows the active theme: an accent tint over the theme background, theme text colour */
-    background:
-      linear-gradient(
-        135deg,
-        rgba(var(--accent-rgb), 0.3),
-        rgba(var(--accent-rgb), 0.14)
-      ),
-      var(--bg-primary, #0a1128);
-    color: var(--text-primary);
-    padding: 10px 20px;
-    border-radius: 10px;
+  .an-verses {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: var(--z-floating);
-    backdrop-filter: blur(5px);
-    border: 1px solid var(--accent-color);
-    box-shadow: 0 6px 20px var(--black-a20);
-    transition: transform 0.3s ease;
-    font-size: 13px;
-    max-width: 90%;
-  }
-
-  .asma-toast.show {
-    transform: translateX(-50%) translateY(0);
-  }
-
-  .asma-toast.error {
-    color: var(--text-bright);
-    border-color: transparent;
-    background: linear-gradient(
-      135deg,
-      rgba(220, 53, 69, 0.95),
-      rgba(200, 35, 51, 0.95)
-    );
-  }
-
-  .asma-toast i {
-    font-size: 16px;
-  }
-
-  .asma-toast span {
-    font-weight: 500;
-  }
-
-  /* Error Message */
-  .error-message {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: var(--text-secondary);
-    text-align: center;
-    padding: 30px;
-  }
-
-  .error-message i {
-    font-size: 36px;
-    color: var(--color-danger);
-    margin-bottom: 15px;
-  }
-
-  .error-message div {
-    font-size: 14px;
-    margin-bottom: 15px;
-    font-weight: 500;
-  }
-
-  .retry-button {
-    background: linear-gradient(
-      135deg,
-      var(--accent-color),
-      rgba(var(--accent-rgb, 0, 122, 255), 0.8)
-    );
-    border: none;
-    border-radius: 10px;
-    padding: 10px 20px;
-    color: var(--text-bright);
-    font-weight: 500;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .retry-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb, 0, 122, 255), 0.2);
+  .an-verse {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 4px 9px;
+    border: 1px solid var(--border-medium);
+    border-radius: 999px;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
   }
 
-  /* Responsive */
-  @media (width <= 480px) {
-    .asma-container {
-      padding: 16px;
+  .an-verse:hover {
+    background: var(--surface-3);
+  }
+
+  .an-verse-ref {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .an-detail-nav {
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .an-detail-number {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Narrow window: one column, the chosen name first, the page scrolls ── */
+
+  @media (width <= 700px) {
+    .an-layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-rows: max-content;
+      overflow: hidden auto;
     }
 
-    /* Arabic single-column responsive */
-    [lang="ar"] .asma-list {
-      gap: 6px;
-      padding: 0 2px;
+    .an-detail {
+      order: -1;
     }
 
-    .asma-card {
-      padding: 10px;
+    .an-grid,
+    .an-detail-body {
+      overflow: visible;
     }
 
-    [lang="ar"] .asma-card {
-      padding: 10px 12px;
-    }
-
-    .asma-name {
-      font-size: 18px;
-      /* stylelint-disable-next-line property-disallowed-list -- the Arabic name is always laid out right-to-left (also in the English UI), so this side must not flip with the page language */
-      margin-left: 28px;
-    }
-
-    [lang="ar"] .asma-card .asma-name {
-      font-size: 20px;
-    }
-
-    [lang="ar"] .asma-card .asma-meaning {
-      font-size: 13px;
-    }
-
-    .asma-desc {
-      -webkit-line-clamp: 2;
-    }
-
-    [lang="ar"] .asma-card .asma-desc {
-      font-size: 12.5px;
-    }
-
-    [lang="ar"] .asma-card .asma-number {
-      width: 22px;
-      height: 22px;
-      font-size: 9px;
-    }
-
-    [lang="ar"] .asma-card .asma-copy-btn {
-      width: 22px;
-      height: 22px;
-    }
-
-    [lang="ar"] .asma-card .asma-copy-btn i {
-      font-size: 10px;
-    }
-
-    /* Fullscreen mobile */
-    .asma-container.fullscreen[lang="ar"] .asma-list,
-    [lang="ar"] .asma-container.fullscreen .asma-list {
-      gap: 8px;
-      padding: 0 4px;
-    }
-
-    .asma-container.fullscreen[lang="ar"] .asma-card,
-    [lang="ar"] .asma-container.fullscreen .asma-card {
-      padding: 12px 14px;
+    .an-name {
+      font-size: 34px;
     }
   }
 
-  /* ========== RESPONSIVE DESIGN ========== */
-
-  /* Tablet (768px and below) */
-  @media (width <= 768px) {
-    .asma-container {
-      padding: 12px;
-      gap: 8px;
-    }
-
-    .asma-content {
-      padding: 4px 0;
-    }
-  }
-
-  /* Mobile (480px and below) */
   @media (width <= 480px) {
     .asma-container {
       padding: 8px;
-      gap: 6px;
-    }
-
-    /* Arabic mobile adjustment */
-    [lang="ar"] .asma-list {
-      gap: 4px;
-      padding: 0 1px;
-    }
-
-    [lang="ar"] .asma-card {
-      padding: 8px 10px;
-    }
-
-    [lang="ar"] .asma-card .asma-name {
-      font-size: 17px;
-    }
-
-    [lang="ar"] .asma-card .asma-meaning {
-      font-size: 12px;
-    }
-
-    [lang="ar"] .asma-card .asma-desc {
-      font-size: 11.5px;
-    }
-  }
-
-  /* Very Small Mobile (320px and below) */
-  @media (width <= 320px) {
-    [lang="ar"] .asma-card {
-      padding: 7px 9px;
-    }
-
-    [lang="ar"] .asma-card .asma-name {
-      font-size: 15px;
-    }
-  }
-
-  /* Landscape Mode (for mobile) */
-  @media (height <= 500px) and (orientation: landscape) {
-    .asma-container {
-      padding: 8px;
       gap: 8px;
-    }
-
-    .asma-header {
-      padding-bottom: 8px;
-      min-height: 32px;
-    }
-
-    .asma-content {
-      padding: 4px 0;
     }
   }
 }

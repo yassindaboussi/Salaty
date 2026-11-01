@@ -114,13 +114,13 @@ function renderAyahs(ayahs) {
     // one space between the ayahs (running text, as in the Mushaf)
     const flowHtml = ayahs.map(
       (a, i) =>
-        html`${i ? " " : ""}${a.arabic} <span class="ayah-number-inline" data-ayah="${a.number}">﴿${fmt(a.number)}﴾</span>`,
+        html`${i ? " " : ""}<span class="ayah-text" id="ayah-${a.number}">${a.arabic} <span class="ayah-number-inline" data-ayah="${a.number}">﴿${fmt(a.number)}﴾</span></span>`,
     );
     content = html`<div class="surah-flow-text" id="surahFlowText" style="font-size:${state.fontSize}px">${flowHtml}</div>`;
   } else {
     content = html`<div class="ayah-translation-list" id="ayahTranslationList" style="font-size:${state.fontSize}px">${withTranslation.map(
       (a) =>
-        html`<div class="ayah-translation-row"><span class="ayah-translation-num">${fmt(a.number)}.</span> ${a.translation}</div>`,
+        html`<div class="ayah-translation-row" id="ayah-${a.number}"><span class="ayah-translation-num">${fmt(a.number)}.</span> ${a.translation}</div>`,
     )}</div>`;
   }
 

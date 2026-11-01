@@ -13,7 +13,11 @@
 const { execSync } = require("child_process");
 
 /** @type {Record<string, string>} advisory id -> why it is accepted */
-const ACCEPTED = {};
+const ACCEPTED = {
+  // only fixed in minimatch 11; electron-builder, asar and glob still need 3 / 5 / 9. Build-time
+  // only (not in the installer), and the patterns are our own, never user input.
+  "GHSA-g3hv-75wg-m249": "minimatch: build tools only, our own glob patterns",
+};
 
 const BLOCKING = new Set(["moderate", "high", "critical"]);
 

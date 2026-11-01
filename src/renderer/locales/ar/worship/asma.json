@@ -1,6 +1,18 @@
 {
   "asmaAllah": "أسماء الله الحسنى",
-  "beautifulNames": "أسماء الله الحسنى",
-  "loadingAsma": "جاري تحميل الأسماء...",
-  "asmaDesc": "تعلم الأسماء الحسنى"
+  "asmaDesc": "تعلم الأسماء الحسنى",
+  "anHadith": "«إنّ لله تسعةً وتسعين اسمًا، مَن أحصاها دخل الجنة»",
+  "anSourceHadith": "البخاري 7392",
+  "anSourceList": "القائمة: الترمذي 3507",
+  "anSourceLabel": "افتح {ref} على sunnah.com",
+  "anSearch": "ابحث باسم أو معنى أو رقم",
+  "anClearSearch": "مسح البحث",
+  "anNoMatch": "لا يوجد اسم يطابق «{query}»",
+  "anShown": "{shown} من 99",
+  "anOf": "{number} من 99",
+  "anInQuran": "في القرآن الكريم",
+  "anVerseLabel": "افتح {surah} {ref} في المصحف",
+  "anPrev": "الاسم السابق",
+  "anNext": "الاسم التالي",
+  "anCopy": "انسخ هذا الاسم"
 }

@@ -1,6 +1,18 @@
 {
   "asmaAllah": "99 Noms d'Allah",
-  "beautifulNames": "Les Beaux Noms d'Allah",
-  "loadingAsma": "Chargement des Noms...",
-  "asmaDesc": "Apprenez les beaux noms"
+  "asmaDesc": "Apprenez les beaux noms",
+  "anHadith": "« Allah a quatre-vingt-dix-neuf noms ; quiconque les apprend entrera au Paradis. »",
+  "anSourceHadith": "Bukhari 7392",
+  "anSourceList": "Liste : Tirmidhi 3507",
+  "anSourceLabel": "Ouvrir {ref} sur sunnah.com",
+  "anSearch": "Rechercher un nom, un sens ou un numéro",
+  "anClearSearch": "Effacer la recherche",
+  "anNoMatch": "Aucun nom ne correspond à « {query} »",
+  "anShown": "{shown} sur 99",
+  "anOf": "{number} sur 99",
+  "anInQuran": "Dans le Coran",
+  "anVerseLabel": "Ouvrir {surah} {ref} dans le Coran",
+  "anPrev": "Nom précédent",
+  "anNext": "Nom suivant",
+  "anCopy": "Copier ce nom"
 }
