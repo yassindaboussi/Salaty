@@ -1,6 +1,18 @@
 {
   "asmaAllah": "99 Names of Allah",
-  "beautifulNames": "The Beautiful Names of Allah",
-  "loadingAsma": "Loading Names...",
-  "asmaDesc": "Learn the beautiful names"
+  "asmaDesc": "Learn the beautiful names",
+  "anHadith": "“Allah has ninety-nine names; whoever learns them will enter Paradise.”",
+  "anSourceHadith": "Bukhari 7392",
+  "anSourceList": "List: Tirmidhi 3507",
+  "anSourceLabel": "Open {ref} on sunnah.com",
+  "anSearch": "Search a name, meaning or number",
+  "anClearSearch": "Clear search",
+  "anNoMatch": "No name matches “{query}”",
+  "anShown": "{shown} of 99",
+  "anOf": "{number} of 99",
+  "anInQuran": "In the Quran",
+  "anVerseLabel": "Open {surah} {ref} in the Quran",
+  "anPrev": "Previous name",
+  "anNext": "Next name",
+  "anCopy": "Copy this name"
 }

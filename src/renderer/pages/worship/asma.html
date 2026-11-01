@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="asmaAllah">Asma Allah - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
+    <link rel="stylesheet" href="../../css/03-components/success-toast.css" />
     <link rel="stylesheet" href="../../css/04-pages/asma.css" />
   </head>
   <body class="page-loading">
@@ -27,34 +28,124 @@
           </h1>
         </header>
 
-        <!-- Asma Content -->
-        <main class="asma-content" id="asmaContent">
-          <div class="asma-loading" id="asmaLoading">
-            <div class="asma-loading-content">
+        <main class="an-layout" id="anLayout">
+          <!-- All the names: the search, the grid -->
+          <section class="an-main" aria-labelledby="asmaTitle">
+            <div class="an-intro">
+              <p class="an-hadith" data-i18n="anHadith">
+                “Allah has ninety-nine names; whoever learns them will enter
+                Paradise.”
+              </p>
+              <p class="an-sources">
+                <button
+                  type="button"
+                  class="an-source"
+                  data-source="https://sunnah.com/bukhari:7392"
+                  data-i18n="anSourceHadith"
+                >
+                  Bukhari 7392
+                </button>
+                <span aria-hidden="true">·</span>
+                <button
+                  type="button"
+                  class="an-source"
+                  data-source="https://sunnah.com/tirmidhi:3507"
+                  data-i18n="anSourceList"
+                >
+                  List: Tirmidhi 3507
+                </button>
+              </p>
+            </div>
+
+            <div class="an-search" role="search">
               <i
-                class="fas fa-star-and-crescent fa-spin"
+                class="fas fa-magnifying-glass an-search-icon"
                 aria-hidden="true"
               ></i>
-              <span id="loadingTextAsma" data-i18n="loadingAsma"
-                >Loading Names...</span
+              <input
+                type="search"
+                class="an-search-input"
+                id="anSearch"
+                autocomplete="off"
+                spellcheck="false"
+                data-i18n-placeholder="anSearch"
+                data-i18n-aria-label="anSearch"
+                placeholder="Search a name, meaning or number"
+              />
+              <button
+                type="button"
+                class="an-search-clear"
+                id="anSearchClear"
+                data-tooltip="anClearSearch"
+                hidden
               >
+                <i class="fas fa-xmark" aria-hidden="true"></i>
+              </button>
+              <span
+                class="an-search-count"
+                id="anCount"
+                aria-live="polite"
+              ></span>
             </div>
-          </div>
 
-          <div class="asma-list" id="asmaList">
-            <!-- Asma cards will be loaded here -->
-          </div>
+            <div class="an-grid" id="anGrid"></div>
+            <p class="an-empty" id="anEmpty" hidden></p>
+          </section>
+
+          <!-- The chosen name -->
+          <aside class="an-detail" id="anDetail" aria-labelledby="anName">
+            <div class="an-detail-head">
+              <button
+                type="button"
+                class="an-icon-btn"
+                id="anCopy"
+                data-tooltip="anCopy"
+              >
+                <i class="fas fa-copy" aria-hidden="true"></i>
+              </button>
+            </div>
+
+            <div class="an-detail-body">
+              <h2 class="an-name" id="anName" lang="ar" dir="rtl"></h2>
+              <p class="an-translit" id="anTranslit"></p>
+              <p class="an-meaning" id="anMeaning"></p>
+              <p class="an-desc" id="anDesc"></p>
+
+              <h3
+                class="an-verses-title"
+                id="anVersesTitle"
+                data-i18n="anInQuran"
+              >
+                In the Quran
+              </h3>
+              <ul
+                class="an-verses"
+                id="anVerses"
+                aria-labelledby="anVersesTitle"
+              ></ul>
+            </div>
+
+            <div class="an-detail-nav">
+              <button
+                type="button"
+                class="an-icon-btn an-step"
+                id="anPrev"
+                data-tooltip="anPrev"
+              >
+                <i class="fas fa-chevron-left" aria-hidden="true"></i>
+              </button>
+              <span class="an-detail-number" id="anNumber"></span>
+              <button
+                type="button"
+                class="an-icon-btn an-step"
+                id="anNext"
+                data-tooltip="anNext"
+              >
+                <i class="fas fa-chevron-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </aside>
         </main>
-
-        <footer class="asma-footer">
-          <div
-            class="asma-footer-text"
-            id="asmaFooterText"
-            data-i18n="beautifulNames"
-          >
-            The Beautiful Names of Allah
-          </div>
-        </footer>
       </div>
     </div>
 
