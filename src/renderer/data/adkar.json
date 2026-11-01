@@ -5,8 +5,8 @@
       "count": "1",
       "description": "",
       "reference": "صحيح مسلم 2723",
-      "reference_en": "Sahih Muslim 2715",
-      "reference_fr": "Sahih Mouslim 2715",
+      "reference_en": "Sahih Muslim 2723",
+      "reference_fr": "Sahih Mouslim 2723",
       "content": "أَصْـبَحْنا وَأَصْـبَحَ المُـلْكُ لله وَالحَمدُ لله ، لا إلهَ إلاّ اللّهُ وَحدَهُ لا شَريكَ لهُ، لهُ المُـلكُ ولهُ الحَمْـد، وهُوَ على كلّ شَيءٍ قدير",
       "grade": "sahih"
     },
@@ -27,8 +27,8 @@
       "count": "3",
       "description": "",
       "reference": "صحيح مسلم 2726",
-      "reference_en": "Sahih Muslim 2715",
-      "reference_fr": "Sahih Mouslim 2715",
+      "reference_en": "Sahih Muslim 2726",
+      "reference_fr": "Sahih Mouslim 2726",
       "content": "سُبْحـانَ اللهِ وَبِحَمْـدِهِ عَدَدَ خَلْـقِه ، وَرِضـا نَفْسِـه ، وَزِنَـةَ عَـرْشِـه ، وَمِـدادَ كَلِمـاتِـه.",
       "grade": "sahih"
     },
@@ -73,8 +73,8 @@
       "count": "01",
       "description": "",
       "reference": "صحيح مسلم 2723",
-      "reference_en": "Sahih Muslim 2715",
-      "reference_fr": "Sahih Mouslim 2715",
+      "reference_en": "Sahih Muslim 2723",
+      "reference_fr": "Sahih Mouslim 2723",
       "content": "أَمْسَيْـنا وَأَمْسـى المـلكُ لله وَالحَمدُ لله ، لا إلهَ إلاّ اللّهُ وَحدَهُ لا شَريكَ لهُ، لهُ المُـلكُ ولهُ الحَمْـد، وهُوَ على كلّ شَيءٍ قدير ، رَبِّ أسْـأَلُـكَ خَـيرَ ما في هـذهِ اللَّـيْلَةِ وَخَـيرَ ما بَعْـدَهـا ، وَأَعـوذُ بِكَ مِنْ شَـرِّ ما في هـذهِ اللَّـيْلةِ وَشَرِّ ما بَعْـدَهـا ، رَبِّ أَعـوذُبِكَ مِنَ الْكَسَـلِ وَسـوءِ الْكِـبَر ، رَبِّ أَعـوذُ بِكَ مِنْ عَـذابٍ في النّـارِ وَعَـذابٍ في القَـبْر.",
       "grade": "sahih"
     },
@@ -95,8 +95,8 @@
       "count": "03",
       "description": "",
       "reference": "صحيح مسلم 2726",
-      "reference_en": "Sahih Muslim 2715",
-      "reference_fr": "Sahih Mouslim 2715",
+      "reference_en": "Sahih Muslim 2726",
+      "reference_fr": "Sahih Mouslim 2726",
       "content": "سُبْحـانَ اللهِ وَبِحَمْـدِهِ عَدَدَ خَلْـقِه ، وَرِضـا نَفْسِـه ، وَزِنَـةَ عَـرْشِـه ، وَمِـدادَ كَلِمـاتِـه.",
       "grade": "sahih"
     },
@@ -151,8 +151,8 @@
       "count": "01",
       "description": "",
       "reference": "صحيح مسلم 591",
-      "reference_en": "Sahih Muslim 2715",
-      "reference_fr": "Sahih Mouslim 2715",
+      "reference_en": "Sahih Muslim 591",
+      "reference_fr": "Sahih Mouslim 591",
       "content": "أَسْـتَغْفِرُ الله، أَسْـتَغْفِرُ الله، أَسْـتَغْفِرُ الله.اللّهُـمَّ أَنْـتَ السَّلامُ ، وَمِـنْكَ السَّلام ، تَبارَكْتَ يا ذا الجَـلالِ وَالإِكْـرام .",
       "grade": "sahih"
     },
@@ -281,8 +281,8 @@
       "count": "01",
       "description": "",
       "reference": "صحيح البخاري 6320",
-      "reference_en": "Sahih al-Bukhari 6324",
-      "reference_fr": "Sahih al-Boukhari 6324",
+      "reference_en": "Sahih al-Bukhari 6320",
+      "reference_fr": "Sahih al-Boukhari 6320",
       "content": "بِاسْمِكَ رَبِّـي وَضَعْـتُ جَنْـبي ، وَبِكَ أَرْفَعُـه، فَإِن أَمْسَـكْتَ نَفْسـي فارْحَـمْها ، وَإِنْ أَرْسَلْتَـها فاحْفَظْـها بِمـا تَحْفَـظُ بِه عِبـادَكَ الصّـالِحـين.",
       "grade": "sahih"
     },
@@ -322,9 +322,9 @@
       "category": "أذكار الاستيقاظ",
       "count": "01",
       "description": "",
-      "reference": "صحيح البخاري 1154، صحيح مسلم 763 — من تعارّ من الليل",
-      "reference_en": "Sahih al-Bukhari 1154, Sahih Muslim 763 — for one who wakes up during the night",
-      "reference_fr": "Sahih al-Boukhari 1154, Sahih Mouslim 763 — pour celui qui se réveille pendant la nuit",
+      "reference": "صحيح البخاري 1154 — من تعارّ من الليل",
+      "reference_en": "Sahih al-Bukhari 1154 — for one who wakes up during the night",
+      "reference_fr": "Sahih al-Boukhari 1154 — pour celui qui se réveille pendant la nuit",
       "content": "لا إلهَ إلاّ اللّهُ وَحْـدَهُ لا شَـريكَ له، لهُ المُلـكُ ولهُ الحَمـد، وهوَ على كلّ شيءٍ قدير، سُـبْحانَ اللهِ، والحمْـدُ لله ، ولا إلهَ إلاّ اللهُ واللهُ أكبَر، وَلا حَولَ وَلا قوّة إلاّ باللّهِ العليّ العظيم. رَبِّ اغْفرْ لي.",
       "grade": "sahih"
     }
@@ -742,9 +742,9 @@
       "description": "يعقوب علية السلام.",
       "description_en": "Jacob (Ya'qub), peace be upon him.",
       "description_fr": "Jacob (Ya'qoub), paix sur lui.",
-      "reference": "[يوسف - 101].",
-      "reference_en": "Yusuf 12:101",
-      "reference_fr": "Yusuf 12:101",
+      "reference": "[يوسف - 86].",
+      "reference_en": "Yusuf 12:86",
+      "reference_fr": "Yusuf 12:86",
       "content": " إِنَّمَا أَشْكُو بَثِّي وَحُزْنِي إِلَى اللَّهِ. [يوسف - 86]. ",
       "grade": "quran"
     }
@@ -753,9 +753,9 @@
     {
       "content": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
       "count": 1,
-      "reference": "متفق عليه — صحيح البخاري 3282، صحيح مسلم",
-      "reference_en": "Narrated by al-Bukhari and Muslim — Sahih al-Bukhari 3282, Sahih Muslim",
-      "reference_fr": "Rapporté par al-Boukhari et Mouslim — Sahih al-Boukhari 3282, Sahih Mouslim",
+      "reference": "متفق عليه — صحيح البخاري 3282، صحيح مسلم 2610",
+      "reference_en": "Narrated by al-Bukhari and Muslim — Sahih al-Bukhari 3282, Sahih Muslim 2610",
+      "reference_fr": "Rapporté par al-Boukhari et Mouslim — Sahih al-Boukhari 3282, Sahih Mouslim 2610",
       "category": "دعاء الغضب",
       "grade": "sahih"
     }
