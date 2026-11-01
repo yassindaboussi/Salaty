@@ -5,6 +5,7 @@
 //   reader.js               one surah's text, previous/next, the settings panel
 //   translation-picker.js   the translation combobox
 //   numerals.js             Arabic-Indic or Western digits
+//   open-request.js         opened at one ayah by another page (the 99 Names verses)
 //   state.js                what is shown now, the surah/juz tables, number formatting
 // The surah text comes from services/api/alquran-cloud.js (online, or the bundled offline data).
 const { t } = require("../../core/i18n");
@@ -42,6 +43,7 @@ const {
   bindTranslationCombo,
   updateTranslationUI,
 } = require("./translation-picker");
+const { handleOpenRequest } = require("./open-request");
 
 // Re-draws everything that shows a number after the user switches digit style.
 function refreshNumbers() {
@@ -89,10 +91,6 @@ function initQuranPage() {
   document
     .getElementById("readerFullscreenBtn")
     ?.addEventListener("click", toggleFullscreen);
-
-  document
-    .getElementById("readerBackBtn")
-    ?.addEventListener("click", showSurahList);
 
   document
     .getElementById("tabSurah")
@@ -147,6 +145,8 @@ function initQuranPage() {
   state.filteredSurahs = [...SURAH_META];
   renderSurahGrid(state.filteredSurahs);
   renderJuzList();
+  // opened at one ayah by another page, or on the surah list; wires the reader's back button
+  handleOpenRequest(openSurah, showSurahList);
 }
 
 function updateQuranText() {

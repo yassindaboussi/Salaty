@@ -67,13 +67,14 @@ function setupHeaderButtons() {
       ipcRenderer.invoke(WINDOW_ACTIONS[btn.dataset.windowAction]),
     );
   });
+  // the target is read on click: a page may change it (the Quran page opened from a verse)
   queryAll("[data-back]", HTMLElement).forEach((btn) => {
-    const target = btn.dataset.back;
-    btn.addEventListener("click", () =>
-      target === "home"
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.back;
+      return target === "home"
         ? ipcRenderer.invoke("go-back")
-        : ipcRenderer.invoke("navigate-to", target),
-    );
+        : ipcRenderer.invoke("navigate-to", target);
+    });
   });
 }
 

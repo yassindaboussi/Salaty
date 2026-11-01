@@ -853,6 +853,18 @@
     unicode-bidi: isolate;
   }
 
+  /* The ayah another page asked for (the 99 Names verses): marked until the page closes */
+  .ayah-text.is-target,
+  .ayah-translation-row.is-target {
+    background: var(--surface-3);
+    border-radius: 6px;
+    box-decoration-break: clone;
+  }
+
+  .ayah-translation-row.is-target {
+    padding-inline: 6px;
+  }
+
   /* ── Translations (shown separately below the Arabic flow, only when a
      translation is selected — keeping the Arabic block itself unbroken) ── */
   .ayah-translation-list {
