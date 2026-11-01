@@ -40,7 +40,8 @@
     .language-card.selected,
     .size-card.selected,
     .theme-card.selected,
-    .category-card.active,
+    .ak-cat[aria-current="true"],
+    .ak-rail-btn[aria-current="true"],
     .quran-tab.active,
     .numerals-btn.active,
     .rm-tab[aria-selected="true"],
@@ -77,7 +78,8 @@
       .language-card.selected,
       .size-card.selected,
       .theme-card.selected,
-      .category-card.active,
+      .ak-cat[aria-current="true"],
+      .ak-rail-btn[aria-current="true"],
       .quran-tab.active,
       .numerals-btn.active,
       .rm-tab[aria-selected="true"],
@@ -116,8 +118,13 @@
     color: Canvas;
   }
 
-  /* a card whose count is complete keeps its contents as they are: marked by its outline */
-  .athkar-card.completed {
+  /* the progress bar: drawn in the text colour */
+  .ak-bar-fill {
+    background: CanvasText;
+  }
+
+  /* a dhikr whose count is complete keeps its contents as they are: marked by its outline */
+  .ak-card.is-done {
     outline: 3px solid Highlight;
     outline-offset: -1px;
   }

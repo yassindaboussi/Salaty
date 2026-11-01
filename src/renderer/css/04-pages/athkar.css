@@ -1,25 +1,20 @@
 @layer pages {
-  /* Athkar container */
+  /* Athkar: the open category's athkar on one side, the search and the categories on the other
+     (mirrored in Arabic), one column in a narrow window with the categories first. As on the
+     tasbih, fasting and 99 Names pages, the states that must always show (the open category,
+     the progress, a dhikr done) are white, not the accent: the theme's accent can be close to
+     its background. */
+
   .athkar-container {
+    position: relative;
+    z-index: var(--z-page);
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 16px;
     gap: 12px;
-    position: relative;
-    z-index: var(--z-page);
-
-    /* This page is Arabic-text-heavy (dhikr, descriptions, references), so use
-       a font stack with real Arabic screen-rendering, not just Inter's fallback. */
-    font-family:
-      "Segoe UI",
-      Tahoma,
-      "Noto Sans Arabic",
-      "Geeza Pro",
-      Inter,
-      -apple-system,
-      BlinkMacSystemFont,
-      sans-serif;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   /* Header: layout comes from the shared .page-header component
@@ -28,1326 +23,593 @@
     z-index: var(--z-page-header);
   }
 
-  /* Dragging over the title does not move the window */
-  .athkar-header .athkar-title {
-    -webkit-app-region: no-drag;
-  }
-
   .athkar-controls {
     z-index: var(--z-page-header-controls);
   }
 
-  /* Reset-all button (only on the Athkar page) */
-  .reset-all-btn {
-    background: rgba(255, 107, 107, 0.15);
-    border: 1px solid rgba(255, 107, 107, 0.2);
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-  }
-
-  .reset-all-btn:hover {
-    background: rgba(255, 107, 107, 0.25);
-    border-color: var(--color-danger);
-  }
-
-  .reset-all-btn i {
-    color: var(--color-danger);
-    font-size: 12px;
-  }
-
-  /* Search bar */
-  .athkar-search {
-    position: relative;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    gap: 8px;
-  }
-
-  /* The icon is positioned against the field, so the toggle button can sit beside it */
-  .athkar-search-field {
-    position: relative;
+  .ak-layout {
     flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-  }
-
-  .athkar-sidebar-toggle {
-    flex-shrink: 0;
-    width: 38px;
-    height: 38px;
+    min-height: 0;
     display: grid;
-    place-items: center;
-    background: var(--surface-1);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    color: var(--text-secondary);
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 12px;
     -webkit-app-region: no-drag;
   }
 
-  .athkar-sidebar-toggle:hover {
+  .ak-main,
+  .ak-panel {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+  }
+
+  /* ── The open category ─────────────────────────────────────────────── */
+
+  .ak-main {
+    padding: 12px 12px 0;
+  }
+
+  .ak-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 30px;
+    padding-inline: 4px;
+  }
+
+  .ak-title-icon {
+    flex-shrink: 0;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .ak-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 700;
     color: var(--text-primary);
-    border-color: var(--accent-color);
-    background: rgba(var(--accent-rgb), 0.12);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .athkar-sidebar-toggle.is-collapsed {
-    color: var(--accent-color);
-    border-color: var(--accent-color);
+  .ak-progress {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
   }
 
-  .athkar-search-icon {
-    position: absolute;
-    inset-inline-start: 12px;
-    font-size: 13px;
-    color: var(--text-secondary);
-    opacity: 0.6;
-    pointer-events: none;
+  .ak-progress.is-complete {
+    color: var(--text-primary);
   }
 
-  .athkar-search-input {
-    width: 100%;
-
-    /* room for the search icon on the start side (left in English, right in Arabic) */
-    padding-block: 9px;
-    padding-inline: 36px 14px;
+  .ak-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
     background: var(--surface-1);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    color: var(--text-primary);
-    font-size: 13px;
-    outline: none;
-    transition: all 0.2s ease;
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
   }
 
-  .athkar-search-input::placeholder {
-    color: var(--text-secondary);
+  .ak-icon-btn[hidden] {
+    display: none;
+  }
+
+  .ak-icon-btn:hover {
+    background: var(--surface-3);
+    color: var(--text-primary);
+  }
+
+  .ak-bar {
+    flex-shrink: 0;
+    height: 4px;
+    margin: 8px 4px 10px;
+    border-radius: 2px;
+    background: var(--white-a10);
+    overflow: hidden;
+  }
+
+  .ak-bar[hidden] {
+    display: none;
+  }
+
+  .ak-bar-fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--text-primary);
+    transition: width 0.3s ease;
+  }
+
+  .ak-list {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 12px;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .ak-empty {
+    margin: 0;
+    padding: 32px 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .ak-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  /* ── A dhikr ───────────────────────────────────────────────────────── */
+
+  .ak-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px 10px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    transition: opacity 0.2s ease;
+  }
+
+  .ak-card.is-done {
     opacity: 0.55;
   }
 
-  .athkar-search-input:focus {
-    background: var(--surface-2);
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
+  .ak-card.is-done:hover,
+  .ak-card.is-done:focus-within {
+    opacity: 0.85;
   }
 
-  /* Two-pane body */
-  .athkar-body {
-    flex: 1;
-    display: flex;
-    gap: 12px;
-    min-height: 0; /* required for children to scroll inside a flex row */
-  }
-
-  .category-nav::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  .category-nav::-webkit-scrollbar-track {
-    background: var(--surface-1);
-    border-radius: 2px;
-  }
-
-  .category-nav::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 2px;
-  }
-
-  .category-nav-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 30px 12px;
-    color: var(--text-secondary);
-    opacity: 0.7;
-    font-size: 12px;
-    text-align: center;
-  }
-
-  .category-nav-empty i {
-    font-size: 20px;
-    opacity: 0.6;
-  }
-
-  /* Group section */
-  .category-group {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .category-group-header {
+  .ak-card-category {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px;
-    background: transparent;
-    border: none;
-    border-radius: 7px;
-    color: var(--text-primary);
-    cursor: pointer;
-    font-size: 12.5px;
-    font-weight: 600;
-    text-align: start;
-    direction: rtl; /* icon/label right, count/chevron left — same fixed rule as everywhere else */
-    -webkit-app-region: no-drag;
-    transition: background 0.15s ease;
-  }
-
-  .category-group-header:hover {
-    background: var(--surface-1);
-  }
-
-  .category-group-icon {
-    font-size: 12px;
-    color: var(--accent-color);
-    flex-shrink: 0;
-    width: 16px;
-    text-align: center;
-  }
-
-  .category-group-label {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .category-group-total {
-    font-size: 10px;
-    color: var(--text-secondary);
-    opacity: 0.7;
-    flex-shrink: 0;
-  }
-
-  .category-group-chevron {
-    font-size: 10px;
-    color: var(--text-secondary);
-    flex-shrink: 0;
-    transition: transform 0.2s ease;
-  }
-
-  .category-group.collapsed .category-group-chevron {
-    transform: rotate(-90deg);
-  }
-
-  .category-group-list {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 2px 4px 8px;
-    overflow: hidden;
-  }
-
-  .category-group.collapsed .category-group-list {
-    display: none;
-  }
-
-  /* Category Cards — now full-width rows inside the sidebar, not grid cells */
-  .category-card {
-    padding: 7px 10px;
-    background: var(--white-a4-5);
-    border: 1px solid transparent;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-
-    /* Always keep the name on the right and the count on the left,
-       regardless of the app's language direction (ar/en/fr). */
-    direction: rtl;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    position: relative;
-    overflow: hidden;
-    min-height: 34px;
-    user-select: none;
-    -webkit-app-region: no-drag;
-    touch-action: manipulation;
-  }
-
-  .category-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--surface-2), transparent);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .category-card:hover {
-    transform: translateY(-1px);
-    background: var(--surface-3);
-    border-color: var(--accent-color);
-    box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.15);
-  }
-
-  .category-card:hover::before {
-    opacity: 1;
-  }
-
-  .category-card.active {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    color: var(--text-bright);
-    box-shadow: 0 2px 12px rgba(var(--accent-rgb), 0.3);
-  }
-
-  .category-card.active::before {
-    background: linear-gradient(135deg, var(--surface-active), transparent);
-    opacity: 1;
-  }
-
-  .category-name {
-    font-size: 13px;
-    font-weight: 500;
-    text-align: start;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-    min-width: 0;
-    color: var(--text-bright);
-    line-height: 1.3;
-  }
-
-  .category-count {
+    gap: 6px;
+    margin: 0;
     font-size: 11px;
-    opacity: 0.8;
-    background: var(--surface-hover);
-    color: var(--text-bright);
-    padding: 2px 7px;
-    border-radius: 6px;
-    font-weight: 500;
-    flex-shrink: 0;
-    margin-inline-start: auto;
-  }
-
-  .category-card.active .category-count {
-    background: var(--white-a30);
-  }
-
-  /* Collapsed sidebar: a narrow icon rail. Each group shows its icon and each
-     category is a count chip; the full name appears as a tooltip on hover. */
-  .category-nav {
-    flex: 0 0 232px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 4px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) var(--white-a10);
-    user-select: none;
-    -webkit-app-region: no-drag;
-    background: var(--black-a12);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    transition: flex-basis 0.2s ease;
-  }
-
-  /* Touch scrolling improvements */
-  .category-nav,
-  .athkar-list {
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  }
-
-  /* Fullscreen mode */
-  .athkar-container.fullscreen .category-nav {
-    flex: 0 0 260px;
-  }
-
-  .athkar-body.sidebar-collapsed .category-nav,
-  .athkar-container.fullscreen .athkar-body.sidebar-collapsed .category-nav {
-    flex: 0 0 56px;
-    align-items: center;
-    padding: 4px 2px;
-    overflow-x: hidden;
-  }
-
-  .athkar-body.sidebar-collapsed .category-group {
-    align-items: center;
-    width: 100%;
-  }
-
-  .athkar-body.sidebar-collapsed .category-group-header {
-    justify-content: center;
-    padding: 8px 0 4px;
-    width: 100%;
-  }
-
-  .athkar-body.sidebar-collapsed .category-group-icon {
-    font-size: 14px;
-    width: auto;
-  }
-
-  .athkar-body.sidebar-collapsed .category-group-label,
-  .athkar-body.sidebar-collapsed .category-group-total,
-  .athkar-body.sidebar-collapsed .category-group-chevron,
-  .athkar-body.sidebar-collapsed .category-name {
-    display: none;
-  }
-
-  /* Groups folded in the expanded view must still show their chips in the rail */
-  .athkar-body.sidebar-collapsed .category-group-list,
-  .athkar-body.sidebar-collapsed
-    .category-group.collapsed
-    .category-group-list {
-    display: flex;
-    align-items: center;
-    padding: 2px 0 6px;
-  }
-
-  .athkar-body.sidebar-collapsed .category-card {
-    width: 40px;
-    min-height: 32px;
-    padding: 4px;
-    justify-content: center;
-  }
-
-  .athkar-body.sidebar-collapsed .category-count {
-    margin-inline-start: 0;
-    min-width: 26px;
-    text-align: center;
-    font-size: 12px;
-    opacity: 1;
-  }
-
-  /* Athkar content (the scrolling area) */
-  .athkar-content {
-    flex: 1;
-    position: relative;
-    background: var(--black-a20);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 0;
-    border: 1px solid var(--border-color);
-    min-height: 200px;
-    -webkit-app-region: no-drag;
-  }
-
-  .athkar-loading {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--black-a85);
-    backdrop-filter: blur(10px);
-    z-index: 10;
-  }
-
-  .athkar-loading-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    padding: 20px;
-    text-align: center;
-    background: var(--surface-1);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 20px var(--black-a30);
-  }
-
-  .athkar-loading-content i {
-    font-size: 24px;
-    color: var(--accent-color);
-    opacity: 0.9;
-  }
-
-  .athkar-loading-content span {
-    font-size: 14px;
-    color: var(--text-primary);
-    font-weight: 500;
-  }
-
-  /* Gentle, respectful loading state — a soft breathing glow instead of a spinning book */
-  .athkar-loading-icon {
-    animation: athkar-loading-breathe 1.8s ease-in-out infinite;
-  }
-
-  @keyframes athkar-loading-breathe {
-    0%,
-    100% {
-      opacity: 0.55;
-      transform: scale(1);
-    }
-
-    50% {
-      opacity: 1;
-      transform: scale(1.08);
-    }
-  }
-
-  .athkar-loading-dots {
-    display: inline-flex;
-    gap: 5px;
-  }
-
-  .athkar-loading-dots span {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--accent-color);
-    opacity: 0.35;
-    animation: athkar-loading-dot 1.2s ease-in-out infinite;
-  }
-
-  .athkar-empty span {
-    font-size: 14px;
-    opacity: 0.7;
-  }
-
-  .athkar-loading-dots span:nth-child(2) {
-    animation-delay: 0.15s;
-  }
-
-  .athkar-loading-dots span:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-
-  @keyframes athkar-loading-dot {
-    0%,
-    80%,
-    100% {
-      opacity: 0.35;
-      transform: translateY(0);
-    }
-
-    40% {
-      opacity: 1;
-      transform: translateY(-3px);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .athkar-loading-icon,
-    .athkar-loading-dots span {
-      animation: none;
-    }
-  }
-
-  /* Force scrollbar to always be on right side */
-  .athkar-list {
-    height: 100%;
-    overflow-y: auto;
-    padding: 12px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-    -webkit-app-region: no-drag;
-    user-select: none;
-    direction: ltr;
-    scrollbar-gutter: stable;
-  }
-
-  .athkar-list::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .athkar-list::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 3px;
-  }
-
-  .athkar-list::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 3px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-  }
-
-  .athkar-list::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-color);
-    opacity: 0.9;
-  }
-
-  /* Athkar Card */
-  .athkar-card {
-    background: linear-gradient(135deg, var(--white-a04), var(--white-a01));
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 10px;
-    border: 1px solid var(--border-soft);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    -webkit-app-region: no-drag;
-  }
-
-  .athkar-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent-color), transparent);
-    opacity: 0.5;
-    transition: opacity 0.2s ease;
-  }
-
-  .athkar-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent-color);
-    box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.15);
-  }
-
-  .athkar-card:hover::before {
-    opacity: 1;
-  }
-
-  /* For ALL languages: Hashtag on right, Copy button on left */
-  .athkar-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border-soft);
-    flex-direction: row-reverse; /* Reverse for ALL languages */
-  }
-
-  /* Adjust hashtag alignment for RTL languages */
-
-  .athkar-category {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: var(--white-a12);
-    color: var(--text-bright);
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 13px;
     font-weight: 600;
-    letter-spacing: 0;
-    border: 1px solid var(--white-a20);
-  }
-
-  [dir="rtl"] .athkar-category,
-  [lang="ar"] .athkar-category,
-  [lang="fa"] .athkar-category,
-  [lang="ur"] .athkar-category,
-  [lang="he"] .athkar-category {
-    flex-direction: row-reverse; /* Reverse hashtag icon for RTL */
-  }
-
-  .athkar-category i {
-    font-size: 10px;
-  }
-
-  .athkar-actions {
-    display: flex;
-    gap: 4px;
-  }
-
-  .athkar-action-btn {
-    width: 24px;
-    height: 24px;
-    border-radius: 5px;
-    border: 1px solid var(--border-medium);
-    background: var(--white-a07);
-    color: var(--text-secondary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Prevent drag on scrollable areas */
-  .category-nav *,
-  .athkar-list *,
-  .athkar-card *,
-  .athkar-action-btn,
-  .count-btn {
-    -webkit-app-region: no-drag;
-  }
-
-  .athkar-action-btn:hover {
-    background: var(--surface-hover);
-    color: var(--text-primary);
-    border-color: var(--accent-color);
-    transform: translateY(-1px);
-  }
-
-  .athkar-action-btn i {
-    font-size: 10px;
-  }
-
-  /* Athkar Content Text - ALWAYS RTL for Arabic text */
-  .athkar-content-text {
-    font-size: 18px;
-    line-height: 1.8;
-    color: var(--text-primary);
-    margin-bottom: 10px;
-    text-align: right; /* Always right-aligned for Arabic */
-    font-family: var(--font-arabic);
-    direction: rtl; /* Always RTL for Arabic text */
-    font-weight: 500;
-    position: relative;
-    padding: 0 4px;
-    min-height: auto;
-  }
-
-  .athkar-content-text::before {
-    content: '"';
-    position: absolute;
-    top: -8px;
-    right: -6px;
-    font-size: 24px;
-    color: var(--accent-color);
-    opacity: 0.3;
-    font-family: serif;
-  }
-
-  /* Athkar Description - ALWAYS RTL for Arabic text */
-  .athkar-description {
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-    padding: 6px 8px;
-    background: var(--white-a04);
-    border-radius: 6px;
-    border-right: 2px solid var(--accent-color); /* Always on right */
-    font-style: italic;
-    text-align: right; /* Always right-aligned */
-    direction: rtl; /* Always RTL */
-
-    /* Each paragraph takes its direction from its own first letter: Arabic stays RTL,
-       English/French read LTR, so the closing full stop stays at the end of the sentence
-       instead of jumping to the left edge. Alignment above is unchanged. */
-    unicode-bidi: plaintext;
-  }
-
-  /* Count Controls - REORDERED LAYOUT */
-  .athkar-count-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 10px;
-    padding-top: 8px;
-    border-top: 1px solid var(--border-soft);
-    gap: 8px;
-    flex-direction: row-reverse; /* Reverse order: buttons on right, count on left */
-  }
-
-  .count-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 60px;
-    order: 2; /* Move to end (left side) */
-  }
-
-  .count-label {
-    font-size: 11px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    text-align: left; /* Always left-aligned */
-  }
-
-  .count-display {
-    display: flex;
-    align-items: baseline;
-    gap: 2px;
-    justify-content: flex-start; /* Align to left */
-  }
-
-  .count-value {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--accent-color);
-    font-feature-settings:
-      "tnum" on,
-      "lnum" on;
-    line-height: 1;
-  }
-
-  .count-target {
-    font-size: 11px;
-    color: var(--text-secondary);
-    margin-inline-start: 2px;
-    opacity: 0.7;
-  }
-
-  /* Progress Bar */
-  .count-progress {
-    flex: 1;
-    min-width: 80px;
-    max-width: 100px;
-    background: var(--surface-2);
-    height: 3px;
-    border-radius: 1.5px;
-    overflow: hidden;
-    margin: 0 4px;
-    order: 1; /* Middle */
-  }
-
-  .progress-bar {
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      var(--accent-color),
-      var(--color-success)
-    );
-    border-radius: 1.5px;
-    transition: width 0.2s ease;
-  }
-
-  /* Used for dhikr with no fixed hadith-based count — hides the progress bar
-     since there's no target to fill toward */
-  .athkar-count-hidden {
-    visibility: hidden;
-  }
-
-  /* Count Buttons - Always on right side */
-  .count-buttons {
-    display: flex;
-    gap: 4px;
-    min-width: 100px;
-    justify-content: flex-start; /* Align to left (but in reversed layout this becomes right) */
-    order: 0; /* First (right side in reversed layout) */
-  }
-
-  .count-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 7px;
-    border: none;
-    background: linear-gradient(
-      135deg,
-      var(--accent-color),
-      rgba(var(--accent-rgb), 0.8)
-    );
-    color: var(--text-bright);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.3);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .count-btn::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, transparent, var(--surface-active));
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .count-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.4);
-  }
-
-  .count-btn:hover::before {
-    opacity: 1;
-  }
-
-  .count-btn:active {
-    transform: translateY(0);
-  }
-
-  .count-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-
-  .count-btn:disabled:hover::before {
-    opacity: 0;
-  }
-
-  .reset-btn {
-    background: linear-gradient(
-      135deg,
-      var(--color-danger),
-      var(--color-danger-strong)
-    );
-    box-shadow: var(--shadow-danger-sm);
-    width: 28px;
-    font-size: 10px;
-  }
-
-  .reset-btn:hover {
-    box-shadow: var(--shadow-danger-md);
-  }
-
-  .decrement-btn {
-    background: var(--surface-2);
-    box-shadow: none;
-    border: 1px solid var(--border-strong);
-    color: var(--text-secondary);
-  }
-
-  .decrement-btn:hover {
-    background: var(--surface-hover);
-    box-shadow: none;
-    color: var(--text-primary);
-  }
-
-  .decrement-btn:disabled {
-    opacity: 0.35;
-  }
-
-  /* Completed State */
-  .athkar-card.completed {
-    background: linear-gradient(
-      135deg,
-      rgba(76, 217, 100, 0.08),
-      rgba(76, 217, 100, 0.04)
-    );
-    border-color: rgba(76, 217, 100, 0.3);
-  }
-
-  .athkar-card.completed::before {
-    background: linear-gradient(90deg, var(--color-success), transparent);
-  }
-
-  .athkar-card.completed .count-value {
-    color: var(--color-success);
-  }
-
-  .athkar-card.completed .progress-bar {
-    background: linear-gradient(90deg, var(--color-success), #2ecc71);
-  }
-
-  .athkar-card.completed .count-btn.increment-btn {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  /* Reference - ALWAYS RTL for Arabic text */
-  .athkar-reference {
-    font-size: 12.5px;
-    line-height: 1.6;
     color: var(--text-faint);
-    margin-top: 6px;
-    font-style: italic;
-    text-align: right; /* Always right-aligned */
-    direction: rtl; /* Always RTL */
-    padding: 5px 9px;
-    background: var(--white-a02);
-    border-radius: 4px;
-    border-right: 1px solid var(--accent-color); /* Always on right */
   }
 
-  /* Selectable text. The app and the list are user-select:none so that clicks and drags
-     on controls never highlight anything; only the readable content opts back in.
-     Buttons, counters, the category tag and the grade badge stay unselectable, so a
-     copied reference doesn't start with a stray "Sahih". */
-  .athkar-content-text,
-  .athkar-description,
-  .athkar-reference {
+  .ak-text {
+    margin: 0;
+    font-family: var(--font-arabic);
+    font-size: 21px;
+    line-height: 2;
+    color: var(--text-primary);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .ak-note {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* the dhikr and its note can be selected and copied (the app is user-select: none) */
+  .ak-text,
+  .ak-note {
     user-select: text;
     cursor: text;
   }
 
-  .athkar-content-text::selection,
-  .athkar-description::selection,
-  .athkar-reference::selection,
-  .athkar-content-text *::selection,
-  .athkar-description *::selection,
-  .athkar-reference *::selection {
+  :is(.ak-text, .ak-note)::selection {
     background: rgba(var(--accent-rgb), 0.45);
     color: var(--text-bright);
   }
 
-  /* Athkar Footer */
-  .athkar-footer {
-    padding-top: 12px;
-    border-top: 1px solid var(--border-color);
-    text-align: center;
-  }
-
-  .athkar-footer-text.athkar-footer-verified {
-    margin-top: 4px;
-    font-size: 11px;
-  }
-
-  .athkar-footer-text {
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-style: italic;
-    opacity: 0.8;
-    background: linear-gradient(
-      135deg,
-      var(--text-secondary),
-      rgba(var(--accent-rgb), 0.8)
-    );
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Empty State */
-  .athkar-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: var(--text-secondary);
-    text-align: center;
-    padding: 30px 20px;
-    gap: 16px;
-  }
-
-  .athkar-empty i {
-    font-size: 32px;
-    opacity: 0.3;
-    color: var(--accent-color);
-  }
-
-  /* Custom Confirm Dialog */
-  .athkar-confirm-dialog {
-    position: fixed;
-    inset: 0;
-    background: var(--black-a70);
-    backdrop-filter: blur(5px);
+  .ak-card-foot {
     display: flex;
     align-items: center;
-    justify-content: center;
-    z-index: var(--z-dialog);
-    padding: 20px;
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-subtle);
   }
 
-  .athkar-confirm-box {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
-    max-width: 300px;
-    width: 100%;
-    box-shadow: 0 8px 32px var(--black-a30);
-    animation: fade-in-scale 0.2s ease;
+  .ak-ref {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    font-size: 11.5px;
+    color: var(--text-faint);
   }
 
-  .athkar-confirm-title {
-    font-size: 16px;
+  .ak-grade {
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--surface-3);
+    font-size: 10.5px;
     font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 12px;
-    text-align: center;
+    color: var(--text-muted);
   }
 
-  .athkar-confirm-message {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-bottom: 20px;
-    text-align: center;
-    line-height: 1.5;
-  }
-
-  .athkar-confirm-buttons {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-  }
-
-  .athkar-confirm-btn {
-    padding: 8px 20px;
-    border-radius: 8px;
+  /* A source: a link to sunnah.com or to the Quran page */
+  .ak-source {
+    padding: 0;
     border: none;
-    font-size: 13px;
-    font-weight: 500;
+    background: none;
+    color: var(--text-muted);
+    font: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--white-a40);
+    text-underline-offset: 2px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 80px;
   }
 
-  .athkar-confirm-cancel {
+  .ak-source:hover {
+    color: var(--text-primary);
+    text-decoration-color: currentcolor;
+  }
+
+  /* The counter: "count / target" in a button like copy and undo (a tick once done) */
+  .ak-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 52px;
+    height: 30px;
+    padding: 0 10px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  .ak-count:hover:not([aria-disabled="true"]) {
     background: var(--surface-3);
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
   }
 
-  .athkar-confirm-cancel:hover {
+  .ak-count[aria-disabled="true"] {
+    color: var(--text-primary);
+    cursor: default;
+  }
+
+  /* ── The search and the categories ─────────────────────────────────── */
+
+  .ak-panel {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .ak-panel-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ak-panel-heading {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding-inline-start: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .ak-panel-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ak-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .ak-search-icon {
+    position: absolute;
+    inset-inline-start: 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  .ak-search-input {
+    width: 100%;
+    padding-block: 7px;
+    padding-inline: 30px;
+    border: 1px solid var(--border-medium);
+    border-radius: 10px;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  .ak-search-input::placeholder {
+    color: var(--text-faint);
+  }
+
+  .ak-search-input:focus-visible {
+    border-color: var(--white-a40);
+  }
+
+  .ak-search-input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .ak-search-clear {
+    position: absolute;
+    inset-inline-end: 6px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .ak-search-clear[hidden] {
+    display: none;
+  }
+
+  .ak-search-clear:hover {
+    background: var(--surface-3);
+    color: var(--text-primary);
+  }
+
+  .ak-nav {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .ak-section-title {
+    margin: 6px 0 4px;
+    padding-inline: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+  }
+
+  .ak-section-title:not(:first-child) {
+    margin-top: 14px;
+  }
+
+  [lang="ar"] .ak-section-title {
+    font-size: 12px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .ak-cats {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ak-cat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 7px 8px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .ak-cat:hover {
+    background: var(--surface-3);
+  }
+
+  .ak-cat[aria-current="true"] {
+    border-color: var(--white-a40);
     background: var(--surface-hover);
   }
 
-  .athkar-confirm-reset {
-    background: linear-gradient(
-      135deg,
-      var(--color-danger),
-      var(--color-danger-strong)
-    );
-    color: var(--text-bright);
-    box-shadow: var(--shadow-danger-sm);
+  .ak-cat-icon {
+    flex-shrink: 0;
+    width: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
   }
 
-  .athkar-confirm-reset:hover {
-    background: linear-gradient(135deg, var(--color-danger-strong), #ff3838);
-    box-shadow: var(--shadow-danger-md);
+  .ak-cat-label {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.35;
   }
 
-  /* Scrollbar styling for better visibility */
-  .athkar-list::-webkit-scrollbar-thumb:active {
-    background: var(--accent-color);
-    opacity: 1;
+  .ak-cat-progress {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
   }
 
-  /* Category name follows the reading direction so it stays inline with the count */
-
-  .athkar-container.fullscreen .athkar-card {
-    padding: 20px;
-    margin-bottom: 16px;
+  .ak-cat.is-complete .ak-cat-progress {
+    color: var(--text-primary);
   }
 
-  .athkar-container.fullscreen .athkar-content-text {
-    font-size: 20px;
-    line-height: 1.9;
+  /* ── The panel folded to the edge: a strip of icons ───────────────── */
+
+  .ak-panel-toggle,
+  .ak-rail-btn {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
   }
 
-  .athkar-container.fullscreen .athkar-description {
-    font-size: 16px;
+  .ak-panel-toggle:hover,
+  .ak-rail-btn:hover {
+    background: var(--surface-3);
   }
 
-  .athkar-container.fullscreen .count-value {
-    font-size: 24px;
+  .ak-rail-btn[aria-current="true"] {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
   }
 
-  .athkar-container.fullscreen .count-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
+  /* the arrows point to the edge the panel folds to (mirrored in Arabic) */
+  [dir="rtl"] .ak-panel-toggle i {
+    transform: scaleX(-1);
   }
 
-  .athkar-container.fullscreen .athkar-list {
-    padding: 20px;
+  .ak-rail {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-height: 0;
+    overflow: hidden auto;
+    scrollbar-width: none;
   }
 
-  /* ========== RESPONSIVE DESIGN ========== */
+  .ak-layout.is-panel-folded {
+    grid-template-columns: minmax(0, 1fr) 58px;
+  }
 
-  /* Tablet (768px and below) */
-  @media (width <= 768px) {
-    .athkar-container {
+  .ak-layout.is-panel-folded .ak-panel {
+    align-items: center;
+    padding: 12px 0;
+  }
+
+  .ak-layout.is-panel-folded .ak-panel-heading,
+  .ak-layout.is-panel-folded .ak-panel-body {
+    display: none;
+  }
+
+  .ak-layout.is-panel-folded .ak-rail {
+    display: flex;
+  }
+
+  .ak-layout.is-panel-folded .ak-panel-toggle i {
+    transform: rotate(180deg);
+  }
+
+  [dir="rtl"] .ak-layout.is-panel-folded .ak-panel-toggle i {
+    transform: none;
+  }
+
+  /* ── Narrow window: one column, the categories first, the page scrolls ── */
+
+  @media (width <= 700px) {
+    .ak-layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-rows: max-content;
+      overflow: hidden auto;
+    }
+
+    .ak-panel {
+      order: -1;
+    }
+
+    /* one column: nothing to fold */
+    .ak-layout.is-panel-folded {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ak-panel-toggle,
+    .ak-layout.is-panel-folded .ak-rail {
+      display: none;
+    }
+
+    .ak-layout.is-panel-folded .ak-panel {
+      align-items: stretch;
       padding: 12px;
-      gap: 8px;
     }
 
-    /* Reset All Button responsive for tablet */
-    .reset-all-btn {
-      width: 28px;
-      height: 28px;
+    .ak-layout.is-panel-folded .ak-panel-heading,
+    .ak-layout.is-panel-folded .ak-panel-body {
+      display: flex;
     }
 
-    .athkar-header .reset-all-btn i {
-      font-size: 10px;
+    .ak-nav,
+    .ak-list {
+      overflow: visible;
     }
 
-    .athkar-body {
-      flex-direction: column;
-    }
-
-    .category-nav {
-      flex: 0 0 auto;
-      max-height: 170px;
-      flex-flow: row nowrap;
-      overflow-x: auto;
-    }
-
-    .category-group {
-      flex: 0 0 auto;
-      min-width: 150px;
-    }
-
-    .category-card {
-      padding: 6px 8px;
-      min-height: 38px;
-    }
-
-    .category-name {
-      font-size: 12px;
-    }
-
-    .category-count {
-      font-size: 10px;
-    }
-
-    .athkar-card {
-      padding: 10px;
-    }
-
-    .athkar-content-text {
-      font-size: 16px;
-    }
-
-    .athkar-description {
-      font-size: 13px;
-    }
-
-    .count-value {
-      font-size: 16px;
-    }
-
-    .count-btn {
-      width: 24px;
-      height: 24px;
-      font-size: 12px;
-    }
-
-    .reset-btn {
-      width: 24px;
-      font-size: 9px;
+    .ak-cats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     }
   }
 
-  /* Mobile (480px and below) */
   @media (width <= 480px) {
     .athkar-container {
       padding: 8px;
-      gap: 6px;
-    }
-
-    /* Reset All Button responsive for mobile */
-    .reset-all-btn {
-      width: 24px;
-      height: 24px;
-    }
-
-    .athkar-header .reset-all-btn i {
-      font-size: 9px;
-    }
-
-    .category-nav {
-      max-height: 140px;
-      gap: 3px;
-    }
-
-    .category-card {
-      padding: 5px 7px;
-      min-height: 34px;
-    }
-
-    .category-name {
-      font-size: 11px;
-    }
-
-    .athkar-list {
-      padding: 8px;
-    }
-
-    .athkar-content-text {
-      font-size: 15px;
-      line-height: 1.7;
-    }
-
-    .count-buttons {
-      min-width: 92px;
-      gap: 3px;
+      gap: 8px;
     }
   }
 
-  /* Very Small Mobile (320px and below) */
-  @media (width <= 320px) {
-    /* Reset All Button responsive for very small mobile */
-    .reset-all-btn {
-      width: 22px;
-      height: 22px;
+  @media (prefers-reduced-motion: reduce) {
+    .ak-card,
+    .ak-bar-fill {
+      transition: none;
     }
-
-    .athkar-header .reset-all-btn i {
-      font-size: 8px;
-    }
-
-    .category-nav {
-      max-height: 120px;
-      gap: 3px;
-    }
-
-    .category-group-label,
-    .category-group-total {
-      font-size: 10px;
-    }
-
-    .category-name {
-      font-size: 10px;
-    }
-  }
-
-  /* ===== Authenticity grade badge =====
-     Shows at a glance whether a dhikr is sahih, hasan, weak, disputed, an
-     athar (a saying of a Companion/Tabi'i rather than the Prophet ﷺ), or a
-     Quranic dua. Colour-coded so a weak or disputed narration is never
-     mistaken for an authenticated one. */
-  .athkar-grade {
-    user-select: none;
-    cursor: default;
-    display: inline-block;
-    font-size: 10.5px;
-    font-weight: 700;
-    font-style: normal;
-    padding: 1px 7px;
-    border-radius: 4px;
-    margin-inline-end: 6px;
-    vertical-align: middle;
-    letter-spacing: 0;
-    white-space: nowrap;
-  }
-
-  .athkar-grade-sahih {
-    background: rgba(76, 217, 100, 0.16);
-    color: #6ee787;
-    border: 1px solid rgba(76, 217, 100, 0.3);
-  }
-
-  .athkar-grade-hasan {
-    background: rgba(90, 170, 255, 0.16);
-    color: #7cc0ff;
-    border: 1px solid rgba(90, 170, 255, 0.3);
-  }
-
-  .athkar-grade-quran {
-    background: rgba(180, 140, 255, 0.16);
-    color: #c4a6ff;
-    border: 1px solid rgba(180, 140, 255, 0.3);
-  }
-
-  .athkar-grade-athar,
-  .athkar-grade-unspecified {
-    background: var(--surface-2);
-    color: var(--white-a65);
-    border: 1px solid var(--white-a16);
-  }
-
-  .athkar-grade-mukhtalaf {
-    background: rgba(255, 190, 60, 0.16);
-    color: #ffcf70;
-    border: 1px solid rgba(255, 190, 60, 0.32);
-  }
-
-  .athkar-grade-daif {
-    background: rgba(255, 110, 110, 0.16);
-    color: #ff9a9a;
-    border: 1px solid rgba(255, 110, 110, 0.32);
   }
 }

@@ -9,8 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="athkar">Athkar - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
-    <link rel="stylesheet" href="../../css/04-pages/athkar.css" />
+    <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
     <link rel="stylesheet" href="../../css/03-components/success-toast.css" />
+    <link rel="stylesheet" href="../../css/04-pages/athkar.css" />
   </head>
   <body class="page-loading">
     <div class="app-container" id="app">
@@ -23,97 +24,93 @@
           data-controls-class="athkar-controls"
           data-back="features"
         >
-          <h1
-            class="page-header__title athkar-title"
-            id="athkarTitle"
-            data-i18n="athkar"
-          >
+          <h1 class="page-header__title" id="athkarTitle" data-i18n="athkar">
             Athkar
           </h1>
-          <button
-            type="button"
-            class="control-btn reset-all-btn"
-            id="resetAllBtn"
-            data-tooltip="tooltipResetAll"
-            data-header-control
-          >
-            <i class="fas fa-redo" aria-hidden="true"></i>
-          </button>
         </header>
 
-        <!-- Search -->
-        <div class="athkar-search">
-          <button
-            class="athkar-sidebar-toggle"
-            id="sidebarToggleBtn"
-            type="button"
-            data-tooltip="tooltipCollapseSidebar"
-          >
-            <i class="fas fa-table-columns" aria-hidden="true"></i>
-          </button>
-          <div class="athkar-search-field">
-            <i
-              class="fas fa-magnifying-glass athkar-search-icon"
-              aria-hidden="true"
-            ></i>
-            <input
-              type="text"
-              id="athkarSearchInput"
-              data-i18n-placeholder="searchAthkar"
-              data-i18n-aria-label="searchAthkar"
-              class="athkar-search-input"
-              placeholder="Search for a dhikr or dua..."
-              autocomplete="off"
-            />
-          </div>
-        </div>
+        <main class="ak-layout" id="akLayout">
+          <!-- The open category, or the search results -->
+          <section class="ak-main" aria-labelledby="akTitle">
+            <div class="ak-head">
+              <i
+                class="fas fa-sun ak-title-icon"
+                id="akTitleIcon"
+                aria-hidden="true"
+              ></i>
+              <h2 class="ak-title" id="akTitle"></h2>
+              <span class="ak-progress" id="akProgress"></span>
+              <button
+                type="button"
+                class="ak-icon-btn"
+                id="akReset"
+                data-tooltip="akResetCategory"
+              >
+                <i class="fas fa-rotate" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="ak-bar" id="akBar">
+              <span class="ak-bar-fill" id="akBarFill"></span>
+            </div>
+            <div class="ak-list" id="akList"></div>
+            <p class="ak-live" id="akLive" aria-live="polite"></p>
+          </section>
 
-        <!-- Two-pane body: category sidebar + athkar content -->
-        <main class="athkar-body">
-          <!-- Category Navigation (grouped, collapsible sidebar) -->
-          <div class="category-nav" id="categoryNav">
-            <!-- Groups + categories will be dynamically loaded -->
-          </div>
+          <!-- The search and the categories -->
+          <aside class="ak-panel">
+            <div class="ak-panel-head">
+              <h2 class="ak-panel-heading" data-i18n="akCategories">
+                Categories
+              </h2>
+              <button
+                type="button"
+                class="ak-panel-toggle"
+                id="akPanelToggle"
+                aria-controls="akPanelBody"
+                aria-expanded="true"
+                data-tooltip="akPanelHide"
+              >
+                <i class="fas fa-angles-right" aria-hidden="true"></i>
+              </button>
+            </div>
 
-          <!-- Athkar Content -->
-          <div class="athkar-content">
-            <div class="athkar-loading" id="athkarLoading">
-              <div class="athkar-loading-content">
+            <!-- folded: a strip of icons (search, then one per category) -->
+            <div class="ak-rail" id="akRail"></div>
+
+            <div class="ak-panel-body" id="akPanelBody">
+              <div class="ak-search" role="search">
                 <i
-                  class="fas fa-book-open athkar-loading-icon"
+                  class="fas fa-magnifying-glass ak-search-icon"
                   aria-hidden="true"
                 ></i>
-                <span class="athkar-loading-dots" aria-hidden="true"
-                  ><span></span><span></span><span></span
-                ></span>
-                <span id="loadingText" data-i18n="loadingAthkar"
-                  >Loading Athkar...</span
+                <input
+                  type="search"
+                  class="ak-search-input"
+                  id="akSearch"
+                  autocomplete="off"
+                  spellcheck="false"
+                  data-i18n-placeholder="searchAthkar"
+                  data-i18n-aria-label="searchAthkar"
+                  placeholder="Search for a dhikr or dua..."
+                />
+                <button
+                  type="button"
+                  class="ak-search-clear"
+                  id="akSearchClear"
+                  data-tooltip="akClearSearch"
+                  hidden
                 >
+                  <i class="fas fa-xmark" aria-hidden="true"></i>
+                </button>
               </div>
+              <nav
+                class="ak-nav"
+                id="akNav"
+                data-i18n-aria-label="akCategories"
+              ></nav>
             </div>
-
-            <div class="athkar-list" id="athkarList">
-              <!-- Athkar cards will be loaded here -->
-            </div>
-          </div>
+          </aside>
         </main>
-
-        <footer class="athkar-footer">
-          <div
-            class="athkar-footer-text"
-            id="athkarFooterText"
-            data-i18n="remembrancesFromSunnah"
-          >
-            Remembrances from the Sunnah
-          </div>
-          <div
-            class="athkar-footer-text athkar-footer-verified"
-            id="athkarFooterVerified"
-            data-i18n="hadithVerifiedFooter"
-          >
-            Hadith references verified against sunnah.com
-          </div>
-        </footer>
       </div>
     </div>
 

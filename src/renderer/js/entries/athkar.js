@@ -1,7 +1,7 @@
 "use strict";
 
 const { startPageWhenReady } = require("../app/app-shell");
-const { initAthkarPage } = require("../pages/athkar");
+const { initAthkarPage } = require("../pages/athkar/index");
 
 startPageWhenReady({
   init: initAthkarPage,

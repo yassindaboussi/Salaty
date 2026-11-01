@@ -1,79 +1,145 @@
 "use strict";
 
 // The Athkar page. Its parts:
-//   category-nav.js   the grouped, searchable category list in the sidebar
-//   sidebar.js        folding the sidebar into an icon rail (remembered)
-//   athkar-list.js    the chosen category's adhkar, one card each
-//   counter.js        counting recitations (+, −, reset) and updating a card
-//   reset-dialog.js   the "reset all counts" confirmation
-//   loader.js         loading the bundled adhkar, error + retry
-//   categories.js     the category groups, category names in the app language
-//   feedback.js       toast messages, copying a dhikr
-//   state.js          what is shown now, the saved counts
-const { t } = require("../../core/i18n");
+//   panel.js       the search and the categories, with today's progress of each
+//   panel-fold.js  the panel folded to a strip of icons (remembered)
+//   list.js        the open category (or the search results): its progress and its cards
+//   counter.js     counting, undo, reset of a category, moving on to the next dhikr
+//   opening.js     the category the page opens on (by the time of day)
+//   categories.js  the categories' sections, icons and names
+//   references.js  the sources as links (sunnah.com, the Quran page)
+//   feedback.js    the copy toast, screen-reader announcements
+//   state.js       the adhkar (data/adkar.json), what is shown, today's counts
+// Everything is bundled, so there is nothing to reload when the connection returns.
+const { ipcRenderer } = require("electron");
 const { initSelectionCopy } = require("../../components/selection-copy");
-const { queryAll } = require("../../core/dom");
-const { state, loadAthkarState } = require("./state");
+const { byId } = require("../../core/dom");
 const {
-  wideScreen,
-  loadSidebarPref,
-  applySidebarState,
-  setSidebarCollapsed,
-} = require("./sidebar");
-const { populateCategoryNav } = require("./category-nav");
-const { loadAthkarData } = require("./loader");
-const { showResetConfirm } = require("./reset-dialog");
+  state,
+  loadData,
+  loadCounts,
+  rememberCategory,
+  RETURN_KEY,
+} = require("./state");
+const { openingCategory } = require("./opening");
+const { renderPanel } = require("./panel");
+const { bindPanelFold } = require("./panel-fold");
+const { renderList } = require("./list");
+const { count, undo, resetCategory, checkNewDay } = require("./counter");
 const { copyAthkar } = require("./feedback");
 
-// The adhkar are bundled (data/adkar.json), so nothing needs reloading when the connection returns.
-function initAthkarPage() {
-  const resetAllBtn = document.getElementById("resetAllBtn");
-  if (resetAllBtn) {
-    resetAllBtn.addEventListener("click", showResetConfirm);
-  }
-
-  const searchInput = document.getElementById("athkarSearchInput");
-  if (searchInput instanceof HTMLInputElement) {
-    searchInput.addEventListener("input", () => {
-      state.searchQuery = searchInput.value || "";
-      populateCategoryNav();
-      // Keep the active card highlighted in the sidebar if it's still visible
-      queryAll(".category-card", HTMLElement).forEach((card) => {
-        card.classList.toggle(
-          "active",
-          card.dataset.category === state.currentCategory,
-        );
-      });
-    });
-  }
-
-  state.sidebarCollapsed = loadSidebarPref();
-  const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
-  // initAthkarPage can run again after a connection recovery; bind only once so
-  // a second listener doesn't toggle the sidebar twice per click.
-  if (sidebarToggleBtn && !sidebarToggleBtn.dataset.bound) {
-    sidebarToggleBtn.dataset.bound = "1";
-    sidebarToggleBtn.addEventListener("click", () =>
-      setSidebarCollapsed(!state.sidebarCollapsed),
-    );
-    wideScreen.addEventListener("change", applySidebarState);
-  }
-
-  initSelectionCopy(document.getElementById("athkarList"), copyAthkar);
-
-  updateAthkarUI();
-  applySidebarState();
-
-  loadAthkarData();
-
-  loadAthkarState();
+/** @param {string} category */
+function openCategory(category) {
+  state.category = category;
+  rememberCategory(category);
+  clearSearch(false);
+  renderPanel();
+  renderList();
 }
 
-function updateAthkarUI() {
-  const resetAllBtn = document.getElementById("resetAllBtn");
-  if (resetAllBtn) {
-    resetAllBtn.setAttribute("aria-label", t("resetAll"));
+/** @param {boolean} focus */
+function clearSearch(focus) {
+  const input = byId("akSearch", HTMLInputElement);
+  input.value = "";
+  state.query = "";
+  byId("akSearchClear", HTMLButtonElement).hidden = true;
+  if (focus) {
+    renderPanel();
+    renderList();
+    input.focus();
   }
+}
+
+function bindSearch() {
+  const input = byId("akSearch", HTMLInputElement);
+  input.addEventListener("input", () => {
+    state.query = input.value;
+    byId("akSearchClear", HTMLButtonElement).hidden = !input.value;
+    renderPanel(); // no category is marked open while searching
+    renderList();
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && input.value) {
+      e.preventDefault();
+      clearSearch(true);
+    }
+  });
+  byId("akSearchClear", HTMLButtonElement).addEventListener("click", () =>
+    clearSearch(true),
+  );
+}
+
+// A hadith opens on sunnah.com; a verse opens the Quran page at that ayah, whose back button
+// returns here, on the same category (sessionStorage, read by opening.js).
+/** @param {HTMLButtonElement} source */
+function openSource(source) {
+  const { href, surah, ayah } = source.dataset;
+  if (href) {
+    ipcRenderer.invoke("open-external", href);
+    return;
+  }
+  try {
+    sessionStorage.setItem(
+      "quranOpenAyah",
+      JSON.stringify({
+        surah: Number(surah),
+        ayah: Number(ayah),
+        back: "athkar",
+      }),
+    );
+    if (!state.query.trim()) sessionStorage.setItem(RETURN_KEY, state.category);
+  } catch {
+    // storage unavailable: the Quran page opens on its list
+  }
+  ipcRenderer.invoke("navigate-to", "quran");
+}
+
+function bindActions() {
+  byId("akNav", HTMLElement).addEventListener("click", (e) => {
+    const row = /** @type {Element} */ (e.target).closest(".ak-cat");
+    if (row instanceof HTMLButtonElement && row.dataset.category) {
+      openCategory(row.dataset.category);
+    }
+  });
+
+  byId("akList", HTMLElement).addEventListener("click", (e) => {
+    const source = /** @type {Element} */ (e.target).closest(".ak-source");
+    if (source instanceof HTMLButtonElement) {
+      openSource(source);
+      return;
+    }
+    const button = /** @type {Element} */ (e.target).closest("[data-action]");
+    if (!(button instanceof HTMLButtonElement)) return;
+    const { action, id = "" } = button.dataset;
+    if (action === "count") count(id);
+    else if (action === "undo") undo(id);
+    else if (action === "copy") {
+      const card = button.closest(".ak-card");
+      const text = card?.querySelector(".ak-text")?.textContent ?? "";
+      const ref = card?.querySelector(".ak-ref bdi")?.textContent ?? "";
+      copyAthkar(ref ? `${text}\n${ref}` : text);
+    }
+  });
+
+  byId("akReset", HTMLButtonElement).addEventListener("click", resetCategory);
+  // back to the page after midnight: the new day starts from 0
+  window.addEventListener("focus", checkNewDay);
+  document.addEventListener("visibilitychange", checkNewDay);
+}
+
+async function initAthkarPage() {
+  await loadData();
+  loadCounts();
+  state.category = await openingCategory();
+
+  bindSearch();
+  bindActions();
+  bindPanelFold(openCategory);
+  // Ctrl/Cmd+C or right-click > Copy on highlighted text of a dhikr
+  initSelectionCopy(byId("akList", HTMLElement), copyAthkar);
+
+  renderPanel();
+  renderList();
 }
 
 module.exports = { initAthkarPage };
