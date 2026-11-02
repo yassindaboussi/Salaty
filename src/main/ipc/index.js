@@ -16,6 +16,7 @@ const secureIpc = require("./secure-ipc");
 const analytics = require("../services/analytics-manager");
 const { refreshTrayMenu } = require("../windows/tray");
 const log = require("../services/logger").logger("IPC");
+const haramainLive = require("../services/haramain-live");
 const { exportPagePdf } = require("../app/export-pdf");
 
 // getMainWindow: returns the main window (or null); read whenever a handler runs.
@@ -46,6 +47,12 @@ function registerIpcHandlers({ getMainWindow }) {
   // The monthly table as a PDF (its print styles), saved where the user picks.
   secureIpc.handle("export-month-pdf", (event, name) =>
     exportPagePdf(event.sender, check.text(name, 100)),
+  );
+  // The Haramain live page: the current live video of al-Haram's / an-Nabawi's channel.
+  secureIpc.handle("get-haramain-live", (_e, key) =>
+    key === "makkah" || key === "madina"
+      ? haramainLive.getLiveVideoId(key)
+      : null,
   );
   // Ramadan (Hijri month 9) of a Hijri year, with its times, for the Ramadan page.
   secureIpc.handle("get-ramadan-calendar", (_e, hijriYear) => {
