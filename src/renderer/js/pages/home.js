@@ -1,9 +1,8 @@
 "use strict";
 
 // Home page: today's prayers (components/prayer-times.js), the location switcher, the
-// Islamic-events banner, the offline banner and the "update available" dialog.
+// Islamic-events banner, the offline banner and the new-version dialog (components/update-dialog.js).
 const { ipcRenderer } = require("electron");
-const { t } = require("../core/i18n");
 const { state } = require("../core/store");
 const screenSizeManager = require("../core/screen-size");
 const { revealPage } = require("../app/app-shell");
@@ -17,6 +16,7 @@ const {
 } = require("../components/location-switcher");
 const { initOfflineBanner } = require("../components/offline-banner");
 const { openFeedbackDialog } = require("../components/feedback-dialog");
+const { initUpdateDialog } = require("../components/update-dialog");
 const { setupConnectionRecovery } = require("../services/connection-recovery");
 const analytics = require("../services/analytics");
 const { byId } = require("../core/dom");
@@ -103,82 +103,6 @@ async function initHomePage() {
     } catch (e) {
       console.error("[Home] location-changed", e);
     }
-  });
-}
-
-// "A new version is available" dialog, driven by the auto-updater in main.
-function initUpdateDialog() {
-  const modal = document.getElementById("updateModal");
-  if (!modal) return;
-
-  const titleEl = document.getElementById("updateTitle");
-  const messageEl = document.getElementById("updateMessage");
-  const actionBtn = document.getElementById("updateActionBtn");
-  const cancelBtn = document.getElementById("updateCancelBtn");
-  const progressWrap = document.getElementById("updateProgress");
-  const progressFill = document.getElementById("updateProgressBar");
-  const progressText = document.getElementById("updateProgressText");
-  let downloaded = false;
-  // "auto": download and install here; otherwise "Download" opens the download page (macOS)
-  let updateMode = "auto";
-  ipcRenderer
-    .invoke("get-update-mode")
-    .then((mode) => (updateMode = mode))
-    .catch(() => {});
-
-  cancelBtn?.addEventListener("click", () => modal.classList.remove("show"));
-  actionBtn?.addEventListener("click", () => {
-    if (!downloaded) {
-      ipcRenderer.send("start-download");
-      if (updateMode !== "auto") {
-        modal.classList.remove("show");
-        return;
-      }
-      if (actionBtn instanceof HTMLButtonElement) actionBtn.disabled = true;
-      if (cancelBtn) cancelBtn.style.display = "none";
-      if (progressWrap) progressWrap.classList.remove("hidden");
-    } else {
-      ipcRenderer.send("install-update");
-    }
-  });
-
-  ipcRenderer.on("update-available", (_e, info) => {
-    downloaded = false;
-    if (titleEl) titleEl.textContent = t("updateAvailable");
-    if (messageEl)
-      messageEl.textContent = t("newVersionAvailable").replace(
-        "{version}",
-        info.version,
-      );
-    if (actionBtn instanceof HTMLButtonElement) {
-      actionBtn.textContent = t(
-        updateMode === "auto" ? "download" : "openDownloadPage",
-      );
-      actionBtn.disabled = false;
-    }
-    if (cancelBtn) {
-      cancelBtn.style.display = "block";
-      cancelBtn.textContent = t("later");
-    }
-    if (progressWrap) progressWrap.classList.add("hidden");
-    modal.classList.add("show");
-  });
-  ipcRenderer.on("download-progress", (_e, { percent }) => {
-    const pct = Math.round(percent);
-    if (progressWrap) progressWrap.classList.remove("hidden");
-    if (progressFill) progressFill.style.width = `${pct}%`;
-    if (progressText) progressText.textContent = `${pct}%`;
-  });
-  ipcRenderer.on("update-downloaded", () => {
-    downloaded = true;
-    if (titleEl) titleEl.textContent = t("updateReady");
-    if (messageEl) messageEl.textContent = t("updateDownloaded");
-    if (actionBtn instanceof HTMLButtonElement) {
-      actionBtn.textContent = t("install");
-      actionBtn.disabled = false;
-    }
-    if (progressWrap) progressWrap.classList.add("hidden");
-    modal.classList.add("show");
   });
 }
 
