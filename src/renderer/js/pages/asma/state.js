@@ -3,6 +3,7 @@
 // The 99 names (data/99_Names_Of_Allah.json, bundled) and what the page shows now.
 const { getNamesOfAllah } = require("../../services/content");
 const quranIndex = require("../../../data/quran-index.json");
+const { normalizeForSearch: normalize } = require("../../utils/search-text");
 
 /**
  * @typedef {{ surah: number, ayah: number, last: number }} VerseRef  a verse, or a range
@@ -19,20 +20,6 @@ const pageState = {
   selected: 1, // the name's number (1-99)
   query: "",
 };
-
-// For the search: no tashkeel or tatweel, and every alif written the same, so "الرحمن" finds
-// "الرَّحْمَنُ"; Latin without accents or punctuation, so "ar-rahman" finds "Ar Rahmaan".
-function normalize(text) {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ًͯ-ٰٟـ]/g, "")
-    .replace(/[أإآٱ]/g, "ا")
-    .replace(/ى/g, "ي")
-    .replace(/ة/g, "ه")
-    .replace(/[^\p{L}\p{N}]+/gu, "")
-    .replace(/(\p{L})\1+/gu, "$1"); // "rahmaan" and "rahman" are the same name
-}
 
 // "(2:163) (3:31)(82:10-12)" → verses; one that does not exist in the Mushaf is dropped.
 /** @returns {VerseRef[]} */
@@ -96,5 +83,4 @@ module.exports = {
   nameByNumber,
   visibleNames,
   surahName,
-  normalize,
 };

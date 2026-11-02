@@ -361,7 +361,7 @@
     scrollbar-color: var(--white-a20) transparent;
   }
 
-  /* groups that fold (like the Athkar page's categories): icon, name, count, chevron */
+  /* groups that fold: icon, name, count, chevron */
   .tb-group + .tb-group {
     padding-top: 4px;
     border-top: 1px solid var(--border-subtle);

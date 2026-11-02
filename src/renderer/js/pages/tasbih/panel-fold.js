@@ -1,7 +1,7 @@
 "use strict";
 
 // Folding the whole side panel to the window's edge (right; left in Arabic), so the counter gets
-// the room: it becomes a thin strip of the groups' icons, like the Athkar page's sidebar. An
+// the room: it becomes a thin strip of the groups' icons. An
 // icon opens the panel on its group. The choice is remembered (localStorage). A narrow window
 // has one column, where nothing folds (CSS).
 const { byId, queryAll } = require("../../core/dom");

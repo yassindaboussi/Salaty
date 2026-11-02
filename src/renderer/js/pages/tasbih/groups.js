@@ -1,7 +1,7 @@
 "use strict";
 
 // The side panel's groups (after prayer, from the Sunnah, my dhikr): each header folds its list,
-// like the Athkar page's categories. The header is a button with aria-expanded; which groups
+// as in a disclosure list. The header is a button with aria-expanded; which groups
 // are folded is remembered (localStorage).
 const { queryAll } = require("../../core/dom");
 
