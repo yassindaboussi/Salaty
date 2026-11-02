@@ -1,0 +1,49 @@
+/*
+  A reciter's photo (components/reciter-photo.js), round, over the first letter of the name: the
+  letter shows while the photo loads and when there is none. Sizes: default (cards), .is-small
+  (dialog), .is-large (the player).
+*/
+.reciter-photo {
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-3);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.reciter-photo-letter {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.reciter-photo-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reciter-photo.is-small {
+  width: 36px;
+  height: 36px;
+}
+
+.reciter-photo.is-small .reciter-photo-letter {
+  font-size: 14px;
+}
+
+.reciter-photo.is-large {
+  width: 120px;
+  height: 120px;
+}
+
+.reciter-photo.is-large .reciter-photo-letter {
+  font-size: 40px;
+}

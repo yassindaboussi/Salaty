@@ -51,5 +51,26 @@
   "waitingForTrack": "Waiting for track...",
   "tafsirBookNames": {
     "1": "Summary of Al-Tabari's Tafsir"
-  }
+  },
+  "acSearch_recite": "Search a reciter",
+  "acSearch_tafsir": "Search a book or surah",
+  "acSearch_tadabor": "Search a surah",
+  "acRiwaya": "Riwaya",
+  "acRiwayaAll": "All",
+  "acRiwayaHafs": "Hafs",
+  "acRiwayaWarsh": "Warsh",
+  "acRiwayaQalun": "Qalun",
+  "acRiwayaOther": "Other riwayat",
+  "acCompleteOnly": "Complete Quran only",
+  "acFavorites": "Favourites",
+  "acAllReciters": "All reciters",
+  "acFavorite": "Add to favourites",
+  "acUnfavorite": "Remove from favourites",
+  "acNoReciter": "No reciter matches",
+  "acSurahCount": "Surahs: {count}",
+  "acNowPlaying": "Now playing",
+  "acSeek": "Position",
+  "acTrackLabel": "Play {title}",
+  "tooltipPlay": "Play",
+  "tooltipPause": "Pause"
 }

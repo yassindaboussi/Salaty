@@ -1,217 +1,131 @@
 "use strict";
 
-// The Tafsir section: the tafsir books, then one book's surahs (with a back button), searchable;
-// opening a surah goes to the playlist page.
-const { ipcRenderer } = require("electron");
+// The Tafasir tab: the tafsir books, then one book's surahs (with a back row), filtered by the
+// search; a surah opens its recordings in the playlist page. The open book is remembered.
 const mp3quranApi = require("../../services/api/mp3quran");
 const { t } = require("../../core/i18n");
-const { html, setHtml, asButton } = require("../../utils/html");
-/** @typedef {import("./index").AlbumsPage} AlbumsPage */
+const { byId } = require("../../core/dom");
+const { html, setHtml } = require("../../utils/html");
+const { normalizeForSearch } = require("../../utils/search-text");
+const { state, surahName } = require("./state");
+const { openAlbum } = require("./open-album");
+const { messageHtml } = require("./messages");
 
-const mp3quranLang = mp3quranApi.apiLanguage;
+const lang = () => mp3quranApi.apiLanguage();
+const box = () => byId("acTafsir", HTMLElement);
 
-/** @param {AlbumsPage} page */
-async function ensureTafsirBooksLoaded(page) {
-  if (page.tafsirBooks) {
-    page.renderTafsir();
+async function loadTafsirBooks() {
+  if (state.tafsirBooks) {
+    renderTafsir();
     return;
   }
-  setHtml(
-    page.tafsirGrid,
-    html`<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingTafasir")}</div>`,
-  );
+  setHtml(box(), messageHtml("loading", t("loadingTafasir")));
   try {
-    page.tafsirBooks = await mp3quranApi.getTafasirBooks(mp3quranLang());
-    page.renderTafsir();
+    const books = await mp3quranApi.getTafasirBooks(lang());
+    state.tafsirBooks = books;
+    const saved = books.find(
+      (b) => String(b.id) === String(state.tafsirBookId),
+    );
+    if (saved) await openTafsirBook(saved);
+    else renderTafsir();
   } catch (error) {
     console.error("Failed to load tafsir books:", error);
-    setHtml(
-      page.tafsirGrid,
-      html`
-        <div class="error-message">
-          <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
-          <div>${t("errorLoadingTafasir")}</div>
-          <button type="button" class="retry-button" id="retryLoadTafsir">${t("retry")}</button>
-        </div>`,
-    );
-    document
-      .getElementById("retryLoadTafsir")
-      ?.addEventListener("click", () => {
-        page.tafsirBooks = null;
-        page.ensureTafsirBooksLoaded();
-      });
+    setHtml(box(), messageHtml("error", t("errorLoadingTafasir"), "tafsir"));
   }
 }
 
-/** @param {AlbumsPage} page */
-async function openTafsirBook(page, book) {
-  setHtml(
-    page.tafsirGrid,
-    html`<div class="loading"><i class="fas fa-spinner" aria-hidden="true"></i>${t("loadingTafasir")}</div>`,
-  );
+async function openTafsirBook(book) {
+  setHtml(box(), messageHtml("loading", t("loadingTafasir")));
   try {
     const { bookName, bySura } = await mp3quranApi.getTafsirSurahs(
       book.id,
-      mp3quranLang(),
+      lang(),
     );
-    if (!page.surahNames) {
-      page.surahNames = await mp3quranApi.getSurahNames(mp3quranLang());
-    }
-    page.currentTafsirBook = {
+    if (!state.surahNames)
+      state.surahNames = await mp3quranApi.getSurahNames(lang());
+    state.tafsirBook = {
       id: book.id,
       name: book.displayName || bookName || book.name,
       bySura,
     };
-    if (page.tafsirSearchInput instanceof HTMLInputElement)
-      page.tafsirSearchInput.value = "";
-    page.renderTafsir();
+    renderTafsir();
   } catch (error) {
     console.error("Failed to load tafsir surahs:", error);
-    setHtml(
-      page.tafsirGrid,
-      html`
-        <div class="error-message">
-          <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
-          <div>${t("errorLoadingTafasir")}</div>
-          <button type="button" class="retry-button" id="retryLoadTafsirBook">${t("retry")}</button>
-        </div>`,
-    );
-    document
-      .getElementById("retryLoadTafsirBook")
-      ?.addEventListener("click", () => page.openTafsirBook(book));
+    setHtml(box(), messageHtml("error", t("errorLoadingTafasir"), "tafsir"));
   }
 }
 
-/** @param {AlbumsPage} page */
-function renderTafsir(page, query = "") {
-  if (page.tafsirBackBtn) {
-    page.tafsirBackBtn.style.display = page.currentTafsirBook ? "flex" : "none";
-  }
-
-  if (page.currentTafsirBook) {
-    page.renderTafsirSurahs(query);
-  } else {
-    page.renderTafsirBooks(query);
-  }
+function closeTafsirBook() {
+  state.tafsirBook = null;
+  state.tafsirBookId = null;
+  renderTafsir();
 }
 
-/** @param {AlbumsPage} page */
-function renderTafsirBooks(page, query) {
-  let books = page.tafsirBooks || [];
-  if (query) {
-    const lower = query.toLowerCase();
-    books = books.filter((b) =>
-      (b.displayName || b.name || "").toLowerCase().includes(lower),
-    );
-  }
+/** @param {string} icon @param {string} title @param {string} meta @param {import("../../utils/html").HtmlFragment} attrs */
+const rowHtml = (icon, title, meta, attrs) =>
+  html`<li><button type="button" class="ac-row" ${attrs}><i class="fas ${icon} ac-row-icon" aria-hidden="true"></i><span class="ac-row-title">${title}</span><span class="ac-row-meta">${meta}</span><i class="fas fa-chevron-right ac-row-go" aria-hidden="true"></i></button></li>`;
 
-  page.tafsirGrid.innerHTML = "";
-  if (books.length === 0) {
+function renderTafsir() {
+  if (!state.tafsirBooks) return;
+  const query = normalizeForSearch(state.query);
+  const has = (/** @type {string} */ text) =>
+    !query || normalizeForSearch(text).includes(query);
+
+  if (!state.tafsirBook) {
+    const books = state.tafsirBooks.filter((b) =>
+      has(b.displayName || b.name || ""),
+    );
     setHtml(
-      page.tafsirGrid,
-      html`<div class="empty-state"><i class="fas fa-search" aria-hidden="true"></i><p>${t("noTracksFound")}</p></div>`,
+      box(),
+      books.length
+        ? html`<ul class="ac-rows">${books.map((b) => rowHtml("fa-book-open", b.displayName || b.name, "", html`data-book="${b.id}"`))}</ul>`
+        : messageHtml("empty", t("noTracksFound")),
     );
     return;
   }
 
-  const grid = document.createElement("div");
-  grid.className = "reciter-grid";
-  books.forEach((book) => {
-    const card = asButton(document.createElement("div"));
-    card.className = "reciter-card";
-    setHtml(
-      card,
-      html`
-        <div class="reciter-card-avatar"><i class="fas fa-book-open" aria-hidden="true"></i></div>
-        <span class="reciter-card-name">${book.displayName || book.name}</span>
-      `,
-    );
-    card.addEventListener("click", () => page.openTafsirBook(book));
-    grid.appendChild(card);
-  });
-  page.tafsirGrid.appendChild(grid);
-}
-
-/** @param {AlbumsPage} page */
-function renderTafsirSurahs(page, query) {
-  const surahNameMap = {};
-  (page.surahNames || []).forEach((s) => {
-    surahNameMap[s.id] = (s.name || "").trim();
-  });
-
-  // renderTafsir() only calls this while a book is open
-  const bySura = page.currentTafsirBook?.bySura || {};
-  let suraIds = Object.keys(bySura)
-    .filter((id) => (bySura[id] || []).length > 0)
-    .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
-
-  if (query) {
-    const lower = query.toLowerCase();
-    suraIds = suraIds.filter((id) =>
-      (surahNameMap[id] || `Surah ${id}`).toLowerCase().includes(lower),
-    );
-  }
-
-  page.tafsirGrid.innerHTML = "";
-  if (suraIds.length === 0) {
-    setHtml(
-      page.tafsirGrid,
-      html`<div class="empty-state"><i class="fas fa-search" aria-hidden="true"></i><p>${t("noTracksFound")}</p></div>`,
-    );
-    return;
-  }
-
-  const grid = document.createElement("div");
-  grid.className = "reciter-grid";
-  suraIds.forEach((id) => {
-    const entries = bySura[id] || [];
-    const suraName = surahNameMap[id] || `${t("surah")} ${id}`;
-    const card = asButton(document.createElement("div"));
-    card.className = "reciter-card";
-    setHtml(
-      card,
-      html`
-        <span class="reciter-card-badge">${entries.length}</span>
-        <div class="reciter-card-avatar"><i class="fas fa-book-open" aria-hidden="true"></i></div>
-        <span class="reciter-card-name">${suraName}</span>
-      `,
-    );
-    card.addEventListener("click", () =>
-      page.openTafsirSurah(suraName, entries),
-    );
-    grid.appendChild(card);
-  });
-  page.tafsirGrid.appendChild(grid);
-}
-
-/** @param {AlbumsPage} page */
-async function openTafsirSurah(page, suraName, entries) {
-  const tracks = mp3quranApi.getTafsirTracksForSura(
-    entries,
-    suraName,
-    page.currentTafsirBook?.name,
+  const { bySura, name } = state.tafsirBook;
+  const ids = Object.keys(bySura)
+    .filter((id) => (bySura[id] ?? []).length && has(surahName(id)))
+    .sort((a, b) => Number(a) - Number(b));
+  setHtml(
+    box(),
+    html`<button type="button" class="ac-back" data-action="tafsir-back"><i class="fas fa-arrow-left ac-back-icon" aria-hidden="true"></i><span>${name}</span></button>${
+      ids.length
+        ? html`<ul class="ac-rows">${ids.map((id) => rowHtml("fa-book-open", `${id}. ${surahName(id)}`, String(bySura[id].length), html`data-sura="${id}"`))}</ul>`
+        : messageHtml("empty", t("noTracksFound"))
+    }`,
   );
-  const album = {
-    source: "mp3quran-tracks",
-    id: `tafsir-${page.currentTafsirBook?.id}-${suraName}`,
-    title: suraName,
-    artist: page.currentTafsirBook?.name || t("tafasir"),
-    icon: "fas fa-book-open",
-    tracks,
-  };
-  page.saveArchiveState({
-    group: "tafsir",
-    tafsirBookId: page.currentTafsirBook?.id,
-  });
-  localStorage.setItem("selectedAlbum", JSON.stringify(album));
-  await ipcRenderer.invoke("navigate-to", "playlist");
 }
 
-module.exports = {
-  ensureTafsirBooksLoaded,
-  openTafsirBook,
-  renderTafsir,
-  renderTafsirBooks,
-  renderTafsirSurahs,
-  openTafsirSurah,
-};
+/** @param {HTMLButtonElement} button */
+function onTafsirAction(button) {
+  if (button.dataset.action === "tafsir-back") {
+    closeTafsirBook();
+    return;
+  }
+  if (button.dataset.book) {
+    const book = state.tafsirBooks?.find(
+      (b) => String(b.id) === button.dataset.book,
+    );
+    if (book) openTafsirBook(book);
+    return;
+  }
+  const id = button.dataset.sura;
+  if (!id || !state.tafsirBook) return;
+  const name = surahName(id);
+  openAlbum({
+    source: "mp3quran-tracks",
+    id: `tafsir-${state.tafsirBook.id}-${id}`,
+    title: name,
+    artist: state.tafsirBook.name,
+    icon: "fas fa-book-open",
+    tracks: mp3quranApi.getTafsirTracksForSura(
+      state.tafsirBook.bySura[id],
+      name,
+      state.tafsirBook.name,
+    ),
+  });
+}
+
+module.exports = { loadTafsirBooks, renderTafsir, onTafsirAction };

@@ -1,643 +1,371 @@
 @layer pages {
-  /* Playlist Container */
+  /* Playlist: the tracks of what was opened in the Audio Archive, beside the player (mirrored in
+     Arabic); one column in a narrow window with the player first. The track playing, the
+     position and the volume are white, as on the other redesigned pages. */
+
   .playlist-container {
+    position: relative;
+    z-index: var(--z-page);
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 16px;
     gap: 12px;
-    position: relative;
+    padding: 16px;
+    box-sizing: border-box;
     overflow: hidden;
   }
 
   /* Header: layout comes from the shared .page-header component
      (03-components/page-header.css). Only what is specific to this page is here. */
+  .playlist-header {
+    z-index: var(--z-page-header);
+  }
+
   .playlist-controls {
-    z-index: 2;
+    z-index: var(--z-page-header-controls);
   }
 
-  /* Search Container */
-  .search-container {
-    display: flex;
-    justify-content: center;
-    padding: 8px 0;
-    -webkit-app-region: no-drag;
-  }
-
-  .search-box {
-    width: 100%;
-    max-width: 600px;
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .search-box i {
-    position: absolute;
-    inset-inline-start: 16px; /* left in English, right in Arabic */
-    color: var(--text-secondary);
-    font-size: 14px;
-  }
-
-  .search-input {
-    width: 100%;
-    padding-block: 10px;
-    padding-inline: 40px 16px; /* room for the icon on the start side */
-    border-radius: 20px;
-    border: 1px solid var(--border-color);
-    background: var(--surface-1);
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 14px;
-    transition: all 0.3s ease;
-  }
-
-  .search-input:focus {
-    outline: none;
-    background: var(--surface-2);
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
-  }
-
-  /* Content Area */
-  .content-area {
+  .pl-layout {
     flex: 1;
-    display: flex;
-    gap: 16px;
-    overflow: hidden;
-    position: relative;
-    width: 100%;
     min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 12px;
     -webkit-app-region: no-drag;
   }
 
-  /* Results List */
-  .results-list {
-    flex: 1;
-    overflow-y: auto;
+  .pl-main,
+  .pl-player {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
     background: var(--surface-subtle);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    -webkit-app-region: no-drag;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
   }
 
-  .results-list::-webkit-scrollbar {
-    width: 5px;
+  /* ── The tracks ────────────────────────────────────────────────────── */
+
+  .pl-main {
+    gap: 10px;
+    padding: 12px;
   }
 
-  .results-list::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 3px;
+  .pl-head {
+    padding-inline: 4px;
   }
 
-  .results-list::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 3px;
-  }
-
-  /* Items & Tracks */
-  .track-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-    user-select: none;
-  }
-
-  .track-item:hover {
-    background: var(--surface-1);
-    border-color: var(--border-color);
-  }
-
-  .track-item.active {
-    background: rgba(var(--accent-rgb), 0.15);
-    border-color: rgba(var(--accent-rgb), 0.3);
-  }
-
-  .track-item .fa-play-circle {
-    font-size: 24px;
-    color: var(--accent-color);
-    opacity: 0.8;
-    transition:
-      transform 0.2s,
-      opacity 0.2s;
-  }
-
-  .track-item:hover .fa-play-circle {
-    opacity: 1;
-    transform: scale(1.1);
-  }
-
-  .track-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
-    min-width: 0; /* Important for text truncation */
-  }
-
-  .track-title {
-    font-weight: 600;
-    font-size: 14px;
+  .pl-heading {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
     color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
   }
 
-  .track-meta {
-    font-size: 12px;
-    color: var(--text-secondary);
-    opacity: 0.8;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* Player Controls Sidebar */
-  .player-controls {
-    width: 320px;
-    background: var(--surface-subtle);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    padding: 20px;
+  .pl-subtitle {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .pl-count {
+    color: var(--text-faint);
+  }
+
+  .pl-search {
+    position: relative;
     flex-shrink: 0;
-  }
-
-  .album-art {
-    width: 140px;
-    height: 140px;
-    background: var(--black-a20);
-    border-radius: 16px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    color: var(--accent-color);
-    box-shadow: 0 8px 24px var(--black-a20);
   }
 
-  .current-track-display {
-    text-align: center;
+  .pl-search-icon {
+    position: absolute;
+    inset-inline-start: 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  .pl-search-input {
     width: 100%;
-  }
-
-  .current-track-display h4 {
-    margin-bottom: 4px;
-    font-size: 16px;
+    padding-block: 7px;
+    padding-inline: 30px 10px;
+    border: 1px solid var(--border-medium);
+    border-radius: 10px;
+    background: var(--surface-1);
     color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
   }
 
-  .current-track-display p {
-    font-size: 14px;
-    color: var(--text-secondary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .pl-search-input::placeholder {
+    color: var(--text-faint);
   }
 
-  /* Progress & Time */
-  .progress-container {
-    width: 100%;
+  .pl-search-input:focus-visible {
+    border-color: var(--white-a40);
+  }
+
+  .pl-list {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .pl-tracks {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .progress-bar {
-    width: 100%;
-    height: 4px;
-    background: var(--surface-3);
-    border-radius: 4px;
-    cursor: pointer;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--accent-color);
-    border-radius: 4px;
-    width: 0;
-    transition: width 0.1s linear;
-  }
-
-  .time-display {
+  .pl-track {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13.5px;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .pl-track:hover {
+    background: var(--surface-3);
+  }
+
+  .pl-track[aria-current="true"] {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
+  }
+
+  .pl-num {
+    flex-shrink: 0;
+    min-width: 28px;
     font-size: 12px;
-    color: var(--text-secondary);
+    color: var(--text-faint);
     font-variant-numeric: tabular-nums;
   }
 
-  /* Controls */
-  .control-buttons {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-    margin: 8px 0;
+  .pl-title {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
-  .skip-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 18px;
-    cursor: pointer;
-    transition: color 0.2s;
-    padding: 8px;
-    border-radius: 8px;
+  .pl-state {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--text-faint);
+    opacity: 0;
   }
 
-  .skip-btn:hover {
+  .pl-track:hover .pl-state,
+  .pl-track:focus-visible .pl-state,
+  .pl-track[aria-current="true"] .pl-state {
+    opacity: 1;
+  }
+
+  .pl-track[aria-current="true"] .pl-state {
     color: var(--text-primary);
-    background: var(--surface-1);
   }
 
-  .play-pause-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--accent-color);
-    color: var(--text-bright);
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.4);
-    transition:
-      transform 0.2s,
-      filter 0.2s;
-  }
-
-  .play-pause-btn:hover {
-    filter: brightness(1.1);
-    transform: scale(1.05);
-  }
-
-  .play-pause-btn:active {
-    transform: scale(0.95);
-  }
-
-  /* Volume */
-  .volume-control {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    color: var(--text-secondary);
-  }
-
-  .volume-slider {
-    flex: 1;
-    height: 4px;
-    background: var(--surface-3);
-    border-radius: 2px;
-    appearance: none;
-    outline: none;
-  }
-
-  .volume-slider::-webkit-slider-thumb {
-    appearance: none;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--white);
-    cursor: pointer;
-    border: 2px solid var(--accent-color);
-  }
-
-  /* Empty State / Loading */
-  .empty-state,
-  .loading,
-  .error {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    font-style: italic;
+  .pl-empty {
+    margin: 0;
+    padding: 32px 12px;
+    font-size: 13px;
+    color: var(--text-muted);
     text-align: center;
-    padding: 20px;
-    flex-direction: column;
-    gap: 12px;
   }
 
-  .empty-state i,
-  .loading i,
-  .error i {
-    font-size: 32px;
+  /* ── The player ────────────────────────────────────────────────────── */
+
+  .pl-player {
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 20px 18px;
+    overflow: hidden auto;
+  }
+
+  .pl-art-icon {
+    width: 120px;
+    height: 120px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--surface-3);
+    border: 1px solid var(--border-subtle);
+    font-size: 40px;
+    color: var(--text-muted);
+  }
+
+  .pl-now {
+    width: 100%;
+    text-align: center;
+  }
+
+  .pl-title-now {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
+  }
+
+  .pl-artist-now {
+    margin: 3px 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+  }
+
+  .pl-progress {
+    width: 100%;
+  }
+
+  .pl-times {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Media controls stay left to right in Arabic too: time runs that way on every player
+     (https://m2.material.io/design/usability/bidirectionality.html), so the position, the
+     volume and the play / previous / next icons are not mirrored. */
+  .pl-progress,
+  .pl-controls,
+  .pl-volume {
+    direction: ltr;
+  }
+
+  /* A slider: the filled part (--fill, set by player.js) is white */
+  .pl-range {
+    width: 100%;
+    height: 18px;
+    margin: 0;
+    background: transparent;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .pl-range:disabled {
+    cursor: default;
     opacity: 0.5;
   }
 
-  /* ========== RESPONSIVE DESIGN ========== */
+  .pl-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(
+      to right,
+      var(--text-primary) var(--fill, 0%),
+      var(--white-a15) var(--fill, 0%)
+    );
+  }
 
-  /* Tablet (768px and below) */
-  @media (width <= 768px) {
-    .playlist-container {
-      padding: 12px;
-      gap: 8px;
+  .pl-range::-webkit-slider-thumb {
+    width: 12px;
+    height: 12px;
+    margin-top: -4px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    appearance: none;
+  }
+
+  .pl-range:focus-visible {
+    outline: 2px solid var(--white-a40);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .pl-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pl-btn {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .pl-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .pl-btn:hover:not(:disabled) {
+    background: var(--surface-3);
+  }
+
+  .pl-play {
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+  }
+
+  .pl-volume {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* ── Narrow window: one column, the player first, the page scrolls ── */
+
+  @media (width <= 700px) {
+    .pl-layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-rows: max-content;
+      overflow: hidden auto;
     }
 
-    .content-area {
-      flex-direction: column;
-      gap: 12px;
+    .pl-player {
+      order: -1;
+      overflow: visible;
     }
 
-    .player-controls {
-      width: 100%;
-      padding: 16px;
-      flex-flow: row wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .album-art {
-      width: 80px;
-      height: 80px;
-      font-size: 32px;
-      margin: 0;
-      order: 1;
-    }
-
-    .current-track-display {
-      text-align: start; /* left in English, right in Arabic */
-      flex: 1;
-      min-width: 0;
-      order: 2;
-      padding: 0 12px;
-    }
-
-    .progress-container {
-      width: 100%;
-      order: 4;
-      grid-column: 1 / -1;
-      margin-top: 8px;
-    }
-
-    .control-buttons {
-      order: 3;
-      margin: 0;
-      gap: 16px;
-    }
-
-    .play-pause-btn {
-      width: 40px;
-      height: 40px;
-      font-size: 16px;
-    }
-
-    .skip-btn {
-      font-size: 16px;
-    }
-
-    .volume-control {
-      order: 5;
-      width: 100%;
-      margin-top: 8px;
-    }
-
-    .search-box {
-      max-width: 100%;
-    }
-
-    .track-item {
-      padding: 10px 12px;
-    }
-
-    .track-title {
-      font-size: 13px;
-    }
-
-    .track-meta {
-      font-size: 11px;
+    .pl-list {
+      overflow: visible;
     }
   }
 
-  /* Mobile (480px and below) */
   @media (width <= 480px) {
     .playlist-container {
       padding: 8px;
-      gap: 6px;
-    }
-
-    .search-input {
-      padding-block: 8px;
-      padding-inline: 36px 16px;
-      font-size: 13px;
-    }
-
-    .search-box i {
-      font-size: 12px;
-      inset-inline-start: 12px;
-    }
-
-    .results-list {
-      padding: 6px;
-      border-radius: 10px;
-    }
-
-    .track-item {
-      padding: 8px 10px;
-      border-radius: 6px;
-    }
-
-    .player-controls {
-      padding: 12px;
-      border-radius: 10px;
-    }
-
-    .album-art {
-      width: 60px;
-      height: 60px;
-      font-size: 24px;
-      border-radius: 12px;
-    }
-
-    .current-track-display h4 {
-      font-size: 14px;
-    }
-
-    .current-track-display p {
-      font-size: 12px;
-    }
-
-    .control-buttons {
-      gap: 12px;
-    }
-
-    .play-pause-btn {
-      width: 36px;
-      height: 36px;
-      font-size: 14px;
-    }
-
-    .skip-btn {
-      font-size: 14px;
-      padding: 6px;
-    }
-
-    .time-display {
-      font-size: 11px;
-    }
-
-    .volume-control {
       gap: 8px;
     }
-
-    .volume-control i {
-      font-size: 12px;
-    }
-  }
-
-  /* Very Small Mobile (320px and below) */
-  @media (width <= 320px) {
-    .search-input {
-      font-size: 12px;
-    }
-
-    .track-item .fa-play-circle {
-      font-size: 20px;
-    }
-
-    .track-title {
-      font-size: 12px;
-    }
-
-    .track-meta {
-      font-size: 10px;
-    }
-
-    .album-art {
-      width: 50px;
-      height: 50px;
-      font-size: 20px;
-    }
-
-    .current-track-display {
-      padding: 0 8px;
-    }
-
-    .current-track-display h4 {
-      font-size: 13px;
-    }
-
-    .current-track-display p {
-      font-size: 11px;
-    }
-
-    .control-buttons {
-      gap: 8px;
-    }
-  }
-
-  /* Landscape Mode (for mobile) */
-  @media (height <= 500px) and (orientation: landscape) {
-    .playlist-container {
-      padding: 8px;
-      gap: 8px;
-    }
-
-    .playlist-header {
-      padding-bottom: 8px;
-      min-height: 32px;
-    }
-
-    .search-container {
-      padding: 4px 0;
-    }
-
-    .content-area {
-      gap: 8px;
-    }
-
-    .track-item {
-      padding: 6px 10px;
-    }
-
-    .player-controls {
-      flex-flow: row wrap;
-      padding: 12px;
-      gap: 12px;
-    }
-
-    .album-art {
-      width: 60px;
-      height: 60px;
-      font-size: 24px;
-      order: 1;
-    }
-
-    .current-track-display {
-      flex: 1;
-      order: 2;
-      text-align: start; /* left in English, right in Arabic */
-      padding: 0 12px;
-    }
-
-    .control-buttons {
-      order: 3;
-      margin: 0;
-    }
-
-    .progress-container {
-      order: 4;
-      width: 100%;
-      margin-top: 4px;
-    }
-
-    .volume-control {
-      order: 5;
-      width: 100%;
-      margin-top: 4px;
-    }
-  }
-
-  /* Fullscreen Mode */
-  .playlist-container.fullscreen .content-area {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .playlist-container.fullscreen .player-controls {
-    width: 380px;
-    padding: 24px;
-  }
-
-  .playlist-container.fullscreen .album-art {
-    width: 180px;
-    height: 180px;
-    font-size: 56px;
-  }
-
-  /* Loading Animation */
-  .loading i {
-    animation: spin 1s linear infinite;
-  }
-
-  /* Arabic: the player's previous/next arrows point the other way */
-  [dir="rtl"] .prev-btn i,
-  [dir="rtl"] .next-btn i {
-    display: inline-block;
-    transform: scaleX(-1);
   }
 }
