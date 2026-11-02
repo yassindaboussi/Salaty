@@ -38,7 +38,8 @@ const POLICY = {
   ],
   // Quran recitations and radio streams come from many hosts, but always over HTTPS
   "media-src": ["'self'", "https:", "blob:"],
-  "frame-src": ["https://makkahlive.netlify.app"],
+  // the Haramain live streams: the official channels on YouTube (privacy-enhanced embed)
+  "frame-src": ["https://www.youtube-nocookie.com"],
   "object-src": ["'none'"],
   "base-uri": ["'none'"],
   "form-action": ["'none'"],
