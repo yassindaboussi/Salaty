@@ -12,202 +12,146 @@
     <link rel="stylesheet" href="../../css/04-pages/albums.css" />
   </head>
   <body class="page-loading">
-    <div class="app-container theme-navy" id="app">
+    <div class="app-container" id="app">
       <div class="drag-area"></div>
 
       <div class="albums-container">
-        <!-- Header -->
         <header
           class="page-header albums-header"
           data-page-header
+          data-controls-class="albums-controls"
           data-back="features"
         >
-          <h1 class="page-header__title albums-title" data-i18n="audioArchive">
+          <h1 class="page-header__title" data-i18n="audioArchive">
             Audio Archive
           </h1>
         </header>
 
-        <!-- Collapsible groups: Quran Recitation (reciters) and Tadabor.
-             Both start collapsed; each has its own search + content area
-             that only loads data once the user actually expands it. -->
-        <main class="archive-groups">
-          <!-- Quran Recitation -->
-          <div class="archive-group" id="reciteGroup">
-            <button
-              type="button"
-              class="archive-group-header"
-              id="reciteGroupHeader"
-              aria-expanded="false"
+        <main class="ac-main" id="acMain">
+          <div class="ac-top">
+            <div
+              class="ac-tabs"
+              id="acTabs"
+              role="tablist"
+              data-i18n-aria-label="audioArchive"
             >
-              <span class="archive-group-header-left">
-                <i
-                  class="fas fa-book-quran archive-group-icon"
-                  aria-hidden="true"
-                ></i>
-                <span
-                  class="archive-group-title"
-                  id="reciteGroupTitle"
-                  data-i18n="quranRecitation"
-                  >Quran Recitation</span
-                >
-              </span>
-              <i
-                class="fas fa-chevron-down archive-group-chevron"
-                aria-hidden="true"
-              ></i>
-            </button>
-            <div class="archive-group-content">
-              <div class="search-container">
-                <div class="search-box">
-                  <i class="fas fa-search" aria-hidden="true"></i>
-                  <input
-                    type="text"
-                    id="searchInput"
-                    data-i18n-placeholder="searchReciters"
-                    data-i18n-aria-label="searchReciters"
-                    class="search-input"
-                    placeholder="Search reciters..."
-                  />
-                </div>
-              </div>
-              <div class="archive-body">
-                <div class="albums-grid" id="albumsGrid">
-                  <!-- Reciters will be injected here -->
-                </div>
-                <div class="az-index" id="azIndex">
-                  <!-- A-Z letters injected here -->
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tafasir -->
-          <div class="archive-group" id="tafsirGroup">
-            <button
-              type="button"
-              class="archive-group-header"
-              id="tafsirGroupHeader"
-              aria-expanded="false"
-            >
-              <span class="archive-group-header-left">
-                <i
-                  class="fas fa-book-open archive-group-icon"
-                  aria-hidden="true"
-                ></i>
-                <span
-                  class="archive-group-title"
-                  id="tafsirGroupTitle"
-                  data-i18n="tafasir"
-                  >Tafasir</span
-                >
-              </span>
-              <i
-                class="fas fa-chevron-down archive-group-chevron"
-                aria-hidden="true"
-              ></i>
-            </button>
-            <div class="archive-group-content">
-              <div class="search-container">
-                <div class="search-box">
-                  <i class="fas fa-search" aria-hidden="true"></i>
-                  <input
-                    type="text"
-                    id="tafsirSearchInput"
-                    data-i18n-placeholder="searchTafasir"
-                    data-i18n-aria-label="searchTafasir"
-                    class="search-input"
-                    placeholder="Search..."
-                  />
-                </div>
-              </div>
               <button
                 type="button"
-                class="archive-back-link"
-                id="tafsirBackBtn"
-                style="display: none"
+                class="ac-tab"
+                id="acTabRecite"
+                role="tab"
+                data-tab="recite"
+                aria-controls="acPanelRecite"
+                aria-selected="true"
               >
-                <i class="fas fa-arrow-left" aria-hidden="true"></i>
-                <span id="tafsirBackBtnLabel" data-i18n="tafasirBooks"
-                  >Tafsir books</span
-                >
+                <i class="fas fa-microphone-lines" aria-hidden="true"></i>
+                <span data-i18n="quranRecitation">Quran Recitation</span>
               </button>
-              <div class="archive-body">
-                <div class="albums-grid" id="tafsirGrid">
-                  <!-- Tafsir books, then surahs, injected here -->
-                </div>
-              </div>
+              <button
+                type="button"
+                class="ac-tab"
+                id="acTabTafsir"
+                role="tab"
+                data-tab="tafsir"
+                aria-controls="acPanelTafsir"
+                aria-selected="false"
+                tabindex="-1"
+              >
+                <i class="fas fa-book-open" aria-hidden="true"></i>
+                <span data-i18n="tafasir">Tafasir</span>
+              </button>
+              <button
+                type="button"
+                class="ac-tab"
+                id="acTabTadabor"
+                role="tab"
+                data-tab="tadabor"
+                aria-controls="acPanelTadabor"
+                aria-selected="false"
+                tabindex="-1"
+              >
+                <i class="fas fa-lightbulb" aria-hidden="true"></i>
+                <span data-i18n="tadabor">Tadabor</span>
+              </button>
+            </div>
+
+            <div class="ac-search" role="search">
+              <i
+                class="fas fa-magnifying-glass ac-search-icon"
+                aria-hidden="true"
+              ></i>
+              <input
+                type="search"
+                class="ac-search-input"
+                id="acSearch"
+                autocomplete="off"
+                spellcheck="false"
+              />
             </div>
           </div>
 
-          <!-- Tadabor -->
-          <div class="archive-group" id="tadaborGroup">
-            <button
-              type="button"
-              class="archive-group-header"
-              id="tadaborGroupHeader"
-              aria-expanded="false"
-            >
-              <span class="archive-group-header-left">
-                <i
-                  class="fas fa-lightbulb archive-group-icon"
-                  aria-hidden="true"
-                ></i>
-                <span
-                  class="archive-group-title"
-                  id="tadaborGroupTitle"
-                  data-i18n="tadabor"
-                  >Tadabor</span
-                >
-              </span>
-              <i
-                class="fas fa-chevron-down archive-group-chevron"
-                aria-hidden="true"
-              ></i>
-            </button>
-            <div class="archive-group-content">
-              <div class="search-container">
-                <div class="search-box">
-                  <i class="fas fa-search" aria-hidden="true"></i>
-                  <input
-                    type="text"
-                    id="tadaborSearchInput"
-                    data-i18n-placeholder="searchSurahs"
-                    data-i18n-aria-label="searchSurahs"
-                    class="search-input"
-                    placeholder="Search surahs..."
-                  />
-                </div>
-              </div>
-              <div class="archive-body">
-                <div class="albums-grid" id="tadaborGrid">
-                  <!-- Surahs with Tadabor content will be injected here -->
-                </div>
-              </div>
+          <!-- Recitations -->
+          <section
+            class="ac-panel"
+            id="acPanelRecite"
+            role="tabpanel"
+            aria-labelledby="acTabRecite"
+          >
+            <div class="ac-filters">
+              <div
+                class="ac-chips"
+                id="acRiwaya"
+                role="group"
+                data-i18n-aria-label="acRiwaya"
+              ></div>
+              <label class="ac-complete">
+                <span data-i18n="acCompleteOnly">Complete Quran only</span>
+                <span class="toggle-switch">
+                  <input type="checkbox" role="switch" id="acComplete" />
+                  <span class="toggle-slider"></span>
+                </span>
+              </label>
             </div>
-          </div>
+            <div class="ac-list" id="acReciters"></div>
+          </section>
+
+          <!-- Tafasir -->
+          <section
+            class="ac-panel"
+            id="acPanelTafsir"
+            role="tabpanel"
+            aria-labelledby="acTabTafsir"
+            hidden
+          >
+            <div class="ac-list" id="acTafsir"></div>
+          </section>
+
+          <!-- Tadabor -->
+          <section
+            class="ac-panel"
+            id="acPanelTadabor"
+            role="tabpanel"
+            aria-labelledby="acTabTadabor"
+            hidden
+          >
+            <div class="ac-list" id="acTadabor"></div>
+          </section>
         </main>
       </div>
 
-      <!-- Recitation-style picker (for reciters with more than one moshaf) -->
-      <div class="modal" id="moshafModal">
-        <div class="modal-content moshaf-modal-content">
-          <div class="moshaf-modal-header">
-            <h3 id="moshafModalTitle"></h3>
-            <button
-              type="button"
-              class="moshaf-modal-close"
-              id="moshafModalClose"
-              aria-label="Close"
-              data-i18n-aria-label="close"
-            >
-              <i class="fas fa-xmark" aria-hidden="true"></i>
-            </button>
-          </div>
-          <div class="moshaf-modal-list" id="moshafModalList">
-            <!-- Moshaf options injected here -->
-          </div>
-        </div>
-      </div>
+      <!-- A reciter's recitations, to pick one -->
+      <dialog class="ac-dialog" id="acDialog" aria-labelledby="acDialogHead">
+        <div class="ac-dialog-head" id="acDialogHead"></div>
+        <button
+          type="button"
+          class="ac-dialog-close"
+          id="acDialogClose"
+          data-tooltip="close"
+        >
+          <i class="fas fa-xmark" aria-hidden="true"></i>
+        </button>
+        <ul class="ac-dialog-list" id="acDialogList"></ul>
+      </dialog>
     </div>
     <script src="../../js-bundled/albums.bundle.js"></script>
   </body>

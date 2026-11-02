@@ -1,222 +1,130 @@
 "use strict";
 
-// The archive page (albums.html): three sections of mp3quran.net audio. Its parts:
-//   sections.js        the collapsible sections and the one remembered for the next visit
-//   reciter-grid.js    the reciters by letter, searchable
-//   az-index.js        the letter of a reciter and the A–Z index
-//   moshaf-picker.js   the dialog to pick one of a reciter's recitations
-//   tadabor.js         reflections by surah
-//   tafsir.js          tafsir books, then one book's surahs
-// The page is the AlbumsManager class below: it finds the elements and wires the listeners; its
-// other methods delegate to the parts above, which take the page as their first argument.
-// The mp3quran.net requests are in services/api/mp3quran.js.
-const { byId } = require("../../core/dom");
-const sections = require("./sections");
-const reciterGrid = require("./reciter-grid");
-const azIndex = require("./az-index");
-const moshafPicker = require("./moshaf-picker");
-const tadabor = require("./tadabor");
+// The Audio Archive page (albums.html): mp3quran.net audio in three tabs. Its parts:
+//   reciters.js       Recitations: reciter cards with photos, favourites first
+//   filters.js        the riwaya chips and "complete Quran only" (riwaya.js: the groups)
+//   moshaf-dialog.js  a reciter's recitations, to pick one
+//   tafsir.js         Tafasir: the books, then a book's surahs
+//   tadabor.js        Tadabor: reflections by surah
+//   open-album.js     opening something in the playlist page
+//   messages.js       loading / nothing found / error + retry
+//   state.js          what is shown, what is remembered (tab, filters, favourites)
+// The requests are in services/api/mp3quran.js (cached a day); the reciters' photos are bundled
+// (components/reciter-photo.js).
+const { t } = require("../../core/i18n");
+const { byId, queryAll } = require("../../core/dom");
+const { state, loadPrefs, savePrefs } = require("./state");
+const { bindFilters } = require("./filters");
+const { bindMoshafDialog } = require("./moshaf-dialog");
+const reciters = require("./reciters");
 const tafsir = require("./tafsir");
+const tadabor = require("./tadabor");
 
-// The page object the parts receive.
-/** @typedef {AlbumsManager} AlbumsPage */
+const TABS = {
+  recite: {
+    panel: "acPanelRecite",
+    load: reciters.loadReciters,
+    render: reciters.renderReciters,
+  },
+  tafsir: {
+    panel: "acPanelTafsir",
+    load: tafsir.loadTafsirBooks,
+    render: tafsir.renderTafsir,
+  },
+  tadabor: {
+    panel: "acPanelTadabor",
+    load: tadabor.loadTadabor,
+    render: tadabor.renderTadabor,
+  },
+};
 
-class AlbumsManager {
-  constructor() {
-    this.reciters = [];
-    this.tadaborBySura = null;
-    this.surahNames = null;
-    this.tafsirBooks = null;
-    /** @type {{ id: any, name: any, bySura: any } | null} */
-    this.currentTafsirBook = null;
-    this.initElements();
-    this.initListeners();
+/** @param {string} tab  shows it (and loads it the first time); the search starts empty */
+function showTab(tab, focus = false) {
+  state.tab = tab;
+  savePrefs();
+  for (const button of queryAll(".ac-tab", HTMLButtonElement)) {
+    const on = button.dataset.tab === tab;
+    button.setAttribute("aria-selected", String(on));
+    button.tabIndex = on ? 0 : -1;
+    if (on && focus) button.focus();
   }
-
-  async init() {
-    this.updateTranslations();
-    await this.restoreArchiveState();
-    return this;
+  for (const [key, { panel }] of Object.entries(TABS)) {
+    byId(panel, HTMLElement).hidden = key !== tab;
   }
-
-  updateTranslations() {}
-
-  initElements() {
-    this.minimizeBtn = document.getElementById("minimizeBtn");
-    this.fullscreenBtn = document.getElementById("fullscreenBtn");
-    this.closeBtn = document.getElementById("closeBtn");
-
-    this.reciteGroup = document.getElementById("reciteGroup");
-    this.reciteGroupHeader = document.getElementById("reciteGroupHeader");
-    this.searchInput = document.getElementById("searchInput");
-    // typed here: set in a method rather than the constructor, so the checker would add undefined
-    /** @type {HTMLElement} */
-    this.albumsGrid = byId("albumsGrid", HTMLElement);
-    /** @type {HTMLElement} */
-    this.azIndex = byId("azIndex", HTMLElement);
-
-    this.tadaborGroup = document.getElementById("tadaborGroup");
-    this.tadaborGroupHeader = document.getElementById("tadaborGroupHeader");
-    this.tadaborSearchInput = document.getElementById("tadaborSearchInput");
-    /** @type {HTMLElement} */
-    this.tadaborGrid = byId("tadaborGrid", HTMLElement);
-
-    this.tafsirGroup = document.getElementById("tafsirGroup");
-    this.tafsirGroupHeader = document.getElementById("tafsirGroupHeader");
-    this.tafsirSearchInput = document.getElementById("tafsirSearchInput");
-    /** @type {HTMLElement} */
-    this.tafsirGrid = byId("tafsirGrid", HTMLElement);
-    this.tafsirBackBtn = document.getElementById("tafsirBackBtn");
-    this.tafsirBackBtnLabel = document.getElementById("tafsirBackBtnLabel");
-
-    /** @type {HTMLElement} */
-    this.moshafModal = byId("moshafModal", HTMLElement);
-    /** @type {HTMLElement} */
-    this.moshafModalTitle = byId("moshafModalTitle", HTMLElement);
-    /** @type {HTMLElement} */
-    this.moshafModalList = byId("moshafModalList", HTMLElement);
-    this.moshafModalClose = document.getElementById("moshafModalClose");
-  }
-
-  initListeners() {
-    this.reciteGroupHeader?.addEventListener("click", () =>
-      this.toggleGroup(this.reciteGroup, this.reciteGroupHeader, () =>
-        this.ensureRecitersLoaded(),
-      ),
-    );
-    this.tadaborGroupHeader?.addEventListener("click", () =>
-      this.toggleGroup(this.tadaborGroup, this.tadaborGroupHeader, () =>
-        this.ensureTadaborLoaded(),
-      ),
-    );
-    this.tafsirGroupHeader?.addEventListener("click", () =>
-      this.toggleGroup(this.tafsirGroup, this.tafsirGroupHeader, () =>
-        this.ensureTafsirBooksLoaded(),
-      ),
-    );
-
-    this.searchInput?.addEventListener("input", () => {
-      if (this.searchInput instanceof HTMLInputElement)
-        this.renderReciters(this.searchInput.value.trim());
-    });
-    this.tadaborSearchInput?.addEventListener("input", () => {
-      if (this.tadaborSearchInput instanceof HTMLInputElement)
-        this.renderTadabor(this.tadaborSearchInput.value.trim());
-    });
-    this.tafsirSearchInput?.addEventListener("input", () => {
-      if (this.tafsirSearchInput instanceof HTMLInputElement)
-        this.renderTafsir(this.tafsirSearchInput.value.trim());
-    });
-
-    this.tafsirBackBtn?.addEventListener("click", () => {
-      this.currentTafsirBook = null;
-      if (this.tafsirSearchInput instanceof HTMLInputElement)
-        this.tafsirSearchInput.value = "";
-      this.renderTafsir();
-    });
-
-    this.moshafModalClose?.addEventListener("click", () =>
-      this.closeMoshafPicker(),
-    );
-    this.moshafModal?.addEventListener("click", (e) => {
-      if (e.target === this.moshafModal) this.closeMoshafPicker();
-    });
-  }
-
-  // sections.js
-  activateGroup(groupEl, headerEl) {
-    return sections.activateGroup(this, groupEl, headerEl);
-  }
-
-  toggleGroup(groupEl, headerEl, onFirstExpand) {
-    return sections.toggleGroup(this, groupEl, headerEl, onFirstExpand);
-  }
-
-  saveArchiveState(state) {
-    return sections.saveArchiveState(this, state);
-  }
-
-  restoreArchiveState() {
-    return sections.restoreArchiveState(this);
-  }
-
-  // reciter-grid.js
-  ensureRecitersLoaded() {
-    return reciterGrid.ensureRecitersLoaded(this);
-  }
-
-  renderReciters(query) {
-    return reciterGrid.renderReciters(this, query);
-  }
-
-  createReciterCard(reciter) {
-    return reciterGrid.createReciterCard(this, reciter);
-  }
-
-  openReciter(reciter, moshaf) {
-    return reciterGrid.openReciter(this, reciter, moshaf);
-  }
-
-  // az-index.js
-  buildAzIndex(availableLetters) {
-    return azIndex.buildAzIndex(this, availableLetters);
-  }
-
-  // moshaf-picker.js
-  openMoshafPicker(reciter) {
-    return moshafPicker.openMoshafPicker(this, reciter);
-  }
-
-  closeMoshafPicker() {
-    return moshafPicker.closeMoshafPicker(this);
-  }
-
-  // tadabor.js
-  ensureTadaborLoaded() {
-    return tadabor.ensureTadaborLoaded(this);
-  }
-
-  renderTadabor(query) {
-    return tadabor.renderTadabor(this, query);
-  }
-
-  createTadaborCard(suraId, suraName, entries) {
-    return tadabor.createTadaborCard(this, suraId, suraName, entries);
-  }
-
-  openTadabor(suraName, entries) {
-    return tadabor.openTadabor(this, suraName, entries);
-  }
-
-  // tafsir.js
-  ensureTafsirBooksLoaded() {
-    return tafsir.ensureTafsirBooksLoaded(this);
-  }
-
-  openTafsirBook(book) {
-    return tafsir.openTafsirBook(this, book);
-  }
-
-  renderTafsir(query) {
-    return tafsir.renderTafsir(this, query);
-  }
-
-  renderTafsirBooks(query) {
-    return tafsir.renderTafsirBooks(this, query);
-  }
-
-  renderTafsirSurahs(query) {
-    return tafsir.renderTafsirSurahs(this, query);
-  }
-
-  openTafsirSurah(suraName, entries) {
-    return tafsir.openTafsirSurah(this, suraName, entries);
-  }
+  const search = byId("acSearch", HTMLInputElement);
+  search.value = "";
+  state.query = "";
+  search.placeholder = t(`acSearch_${tab}`);
+  search.setAttribute("aria-label", search.placeholder);
+  TABS[tab].load();
 }
 
-// Settings, theme, window buttons, the fullscreen toggle and tooltips: app/app-shell.js.
+// The tabs follow the ARIA tabs pattern: arrows move between them (mirrored in Arabic),
+// Home/End to the first/last. https://www.w3.org/WAI/ARIA/apg/patterns/tabs/
+function bindTabs() {
+  const list = byId("acTabs", HTMLElement);
+  list.addEventListener("click", (e) => {
+    const tab = /** @type {Element} */ (e.target).closest(".ac-tab");
+    if (tab instanceof HTMLButtonElement && tab.dataset.tab)
+      showTab(tab.dataset.tab);
+  });
+  list.addEventListener("keydown", (e) => {
+    const keys = Object.keys(TABS);
+    const at = keys.indexOf(state.tab);
+    const rtl = document.documentElement.dir === "rtl";
+    const step = { ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1 }[e.key];
+    let next = -1;
+    if (step) next = (at + step + keys.length) % keys.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = keys.length - 1;
+    if (next === -1) return;
+    e.preventDefault();
+    showTab(keys[next], true);
+  });
+}
+
+function bindSearch() {
+  const search = byId("acSearch", HTMLInputElement);
+  search.addEventListener("input", () => {
+    state.query = search.value;
+    TABS[state.tab].render();
+  });
+  search.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && search.value) {
+      e.preventDefault();
+      search.value = "";
+      state.query = "";
+      TABS[state.tab].render();
+    }
+  });
+}
+
+function bindLists() {
+  byId("acMain", HTMLElement).addEventListener("click", (e) => {
+    const button = /** @type {Element} */ (e.target).closest("button");
+    if (!(button instanceof HTMLButtonElement)) return;
+    const retry = button.dataset.retry;
+    if (retry) {
+      const tab = retry === "reciters" ? "recite" : retry;
+      TABS[tab].load();
+    } else if (button.closest("#acReciters")) {
+      reciters.onCardAction(button);
+    } else if (button.closest("#acTafsir")) {
+      tafsir.onTafsirAction(button);
+    } else if (button.closest("#acTadabor")) {
+      tadabor.onTadaborAction(button);
+    }
+  });
+}
+
 function initAlbumsPage() {
-  return new AlbumsManager().init();
+  loadPrefs();
+  bindTabs();
+  bindSearch();
+  bindFilters(reciters.renderReciters);
+  bindMoshafDialog();
+  bindLists();
+  showTab(state.tab);
 }
 
 module.exports = { initAlbumsPage };
