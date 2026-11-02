@@ -1,671 +1,630 @@
-/* ============================================================
-   RADIO PAGE — VINYL STUDIO REDESIGN
-   ============================================================ */
-
 @layer pages {
+  /* Muslim Radio: the radios (two tabs, a search) on one side, what is playing on the other
+     (mirrored in Arabic), one column in a narrow window with the player first. As on the other
+     redesigned pages, the radio that is playing and the chosen tab are white, not the accent:
+     on several themes the accent is close to the background. */
+
   .radio-container {
+    position: relative;
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 16px;
     gap: 12px;
-    position: relative;
-    z-index: var(--z-page);
-    font-family: var(--font-media);
+    padding: 16px;
+    box-sizing: border-box;
     overflow: hidden;
-  }
-
-  /* Ambient background glow */
-  .radio-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(
-        ellipse 60% 40% at 50% 20%,
-        rgba(255, 165, 50, 0.07) 0%,
-        transparent 70%
-      ),
-      radial-gradient(
-        ellipse 40% 30% at 80% 80%,
-        rgba(255, 100, 30, 0.05) 0%,
-        transparent 60%
-      );
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Header: layout comes from the shared .page-header component
-     (03-components/page-header.css). Only what is specific to this page is here. */
-  .radio-header {
-    z-index: var(--z-page-header);
   }
 
   .radio-controls {
-    z-index: var(--z-page-header-controls);
-  }
-
-  /* ========== MAIN RADIO CONTENT ========== */
-  .radio-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    overflow: hidden auto;
-    position: relative;
-    z-index: 1;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 165, 50, 0.3) transparent;
-    -webkit-app-region: no-drag;
-
-    /* Always LTR so scrollbar stays on the RIGHT for all languages */
-    direction: ltr;
-  }
-
-  /* Re-apply LTR to all children so Arabic/RTL text still renders correctly */
-  .radio-content > * {
-    direction: inherit;
-  }
-
-  /* Scrollbar always on right */
-  .radio-content::-webkit-scrollbar {
-    width: 3px;
-  }
-
-  .radio-content::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .radio-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 165, 50, 0.3);
-    border-radius: 2px;
-  }
-
-  /* ========== VINYL DISC - NOW PLAYING ========== */
-  .now-playing-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px 0 12px;
-    position: relative;
-  }
-
-  /* Vinyl disc wrapper */
-  .vinyl-wrapper {
-    position: relative;
-    width: 160px;
-    height: 160px;
-    margin: 0 auto 16px;
-    flex-shrink: 0;
-  }
-
-  .vinyl-disc {
-    width: 160px;
-    height: 160px;
-    border-radius: 50%;
-    position: relative;
-    transition: transform 0.4s ease;
-    will-change: transform;
-  }
-
-  /* Spinning state */
-  .vinyl-disc.spinning {
-    animation: vinyl-spin 4s linear infinite;
-  }
-
-  @keyframes vinyl-spin {
-    from {
-      transform: rotate(0deg);
-    }
-
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  /* Vinyl SVG rings rendered via box-shadow */
-  .vinyl-disc-inner {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background:
-      radial-gradient(
-        circle at 50% 50%,
-        transparent 0%,
-        transparent 28%,
-        var(--white-a03) 28.5%,
-        var(--white-a03) 29%,
-        transparent 29%,
-        transparent 35%,
-        var(--white-a03) 35.5%,
-        var(--white-a03) 36%,
-        transparent 36%,
-        transparent 42%,
-        var(--white-a03) 42.5%,
-        var(--white-a03) 43%,
-        transparent 43%,
-        transparent 49%
-      ),
-      conic-gradient(
-        from 0deg,
-        #1a1a1a 0deg,
-        #222 30deg,
-        #1a1a1a 60deg,
-        #222 90deg,
-        #1a1a1a 120deg,
-        #222 150deg,
-        #1a1a1a 180deg,
-        #222 210deg,
-        #1a1a1a 240deg,
-        #222 270deg,
-        #1a1a1a 300deg,
-        #222 330deg,
-        #1a1a1a 360deg
-      );
-    box-shadow:
-      0 0 0 2px var(--white-a06),
-      0 8px 32px var(--black-a60),
-      0 2px 8px var(--black-a40);
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Center hole with album art */
-  .vinyl-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid rgba(255, 165, 50, 0.6);
-    box-shadow:
-      0 0 0 2px var(--black-a80),
-      0 0 16px rgba(255, 165, 50, 0.3);
     z-index: 2;
   }
 
-  .vinyl-center img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  /* Default state — glowing dot */
-  .vinyl-center-default {
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(
-      circle,
-      rgba(255, 165, 50, 0.8) 0%,
-      rgba(255, 100, 30, 0.4) 60%,
-      transparent 100%
-    );
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .vinyl-center-default i {
-    font-size: 18px;
-    color: rgba(255, 165, 50, 0.9);
-  }
-
-  /* Tonearm needle */
-  .tonearm {
-    position: absolute;
-    top: -8px;
-    right: -12px;
-    width: 60px;
-    height: 60px;
-    pointer-events: none;
-    z-index: 10;
-    transform-origin: 8px 8px;
-    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-
-  .tonearm.playing {
-    transform: rotate(-18deg);
-  }
-
-  .tonearm.idle {
-    transform: rotate(15deg);
-  }
-
-  .tonearm svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Now playing info text */
-  .now-playing-info {
-    text-align: center;
-    width: 100%;
-    padding: 0 12px;
-  }
-
-  .now-playing-label {
-    font-size: 9px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: rgba(255, 165, 50, 0.7);
-    margin-bottom: 5px;
-    font-weight: 500;
-  }
-
-  .station-name {
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 26px;
-    color: var(--text-bright);
-    letter-spacing: 1px;
-    line-height: 1.1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 3px;
-  }
-
-  .station-description {
-    font-size: 11px;
-    color: var(--white-a40);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* Sound bars animation */
-  .sound-bars {
-    display: none;
-    align-items: flex-end;
-    gap: 3px;
-    height: 14px;
-    justify-content: center;
-    margin-top: 6px;
-  }
-
-  .sound-bars.active {
-    display: flex;
-  }
-
-  .sound-bars span {
-    width: 3px;
-    background: rgba(255, 165, 50, 0.8);
-    border-radius: 2px;
-    animation: bar 1s infinite ease-in-out;
-  }
-
-  .station-card-bars span {
-    width: 2px;
-    background: var(--color-warning);
-    border-radius: 1px;
-    animation: bar 0.8s infinite ease-in-out;
-  }
-
-  .sound-bars span:nth-child(1) {
-    height: 6px;
-    animation-delay: 0s;
-  }
-
-  .sound-bars span:nth-child(2) {
-    height: 10px;
-    animation-delay: 0.15s;
-  }
-
-  .sound-bars span:nth-child(3) {
-    height: 14px;
-    animation-delay: 0.3s;
-  }
-
-  .sound-bars span:nth-child(4) {
-    height: 8px;
-    animation-delay: 0.45s;
-  }
-
-  .sound-bars span:nth-child(5) {
-    height: 12px;
-    animation-delay: 0.6s;
-  }
-
-  @keyframes bar {
-    0%,
-    100% {
-      transform: scaleY(0.4);
-      opacity: 0.5;
-    }
-
-    50% {
-      transform: scaleY(1);
-      opacity: 1;
-    }
-  }
-
-  /* ========== PLAYER CONTROLS (INLINE, ALWAYS VISIBLE) ========== */
-  .player-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px 16px 14px;
-    direction: ltr;
-  }
-
-  .player-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: var(--white-a06);
-    border: 1px solid var(--border-medium);
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-    font-size: 13px;
-  }
-
-  .player-btn:hover {
-    background: var(--white-a12);
-    color: var(--text-bright);
-    border-color: var(--white-a20);
-  }
-
-  .player-btn:active {
-    transform: scale(0.92);
-  }
-
-  .player-btn.play-pause-btn {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, var(--color-warning), #f60);
-    border: none;
-    color: var(--text-bright);
-    font-size: 16px;
-    box-shadow: 0 4px 20px rgba(255, 140, 0, 0.35);
-  }
-
-  .player-btn.play-pause-btn:hover {
-    transform: scale(1.08);
-    box-shadow: 0 6px 24px rgba(255, 140, 0, 0.5);
-    background: linear-gradient(135deg, #ffbb20, #f72);
-  }
-
-  .volume-control {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-inline-start: 4px;
-  }
-
-  .volume-slider {
-    width: 65px;
-    height: 3px;
-    appearance: none;
-    background: var(--white-a12);
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-  }
-
-  .volume-slider::-webkit-slider-thumb {
-    appearance: none;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--color-warning);
-    cursor: pointer;
-    box-shadow: 0 0 6px rgba(255, 170, 0, 0.5);
-  }
-
-  /* ========== DIVIDER ========== */
-  .stations-divider {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 16px 10px;
-  }
-
-  .stations-divider-line {
+  .rd-layout {
     flex: 1;
-    height: 1px;
-    background: var(--white-a07);
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 12px;
+    -webkit-app-region: no-drag;
   }
 
-  .stations-divider-label {
-    font-size: 9px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--white-a30);
-    white-space: nowrap;
-  }
-
-  /* ========== STATIONS LIST (HORIZONTAL ROWS) ========== */
-  .stations-section {
-    padding: 0 4px 8px;
-    direction: ltr;
-  }
-
-  .stations-grid {
+  .rd-main,
+  .rd-panel {
+    min-width: 0;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-  }
-
-  .station-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    border-radius: 12px;
     background: var(--surface-subtle);
     border: 1px solid var(--border-subtle);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
+    border-radius: var(--radius-lg);
   }
 
-  /* Active glow bar on left */
-  .station-card::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 20%;
-    bottom: 20%;
-    width: 3px;
-    border-radius: 0 2px 2px 0;
-    background: var(--color-warning);
-    opacity: 0;
-    transition: opacity 0.25s ease;
+  /* ── The radios ────────────────────────────────────────────────────── */
+
+  .rd-main {
+    gap: 10px;
+    padding: 12px;
   }
 
-  .station-card.active::before {
-    opacity: 1;
-  }
-
-  .station-card:hover {
-    background: var(--white-a06);
-    border-color: rgba(255, 165, 50, 0.2);
-    transform: translateX(3px);
-  }
-
-  .station-card.active {
-    background: rgba(255, 140, 0, 0.08);
-    border-color: rgba(255, 140, 0, 0.25);
-  }
-
-  .station-card-image {
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--border-medium);
+  .rd-toolbar {
     flex-shrink: 0;
+    display: flex;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
-  .station-card-image img {
+  .rd-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 3px;
+    border-radius: 10px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .rd-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: none;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .rd-tab:hover {
+    color: var(--text-primary);
+  }
+
+  .rd-tab[aria-selected="true"] {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
+    color: var(--text-primary);
+  }
+
+  .rd-search {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    align-items: center;
+  }
+
+  .rd-search-icon {
+    position: absolute;
+    inset-inline-start: 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  .rd-search-input {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    min-height: 36px;
+    padding-block: 7px;
+    padding-inline: 30px 10px;
+    border: 1px solid var(--border-medium);
+    border-radius: 10px;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
   }
 
-  .station-card-info {
+  .rd-search-input::placeholder {
+    color: var(--text-faint);
+  }
+
+  .rd-search-input:focus-visible {
+    border-color: var(--white-a40);
+  }
+
+  .rd-list {
     flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .rd-group {
+    margin: 6px 0 2px;
+    padding-inline-start: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .rd-group:first-child {
+    margin-top: 0;
+  }
+
+  .rd-row {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+  }
+
+  .rd-row:hover {
+    background: var(--white-a03);
+  }
+
+  .rd-row.is-current {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
+  }
+
+  .rd-row-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .rd-row-main:focus-visible {
+    outline: 2px solid var(--white-a40);
+    outline-offset: -2px;
+  }
+
+  .rd-row-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* names written in the other direction than the page keep to the page's side */
+  .rd-row-name,
+  .rd-row-sub {
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rd-row-name {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .rd-row-sub {
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+
+  [dir="rtl"] .rd-row-name,
+  [dir="rtl"] .rd-row-sub {
+    text-align: right;
+  }
+
+  .rd-row-state {
+    flex-shrink: 0;
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+
+  .rd-row-state i {
+    font-size: 7px;
+    vertical-align: 2px;
+    color: var(--text-primary);
+  }
+
+  .rd-star {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    margin-inline-end: 4px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--text-faint);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .rd-star:hover {
+    background: var(--surface-3);
+    color: var(--text-primary);
+  }
+
+  .rd-star[aria-pressed="true"] {
+    color: var(--text-primary);
+  }
+
+  .rd-star:focus-visible {
+    outline: 2px solid var(--white-a40);
+    outline-offset: -2px;
+  }
+
+  .rd-message {
+    margin: 0;
+    padding: 32px 16px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .rd-retry {
+    margin-inline-start: 6px;
+    padding: 4px 10px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* A station's logo (square, its own white background) or a reciter's photo */
+  .rd-logo,
+  .rd-photo {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .rd-logo {
+    display: grid;
+    place-items: center;
+    background: #fff;
+  }
+
+  .rd-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .rd-logo.is-large,
+  .rd-photo.is-large {
+    width: 112px;
+    height: 112px;
+    border-radius: var(--radius-lg);
+    font-size: 36px;
+  }
+
+  /* ── The panel: what is playing ────────────────────────────────────── */
+
+  .rd-panel {
+    gap: 12px;
+    padding: 12px;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .rd-panel-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rd-panel-heading {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding-inline-start: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .rd-panel-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .rd-art {
+    display: grid;
+    place-items: center;
+    padding-top: 4px;
+  }
+
+  .rd-art-icon {
+    width: 112px;
+    height: 112px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    color: var(--text-muted);
+    font-size: 34px;
+  }
+
+  .rd-now {
+    width: 100%;
     min-width: 0;
   }
 
-  .station-card-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-soft);
-    margin-bottom: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .rd-now-name {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
   }
 
-  .station-card.active .station-card-name {
-    color: #fc4;
+  .rd-now-sub {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
   }
 
-  .station-card-location {
-    font-size: 10px;
-    color: var(--white-a35);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* Mini sound bars on active card */
-  .station-card-bars {
-    display: none;
-    align-items: flex-end;
-    gap: 2px;
-    height: 12px;
-    margin-inline-end: 4px;
-  }
-
-  .station-card.active .station-card-bars {
-    display: flex;
-  }
-
-  .station-card-bars span:nth-child(1) {
-    height: 5px;
-    animation-delay: 0s;
-  }
-
-  .station-card-bars span:nth-child(2) {
-    height: 9px;
-    animation-delay: 0.12s;
-  }
-
-  .station-card-bars span:nth-child(3) {
-    height: 6px;
-    animation-delay: 0.24s;
-  }
-
-  .station-play-btn {
-    width: 30px;
-    height: 30px;
+  /* "Live": a white dot before it */
+  .rd-now-sub.is-live::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-inline-end: 6px;
     border-radius: 50%;
-    background: var(--white-a07);
-    border: 1px solid var(--white-a12);
-    color: var(--text-faint);
+    background: var(--text-primary);
+    vertical-align: 1px;
+  }
+
+  .rd-controls {
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    gap: 10px;
+  }
+
+  .rd-btn,
+  .rd-panel-toggle,
+  .rd-icon-btn {
     flex-shrink: 0;
-    font-size: 10px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 13px;
+    cursor: pointer;
   }
 
-  .station-play-btn:hover {
-    background: rgba(255, 140, 0, 0.2);
-    border-color: rgba(255, 140, 0, 0.4);
-    color: var(--color-warning);
-    transform: scale(1.1);
+  .rd-btn {
+    width: 38px;
+    height: 38px;
   }
 
-  .station-card.active .station-play-btn {
-    background: rgba(255, 100, 50, 0.2);
-    border-color: rgba(255, 100, 50, 0.4);
-    color: #f64;
+  .rd-btn-main {
+    width: 46px;
+    height: 46px;
+    font-size: 16px;
   }
 
-  /* ========== LOADING STATE ========== */
-  .radio-loading {
+  .rd-panel-toggle,
+  .rd-icon-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .rd-icon-btn {
+    border-color: transparent;
+    background: none;
+  }
+
+  .rd-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .rd-btn:hover:not(:disabled),
+  .rd-panel-toggle:hover,
+  .rd-icon-btn:hover {
+    background: var(--surface-3);
+  }
+
+  .rd-btn[aria-pressed="true"] {
+    border-color: var(--white-a40);
+  }
+
+  /* media controls stay left to right in Arabic (Material bidirectionality) */
+  .rd-volume {
+    width: 100%;
     display: flex;
+    align-items: center;
+    gap: 8px;
+    direction: ltr;
+  }
+
+  .rd-range {
+    flex: 1;
+    min-width: 0;
+    height: 18px;
+    margin: 0;
+    background: transparent;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .rd-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(
+      to right,
+      var(--text-primary) var(--fill, 100%),
+      var(--white-a15) var(--fill, 100%)
+    );
+  }
+
+  .rd-range::-webkit-slider-thumb {
+    width: 12px;
+    height: 12px;
+    margin-top: -4px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    appearance: none;
+  }
+
+  .rd-range:focus-visible {
+    outline: 2px solid var(--white-a40);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .rd-note {
+    margin: 0;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--text-faint);
+  }
+
+  /* ── The panel folded to the edge: a strip of icons ───────────────── */
+
+  /* the arrows point to the edge the panel folds to (mirrored in Arabic) */
+  [dir="rtl"] .rd-panel-toggle i.fa-angles-right {
+    transform: scaleX(-1);
+  }
+
+  .rd-rail {
+    display: none;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     gap: 8px;
-    padding: 16px;
-    color: var(--white-a40);
-    font-size: 11px;
   }
 
-  .radio-loading i {
-    font-size: 20px;
-    color: var(--color-warning);
+  .rd-layout.is-panel-folded {
+    grid-template-columns: minmax(0, 1fr) 58px;
   }
 
-  /* ========== FOOTER ========== */
-  .radio-footer {
-    padding-top: 8px;
-    border-top: 1px solid var(--border-subtle);
-    text-align: center;
-    position: relative;
-    z-index: 1;
-  }
-
-  .radio-footer-text {
-    font-size: 10px;
-    color: var(--white-a20);
-    font-style: italic;
-    line-height: 1.4;
-    letter-spacing: 0.3px;
-  }
-
-  /* ========== TOAST ========== */
-  .radio-toast {
-    position: fixed;
-    bottom: 16px;
-    right: 16px;
-    background: linear-gradient(135deg, #f44, #c22);
-    color: var(--text-bright);
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    box-shadow: 0 4px 16px rgba(255, 60, 60, 0.3);
-    display: flex;
+  .rd-layout.is-panel-folded .rd-panel {
     align-items: center;
-    gap: 8px;
-    z-index: var(--z-dialog);
-    transform: translateX(110%);
-    opacity: 0;
-    max-width: 240px;
-    pointer-events: none;
-    transition:
-      transform 0.25s ease,
-      opacity 0.25s ease;
+    padding: 12px 0;
   }
 
-  .radio-toast.show {
-    transform: translateX(0);
-    opacity: 1;
+  .rd-layout.is-panel-folded .rd-panel-heading,
+  .rd-layout.is-panel-folded .rd-panel-body {
+    display: none;
   }
 
-  /* Station logo inside the vinyl label (shown by radio/now-playing.js while a station plays) */
-  .vinyl-station-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    inset: 0;
+  .rd-layout.is-panel-folded .rd-rail {
+    display: flex;
+  }
+
+  .rd-layout.is-panel-folded .rd-panel-toggle i.fa-angles-right {
+    transform: rotate(180deg);
+  }
+
+  [dir="rtl"] .rd-layout.is-panel-folded .rd-panel-toggle i.fa-angles-right {
+    transform: none;
+  }
+
+  /* ── Maximized window: more room ───────────────────────────────────── */
+
+  .fullscreen-mode .rd-layout:not(.is-panel-folded) {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 16px;
+  }
+
+  /* ── Narrow window: one column, the player first, the page scrolls ─── */
+
+  @media (width <= 700px) {
+    .rd-layout,
+    .rd-layout.is-panel-folded {
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-rows: max-content;
+      overflow: hidden auto;
+    }
+
+    .rd-panel {
+      order: -1;
+      overflow: visible;
+    }
+
+    .rd-list {
+      overflow: visible;
+    }
+
+    /* the player in one line: art, name, controls */
+    .rd-panel-body {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      text-align: start;
+    }
+
+    .rd-art {
+      padding-top: 0;
+    }
+
+    .rd-logo.is-large,
+    .rd-photo.is-large,
+    .rd-art-icon {
+      width: 56px;
+      height: 56px;
+      font-size: 20px;
+    }
+
+    .rd-volume,
+    .rd-note {
+      grid-column: 1 / -1;
+    }
+
+    /* one column: nothing to fold */
+    .rd-panel-head .rd-panel-toggle,
+    .rd-layout.is-panel-folded .rd-rail {
+      display: none;
+    }
+
+    .rd-layout.is-panel-folded .rd-panel {
+      align-items: stretch;
+      padding: 12px;
+    }
+
+    .rd-layout.is-panel-folded .rd-panel-heading {
+      display: block;
+    }
+
+    .rd-layout.is-panel-folded .rd-panel-body {
+      display: grid;
+    }
+  }
+
+  @media (width <= 480px) {
+    .radio-container {
+      padding: 8px;
+      gap: 8px;
+    }
   }
 }

@@ -52,7 +52,7 @@
         "fr": "Algérie",
         "ar": "الجزائر"
       },
-      "url": "https://radiocoran.ice.infomaniak.ch/coran.mp3",
+      "url": "https://webradio1.tda.dz:8001/Coran_64K.mp3",
       "image": "../../../assets/images/radio/logo_radio_algerie.jpg",
       "description": {
         "en": "Live Quran recitation from Algeria",

@@ -28,6 +28,7 @@ const PLAYER_COMMANDS = new Set([
   "resume",
   "seek",
   "set-playlist",
+  "stop",
   "volume",
 ]);
 

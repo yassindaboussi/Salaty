@@ -70,6 +70,18 @@ async function getReciters(language = "eng") {
   return reciters;
 }
 
+// The 24/7 radios (one per reciter, and some on a theme): [{ id, name, url }].
+async function getRadios(language = "eng") {
+  const key = `mp3quran:radios:${language}`;
+  const cached = cacheGet(key);
+  if (cached) return cached;
+
+  const data = await fetchJson(`${BASE_URL}/radios?language=${language}`);
+  const radios = (data.radios || []).filter((r) => r?.id && r.url);
+  cacheSet(key, radios);
+  return radios;
+}
+
 async function getSurahNames(language = "eng") {
   const key = `mp3quran:suwar:${language}`;
   const cached = cacheGet(key);
@@ -265,6 +277,7 @@ function getTafsirTracksForSura(entries, suraName, bookName) {
 module.exports = {
   apiLanguage,
   getReciters,
+  getRadios,
   getSurahNames,
   getReciterTracks,
   getTadabor,

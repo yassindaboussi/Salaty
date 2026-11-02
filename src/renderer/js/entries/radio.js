@@ -7,4 +7,5 @@ startPageWhenReady({
   init: initRadioPage,
   screenSize: "radio-container",
   feature: "radio",
+  miniPlayer: false, // the panel is the player here
 });

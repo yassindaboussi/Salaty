@@ -18,6 +18,8 @@ class BackgroundPlayer {
     this.sound = null;
     this.isPlaying = false;
     this.stepInterval = null;
+    this.failed = false; // the last track could not be loaded (the page tells the user)
+    this.loading = false; // asked to play, the audio not started yet (a radio connecting)
 
     this.initIPC();
     this.initUI();
@@ -44,6 +46,9 @@ class BackgroundPlayer {
           break;
         case "pause":
           this.togglePlay(false);
+          break;
+        case "stop":
+          this.stop();
           break;
         case "resume":
           this.togglePlay(true);
@@ -73,6 +78,7 @@ class BackgroundPlayer {
 
   setPlaylist(tracks, startIndex = 0) {
     this.tracks = tracks;
+    this.retried = false;
     this.playTrack(startIndex);
   }
 
@@ -113,6 +119,8 @@ class BackgroundPlayer {
       duration: this.sound ? this.sound.duration() : 0,
       currentTime: this.sound ? this.sound.seek() : 0,
       volume: Howler.volume(),
+      failed: this.failed,
+      loading: this.loading,
     };
     ipcRenderer.send("player-update", { type: "state", state });
     this.updateLocalUI();
@@ -187,13 +195,19 @@ class BackgroundPlayer {
     this.currentTrackIndex = index;
     this.currentTrackUrl = track.url;
     this.isPlaying = true;
+    this.failed = false;
+    this.loading = true;
 
     this.sendState();
 
     this.sound = new Howl({
       src: [track.url],
       html5: true,
+      // a radio's URL has no file extension to tell the format by ("/live"): the streams are MP3
+      ...(track.live ? { format: ["mp3"] } : {}),
       onplay: () => {
+        this.loading = false;
+        this.failed = false;
         this.isPlaying = true;
         this.sendState();
         this.startStepLoop();
@@ -208,18 +222,28 @@ class BackgroundPlayer {
       },
       onloaderror: (id, err) => {
         console.error("Load error", err);
+        // a radio server sometimes drops the first connection: try once more before failing
+        if (track.live && !this.retried) {
+          this.retried = true;
+          this.currentTrackUrl = null;
+          setTimeout(() => this.playTrack(index), 1000);
+          return;
+        }
         // Without this, a track that fails to load left isPlaying stuck
         // at true (set optimistically above, before we knew whether the
         // load would succeed) — the UI would show "playing" forever with
         // nothing actually happening. Reset state and move on instead of
         // getting stuck.
         this.isPlaying = false;
+        this.loading = false;
+        this.failed = true;
         this.sendState();
         this.playNext();
       },
       onplayerror: (id, err) => {
         console.error("Play error", err);
         this.isPlaying = false;
+        this.loading = false;
         this.sendState();
       },
     });
@@ -234,11 +258,29 @@ class BackgroundPlayer {
       shouldPlay = !this.isPlaying;
     }
 
-    if (shouldPlay) {
+    const track = this.tracks[this.currentTrackIndex];
+    if (shouldPlay && track?.live) {
+      // a live stream starts again at "now", not where it was paused
+      this.currentTrackUrl = null;
+      this.playTrack(this.currentTrackIndex);
+    } else if (shouldPlay) {
       this.sound.play();
     } else {
       this.sound.pause();
     }
+  }
+
+  // Nothing loaded any more (the radio's stop): the mini players hide.
+  stop() {
+    if (this.sound) this.sound.unload();
+    this.sound = null;
+    this.tracks = [];
+    this.currentTrackIndex = -1;
+    this.currentTrackUrl = null;
+    this.isPlaying = false;
+    this.loading = false;
+    this.stopStepLoop();
+    this.sendState();
   }
 
   playNext() {

@@ -42,10 +42,12 @@ const POLICY = {
   "object-src": ["'none'"],
   "base-uri": ["'none'"],
   "form-action": ["'none'"],
+  // an http address (e.g. a radio stream that redirects to http) is loaded over https instead
+  "upgrade-insecure-requests": [],
 };
 
 const POLICY_TEXT = Object.entries(POLICY)
-  .map(([directive, sources]) => `${directive} ${sources.join(" ")}`)
+  .map(([directive, sources]) => [directive, ...sources].join(" "))
   .join("; ");
 
 // written the way Prettier formats a tag this long, so `npm run format` leaves it alone
