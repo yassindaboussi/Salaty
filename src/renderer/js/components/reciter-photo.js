@@ -2,9 +2,8 @@
 
 // A reciter's photo, or the first letter of the name when there is none. The photos are bundled
 // (assets/images/reciters/<mp3quran.net reciter id>.jpg, 240 × 240; the list of ids is
-// data/reciter-photos.json), so they show offline too. They come from MAWAQIT's CDN
-// (cdn.mawaqit.net/quran/reciters-pictures), which names them by the same ids. The image is
-// decorative: the name is always next to it.
+// data/reciter-photos.json), so they show offline too. The image is decorative: the name is
+// always next to it.
 const { html } = require("../utils/html");
 const { ids } = require("../../data/reciter-photos.json");
 
