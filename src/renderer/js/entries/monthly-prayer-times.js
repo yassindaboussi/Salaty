@@ -1,7 +1,9 @@
 "use strict";
 
 const { startPageWhenReady } = require("../app/app-shell");
-const { initMonthlyPrayerTimesPage } = require("../pages/monthly-prayer-times");
+const {
+  initMonthlyPrayerTimesPage,
+} = require("../pages/monthly-prayer-times/index");
 
 startPageWhenReady({
   init: initMonthlyPrayerTimesPage,
