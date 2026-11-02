@@ -10,8 +10,16 @@
 //             replace themselves (the macOS build is not signed), and an app run from an
 //             unpacked folder has no installer to update
 //   "store"   the Microsoft Store installs them; the app does not check at all
+//
+// A downloaded update installs when the app quits (autoInstallOnAppQuit). It can still be
+// waiting on the next start: "Later", then the PC was restarted (Windows ends apps without a
+// normal quit) or the window was only closed to the tray. Its version is remembered
+// (<userData>/pending-update.json), and when a check finds that version again it is made
+// ready at once: electron-updater re-checks the file it kept (sha512) and only downloads it
+// again if that file is gone or damaged. So the page says "Update ready", not "Download".
 const fs = require("fs");
 const path = require("path");
+const { app } = require("electron");
 const secureIpc = require("../ipc/secure-ipc");
 const { openExternalSafely } = require("../app/security");
 const log = require("../services/logger").logger("Updater");
@@ -27,6 +35,7 @@ const DOWNLOAD_PAGE =
 
 /** @type {AppUpdater | null} */
 let updater = null;
+let readyingPending = false; // making a kept download ready (no "update-available" sent)
 /** @type {() => BrowserWindow | null} */
 let getMainWindow = () => null;
 
@@ -53,6 +62,32 @@ function send(channel, ...args) {
   if (win && !win.isDestroyed()) win.webContents.send(channel, ...args);
 }
 
+// ── The version already downloaded, waiting to be installed ─────────────────
+
+const pendingFile = () =>
+  path.join(app.getPath("userData"), "pending-update.json");
+
+/** @returns {string} "" when none */
+function pendingVersion() {
+  try {
+    const { version } = JSON.parse(fs.readFileSync(pendingFile(), "utf8"));
+    return typeof version === "string" ? version : "";
+  } catch {
+    return ""; // no file (nothing waiting) or unreadable
+  }
+}
+
+/** @param {string} version "" forgets it */
+function setPendingVersion(version) {
+  try {
+    if (version)
+      fs.writeFileSync(pendingFile(), JSON.stringify({ version }), "utf8");
+    else fs.rmSync(pendingFile(), { force: true });
+  } catch (err) {
+    log.warn("pending update file:", err);
+  }
+}
+
 /** electron-updater, loaded and set up the first time it is needed. */
 function getUpdater() {
   if (updater) return updater;
@@ -61,16 +96,37 @@ function getUpdater() {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
 
-  autoUpdater.on("update-available", (info) => send("update-available", info));
-  autoUpdater.on("update-not-available", () => send("update-not-available"));
+  autoUpdater.on("update-available", (info) => {
+    // downloaded before and not installed yet: make it ready, don't ask to download it again
+    if (updateMode() === "auto" && info?.version === pendingVersion()) {
+      log.info(
+        `update ${info.version} was downloaded before: getting it ready`,
+      );
+      readyingPending = true;
+      autoUpdater.downloadUpdate().catch(() => {});
+      return;
+    }
+    send("update-available", info);
+  });
+  autoUpdater.on("update-not-available", () => {
+    setPendingVersion(""); // installed, or withdrawn from the releases
+    send("update-not-available");
+  });
   autoUpdater.on("download-progress", (progress) =>
     send("download-progress", progress),
   );
-  autoUpdater.on("update-downloaded", (info) =>
-    send("update-downloaded", info),
-  );
+  autoUpdater.on("update-downloaded", (info) => {
+    readyingPending = false;
+    setPendingVersion(String(info?.version ?? ""));
+    send("update-downloaded", info);
+  });
   autoUpdater.on("error", (err) => {
     log.error("update check failed:", err);
+    // the kept file could not be made ready: forget it, the next check offers it again
+    if (readyingPending) {
+      readyingPending = false;
+      setPendingVersion("");
+    }
     send("update-error", err?.message || String(err));
   });
   updater = autoUpdater;
