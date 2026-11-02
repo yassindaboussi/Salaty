@@ -16,6 +16,7 @@ const secureIpc = require("./secure-ipc");
 const analytics = require("../services/analytics-manager");
 const { refreshTrayMenu } = require("../windows/tray");
 const log = require("../services/logger").logger("IPC");
+const { exportPagePdf } = require("../app/export-pdf");
 
 // getMainWindow: returns the main window (or null); read whenever a handler runs.
 function registerIpcHandlers({ getMainWindow }) {
@@ -42,6 +43,10 @@ function registerIpcHandlers({ getMainWindow }) {
     if (y === undefined || m === undefined) return null;
     return prayerTimes.getMonth(settingsStore.get(), y, m);
   });
+  // The monthly table as a PDF (its print styles), saved where the user picks.
+  secureIpc.handle("export-month-pdf", (event, name) =>
+    exportPagePdf(event.sender, check.text(name, 100)),
+  );
   // Ramadan (Hijri month 9) of a Hijri year, with its times, for the Ramadan page.
   secureIpc.handle("get-ramadan-calendar", (_e, hijriYear) => {
     const y = check.int(hijriYear, 1400, 1600);

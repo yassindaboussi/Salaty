@@ -21,6 +21,7 @@
         <header
           class="page-header monthly-header"
           data-page-header
+          data-controls-class="monthly-controls"
           data-back="features"
         >
           <h1
@@ -32,67 +33,115 @@
           </h1>
         </header>
 
-        <main class="monthly-content">
-          <!-- Month navigator -->
-          <div class="monthly-nav">
-            <button
-              type="button"
-              class="monthly-nav-btn"
-              id="mptPrevBtn"
-              data-tooltip="tooltipPrevMonth"
-            >
-              <i class="fas fa-chevron-left" aria-hidden="true"></i>
-            </button>
-            <div class="monthly-nav-label" id="mptMonthLabel">—</div>
-            <button
-              type="button"
-              class="monthly-nav-btn"
-              id="mptNextBtn"
-              data-tooltip="tooltipNextMonth"
-            >
-              <i class="fas fa-chevron-right" aria-hidden="true"></i>
-            </button>
-            <button type="button" class="monthly-today-btn" id="mptTodayBtn">
-              <i class="fas fa-calendar-day" aria-hidden="true"></i>
-              <span id="mptTodayLabel" data-i18n="today">Today</span>
-            </button>
-          </div>
-
-          <!-- Today snapshot -->
-          <div class="monthly-today-card" id="mptTodayCard">
-            <div class="monthly-today-date" id="mptTodayDate">—</div>
-            <div class="monthly-today-row" id="mptTodayRow">
-              <!-- 5 prayer cells injected via JS -->
+        <main class="mp-layout" id="mpLayout">
+          <!-- The month: navigation, then the timetable -->
+          <section class="mp-main">
+            <div class="mp-head">
+              <div class="mp-nav">
+                <button
+                  type="button"
+                  class="mp-btn"
+                  id="mpPrev"
+                  data-tooltip="tooltipPrevMonth"
+                >
+                  <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                </button>
+                <div class="mp-month">
+                  <h2 class="mp-month-name" id="mpMonth" aria-live="polite">
+                    —
+                  </h2>
+                  <p class="mp-month-hijri" id="mpMonthHijri"></p>
+                </div>
+                <button
+                  type="button"
+                  class="mp-btn"
+                  id="mpNext"
+                  data-tooltip="tooltipNextMonth"
+                >
+                  <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                </button>
+              </div>
+              <div class="mp-actions">
+                <button type="button" class="mp-btn mp-btn-text" id="mpToday">
+                  <span data-i18n="today">Today</span>
+                </button>
+                <button
+                  type="button"
+                  class="mp-btn"
+                  id="mpPdf"
+                  data-tooltip="mpExportPdf"
+                >
+                  <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <!-- Table -->
-          <div class="monthly-table-wrap">
-            <div class="monthly-loading" id="mptLoading">
-              <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
-              <span id="mptLoadingText" data-i18n="loadingMonthlyPrayerTimes"
-                >Loading prayer times...</span
+            <!-- shown in the PDF only -->
+            <div class="mp-print-head" id="mpPrintHead"></div>
+
+            <p class="mp-message" id="mpMessage" role="status"></p>
+
+            <div class="mp-table-wrap" id="mpTableWrap" hidden>
+              <table class="mp-table" id="mpTable">
+                <thead>
+                  <tr id="mpTableHead"></tr>
+                </thead>
+                <tbody id="mpTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- The selected day's times and the location -->
+          <aside class="mp-panel">
+            <div class="mp-panel-head">
+              <h2 class="mp-panel-heading" id="mpDayTitle">—</h2>
+              <button
+                type="button"
+                class="mp-panel-toggle"
+                id="mpPanelToggle"
+                aria-controls="mpPanelBody"
+                aria-expanded="true"
+                data-tooltip="mpPanelHide"
               >
+                <i class="fas fa-angles-right" aria-hidden="true"></i>
+              </button>
             </div>
-            <table class="monthly-table hidden" id="mptTable">
-              <thead>
-                <tr id="mptTableHead"></tr>
-              </thead>
-              <tbody id="mptTableBody"></tbody>
-            </table>
-          </div>
-        </main>
 
-        <footer class="monthly-footer">
-          <div
-            class="monthly-footer-text"
-            id="mptFooterText"
-            data-i18n="monthlyPrayerTimesFooter"
-          >
-            Times are calculated for your saved location and may differ slightly
-            from your local mosque.
-          </div>
-        </footer>
+            <!-- folded: a strip of icons -->
+            <div class="mp-rail" id="mpRail">
+              <button
+                type="button"
+                class="mp-panel-toggle"
+                data-rail="day"
+                data-tooltip="mpSelectedDay"
+              >
+                <i class="fas fa-calendar-day" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                class="mp-panel-toggle"
+                data-rail="pdf"
+                data-tooltip="mpExportPdf"
+              >
+                <i class="fas fa-file-pdf" aria-hidden="true"></i>
+              </button>
+            </div>
+
+            <div class="mp-panel-body" id="mpPanelBody">
+              <p class="mp-day-hijri" id="mpDayHijri"></p>
+              <ul class="mp-day-times" id="mpDayTimes"></ul>
+
+              <div class="mp-location">
+                <p class="mp-box-title" data-i18n="mpLocation">Location</p>
+                <p class="mp-location-name" id="mpLocation" dir="auto">—</p>
+                <p class="mp-note" data-i18n="monthlyPrayerTimesFooter">
+                  Times are calculated for your saved location and may differ
+                  slightly from your local mosque.
+                </p>
+              </div>
+            </div>
+          </aside>
+        </main>
       </div>
     </div>
 

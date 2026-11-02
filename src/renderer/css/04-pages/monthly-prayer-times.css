@@ -1,403 +1,562 @@
 @layer pages {
-  /* Monthly Prayer Times Page */
+  /* Monthly Prayer Times: the month's timetable on one side, the chosen day and the location on
+     the other (mirrored in Arabic), one column in a narrow window. As on the other redesigned
+     pages, today and the chosen day are white, not the accent: on several themes the accent is
+     close to the background. The PDF (print styles) keeps only the heading and the table, black on white. */
+
   .monthly-container {
+    position: relative;
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 16px;
     gap: 12px;
-    position: relative;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
-  /* ========== CONTENT ========== */
-  .monthly-content {
+  .monthly-controls {
+    z-index: 2;
+  }
+
+  .mp-layout {
     flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 12px;
+    -webkit-app-region: no-drag;
+  }
+
+  .mp-main,
+  .mp-panel {
+    min-width: 0;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    overflow-y: auto;
-    padding: 6px 2px;
-    -webkit-app-region: no-drag;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-    direction: ltr; /* keep the scrollbar on the right (start side in RTL) */
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
   }
 
-  .monthly-content::-webkit-scrollbar {
-    width: 5px;
+  /* ── The month ─────────────────────────────────────────────────────── */
+
+  .mp-main {
+    gap: 10px;
+    padding: 12px;
   }
 
-  .monthly-content::-webkit-scrollbar-track {
-    background: transparent;
+  .mp-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
   }
 
-  .monthly-content::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 3px;
+  /* not mirrored in Arabic: "previous" points left, "next" right (time, not text direction) */
+  .mp-nav {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    direction: ltr;
   }
 
-  [dir="rtl"] .monthly-content > *,
-  [lang="ar"] .monthly-content > *,
-  [lang="fa"] .monthly-content > *,
-  [lang="ur"] .monthly-content > *,
-  [lang="he"] .monthly-content > * {
+  .mp-month {
+    min-width: 0;
+    direction: initial;
+    text-align: center;
+  }
+
+  [dir="rtl"] .mp-month {
     direction: rtl;
   }
 
-  /* Exceptions to the blanket rule above — these two need to stay physically
-     LTR even in RTL languages (nav row for correct arrow meaning, table
-     wrapper for a right-side scrollbar), so they need to win over it. */
-
-  /* Deliberately NOT mirrored in RTL — same convention as the header controls
-     and the Tasbih ring row. A "previous" chevron pointing left and a "next"
-     chevron pointing right is a time-direction metaphor, not a text-direction
-     one; mirroring the row would flip the buttons' positions but not their
-     icons, so a left-pointing arrow would end up meaning "next" — confusing
-     regardless of language. Keeping the row LTR keeps arrow direction and
-     arrow meaning in sync. */
-  .monthly-nav {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 8px 10px;
-    direction: ltr;
-  }
-
-  /* The scrollbar belongs to whichever element actually has overflow:auto —
-     that's this wrapper, not .monthly-content above it, so the earlier
-     content-level LTR fix never reached it. Force LTR here for the scrollbar
-     position, then force the table itself back to RTL explicitly (not just
-     inherited) so the column order — date on the right, Isha on the left —
-     stays exactly as it was. */
-  .monthly-table-wrap {
-    flex: 1;
-    min-height: 200px;
-    background: var(--black-a20);
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 4px;
-    position: relative;
-    overflow-y: auto;
-    direction: ltr;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-  }
-
-  [dir="rtl"] .monthly-content > .monthly-nav,
-  [lang="ar"] .monthly-content > .monthly-nav,
-  [lang="fa"] .monthly-content > .monthly-nav,
-  [lang="ur"] .monthly-content > .monthly-nav,
-  [lang="he"] .monthly-content > .monthly-nav,
-  [dir="rtl"] .monthly-content > .monthly-table-wrap,
-  [lang="ar"] .monthly-content > .monthly-table-wrap,
-  [lang="fa"] .monthly-content > .monthly-table-wrap,
-  [lang="ur"] .monthly-content > .monthly-table-wrap,
-  [lang="he"] .monthly-content > .monthly-table-wrap {
-    direction: ltr;
-  }
-
-  /* ========== Month navigator ========== */
-
-  .monthly-nav-label {
-    direction: inherit;
-    flex: 1;
-    text-align: center;
+  .mp-month-name {
+    margin: 0;
     font-size: 15px;
     font-weight: 700;
     color: var(--text-primary);
-    text-transform: capitalize;
+    white-space: nowrap;
   }
 
-  [dir="rtl"] .monthly-nav-label,
-  [lang="ar"] .monthly-nav-label {
-    direction: rtl;
-    unicode-bidi: plaintext;
+  .mp-month-hijri {
+    margin: 2px 0 0;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    white-space: nowrap;
   }
 
-  .monthly-nav-btn {
-    width: 34px;
-    height: 34px;
-    flex: 0 0 auto;
-    border-radius: 9px;
-    border: 1px solid var(--border-color);
+  .mp-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .mp-btn,
+  .mp-panel-toggle {
+    flex-shrink: 0;
+    min-width: 32px;
+    height: 32px;
+    display: inline-grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
     background: var(--surface-1);
     color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .monthly-nav-btn:hover {
-    background: rgba(var(--accent-rgb), 0.18);
-    border-color: var(--accent-color);
-  }
-
-  .monthly-today-btn {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    border-radius: 9px;
-    border: 1px solid rgba(var(--accent-rgb), 0.4);
-    background: rgba(var(--accent-rgb), 0.12);
-    color: var(--text-primary);
-    font-size: 12.5px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .monthly-today-btn:hover {
-    background: rgba(var(--accent-rgb), 0.22);
-  }
-
-  .monthly-today-btn i {
-    color: var(--accent-color);
+    font: inherit;
     font-size: 12px;
+    cursor: pointer;
   }
 
-  /* ========== Today snapshot card ========== */
-  .monthly-today-card {
-    background: linear-gradient(
-      135deg,
-      rgba(var(--accent-rgb), 0.18),
-      rgba(var(--accent-rgb), 0.05)
-    );
-    border: 1px solid rgba(var(--accent-rgb), 0.3);
-    border-radius: 14px;
-    padding: 14px 12px;
+  .mp-panel-toggle {
+    width: 32px;
   }
 
-  .monthly-today-date {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--accent-color);
-    text-align: center;
-    margin-bottom: 10px;
-    text-transform: capitalize;
-  }
-
-  .monthly-today-row {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
-  }
-
-  .monthly-today-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 8px 4px;
-    border-radius: 10px;
-    background: var(--white-a04);
-  }
-
-  .monthly-today-cell i {
-    font-size: 14px;
-    color: var(--text-secondary);
-  }
-
-  .monthly-today-cell-name {
-    font-size: 10.5px;
-    color: var(--text-secondary);
+  .mp-btn-text {
+    padding: 0 12px;
     font-weight: 600;
   }
 
-  .monthly-today-cell-time {
+  .mp-btn:hover,
+  .mp-panel-toggle:hover {
+    background: var(--surface-3);
+  }
+
+  .mp-message {
+    margin: 0;
+    padding: 40px 16px;
+    text-align: center;
     font-size: 13px;
-    font-weight: 700;
-    color: var(--text-primary);
-    font-feature-settings:
-      "tnum" on,
-      "lnum" on;
+    color: var(--text-muted);
   }
 
-  .monthly-today-cell--next {
-    background: rgba(var(--accent-rgb), 0.22);
+  .mp-message[hidden],
+  .mp-table-wrap[hidden],
+  .mp-print-head {
+    display: none;
   }
 
-  .monthly-today-cell--next i,
-  .monthly-today-cell--next .monthly-today-cell-name {
-    color: var(--accent-color);
+  /* ── The timetable ─────────────────────────────────────────────────── */
+
+  .mp-table-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    border-radius: var(--radius-md);
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
   }
 
-  .monthly-today-cell--next .monthly-today-cell-time {
-    color: var(--text-bright);
-  }
-
-  /* ========== Table ========== */
-
-  .monthly-table-wrap::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  .monthly-table-wrap::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .monthly-table-wrap::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 3px;
-  }
-
-  .monthly-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: var(--text-secondary);
-    font-size: 13px;
-    padding: 30px;
-    direction: rtl;
-  }
-
-  [dir="ltr"] .monthly-loading,
-  [lang="en"] .monthly-loading,
-  [lang="fr"] .monthly-loading {
-    direction: ltr;
-  }
-
-  .monthly-loading i {
-    color: var(--accent-color);
-  }
-
-  .monthly-table {
+  .mp-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12.5px;
-    direction: rtl;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
   }
 
-  [dir="ltr"] .monthly-table,
-  [lang="en"] .monthly-table,
-  [lang="fr"] .monthly-table {
-    direction: ltr;
-  }
-
-  .monthly-table thead,
-  .monthly-table tbody {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-  }
-
-  .monthly-table th {
+  .mp-table thead th {
     position: sticky;
     top: 0;
-    background: #0d1b3d;
-    color: var(--text-primary);
-    font-weight: 700;
-    padding: 10px 4px;
-    text-align: center;
-    font-size: 11.5px;
     z-index: 1;
+    padding: 8px;
+
+    /* opaque (rows scroll under it) but a step lighter than the page, so it reads as part of
+       the card, not a black bar; a line marks its edge */
+    background: color-mix(in srgb, var(--bg-primary), #fff 7%);
+    box-shadow: inset 0 -1px 0 var(--border-subtle);
+    color: var(--text-faint);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-align: start;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 
-  .monthly-table td {
-    padding: 8px 4px;
-    text-align: center;
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--border-subtle);
-    font-feature-settings:
-      "tnum" on,
-      "lnum" on;
+  .mp-table tbody th,
+  .mp-table td {
+    padding: 7px 8px;
+    border-top: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    font-weight: 400;
+    text-align: start;
+    white-space: nowrap;
   }
 
-  .monthly-today-row-highlight td {
-    background: rgba(var(--accent-rgb), 0.16);
-    color: var(--text-bright);
+  .mp-table tbody th {
+    border-inline-start: 3px solid transparent;
+  }
+
+  .mp-table tbody tr {
+    cursor: pointer;
+  }
+
+  .mp-table tbody tr:hover {
+    background: var(--white-a03);
+  }
+
+  .mp-table tbody tr:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: -2px;
+  }
+
+  .mp-day-num {
+    display: inline-block;
+    min-width: 18px;
     font-weight: 700;
   }
 
-  .monthly-table tbody tr:hover td {
-    background: var(--white-a04);
+  .mp-weekday,
+  .mp-hijri,
+  .mp-table .mp-muted {
+    color: var(--text-muted);
   }
 
-  .monthly-date-cell {
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 5px;
-    color: var(--text-primary);
-    font-weight: 600;
-  }
-
-  .monthly-date-weekday {
-    font-size: 10px;
-    color: var(--text-secondary);
-    font-weight: 500;
-    text-transform: uppercase;
-  }
-
-  .monthly-today-row-highlight .monthly-date-cell {
-    color: var(--accent-color);
-  }
-
-  /* ========== Footer ========== */
-  .monthly-footer {
-    padding-top: 8px;
-    border-top: 1px solid var(--border-color);
-    text-align: center;
-  }
-
-  .monthly-footer-text {
+  .mp-hijri-month {
+    display: block;
     font-size: 10.5px;
-    color: var(--text-secondary);
-    opacity: 0.75;
-    line-height: 1.4;
+    line-height: 1.2;
   }
 
-  /* ========== RESPONSIVE ========== */
-  @media (width <= 640px) {
-    .monthly-today-row {
-      grid-template-columns: repeat(3, 1fr);
+  /* days gone by step back */
+  .mp-table tr.is-past > * {
+    color: var(--text-faint);
+  }
+
+  .mp-table tr.is-today th {
+    border-inline-start-color: var(--text-primary);
+  }
+
+  .mp-table tr[aria-selected="true"] {
+    background: var(--surface-hover);
+  }
+
+  .mp-table tr[aria-selected="true"] > * {
+    color: var(--text-primary);
+  }
+
+  /* ── The panel ─────────────────────────────────────────────────────── */
+
+  .mp-panel {
+    gap: 10px;
+    padding: 12px;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .mp-panel-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mp-panel-heading {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding-inline-start: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .mp-panel-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mp-day-hijri {
+    margin: -6px 0 0;
+    padding-inline-start: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .mp-day-times {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mp-time {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+
+  .mp-time i {
+    width: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .mp-time-name {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mp-time-value {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mp-time.is-sunrise {
+    color: var(--text-muted);
+  }
+
+  .mp-time.is-next {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
+  }
+
+  .mp-next-tag {
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--surface-3);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .mp-location {
+    padding-top: 10px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .mp-box-title {
+    margin: 0 0 4px;
+    padding-inline-start: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .mp-location-name {
+    margin: 0;
+    padding-inline-start: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
+  }
+
+  .mp-note {
+    margin: 6px 0 0;
+    padding-inline-start: 4px;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--text-faint);
+  }
+
+  /* ── The panel folded to the edge: a strip of icons ───────────────── */
+
+  /* the arrows point to the edge the panel folds to (mirrored in Arabic) */
+  [dir="rtl"] .mp-panel-toggle i.fa-angles-right {
+    transform: scaleX(-1);
+  }
+
+  .mp-rail {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mp-layout.is-panel-folded {
+    grid-template-columns: minmax(0, 1fr) 58px;
+  }
+
+  .mp-layout.is-panel-folded .mp-panel {
+    align-items: center;
+    padding: 12px 0;
+  }
+
+  .mp-layout.is-panel-folded .mp-panel-heading,
+  .mp-layout.is-panel-folded .mp-panel-body {
+    display: none;
+  }
+
+  .mp-layout.is-panel-folded .mp-rail {
+    display: flex;
+  }
+
+  .mp-layout.is-panel-folded .mp-panel-toggle i.fa-angles-right {
+    transform: rotate(180deg);
+  }
+
+  [dir="rtl"] .mp-layout.is-panel-folded .mp-panel-toggle i.fa-angles-right {
+    transform: none;
+  }
+
+  /* loading, no location or offline with nothing saved: only the message */
+  .mp-layout.is-empty {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+  }
+
+  .mp-layout.is-empty .mp-panel {
+    display: none;
+  }
+
+  /* ── Maximized window: more room ───────────────────────────────────── */
+
+  .fullscreen-mode .mp-layout:not(.is-panel-folded, .is-empty) {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 16px;
+  }
+
+  .fullscreen-mode .mp-table {
+    font-size: 14px;
+  }
+
+  /* ── Narrow window: one column, the page scrolls ───────────────────── */
+
+  @media (width <= 700px) {
+    .mp-layout,
+    .mp-layout.is-panel-folded {
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-rows: max-content;
+      overflow: hidden auto;
     }
 
-    .monthly-table {
-      font-size: 11px;
+    .mp-panel {
+      order: -1;
+      overflow: visible;
     }
 
-    .monthly-table th {
-      font-size: 10px;
-      padding: 8px 2px;
+    .mp-table-wrap {
+      flex: none;
+      max-height: 420px;
     }
 
-    .monthly-table td {
-      padding: 6px 2px;
+    /* one column: nothing to fold */
+    .mp-panel-head .mp-panel-toggle,
+    .mp-layout.is-panel-folded .mp-rail {
+      display: none;
+    }
+
+    .mp-layout.is-panel-folded .mp-panel {
+      align-items: stretch;
+      padding: 12px;
+    }
+
+    .mp-layout.is-panel-folded .mp-panel-heading,
+    .mp-layout.is-panel-folded .mp-panel-body {
+      display: flex;
+    }
+
+    .mp-next-tag {
+      display: none;
+    }
+
+    .mp-day-times {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
   }
 
   @media (width <= 480px) {
     .monthly-container {
-      padding: 10px;
+      padding: 8px;
       gap: 8px;
     }
 
-    .monthly-nav-label {
-      font-size: 13px;
+    .mp-head {
+      flex-wrap: wrap;
+    }
+  }
+
+  /* ── PDF: the heading and the table only, black on white ──────── */
+
+  @media print {
+    @page {
+      margin: 12mm;
     }
 
-    .monthly-today-btn span {
-      display: none; /* icon-only on very narrow widths */
+    html,
+    body {
+      /* stylelint-disable-next-line declaration-no-important -- reset.css paints html/body dark outside any layer: only an important rule in a layer wins, and paper must be white */
+      background: #fff !important;
     }
 
-    .monthly-today-row {
-      grid-template-columns: repeat(3, 1fr);
+    .app-container,
+    .monthly-container,
+    .mp-layout,
+    .mp-main,
+    .mp-table-wrap {
+      height: auto;
+      overflow: visible;
+      background: #fff;
+      border: none;
+      padding: 0;
     }
 
-    .monthly-today-cell-name {
-      font-size: 9.5px;
+    .page-header,
+    .drag-area,
+    .mp-head,
+    .mp-panel {
+      display: none;
     }
 
-    .monthly-today-cell-time {
-      font-size: 12px;
+    .mp-layout {
+      display: block;
+    }
+
+    .mp-print-head {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #000;
+    }
+
+    .mp-table {
+      font-size: 10.5px;
+    }
+
+    .mp-table *,
+    .mp-table .mp-muted {
+      color: #000;
+    }
+
+    .mp-hijri-month {
+      display: inline;
+    }
+
+    .mp-table thead th,
+    .mp-table tbody th,
+    .mp-table td,
+    .mp-table tr.is-past > *,
+    .mp-table tr[aria-selected="true"] > * {
+      position: static;
+      padding: 3px 6px;
+      border: none;
+      border-bottom: 1px solid #ccc;
+      background: #fff;
+      color: #000;
+    }
+
+    .mp-table tr[aria-selected="true"] {
+      background: #fff;
+    }
+
+    .mp-table tr.is-today > * {
+      font-weight: 700;
     }
   }
 }
