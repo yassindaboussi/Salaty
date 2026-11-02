@@ -14,8 +14,12 @@ const log = require("../services/logger").logger("Security");
 const PAGES_DIR = path.join(RENDERER_DIR, "pages");
 
 // Sites a link inside the app may open in the user's browser.
-// github.com: the project; sunnah.com: the hadith references of the Sunnah fasting page
-const EXTERNAL_HOSTS = new Set(["github.com", "sunnah.com"]);
+// github.com: the project; sunnah.com: the hadith references of the Sunnah fasting page;
+// www.youtube.com: the Haramain live channels ("Open on YouTube")
+const EXTERNAL_HOSTS = new Set(["github.com", "sunnah.com", "www.youtube.com"]);
+
+// Who embeds YouTube's player (see applySecurityRules): the project's page.
+const APP_HOMEPAGE = "https://github.com/yassindaboussi/Salaty";
 
 // The only permission the app grants: the live-stream player's fullscreen button.
 const ALLOWED_PERMISSIONS = new Set(["fullscreen"]);
@@ -74,6 +78,18 @@ function applySecurityRules() {
     );
     ses.setPermissionCheckHandler((_wc, permission) =>
       ALLOWED_PERMISSIONS.has(permission),
+    );
+    // YouTube's embedded player asks the site that embeds it to say who it is (the Referer,
+    // YouTube API terms); app:// pages send none, so it shows "Error 153". The Haramain live
+    // page's player says it is Salaty (the project's page).
+    ses.webRequest.onBeforeSendHeaders(
+      { urls: ["https://www.youtube-nocookie.com/embed/*"] },
+      ({ requestHeaders, resourceType }, callback) => {
+        if (resourceType === "subFrame" && !requestHeaders.Referer) {
+          requestHeaders.Referer = APP_HOMEPAGE;
+        }
+        callback({ requestHeaders });
+      },
     );
   });
 }

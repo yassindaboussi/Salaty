@@ -35,6 +35,7 @@ const INVOKE = {
   "get-feedback-info": true,
   "get-prayer-data": true,
   "get-prayer-month": true,
+  "get-haramain-live": true,
   "export-month-pdf": true,
   "get-ramadan-calendar": true,
   "get-hijri-month": true,

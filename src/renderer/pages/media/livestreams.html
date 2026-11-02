@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data:; connect-src 'self' https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://makkahlive.netlify.app; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.tile.openstreetmap.org; font-src 'self' data:; connect-src 'self' https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io https://ipapi.co; media-src 'self' https: blob:; frame-src https://www.youtube-nocookie.com; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="livestreamsTitle">Live Streams - Salaty Time</title>
@@ -19,160 +19,89 @@
       <div class="drag-area"></div>
 
       <div class="livestreams-container">
-        <!-- ── HEADER ── -->
         <header
-          class="page-header page-header--inset livestreams-header"
+          class="page-header livestreams-header"
           data-page-header
           data-controls-class="livestreams-controls"
+          data-back="features"
         >
-          <h1
-            class="page-header__title"
-            id="livestreamsTitle"
-            data-i18n="livestreamsTitle"
-          >
+          <h1 class="page-header__title" data-i18n="livestreamsTitle">
             Live Haramain Streams
           </h1>
         </header>
 
-        <!-- ── CHANNEL SELECTOR TABS ── -->
-        <div class="channel-tabs" role="tablist">
-          <button
-            type="button"
-            class="channel-tab active"
-            id="tabMakkah"
-            role="tab"
-            aria-selected="true"
-            aria-controls="panelMakkah"
-          >
-            <span class="channel-tab-icon"
-              ><i class="fas fa-kaaba" aria-hidden="true"></i
-            ></span>
-            <span id="tabMakkahLabel" data-i18n="makkahTab">Makkah</span>
-          </button>
-          <button
-            type="button"
-            class="channel-tab"
-            id="tabMadina"
-            role="tab"
-            aria-selected="false"
-            aria-controls="panelMadina"
-          >
-            <span class="channel-tab-icon"
-              ><i class="fas fa-mosque" aria-hidden="true"></i
-            ></span>
-            <span id="tabMadinaLabel" data-i18n="madinaTab">Madina</span>
-          </button>
-        </div>
-
-        <!-- ── CONTENT PANELS ── -->
-        <main class="livestreams-content">
-          <!-- Makkah Panel -->
-          <div
-            class="stream-panel active"
-            id="panelMakkah"
-            role="tabpanel"
-            aria-labelledby="tabMakkah"
-          >
-            <!-- Info bar -->
-            <div class="stream-info-bar">
-              <div class="stream-location">
-                <div class="stream-location-icon">
-                  <i class="fas fa-kaaba" aria-hidden="true"></i>
-                </div>
-                <div class="stream-location-text">
-                  <span
-                    class="stream-location-name"
-                    id="makkahTitle"
-                    data-i18n="makkahLive"
-                    >Al Masjid al-Haram</span
-                  >
-                  <span class="stream-location-sub" data-i18n="makkahLocation"
-                    >Makkah al-Mukarramah</span
-                  >
-                </div>
-              </div>
-              <div class="live-badge">
-                <span class="live-dot"></span>
-                <span class="live-text" data-i18n="live">Live</span>
-              </div>
-            </div>
-
-            <!-- Video -->
-            <div class="video-container">
+        <main class="lv-layout" id="lvLayout">
+          <!-- The live video -->
+          <section class="lv-main">
+            <div class="lv-video" id="lvVideo">
               <iframe
-                id="iframe-makkah"
-                class="responsive-iframe"
+                id="lvFrame"
+                class="lv-frame"
                 src="about:blank"
-                title="Makkah Live"
-                data-i18n-title="makkahLive"
-                frameborder="0"
-                allow="
-                  autoplay;
-                  encrypted-media;
-                  picture-in-picture;
-                  fullscreen;
-                "
+                data-i18n-title="livestreamsTitle"
+                title="Live"
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                 allowfullscreen
                 referrerpolicy="strict-origin-when-cross-origin"
-                sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
+                sandbox="allow-scripts allow-same-origin allow-presentation"
+                hidden
               ></iframe>
-            </div>
-          </div>
-
-          <!-- Madina Panel -->
-          <div
-            class="stream-panel"
-            id="panelMadina"
-            role="tabpanel"
-            aria-labelledby="tabMadina"
-          >
-            <!-- Info bar -->
-            <div class="stream-info-bar">
-              <div class="stream-location">
-                <div class="stream-location-icon">
-                  <i class="fas fa-mosque" aria-hidden="true"></i>
-                </div>
-                <div class="stream-location-text">
-                  <span
-                    class="stream-location-name"
-                    id="madinaTitle"
-                    data-i18n="madinaLive"
-                    >Al Masjid an-Nabawi</span
-                  >
-                  <span class="stream-location-sub" data-i18n="madinaLocation"
-                    >Al-Madinah al-Munawwarah</span
-                  >
-                </div>
-              </div>
-              <div class="live-badge">
-                <span class="live-dot"></span>
-                <span class="live-text" data-i18n="live">Live</span>
+              <div class="lv-message" id="lvMessage" role="status">
+                <i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>
+                <span id="lvMessageText"
+                  >Connecting to the live broadcast…</span
+                >
+                <button type="button" class="lv-btn-text" id="lvRetry" hidden>
+                  <span data-i18n="lvRetry">Try again</span>
+                </button>
               </div>
             </div>
+          </section>
 
-            <!-- Video -->
-            <div class="video-container">
-              <iframe
-                id="iframe-madina"
-                class="responsive-iframe"
-                src="about:blank"
-                title="Madina Live"
-                data-i18n-title="madinaLive"
-                frameborder="0"
-                allow="
-                  autoplay;
-                  encrypted-media;
-                  picture-in-picture;
-                  fullscreen;
-                "
-                allowfullscreen
-                referrerpolicy="strict-origin-when-cross-origin"
-                sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
-              ></iframe>
+          <!-- The two mosques, the time in Makkah -->
+          <aside class="lv-panel">
+            <div class="lv-panel-head">
+              <h2 class="lv-panel-heading" data-i18n="lvChannels">Live from</h2>
+              <button
+                type="button"
+                class="lv-panel-toggle"
+                id="lvPanelToggle"
+                aria-controls="lvPanelBody"
+                aria-expanded="true"
+                data-tooltip="lvPanelHide"
+              >
+                <i class="fas fa-angles-right" aria-hidden="true"></i>
+              </button>
             </div>
-          </div>
+
+            <!-- folded: one icon per mosque -->
+            <div class="lv-rail" id="lvRail"></div>
+
+            <div class="lv-panel-body" id="lvPanelBody">
+              <div class="lv-channels" id="lvChannels"></div>
+
+              <div class="lv-box">
+                <p class="lv-box-title" data-i18n="lvMakkahTime">
+                  Time in Makkah
+                </p>
+                <p class="lv-clock" id="lvClock">--:--</p>
+                <p class="lv-date" id="lvDate"></p>
+              </div>
+
+              <button
+                type="button"
+                class="lv-btn-text lv-youtube"
+                id="lvYoutube"
+              >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+                <span data-i18n="lvOpenYoutube">Open on YouTube</span>
+              </button>
+              <p class="lv-note" data-i18n="lvSource">
+                Official broadcast of the Saudi Broadcasting Authority.
+              </p>
+            </div>
+          </aside>
         </main>
-        <!-- end .livestreams-content -->
       </div>
     </div>
 

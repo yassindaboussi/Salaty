@@ -25,6 +25,7 @@ export type InvokeChannel =
   | "get-feedback-info"
   | "get-prayer-data"
   | "get-prayer-month"
+  | "get-haramain-live"
   | "export-month-pdf"
   | "get-ramadan-calendar"
   | "get-hijri-month"
