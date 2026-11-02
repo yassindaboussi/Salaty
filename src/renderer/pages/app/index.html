@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../../css/04-pages/home.css" />
     <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
     <link rel="stylesheet" href="../../css/03-components/feedback-dialog.css" />
+    <link rel="stylesheet" href="../../css/03-components/update-dialog.css" />
     <link rel="stylesheet" href="../../css/03-components/offline-banner.css" />
   </head>
   <body class="page-loading">
@@ -142,37 +143,80 @@
         <div class="prayer-list" id="prayerList"></div>
       </div>
 
-      <!-- Update Modal -->
-      <div id="updateModal" class="modal">
-        <div class="modal-content">
-          <h3 id="updateTitle" data-i18n="updateAvailable">Update Available</h3>
-          <p id="updateMessage"></p>
-          <div class="modal-buttons">
+      <!-- A new version: available, downloading, ready, failed (components/update-dialog.js) -->
+      <dialog
+        class="update-dialog"
+        id="updateDialog"
+        aria-labelledby="updateTitle"
+        aria-describedby="updateText"
+      >
+        <div class="update-body">
+          <button
+            type="button"
+            class="update-close"
+            id="updateClose"
+            data-i18n-aria-label="updClose"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+          <div class="update-head">
+            <span class="update-icon" aria-hidden="true">
+              <i class="fas fa-circle-arrow-down" id="updateIcon"></i>
+            </span>
+            <h2 class="update-title" id="updateTitle">Update available</h2>
+          </div>
+          <p class="update-text" id="updateText"></p>
+          <a
+            class="update-link"
+            id="updateWhatsNew"
+            href="https://github.com/yassindaboussi/Salaty/releases/latest"
+            target="_blank"
+            rel="noopener"
+            ><span data-i18n="updWhatsNew">What's new</span
+            ><i class="fas fa-arrow-right" aria-hidden="true"></i
+          ></a>
+          <div class="update-progress" id="updateProgress" hidden>
+            <div
+              class="update-bar"
+              id="updateBar"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+              aria-labelledby="updateTitle"
+            >
+              <div class="update-bar-fill" id="updateBarFill"></div>
+            </div>
+            <span
+              class="update-progress-text"
+              id="updateProgressText"
+              aria-live="polite"
+              >0%</span
+            >
+          </div>
+          <p
+            class="update-note"
+            id="updateLaterNote"
+            data-i18n="updLaterNote"
+            hidden
+          >
+            If you choose Later, it installs when you quit Salaty Time.
+            Otherwise we will remind you the next time you open it.
+          </p>
+          <div class="update-actions">
+            <button type="button" class="update-btn" id="updateSecondary">
+              Later
+            </button>
             <button
               type="button"
-              id="updateActionBtn"
-              class="modal-btn primary"
-              data-i18n="download"
+              class="update-btn update-btn--primary"
+              id="updatePrimary"
             >
               Download
             </button>
-            <button
-              type="button"
-              id="updateCancelBtn"
-              class="modal-btn secondary"
-              data-i18n="later"
-            >
-              Later
-            </button>
-          </div>
-          <div id="updateProgress" class="update-progress hidden">
-            <div class="progress-bar">
-              <div class="progress-fill" id="updateProgressBar"></div>
-            </div>
-            <span class="update-progress-text" id="updateProgressText">0%</span>
           </div>
         </div>
-      </div>
+      </dialog>
     </div>
 
     <script src="../../js-bundled/home.bundle.js"></script>

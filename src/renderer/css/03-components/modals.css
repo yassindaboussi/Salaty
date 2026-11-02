@@ -81,29 +81,3 @@
 .modal-btn.secondary:hover {
   background-color: var(--surface-active);
 }
-
-.update-progress {
-  margin-top: 20px;
-  width: 100%;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 6px;
-  background-color: var(--surface-3);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-.progress-fill {
-  height: 100%;
-  background-color: var(--accent-color, #3b82f6);
-  width: 0%;
-  transition: width 0.3s ease;
-}
-
-.update-progress-text {
-  font-size: 0.8rem;
-  opacity: 0.8;
-}

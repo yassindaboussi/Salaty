@@ -163,11 +163,11 @@
   }
 
   /* ── Progress bars: an outlined track, filled with Highlight ───────── */
-  .update-progress .progress-bar {
+  .update-bar {
     border: 1px solid CanvasText;
   }
 
-  .progress-fill {
+  .update-bar-fill {
     background-color: Highlight;
   }
 
