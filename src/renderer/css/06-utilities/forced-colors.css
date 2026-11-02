@@ -63,7 +63,8 @@
     .ac-tab[aria-selected="true"],
     .ac-chip[aria-pressed="true"],
     .pl-track[aria-current="true"],
-    .station-card.active,
+    .rd-row.is-current,
+    .rd-tab[aria-selected="true"],
     .location-switcher-item.active,
     .widget-toggle-btn--active,
     .ts-dropdown .option.active
@@ -100,7 +101,8 @@
       .ac-tab[aria-selected="true"],
       .ac-chip[aria-pressed="true"],
       .pl-track[aria-current="true"],
-      .station-card.active,
+      .rd-row.is-current,
+      .rd-tab[aria-selected="true"],
       .location-switcher-item.active,
       .widget-toggle-btn--active,
       .ts-dropdown .option.active

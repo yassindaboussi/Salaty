@@ -1,66 +1,127 @@
 "use strict";
 
-// The radio page (radio.html). Its parts:
-//   stations.js      the station cards
-//   playback.js      the audio: play, pause/resume, stop
-//   volume.js        volume slider and mute
-//   now-playing.js   what the page shows about playback (vinyl, tonearm, icons, loading, toasts)
-//   state.js         the stations and what is playing now
-const { ipcRenderer } = require("electron");
+// The radio page: the national Quran stations and the reciter radios of mp3quran.net in two
+// tabs, searchable, favourites first; the panel shows what is playing. Its parts:
+//   state.js       what is shown now, the favourites
+//   catalog.js     the two lists of radios
+//   list.js        the open tab's list
+//   player.js      playing (in the background player, so it goes on after the page closes)
+//   panel-fold.js  folding the panel to a strip
 const {
   setupConnectionRecovery,
 } = require("../../services/connection-recovery");
-const { t } = require("../../core/i18n");
-const { loadStations } = require("./stations");
-const { togglePlayPause, stopPlayback } = require("./playback");
-const { setVolume, toggleMute, loadSavedVolume } = require("./volume");
-const { setDefaultNowPlaying } = require("./now-playing");
+const { byId, queryAll } = require("../../core/dom");
+const { view, loadFavourites, toggleFavourite } = require("./state");
+const { stationItems, loadReciterItems } = require("./catalog");
+const { renderList } = require("./list");
+const player = require("./player");
+const { bindPanelFold } = require("./panel-fold");
+
+const TAB_KEY = "radioTab";
+
+async function loadReciters() {
+  if (view.reciters) return;
+  view.recitersFailed = false;
+  renderList();
+  try {
+    view.reciters = await loadReciterItems();
+  } catch (err) {
+    console.warn("[Radio] the reciter radios could not be loaded:", err);
+    view.recitersFailed = true;
+  }
+  player.render();
+}
+
+/** @param {"stations" | "reciters"} tab @param {boolean} [focus] */
+function openTab(tab, focus = false) {
+  view.tab = tab;
+  for (const button of queryAll(".rd-tab", HTMLButtonElement)) {
+    const on = button.dataset.tab === tab;
+    button.setAttribute("aria-selected", String(on));
+    button.tabIndex = on ? 0 : -1;
+    if (on && focus) button.focus();
+  }
+  byId("rdList", HTMLElement).setAttribute(
+    "aria-labelledby",
+    tab === "stations" ? "rdTabStations" : "rdTabReciters",
+  );
+  try {
+    localStorage.setItem(TAB_KEY, tab);
+  } catch {
+    // storage unavailable: the tab is not remembered
+  }
+  renderList();
+  if (tab === "reciters") loadReciters();
+}
+
+function bindTabs() {
+  const tabs = byId("rdTabStations", HTMLButtonElement).parentElement;
+  tabs?.addEventListener("click", (e) => {
+    const tab = /** @type {Element} */ (e.target).closest(".rd-tab");
+    if (tab instanceof HTMLButtonElement)
+      openTab(tab.dataset.tab === "reciters" ? "reciters" : "stations");
+  });
+  // arrow keys move between the tabs (ARIA tabs pattern)
+  tabs?.addEventListener("keydown", (e) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+    e.preventDefault();
+    openTab(view.tab === "stations" ? "reciters" : "stations", true);
+  });
+}
+
+function bindList() {
+  byId("rdList", HTMLElement).addEventListener("click", (e) => {
+    const button = /** @type {Element} */ (e.target).closest("[data-action]");
+    if (!(button instanceof HTMLButtonElement)) return;
+    if (button.dataset.action === "retry") {
+      loadReciters();
+      return;
+    }
+    const key = button.closest(".rd-row")?.getAttribute("data-key");
+    if (!key) return;
+    if (button.dataset.action === "play") player.playItem(key);
+    else if (button.dataset.action === "favourite") {
+      toggleFavourite(key);
+      player.render();
+    }
+  });
+  const search = byId("rdSearch", HTMLInputElement);
+  search.addEventListener("input", () => {
+    view.query = search.value;
+    renderList();
+  });
+  search.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && search.value) {
+      e.preventDefault();
+      search.value = view.query = "";
+      renderList();
+    }
+  });
+}
 
 function initRadioPage() {
+  loadFavourites();
+  view.stations = stationItems();
+  bindTabs();
+  bindList();
+  player.bindControls();
+  bindPanelFold(player);
+
+  let tab = "stations";
+  try {
+    tab =
+      localStorage.getItem(TAB_KEY) === "reciters" ? "reciters" : "stations";
+  } catch {
+    // storage unavailable: the stations
+  }
+  openTab(/** @type {"stations" | "reciters"} */ (tab));
+  player.renderPanel();
+  // what is playing already (the radio goes on between pages)
+  player.bindPlayerUpdates();
+  // back online: the reciter radios that failed to load
   setupConnectionRecovery(() => {
-    loadStations();
+    if (view.recitersFailed) loadReciters();
   }, "Radio");
-  updateRadioUI();
-
-  const backBtn = document.getElementById("backBtn");
-  if (backBtn) {
-    backBtn.addEventListener("click", () => {
-      stopPlayback();
-      ipcRenderer.invoke("navigate-to", "features");
-    });
-  }
-
-  loadStations();
-  setupPlayerControls();
-  loadSavedVolume();
-  setDefaultNowPlaying();
-  window.addEventListener("beforeunload", () => stopPlayback());
-}
-
-function updateRadioUI() {
-  const els = {
-    radioTitle: t("muslimRadio"),
-    radioFooterText: t("radioFooterText"),
-    nowPlayingBadge: t("nowPlaying"),
-    stationsLabel: t("availableStations"),
-    loadingText: t("connectingToStation"),
-  };
-  for (const [id, text] of Object.entries(els)) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = text;
-  }
-}
-
-function setupPlayerControls() {
-  const pp = document.getElementById("playPauseBtn");
-  const st = document.getElementById("stopBtn");
-  const mu = document.getElementById("muteBtn");
-  const vol = document.getElementById("volumeSlider");
-  if (pp) pp.addEventListener("click", togglePlayPause);
-  if (st) st.addEventListener("click", stopPlayback);
-  if (mu) mu.addEventListener("click", toggleMute);
-  if (vol instanceof HTMLInputElement)
-    vol.addEventListener("input", () => setVolume(parseInt(vol.value)));
 }
 
 module.exports = { initRadioPage };

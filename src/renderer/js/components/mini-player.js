@@ -93,8 +93,10 @@ function setupMiniPlayer() {
   nextBtn.addEventListener("click", () =>
     ipcRenderer.send("player-command", { type: "next" }),
   );
+  // back to what is playing: the radio page for a radio, else the playlist
+  let page = "playlist";
   playlistBtn.addEventListener("click", () =>
-    ipcRenderer.invoke("navigate-to", "playlist", 850, 600),
+    ipcRenderer.invoke("navigate-to", page, 850, 600),
   );
 
   function trackKeyOf(track) {
@@ -127,6 +129,9 @@ function setupMiniPlayer() {
       hideMiniPlayer();
       return;
     }
+    page = state.currentTrack.page === "radio" ? "radio" : "playlist";
+    // a live radio has no previous / next
+    prevBtn.hidden = nextBtn.hidden = Boolean(state.currentTrack.live);
     title.textContent = state.currentTrack.title;
     artist.textContent = state.currentTrack.artist;
     const icon = playBtn.querySelector("i");
