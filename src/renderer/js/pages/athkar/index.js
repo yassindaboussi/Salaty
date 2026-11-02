@@ -109,7 +109,14 @@ function bindActions() {
       return;
     }
     const button = /** @type {Element} */ (e.target).closest("[data-action]");
-    if (!(button instanceof HTMLButtonElement)) return;
+    if (!(button instanceof HTMLButtonElement)) {
+      // a click anywhere on a card counts too, but not when the user selects text to copy
+      const card = /** @type {Element} */ (e.target).closest(".ak-card");
+      const selecting = Boolean(window.getSelection()?.toString());
+      if (card instanceof HTMLElement && card.dataset.id && !selecting)
+        count(card.dataset.id);
+      return;
+    }
     const { action, id = "" } = button.dataset;
     if (action === "count") count(id);
     else if (action === "undo") undo(id);

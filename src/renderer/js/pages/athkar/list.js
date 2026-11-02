@@ -30,15 +30,15 @@ function counterView(id, target) {
     inner: done
       ? html`<i class="fas fa-check"></i>`
       : target === null
-        ? html`${count}`
-        : html`${count}/${target}`,
+        ? html`<i class="fas fa-plus"></i>${count}`
+        : html`<i class="fas fa-plus"></i>${count}/${target}`,
   };
 }
 
 /** @param {string} id @param {number | null} target */
 function counterHtml(id, target) {
   const v = counterView(id, target);
-  return html`<button type="button" class="ak-count" data-action="count" data-id="${id}" aria-label="${v.label}" ${v.done ? "aria-disabled=true" : ""}><span class="ak-count-text" aria-hidden="true">${v.inner}</span></button>`;
+  return html`<button type="button" class="ak-count" data-action="count" data-id="${id}" data-tip="${t("akTapToCount")}" aria-label="${v.label}" ${v.done ? "aria-disabled=true" : ""}><span class="ak-count-text" aria-hidden="true">${v.inner}</span></button>`;
 }
 
 /** @param {string} category @param {number} index @param {boolean} withCategory */

@@ -33,6 +33,7 @@
   "akCountLabel": "العدّ: {count} من {target}",
   "akCountFree": "العدّ: {count}",
   "akUndo": "تراجع عن واحدة",
+  "akTapToCount": "اضغط على البطاقة أو هنا للعدّ",
   "akResetCategory": "تصفير هذا القسم",
   "akResetConfirm": "تصفير عدّ «{category}»؟",
   "akReset": "تصفير",
