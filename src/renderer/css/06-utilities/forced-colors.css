@@ -58,8 +58,9 @@
     .hc-day.is-selected,
     .segmented-option input:checked + .segmented-label,
     .channel-tab.active,
-    .az-index-letter.active,
-    .track-item.active,
+    .ac-tab[aria-selected="true"],
+    .ac-chip[aria-pressed="true"],
+    .pl-track[aria-current="true"],
     .station-card.active,
     .location-switcher-item.active,
     .widget-toggle-btn--active,
@@ -92,8 +93,9 @@
       .vf-date-block,
       .hc-day.is-selected,
       .channel-tab.active,
-      .az-index-letter.active,
-      .track-item.active,
+      .ac-tab[aria-selected="true"],
+      .ac-chip[aria-pressed="true"],
+      .pl-track[aria-current="true"],
       .station-card.active,
       .location-switcher-item.active,
       .widget-toggle-btn--active,
@@ -155,14 +157,11 @@
   }
 
   /* ── Progress bars: an outlined track, filled with Highlight ───────── */
-  .update-progress .progress-bar,
-  .progress-container .progress-bar,
-  .count-progress {
+  .update-progress .progress-bar {
     border: 1px solid CanvasText;
   }
 
-  .progress-fill,
-  .count-progress .progress-bar {
+  .progress-fill {
     background-color: Highlight;
   }
 
@@ -185,7 +184,8 @@
   }
 
   /* ── Sliders: the native control, which follows the contrast theme ──── */
-  .volume-slider {
+  .volume-slider,
+  .pl-range {
     appearance: auto;
   }
 }

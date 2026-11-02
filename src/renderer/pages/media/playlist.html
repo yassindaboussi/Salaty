@@ -12,114 +12,124 @@
     <link rel="stylesheet" href="../../css/04-pages/playlist.css" />
   </head>
   <body class="page-loading">
-    <div class="app-container theme-navy" id="app">
+    <div class="app-container" id="app">
       <div class="drag-area"></div>
 
       <div class="playlist-container">
-        <!-- Header -->
         <header
           class="page-header playlist-header"
           data-page-header
           data-controls-class="playlist-controls"
           data-back="albums"
         >
-          <h1
-            class="page-header__title playlist-title"
-            data-i18n="audioArchive"
-          >
+          <h1 class="page-header__title" data-i18n="audioArchive">
             Audio Archive
           </h1>
         </header>
 
-        <!-- Search Box -->
-        <div class="search-container">
-          <div class="search-box">
-            <i class="fas fa-search" aria-hidden="true"></i>
-            <input
-              type="text"
-              id="searchInput"
-              data-i18n-placeholder="searchInPlaylist"
-              data-i18n-aria-label="searchInPlaylist"
-              class="search-input"
-              placeholder="Search in playlist..."
-            />
-          </div>
-        </div>
-
-        <!-- Main Content Area -->
-        <main class="content-area">
-          <!-- Results List -->
-          <div class="results-list" id="resultsList">
-            <!-- Results will be injected here -->
-          </div>
-
-          <!-- Player Controls -->
-          <div class="player-controls">
-            <!-- Album Art -->
-            <div class="album-art">
-              <i class="fas fa-music" aria-hidden="true"></i>
-            </div>
-
-            <!-- Track Info -->
-            <div class="current-track-display">
-              <h4 id="currentTrackTitle">No Track Selected</h4>
-              <p id="currentTrackArtist">-</p>
-            </div>
-
-            <!-- Progress Bar -->
-            <div class="progress-container">
-              <div class="progress-bar" id="progressBar">
-                <div class="progress-fill" id="progressFill"></div>
-              </div>
-              <div class="time-display">
-                <span id="currentTime">0:00</span> /
-                <span id="duration">0:00</span>
+        <main class="pl-layout">
+          <!-- What was opened: its tracks -->
+          <section class="pl-main" aria-labelledby="plHeading">
+            <div class="pl-head">
+              <div class="pl-head-text">
+                <h2 class="pl-heading" id="plHeading"></h2>
+                <p class="pl-subtitle">
+                  <span id="plSubtitle"></span>
+                  <span class="pl-count" id="plCount"></span>
+                </p>
               </div>
             </div>
+            <div class="pl-search" role="search">
+              <i
+                class="fas fa-magnifying-glass pl-search-icon"
+                aria-hidden="true"
+              ></i>
+              <input
+                type="search"
+                class="pl-search-input"
+                id="plSearch"
+                autocomplete="off"
+                spellcheck="false"
+                data-i18n-placeholder="searchInPlaylist"
+                data-i18n-aria-label="searchInPlaylist"
+                placeholder="Search in playlist..."
+              />
+            </div>
+            <div class="pl-list" id="plList"></div>
+          </section>
 
-            <!-- Control Buttons -->
-            <div class="control-buttons">
+          <!-- The player -->
+          <aside
+            class="pl-player"
+            data-i18n-aria-label="acNowPlaying"
+            aria-label="Now playing"
+          >
+            <div class="pl-art" id="plArt"></div>
+            <div class="pl-now" aria-live="polite">
+              <p class="pl-title-now" id="plTitle">No Track Selected</p>
+              <p class="pl-artist-now" id="plArtist"></p>
+            </div>
+
+            <div class="pl-progress">
+              <input
+                type="range"
+                class="pl-range"
+                id="plSeek"
+                min="0"
+                max="1"
+                value="0"
+                step="1"
+                data-i18n-aria-label="acSeek"
+                aria-label="Position"
+              />
+              <div class="pl-times">
+                <span id="plTime">0:00</span>
+                <span id="plDuration">0:00</span>
+              </div>
+            </div>
+
+            <div class="pl-controls">
               <button
                 type="button"
-                class="skip-btn prev-btn"
-                id="prevBtn"
+                class="pl-btn"
+                id="plPrev"
                 data-tooltip="tooltipPrev"
               >
-                <i class="fas fa-step-backward" aria-hidden="true"></i>
+                <i class="fas fa-backward-step" aria-hidden="true"></i>
               </button>
               <button
                 type="button"
-                class="play-pause-btn"
-                id="playPauseBtn"
-                data-tooltip="tooltipPlayPause"
+                class="pl-btn pl-play"
+                id="plPlay"
+                data-tooltip="tooltipPlay"
               >
                 <i class="fas fa-play" aria-hidden="true"></i>
               </button>
               <button
                 type="button"
-                class="skip-btn next-btn"
-                id="nextBtn"
+                class="pl-btn"
+                id="plNext"
                 data-tooltip="tooltipNext"
               >
-                <i class="fas fa-step-forward" aria-hidden="true"></i>
+                <i class="fas fa-forward-step" aria-hidden="true"></i>
               </button>
             </div>
 
-            <!-- Volume Control -->
-            <div class="volume-control">
-              <i class="fas fa-volume-up" aria-hidden="true"></i>
+            <div class="pl-volume">
+              <i class="fas fa-volume-low" aria-hidden="true"></i>
               <input
                 type="range"
-                class="volume-slider"
-                id="volumeSlider"
+                class="pl-range"
+                id="plVolume"
                 min="0"
                 max="100"
                 value="100"
-                aria-label="Volume"
                 data-i18n-aria-label="volume"
+                aria-label="Volume"
               />
+              <i class="fas fa-volume-high" aria-hidden="true"></i>
             </div>
-          </div>
+          </aside>
         </main>
       </div>
     </div>

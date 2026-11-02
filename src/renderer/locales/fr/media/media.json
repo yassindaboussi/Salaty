@@ -51,5 +51,26 @@
   "waitingForTrack": "En attente d’une piste...",
   "tafsirBookNames": {
     "1": "Résumé du Tafsir d'Al-Tabari"
-  }
+  },
+  "acSearch_recite": "Rechercher un récitateur",
+  "acSearch_tafsir": "Rechercher un livre ou une sourate",
+  "acSearch_tadabor": "Rechercher une sourate",
+  "acRiwaya": "Riwaya",
+  "acRiwayaAll": "Toutes",
+  "acRiwayaHafs": "Hafs",
+  "acRiwayaWarsh": "Warsh",
+  "acRiwayaQalun": "Qalun",
+  "acRiwayaOther": "Autres riwayat",
+  "acCompleteOnly": "Coran complet seulement",
+  "acFavorites": "Favoris",
+  "acAllReciters": "Tous les récitateurs",
+  "acFavorite": "Ajouter aux favoris",
+  "acUnfavorite": "Retirer des favoris",
+  "acNoReciter": "Aucun récitateur ne correspond",
+  "acSurahCount": "Sourates : {count}",
+  "acNowPlaying": "En cours de lecture",
+  "acSeek": "Position",
+  "acTrackLabel": "Écouter {title}",
+  "tooltipPlay": "Lecture",
+  "tooltipPause": "Pause"
 }

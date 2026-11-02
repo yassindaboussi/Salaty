@@ -51,5 +51,26 @@
   "waitingForTrack": "في انتظار مقطع...",
   "tafsirBookNames": {
     "1": "مختصر تفسير الطبري"
-  }
+  },
+  "acSearch_recite": "ابحث عن قارئ",
+  "acSearch_tafsir": "ابحث عن كتاب أو سورة",
+  "acSearch_tadabor": "ابحث عن سورة",
+  "acRiwaya": "الرواية",
+  "acRiwayaAll": "الكل",
+  "acRiwayaHafs": "حفص",
+  "acRiwayaWarsh": "ورش",
+  "acRiwayaQalun": "قالون",
+  "acRiwayaOther": "روايات أخرى",
+  "acCompleteOnly": "المصحف كاملًا فقط",
+  "acFavorites": "المفضلة",
+  "acAllReciters": "كل القرّاء",
+  "acFavorite": "أضف إلى المفضلة",
+  "acUnfavorite": "أزل من المفضلة",
+  "acNoReciter": "لا يوجد قارئ مطابق",
+  "acSurahCount": "السور: {count}",
+  "acNowPlaying": "يُشغَّل الآن",
+  "acSeek": "الموضع",
+  "acTrackLabel": "استمع إلى {title}",
+  "tooltipPlay": "تشغيل",
+  "tooltipPause": "إيقاف مؤقت"
 }
