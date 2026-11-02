@@ -33,6 +33,7 @@
   "akCountLabel": "Count: {count} of {target}",
   "akCountFree": "Count: {count}",
   "akUndo": "Undo one",
+  "akTapToCount": "Click the card or here to count",
   "akResetCategory": "Reset this category",
   "akResetConfirm": "Reset the counts of “{category}”?",
   "akReset": "Reset",

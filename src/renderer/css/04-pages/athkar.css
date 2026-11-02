@@ -176,10 +176,23 @@
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     background: var(--surface-1);
-    transition: opacity 0.2s ease;
+    cursor: pointer;
+    transition:
+      opacity 0.2s ease,
+      background-color 0.15s ease;
+  }
+
+  /* The whole card counts: a light hover shows it can be clicked */
+  .ak-card:not(.is-done):hover {
+    background: var(--surface-2);
+  }
+
+  .ak-card:not(.is-done):active {
+    background: var(--surface-3);
   }
 
   .ak-card.is-done {
+    cursor: default;
     opacity: 0.55;
   }
 
@@ -291,6 +304,16 @@
     font-size: 12px;
     font-variant-numeric: tabular-nums;
     cursor: pointer;
+  }
+
+  .ak-count-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ak-count-text .fa-plus {
+    font-size: 10px;
   }
 
   .ak-count:hover:not([aria-disabled="true"]) {

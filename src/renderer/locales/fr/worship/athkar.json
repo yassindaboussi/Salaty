@@ -33,6 +33,7 @@
   "akCountLabel": "Compter : {count} sur {target}",
   "akCountFree": "Compter : {count}",
   "akUndo": "Annuler un",
+  "akTapToCount": "Cliquez sur la carte ou ici pour compter",
   "akResetCategory": "Remettre cette catégorie à zéro",
   "akResetConfirm": "Remettre à zéro « {category} » ?",
   "akReset": "Remettre à zéro",
