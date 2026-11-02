@@ -24,7 +24,12 @@ const POLICY = {
   "style-src": ["'self'"], // web fonts are bundled (css/01-base/web-fonts.css)
   // style="" attributes in the markup and in JS templates
   "style-src-attr": ["'unsafe-inline'"],
-  "img-src": ["'self'", "data:", "blob:", "https://*.tile.openstreetmap.org"],
+  "img-src": [
+    "'self'",
+    "data:",
+    "blob:",
+    "https://tile.openstreetmap.org", // Qibla: the map's tiles
+  ],
   "font-src": ["'self'", "data:"],
   "connect-src": [
     "'self'", // ../../locales/*.json, ../../data/*.json
@@ -34,7 +39,6 @@ const POLICY = {
     "https://www.mp3quran.net", // mp3quran.net/api redirects here
     "https://countriesnow.space",
     "https://photon.komoot.io", // Qibla: city -> coordinates
-    "https://ipapi.co", // Qibla: last-resort location guess
   ],
   // Quran recitations and radio streams come from many hosts, but always over HTTPS
   "media-src": ["'self'", "https:", "blob:"],
