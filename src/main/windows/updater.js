@@ -17,11 +17,18 @@
 // (<userData>/pending-update.json), and when a check finds that version again it is made
 // ready at once: electron-updater re-checks the file it kept (sha512) and only downloads it
 // again if that file is gone or damaged. So the page says "Update ready", not "Download".
+// Once per run: later checks of the same run don't bring the dialog back.
+//
+// When to check: 3 s after start, then every 12 h of real time. The app starts with Windows,
+// often before the network is up, and laptops sleep (a timer doesn't run then), so a failed
+// check is tried again when the connection comes back, and an hourly tick (and waking from
+// sleep) checks whether 12 h have passed since the last check.
 const fs = require("fs");
 const path = require("path");
-const { app } = require("electron");
+const { app, powerMonitor } = require("electron");
 const secureIpc = require("../ipc/secure-ipc");
 const { openExternalSafely } = require("../app/security");
+const connectionManager = require("../services/connection-manager");
 const log = require("../services/logger").logger("Updater");
 
 /**
@@ -36,6 +43,15 @@ const DOWNLOAD_PAGE =
 /** @type {AppUpdater | null} */
 let updater = null;
 let readyingPending = false; // making a kept download ready (no "update-available" sent)
+let readyVersion = ""; // the version the page was told is ready, this run
+let manualCheck = false; // a check started from Settings: its page waits for an answer
+let lastCheckAt = 0; // Date.now() of the last automatic or manual check
+let lastCheckFailed = false;
+
+const FIRST_CHECK_MS = 3000;
+const CHECK_EVERY_MS = 12 * 60 * 60 * 1000;
+const TICK_MS = 60 * 60 * 1000;
+const AFTER_WAKE_MS = 15_000; // the network comes back a few seconds after waking
 /** @type {() => BrowserWindow | null} */
 let getMainWindow = () => null;
 
@@ -97,8 +113,14 @@ function getUpdater() {
   autoUpdater.autoInstallOnAppQuit = true;
 
   autoUpdater.on("update-available", (info) => {
+    const kept = updateMode() === "auto" && info?.version === pendingVersion();
+    // already ready this run: the dialog said so once; Settings still gets its answer
+    if (kept && info.version === readyVersion) {
+      if (manualCheck) send("update-downloaded", info);
+      return;
+    }
     // downloaded before and not installed yet: make it ready, don't ask to download it again
-    if (updateMode() === "auto" && info?.version === pendingVersion()) {
+    if (kept) {
       log.info(
         `update ${info.version} was downloaded before: getting it ready`,
       );
@@ -117,7 +139,8 @@ function getUpdater() {
   );
   autoUpdater.on("update-downloaded", (info) => {
     readyingPending = false;
-    setPendingVersion(String(info?.version ?? ""));
+    readyVersion = String(info?.version ?? "");
+    setPendingVersion(readyVersion);
     send("update-downloaded", info);
   });
   autoUpdater.on("error", (err) => {
@@ -158,24 +181,60 @@ function configureAutoUpdater(getMainWindowFn, markQuitting) {
   });
 }
 
-// Errors are reported by the "error" event: catch the promise too, or every failed check
-// (offline, no release feed) is also an unhandled rejection.
-function checkForUpdates() {
-  getUpdater()
+/**
+ * One check. Errors are reported by the "error" event: the promise is caught too, or every
+ * failed check (offline, no release feed) is also an unhandled rejection.
+ * @param {boolean} [manual] started from Settings
+ */
+function runCheck(manual = false) {
+  lastCheckAt = Date.now();
+  manualCheck = manual;
+  const done = getUpdater()
     .checkForUpdates()
-    ?.catch(() => {});
+    ?.then(
+      (result) => {
+        lastCheckFailed = false;
+        return result;
+      },
+      (err) => {
+        lastCheckFailed = true;
+        throw err;
+      },
+    )
+    .finally(() => {
+      manualCheck = false;
+    });
+  return done ?? Promise.resolve(null);
+}
+
+function checkForUpdates() {
+  runCheck().catch(() => {});
+}
+
+/**
+ * The hourly tick and waking from sleep: a check if the last one is 12 h old, or failed an
+ * hour ago (the site was down while the connection was fine).
+ */
+function checkIfDue() {
+  const since = Date.now() - lastCheckAt;
+  if (since >= CHECK_EVERY_MS || (lastCheckFailed && since >= TICK_MS))
+    checkForUpdates();
 }
 
 /** The check the user starts from Settings; the page shows its result. */
 function checkForUpdatesNow() {
   if (updateMode() === "store") return Promise.resolve(null);
-  return getUpdater().checkForUpdates();
+  return runCheck(true);
 }
 
 function startUpdateChecks() {
   if (updateMode() === "store") return;
-  setTimeout(checkForUpdates, 3000);
-  setInterval(checkForUpdates, 12 * 60 * 60 * 1000);
+  setTimeout(checkForUpdates, FIRST_CHECK_MS);
+  setInterval(checkIfDue, TICK_MS);
+  powerMonitor.on("resume", () => setTimeout(checkIfDue, AFTER_WAKE_MS));
+  connectionManager.onRestored(() => {
+    if (lastCheckFailed) checkForUpdates();
+  });
 }
 
 module.exports = {

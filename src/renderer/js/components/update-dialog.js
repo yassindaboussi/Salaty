@@ -8,11 +8,16 @@
 //   ready        Restart now, or Later: it installs when the app quits (autoInstallOnAppQuit)
 //   failed       Try again, Close
 // Hidden while downloading, it comes back by itself when the update is ready (or failed).
+// "Later" (or closing it) on "available" is a real "later": that version isn't offered again
+// for 24 h, though the app starts with Windows and checks every 12 h. Settings still shows it
+// when the user checks there.
 const { ipcRenderer } = require("electron");
 const { t, getLocaleTag } = require("../core/i18n");
 const { byId } = require("../core/dom");
 
 const MB = 1024 * 1024;
+const LATER_KEY = "updateLater";
+const LATER_MS = 24 * 60 * 60 * 1000;
 
 /** @typedef {"available" | "downloading" | "ready" | "failed"} UpdateState */
 
@@ -108,6 +113,34 @@ function showProgress(percent, transferred, total) {
   );
 }
 
+/** "Later" on this version: not offered again for 24 h. */
+function remindLater() {
+  try {
+    localStorage.setItem(
+      LATER_KEY,
+      JSON.stringify({ version, until: Date.now() + LATER_MS }),
+    );
+  } catch {
+    // storage unavailable: offered again at the next check
+  }
+}
+
+/** @param {string} v */
+function isPutOff(v) {
+  try {
+    const later = JSON.parse(localStorage.getItem(LATER_KEY) ?? "null");
+    return later?.version === v && Date.now() < Number(later.until);
+  } catch {
+    return false;
+  }
+}
+
+/** Later, ✕, the backdrop: on "available" that is a "remind me later". */
+function closeDialog() {
+  if (current === "available") remindLater();
+  dialog().close();
+}
+
 function open() {
   if (!dialog().open) dialog().showModal();
   // the main action has the focus (Enter), not the ✕ that comes first
@@ -118,7 +151,7 @@ function onPrimary() {
   if (current === "available" || current === "failed") {
     ipcRenderer.send("start-download");
     if (updateMode !== "auto") {
-      dialog().close(); // main opens the download page in the browser
+      closeDialog(); // main opens the download page in the browser
       return;
     }
     showProgress(0);
@@ -140,20 +173,22 @@ function initUpdateDialog() {
     .catch(() => {});
 
   primary().addEventListener("click", onPrimary);
-  secondary().addEventListener("click", () => dialog().close());
-  byId("updateClose", HTMLButtonElement).addEventListener("click", () =>
-    dialog().close(),
-  );
+  secondary().addEventListener("click", closeDialog);
+  byId("updateClose", HTMLButtonElement).addEventListener("click", closeDialog);
   // a click on the dimmed backdrop closes it, as Esc does
   dialog().addEventListener("click", (e) => {
-    if (e.target === dialog()) dialog().close();
+    if (e.target === dialog()) closeDialog();
+  });
+  // Esc ("cancel" comes at once; "close" only with the next frame, none in a hidden window)
+  dialog().addEventListener("cancel", () => {
+    if (current === "available") remindLater();
   });
 
   ipcRenderer.on("update-available", (_e, info) => {
     if (current === "downloading" || current === "ready") return;
     version = String(info?.version ?? "");
     render("available");
-    open();
+    if (!isPutOff(version)) open();
   });
   ipcRenderer.on("download-progress", (_e, p) => {
     if (current !== "downloading") render("downloading");
