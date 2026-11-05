@@ -25,7 +25,7 @@ const {
   scrollToSelected,
   bindTable,
 } = require("./table");
-const { renderDay, renderLocation } = require("./panel");
+const { renderDay, renderLocation, methodText } = require("./panel");
 const { bindPanelFold } = require("./panel-fold");
 
 let loadId = 0; // a quicker later month wins over a slower earlier one
@@ -49,10 +49,13 @@ function renderMonthTitle() {
   const b = view.days.at(-1)?.hijri;
   let hijri = "";
   if (a && b) {
+    // a February can sit inside one Hijri month: its name once
     hijri =
-      a.year === b.year
-        ? `${hijriMonthName(a.month)} – ${hijriMonthName(b.month)} ${b.year} ${t("ah")}`
-        : `${hijriMonthName(a.month)} ${a.year} – ${hijriMonthName(b.month)} ${b.year} ${t("ah")}`;
+      a.month === b.month && a.year === b.year
+        ? `${hijriMonthName(a.month)} ${a.year} ${t("ah")}`
+        : a.year === b.year
+          ? `${hijriMonthName(a.month)} – ${hijriMonthName(b.month)} ${b.year} ${t("ah")}`
+          : `${hijriMonthName(a.month)} ${a.year} – ${hijriMonthName(b.month)} ${b.year} ${t("ah")}`;
   }
   byId("mpMonthHijri", HTMLElement).textContent = hijri;
 }
@@ -64,6 +67,7 @@ function renderPrintHead() {
     t("prayerTimesMonthly"),
     byId("mpMonth", HTMLElement).textContent,
     [city, country].filter(Boolean).join(", "),
+    methodText(),
   ]
     .filter(Boolean)
     .join(" · ");
@@ -73,6 +77,7 @@ function renderPrintHead() {
 async function showMonth({ scroll = true } = {}) {
   const id = ++loadId;
   view.days = [];
+  view.method = null;
   renderMonthTitle();
   renderLocation();
   if (!state.settings.city || !state.settings.country) {
@@ -81,20 +86,22 @@ async function showMonth({ scroll = true } = {}) {
     return;
   }
   showMessage(t("loadingMonthlyPrayerTimes"));
-  /** @type {import("./state").MonthDay[] | null} */
-  let days = null;
+  /** @type {import("./state").Month | null} */
+  let month = null;
   try {
-    days = await loadMonth(view.year, view.month);
+    month = await loadMonth(view.year, view.month);
   } catch (err) {
     console.error("[MonthlyPrayerTimes] could not load the month:", err);
   }
   if (id !== loadId) return;
-  if (!days) {
+  if (!month) {
     showMessage(t("mpOffline"));
     renderDay();
     return;
   }
+  const { days } = month;
   view.days = days;
+  view.method = month.method;
   // today in its month, else the 1st
   if (!days.some((d) => d.iso === view.selectedIso)) {
     view.selectedIso = (
@@ -103,6 +110,7 @@ async function showMonth({ scroll = true } = {}) {
   }
   showMessage("");
   renderMonthTitle();
+  renderLocation();
   renderPrintHead();
   renderTable();
   renderDay();

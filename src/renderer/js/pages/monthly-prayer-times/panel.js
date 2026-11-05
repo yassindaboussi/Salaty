@@ -65,10 +65,29 @@ function renderDay() {
   );
 }
 
+/** [method, Asr rule] of this month's times (in the UI language), null when unknown. */
+function methodParts() {
+  const method = view.method;
+  if (!method) return null;
+  const key = `mpMethod${method.id}`;
+  const translated = method.id === null ? key : t(key);
+  return [
+    translated === key ? method.name : translated, // an id newer than the app: Aladhan's name
+    t(method.hanafi ? "mpAsrHanafi" : "mpAsrStandard"),
+  ];
+}
+
+/** "Tunisia · Asr: majority view…" for the PDF heading, "" when unknown. */
+const methodText = () => methodParts()?.filter(Boolean).join(" · ") ?? "";
+
 function renderLocation() {
   const { city, country } = state.settings;
   byId("mpLocation", HTMLElement).textContent =
     [city, country].filter(Boolean).join(", ") || "—";
+  const parts = methodParts();
+  byId("mpMethodBox", HTMLElement).hidden = !parts;
+  byId("mpMethod", HTMLElement).textContent = parts?.[0] ?? "";
+  byId("mpAsr", HTMLElement).textContent = parts?.[1] ?? "";
 }
 
-module.exports = { renderDay, renderLocation };
+module.exports = { renderDay, renderLocation, methodText };
