@@ -11,6 +11,15 @@
  * @property {boolean} friday
  * @property {{ day: number, month: number, year: number }} hijri  with the Settings correction
  * @property {Record<TimeKey, string>} times  "HH:MM"
+ *
+ * @typedef {object} MonthMethod  how the times were calculated (Aladhan picks it for the place)
+ * @property {number | null} id    Aladhan's method id, null when unknown
+ * @property {string} name         Aladhan's English name (used when the id has no translation)
+ * @property {boolean} hanafi      Asr when a shadow is twice its length (else once: the majority)
+ *
+ * @typedef {object} Month
+ * @property {MonthDay[]} days
+ * @property {MonthMethod | null} method
  */
 
 /** The columns of the timetable, in order (Sunrise: when Fajr's time ends). */
@@ -30,6 +39,8 @@ const view = {
   selectedIso: "",
   /** @type {MonthDay[]} */
   days: [],
+  /** @type {MonthMethod | null} */
+  method: null,
 };
 
 module.exports = { view, TIME_KEYS };

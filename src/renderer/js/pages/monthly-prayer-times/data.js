@@ -10,7 +10,7 @@ const { cleanTime } = require("../../../../shared/prayerUtils");
 const { locationQuery } = require("../../../../shared/aladhan");
 const { TIME_KEYS } = require("./state");
 
-/** @type {Map<string, import("./state").MonthDay[]>} */
+/** @type {Map<string, import("./state").Month>} */
 const cache = new Map();
 
 /** The saved correction in days (0 when unset or not valid), as in the main process. */
@@ -46,7 +46,7 @@ async function correctedHijri(entries, index) {
 
 /**
  * @param {number} year @param {number} month 1-12
- * @returns {Promise<import("./state").MonthDay[] | null>} null when offline with nothing saved
+ * @returns {Promise<import("./state").Month | null>} null when offline with nothing saved
  */
 async function loadMonth(year, month) {
   // the location and the correction are part of the key: a change never reuses another's month
@@ -79,8 +79,20 @@ async function loadMonth(year, month) {
       };
     }),
   );
-  cache.set(key, days);
-  return days;
+  const result = { days, method: methodOf(entries[0]?.meta) };
+  cache.set(key, result);
+  return result;
+}
+
+/** @param {any} meta Aladhan's meta of a day @returns {import("./state").MonthMethod | null} */
+function methodOf(meta) {
+  const method = meta?.method;
+  if (!method) return null;
+  return {
+    id: Number.isInteger(method.id) ? method.id : null,
+    name: String(method.name ?? ""),
+    hanafi: String(meta.school ?? "").toUpperCase() === "HANAFI",
+  };
 }
 
 module.exports = { loadMonth };

@@ -50,6 +50,7 @@
     flex-shrink: 0;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: 8px;
   }
@@ -79,6 +80,8 @@
     font-weight: 700;
     color: var(--text-primary);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mp-month-hijri {
@@ -86,6 +89,8 @@
     font-size: 11.5px;
     color: var(--text-muted);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mp-actions {
@@ -172,12 +177,12 @@
     letter-spacing: 0.04em;
     text-align: start;
     text-transform: uppercase;
-    white-space: nowrap;
+    vertical-align: bottom;
   }
 
   .mp-table tbody th,
   .mp-table td {
-    padding: 7px 8px;
+    padding: 7px 6px;
     border-top: 1px solid var(--border-subtle);
     color: var(--text-primary);
     font-weight: 400;
@@ -214,10 +219,21 @@
     color: var(--text-muted);
   }
 
-  .mp-hijri-month {
-    display: block;
-    font-size: 10.5px;
-    line-height: 1.2;
+  /* where a Hijri month starts: its name on a thin row across the table */
+  .mp-table tbody tr.mp-month-row {
+    cursor: default;
+  }
+
+  .mp-table tbody tr.mp-month-row:hover {
+    background: none;
+  }
+
+  .mp-table .mp-month-row td {
+    padding: 5px 8px 4px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
 
   /* days gone by step back */
@@ -355,8 +371,32 @@
     overflow-wrap: anywhere;
   }
 
+  .mp-method {
+    margin-top: 10px;
+  }
+
+  .mp-method[hidden] {
+    display: none;
+  }
+
+  .mp-method-name {
+    margin: 0;
+    padding-inline-start: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
+  }
+
+  .mp-method-asr {
+    margin: 2px 0 0;
+    padding-inline-start: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
   .mp-note {
-    margin: 6px 0 0;
+    margin: 10px 0 0;
     padding-inline-start: 4px;
     font-size: 11.5px;
     line-height: 1.45;
@@ -415,13 +455,15 @@
 
   /* ── Maximized window: more room ───────────────────────────────────── */
 
-  .fullscreen-mode .mp-layout:not(.is-panel-folded, .is-empty) {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 16px;
-  }
+  @media (width > 1000px) {
+    .fullscreen-mode .mp-layout:not(.is-panel-folded, .is-empty) {
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 16px;
+    }
 
-  .fullscreen-mode .mp-table {
-    font-size: 14px;
+    .fullscreen-mode .mp-table {
+      font-size: 14px;
+    }
   }
 
   /* ── Narrow window: one column, the page scrolls ───────────────────── */
@@ -532,10 +574,6 @@
     .mp-table *,
     .mp-table .mp-muted {
       color: #000;
-    }
-
-    .mp-hijri-month {
-      display: inline;
     }
 
     .mp-table thead th,
