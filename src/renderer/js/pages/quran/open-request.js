@@ -27,16 +27,8 @@ function takeOpenRequest() {
   }
 }
 
-/** @param {number} ayah */
-function revealAyah(ayah) {
-  const el = document.getElementById(`ayah-${ayah}`);
-  if (!el) return;
-  el.classList.add("is-target");
-  el.scrollIntoView({ block: "center" });
-}
-
 /**
- * @param {(surah: number) => Promise<void>} openSurah
+ * @param {(surah: number, ayah?: number) => Promise<void>} openSurah
  * @param {() => void} showSurahList  the reader's own back (to the surah list)
  */
 function handleOpenRequest(openSurah, showSurahList) {
@@ -50,7 +42,7 @@ function handleOpenRequest(openSurah, showSurahList) {
   readerBack.addEventListener("click", () =>
     ipcRenderer.invoke("navigate-to", request.back),
   );
-  openSurah(request.surah).then(() => revealAyah(request.ayah));
+  openSurah(request.surah, request.ayah);
 }
 
 module.exports = { handleOpenRequest };

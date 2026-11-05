@@ -9,13 +9,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="holyQuran">Holy Quran - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
+    <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
     <link rel="stylesheet" href="../../css/04-pages/quran.css" />
   </head>
   <body class="page-loading">
     <div class="app-container" id="app">
       <div class="drag-area"></div>
 
-      <!-- ═══════════════ VIEW: SURAH LIST ═══════════════ -->
+      <!-- ═══════════════ The surah list ═══════════════ -->
       <div class="quran-container" id="viewSurahList">
         <header
           class="page-header quran-header"
@@ -23,70 +24,110 @@
           data-back="features"
         >
           <h1 class="page-header__title" id="quranTitle" data-i18n="holyQuran">
-            القرآن الكريم
+            Holy Quran
           </h1>
         </header>
 
-        <!-- Search Bar -->
-        <div class="quran-search-bar">
-          <i class="fas fa-search quran-search-icon" aria-hidden="true"></i>
-          <input
-            type="text"
-            id="surahSearchInput"
-            data-i18n-placeholder="searchSurah"
-            data-i18n-aria-label="searchSurah"
-            class="quran-search-input"
-            placeholder="Search surah..."
-            autocomplete="off"
-          />
-        </div>
-
-        <!-- Juz / Surah Tab Toggle -->
-        <div class="quran-tabs">
-          <button
-            type="button"
-            class="quran-tab active"
-            id="tabSurah"
-            data-i18n="surah"
-          >
-            Surah
+        <main class="q-list">
+          <!-- where the reader stopped last time -->
+          <button type="button" class="q-continue" id="qContinue" hidden>
+            <i
+              class="fas fa-book-open-reader q-continue-icon"
+              aria-hidden="true"
+            ></i>
+            <span class="q-continue-text">
+              <span class="q-continue-label" data-i18n="quranContinue"
+                >Continue reading</span
+              >
+              <span class="q-continue-place" id="qContinuePlace"></span>
+            </span>
+            <i class="fas fa-chevron-right q-forward" aria-hidden="true"></i>
           </button>
-          <button type="button" class="quran-tab" id="tabJuz" data-i18n="juz">
-            Juz
-          </button>
-        </div>
 
-        <!-- Surah Grid -->
-        <main class="quran-content">
-          <div class="quran-loading" id="surahLoading">
-            <div class="quran-loading-content">
+          <div class="q-top">
+            <div class="q-tabs" role="tablist" data-i18n-aria-label="holyQuran">
+              <button
+                type="button"
+                class="q-tab"
+                id="tabSurah"
+                role="tab"
+                data-tab="surah"
+                aria-controls="surahGrid"
+                aria-selected="true"
+              >
+                <span data-i18n="surah">Surah</span>
+              </button>
+              <button
+                type="button"
+                class="q-tab"
+                id="tabJuz"
+                role="tab"
+                data-tab="juz"
+                aria-controls="juzList"
+                aria-selected="false"
+                tabindex="-1"
+              >
+                <span data-i18n="juz">Juz</span>
+              </button>
+              <button
+                type="button"
+                class="q-tab"
+                id="tabBookmarks"
+                role="tab"
+                data-tab="bookmarks"
+                aria-controls="bookmarkList"
+                aria-selected="false"
+                tabindex="-1"
+              >
+                <span data-i18n="quranBookmarks">Bookmarks</span>
+                <span class="q-tab-count" id="bookmarkCount"></span>
+              </button>
+            </div>
+
+            <div class="q-search" role="search" id="surahSearch">
               <i
-                class="fas fa-book-quran quran-loading-icon"
+                class="fas fa-magnifying-glass q-search-icon"
                 aria-hidden="true"
               ></i>
-              <span class="quran-loading-dots" aria-hidden="true"
-                ><span></span><span></span><span></span
-              ></span>
-              <span id="loadingText" data-i18n="loadingQuran">Loading...</span>
+              <input
+                type="search"
+                id="surahSearchInput"
+                class="q-search-input"
+                data-i18n-placeholder="searchSurah"
+                data-i18n-aria-label="searchSurah"
+                autocomplete="off"
+                spellcheck="false"
+              />
             </div>
           </div>
-          <div class="surah-grid" id="surahGrid"></div>
-          <div class="juz-list" id="juzList" style="display: none"></div>
-        </main>
 
-        <footer class="quran-footer">
-          <div
-            class="quran-footer-text"
-            id="quranFooterText"
-            data-i18n="listenReadQuran"
-          >
-            Read the Holy Quran
+          <div class="q-scroll">
+            <div
+              class="surah-grid"
+              id="surahGrid"
+              role="tabpanel"
+              aria-labelledby="tabSurah"
+            ></div>
+            <div
+              class="juz-list"
+              id="juzList"
+              role="tabpanel"
+              aria-labelledby="tabJuz"
+              hidden
+            ></div>
+            <div
+              class="bookmark-list"
+              id="bookmarkList"
+              role="tabpanel"
+              aria-labelledby="tabBookmarks"
+              hidden
+            ></div>
           </div>
-        </footer>
+        </main>
       </div>
 
-      <!-- ═══════════════ VIEW: SURAH READER ═══════════════ -->
-      <div class="quran-container" id="viewSurahReader" style="display: none">
+      <!-- ═══════════════ The reader ═══════════════ -->
+      <div class="quran-container" id="viewSurahReader" hidden>
         <header
           class="page-header quran-header"
           data-page-header
@@ -96,244 +137,252 @@
             <h1 class="page-header__title" id="readerSurahName"></h1>
             <span class="reader-surah-meta" id="readerSurahMeta"></span>
           </div>
-          <button
-            type="button"
-            class="control-btn reader-settings-btn"
-            id="readerSettingsBtn"
-            data-tooltip="tooltipSettings"
-            data-header-control
-          >
-            <i class="fas fa-sliders-h" aria-hidden="true"></i>
-          </button>
         </header>
 
-        <!-- Reader Settings Panel (visible by default; close with the X) -->
-        <div class="reader-settings-panel" id="readerSettingsPanel">
-          <button
-            type="button"
-            class="settings-panel-close"
-            id="settingsPanelCloseBtn"
-            data-tooltip="tooltipClose"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-          </button>
-          <div class="settings-toolbar">
-            <div class="settings-group">
-              <i
-                class="fas fa-text-height settings-group-icon"
-                aria-hidden="true"
-              ></i>
-              <div class="font-size-controls">
-                <button
-                  type="button"
-                  class="font-btn"
-                  id="fontDecBtn"
-                  data-tooltip="decreaseFontSize"
-                >
-                  <i class="fas fa-minus" aria-hidden="true"></i>
-                </button>
-                <span class="font-size-display" id="fontSizeDisplay">26</span>
-                <button
-                  type="button"
-                  class="font-btn"
-                  id="fontIncBtn"
-                  data-tooltip="increaseFontSize"
-                >
-                  <i class="fas fa-plus" aria-hidden="true"></i>
-                </button>
+        <div class="q-reader-layout" id="qReaderLayout">
+          <section class="q-reader-main">
+            <main class="reader-content" id="readerContent">
+              <div class="quran-loading" id="readerLoading" hidden>
+                <span class="quran-loading-dots" aria-hidden="true"
+                  ><span></span><span></span><span></span
+                ></span>
+                <span data-i18n="loadingSurah">Loading surah...</span>
               </div>
-            </div>
-            <div class="settings-divider"></div>
-            <div
-              class="settings-group"
-              id="numeralsGroup"
-              role="group"
-              aria-label="Numerals"
-              data-i18n-aria-label="numeralsLabel"
-            >
-              <!-- Material Symbols "123" (Apache-2.0), cropped to the glyph -->
-              <svg
-                class="settings-group-icon settings-group-icon-svg"
-                viewBox="3.5 8 16.5 8"
-                aria-hidden="true"
-                data-tooltip="numeralsLabel"
+              <p
+                class="reader-notice"
+                id="readerNotice"
+                role="status"
+                hidden
+              ></p>
+              <!-- not before At-Tawbah; in Al-Fatihah it is the first ayah -->
+              <p
+                class="bismillah"
+                id="bismillahHeader"
+                lang="ar"
+                dir="rtl"
+                hidden
               >
-                <path
-                  fill="currentColor"
-                  d="M5.5 15v-4.5H4V9h3v6zM9 15v-2.5q0-.425.288-.712T10 11.5h2v-1H9V9h3.5q.425 0 .713.288T13.5 10v1.5q0 .425-.288.713t-.712.287h-2v1h3V15zm6 0v-1.5h3v-1h-2v-1h2v-1h-3V9h3.5q.425 0 .713.288T19.5 10v4q0 .425-.288.713T18.5 15z"
-                />
-              </svg>
-              <div class="numerals-toggle">
-                <button
-                  type="button"
-                  class="numerals-btn"
-                  data-numerals="arabic"
-                  aria-pressed="false"
-                  data-tooltip="numeralsArabic"
-                >
-                  ١٢٣
-                </button>
-                <button
-                  type="button"
-                  class="numerals-btn"
-                  data-numerals="latin"
-                  aria-pressed="false"
-                  data-tooltip="numeralsLatin"
-                >
-                  123
-                </button>
-              </div>
-            </div>
-            <div class="settings-divider"></div>
-            <div class="settings-group settings-group-translation">
-              <i
-                class="fas fa-language settings-group-icon"
-                data-tooltip="translation"
-                aria-hidden="true"
-              ></i>
-              <div class="translation-combo" id="translationCombo">
-                <button
-                  type="button"
-                  class="translation-combo-trigger"
-                  id="translationTrigger"
-                  role="combobox"
-                  aria-haspopup="listbox"
-                  aria-expanded="false"
-                  aria-controls="translationList"
-                  aria-label="Translation"
-                  data-i18n-aria-label="translation"
-                >
-                  <span class="combo-value">
-                    <span class="combo-name" id="translationCurrentName"
-                      >Arabic only</span
-                    >
-                    <span
-                      class="pill-lang"
-                      id="translationCurrentLang"
-                      hidden
-                    ></span>
-                  </span>
-                  <i
-                    class="fas fa-chevron-down combo-chevron"
-                    aria-hidden="true"
-                  ></i>
-                </button>
-                <ul
-                  class="translation-list"
-                  id="translationList"
-                  role="listbox"
-                  aria-label="Translation"
-                  data-i18n-aria-label="translation"
-                  hidden
-                >
-                  <li
-                    class="translation-option"
-                    id="translationOpt-none"
-                    role="option"
-                    aria-selected="true"
-                    data-translation="none"
-                  >
-                    <i class="fas fa-check combo-check" aria-hidden="true"></i>
-                    <span class="combo-name" id="translationNoneLabel"
-                      >Arabic only</span
-                    >
-                  </li>
-                  <li
-                    class="translation-group-label"
-                    role="presentation"
-                    aria-hidden="true"
-                  >
-                    English
-                  </li>
-                  <li
-                    class="translation-option"
-                    id="translationOpt-en-sahih"
-                    role="option"
-                    aria-selected="false"
-                    data-translation="en.sahih"
-                  >
-                    <i class="fas fa-check combo-check" aria-hidden="true"></i>
-                    <span class="combo-name">Sahih International</span
-                    ><span class="pill-lang">EN</span>
-                  </li>
-                  <li
-                    class="translation-option"
-                    id="translationOpt-en-asad"
-                    role="option"
-                    aria-selected="false"
-                    data-translation="en.asad"
-                    data-needs-internet="1"
-                  >
-                    <i class="fas fa-check combo-check" aria-hidden="true"></i>
-                    <span class="combo-name">Muhammad Asad</span
-                    ><span class="pill-lang">EN</span>
-                  </li>
-                  <li
-                    class="translation-group-label"
-                    role="presentation"
-                    aria-hidden="true"
-                  >
-                    Français
-                  </li>
-                  <li
-                    class="translation-option"
-                    id="translationOpt-fr-hamidullah"
-                    role="option"
-                    aria-selected="false"
-                    data-translation="fr.hamidullah"
-                    data-needs-internet="1"
-                  >
-                    <i class="fas fa-check combo-check" aria-hidden="true"></i>
-                    <span class="combo-name">Hamidullah</span
-                    ><span class="pill-lang">FR</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
+                بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ
+              </p>
+              <div class="ayah-list" id="ayahList"></div>
+            </main>
 
-        <!-- Ayah Reader Area -->
-        <main class="reader-content" id="readerContent">
-          <div class="quran-loading" id="readerLoading">
-            <div class="quran-loading-content">
-              <i
-                class="fas fa-book-quran quran-loading-icon"
-                aria-hidden="true"
-              ></i>
-              <span class="quran-loading-dots" aria-hidden="true"
-                ><span></span><span></span><span></span
-              ></span>
-              <span data-i18n="loadingSurah">Loading surah...</span>
-            </div>
-          </div>
-          <!-- Bismillah -->
-          <div
-            class="bismillah-header"
-            id="bismillahHeader"
-            style="display: none"
-          >
-            <span class="bismillah-text"
-              >بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span
-            >
-          </div>
-          <!-- Ayahs will be injected here -->
-          <div class="ayah-list" id="ayahList"></div>
-        </main>
+            <nav class="reader-nav">
+              <button type="button" class="reader-nav-btn" id="prevSurahBtn">
+                <i class="fas fa-chevron-left q-back" aria-hidden="true"></i>
+                <span class="reader-nav-label" id="prevSurahLabel"></span>
+              </button>
+              <span class="reader-page-info" id="readerPageInfo"></span>
+              <button type="button" class="reader-nav-btn" id="nextSurahBtn">
+                <span class="reader-nav-label" id="nextSurahLabel"></span>
+                <i
+                  class="fas fa-chevron-right q-forward"
+                  aria-hidden="true"
+                ></i>
+              </button>
+            </nav>
+          </section>
 
-        <!-- Navigation between surahs -->
-        <div class="reader-nav">
-          <button type="button" class="reader-nav-btn" id="prevSurahBtn">
-            <i class="fas fa-chevron-left" aria-hidden="true"></i>
-            <span id="prevSurahLabel"></span>
-          </button>
-          <div class="reader-progress">
-            <span class="reader-page-info" id="readerPageInfo"></span>
-          </div>
-          <button type="button" class="reader-nav-btn" id="nextSurahBtn">
-            <span id="nextSurahLabel"></span>
-            <i class="fas fa-chevron-right" aria-hidden="true"></i>
-          </button>
+          <!-- Display settings (folds to a strip of icons) -->
+          <aside class="q-panel">
+            <div class="q-panel-head">
+              <h2 class="q-panel-heading" data-i18n="quranDisplay">Display</h2>
+              <button
+                type="button"
+                class="q-panel-toggle"
+                id="qPanelToggle"
+                aria-controls="qPanelBody"
+                aria-expanded="true"
+                data-tooltip="quranPanelHide"
+              >
+                <i class="fas fa-angles-right" aria-hidden="true"></i>
+              </button>
+            </div>
+
+            <div class="q-rail" id="qRail">
+              <button
+                type="button"
+                class="q-panel-toggle"
+                data-rail="open"
+                data-tooltip="quranDisplay"
+              >
+                <i class="fas fa-text-height" aria-hidden="true"></i>
+              </button>
+            </div>
+
+            <div class="q-panel-body" id="qPanelBody">
+              <div class="q-field">
+                <p class="q-field-label" data-i18n="quranFontSize">Text size</p>
+                <div class="q-stepper">
+                  <button
+                    type="button"
+                    class="q-step"
+                    id="fontDecBtn"
+                    data-tooltip="decreaseFontSize"
+                  >
+                    <i class="fas fa-minus" aria-hidden="true"></i>
+                  </button>
+                  <span class="q-step-value" id="fontSizeDisplay">26</span>
+                  <button
+                    type="button"
+                    class="q-step"
+                    id="fontIncBtn"
+                    data-tooltip="increaseFontSize"
+                  >
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="q-field">
+                <p class="q-field-label" data-i18n="translation">Translation</p>
+                <div class="translation-combo" id="translationCombo">
+                  <button
+                    type="button"
+                    class="translation-combo-trigger"
+                    id="translationTrigger"
+                    role="combobox"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="translationList"
+                    aria-label="Translation"
+                    data-i18n-aria-label="translation"
+                  >
+                    <span class="combo-value">
+                      <span class="combo-name" id="translationCurrentName"
+                        >Arabic only</span
+                      >
+                      <span
+                        class="pill-lang"
+                        id="translationCurrentLang"
+                        hidden
+                      ></span>
+                    </span>
+                    <i
+                      class="fas fa-chevron-down combo-chevron"
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                  <ul
+                    class="translation-list"
+                    id="translationList"
+                    role="listbox"
+                    aria-label="Translation"
+                    data-i18n-aria-label="translation"
+                    hidden
+                  >
+                    <li
+                      class="translation-option"
+                      id="translationOpt-none"
+                      role="option"
+                      aria-selected="true"
+                      data-translation="none"
+                    >
+                      <i
+                        class="fas fa-check combo-check"
+                        aria-hidden="true"
+                      ></i>
+                      <span class="combo-name" id="translationNoneLabel"
+                        >Arabic only</span
+                      >
+                    </li>
+                    <li
+                      class="translation-group-label"
+                      role="presentation"
+                      aria-hidden="true"
+                    >
+                      English
+                    </li>
+                    <li
+                      class="translation-option"
+                      id="translationOpt-en-sahih"
+                      role="option"
+                      aria-selected="false"
+                      data-translation="en.sahih"
+                    >
+                      <i
+                        class="fas fa-check combo-check"
+                        aria-hidden="true"
+                      ></i>
+                      <span class="combo-name">Sahih International</span
+                      ><span class="pill-lang">EN</span>
+                    </li>
+                    <li
+                      class="translation-option"
+                      id="translationOpt-en-asad"
+                      role="option"
+                      aria-selected="false"
+                      data-translation="en.asad"
+                      data-needs-internet="1"
+                    >
+                      <i
+                        class="fas fa-check combo-check"
+                        aria-hidden="true"
+                      ></i>
+                      <span class="combo-name">Muhammad Asad</span
+                      ><span class="pill-lang">EN</span>
+                    </li>
+                    <li
+                      class="translation-group-label"
+                      role="presentation"
+                      aria-hidden="true"
+                    >
+                      Français
+                    </li>
+                    <li
+                      class="translation-option"
+                      id="translationOpt-fr-hamidullah"
+                      role="option"
+                      aria-selected="false"
+                      data-translation="fr.hamidullah"
+                      data-needs-internet="1"
+                    >
+                      <i
+                        class="fas fa-check combo-check"
+                        aria-hidden="true"
+                      ></i>
+                      <span class="combo-name">Hamidullah</span
+                      ><span class="pill-lang">FR</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div
+                class="q-field"
+                id="numeralsGroup"
+                role="group"
+                data-i18n-aria-label="numeralsLabel"
+              >
+                <p class="q-field-label" data-i18n="numeralsLabel">Numerals</p>
+                <div class="numerals-toggle">
+                  <button
+                    type="button"
+                    class="numerals-btn"
+                    data-numerals="arabic"
+                    aria-pressed="false"
+                    data-tooltip="numeralsArabic"
+                  >
+                    ١٢٣
+                  </button>
+                  <button
+                    type="button"
+                    class="numerals-btn"
+                    data-numerals="latin"
+                    aria-pressed="false"
+                    data-tooltip="numeralsLatin"
+                  >
+                    123
+                  </button>
+                </div>
+              </div>
+
+              <p class="q-panel-note" data-i18n="quranSourceNote">
+                The Arabic text (Hafs) works offline. Translations other than
+                Sahih International need the internet.
+              </p>
+            </div>
+          </aside>
         </div>
       </div>
     </div>

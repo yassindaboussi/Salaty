@@ -1,70 +1,76 @@
 "use strict";
 
 // The Quran page. Its parts:
-//   surah-list.js           the 114 surahs (searchable) and the 30 juz
-//   reader.js               one surah's text, previous/next, the settings panel
+//   surah-list.js           "Continue reading", the 114 surahs (searchable), the 30 juz, the tabs
+//   bookmarks.js            bookmarked ayahs: toggling them, the Bookmarks tab
+//   reader.js               one surah: running text, or ayah cards with a translation
+//   reading-position.js     where the reader stopped (for "Continue reading")
+//   panel-fold.js           folding the reader's display panel to a strip
 //   translation-picker.js   the translation combobox
 //   numerals.js             Arabic-Indic or Western digits
-//   open-request.js         opened at one ayah by another page (the 99 Names verses)
-//   state.js                what is shown now, the surah/juz tables, number formatting
-// The surah text comes from services/api/alquran-cloud.js (online, or the bundled offline data).
+//   open-request.js         opened at one ayah by another page (99 Names, Athkar)
+//   storage.js              what the page remembers (localStorage)
+//   state.js                what is shown now, the surah/juz tables, numbers and names
+// The Arabic text is bundled (data/Quran.json); translations other than Sahih International come
+// from services/api/alquran-cloud.js.
 const { t } = require("../../core/i18n");
 const screenSizeManager = require("../../core/screen-size");
 const { showToast } = require("../../core/toast");
 const { copyText } = require("../../core/clipboard");
-const { initSelectionCopy } = require("../../components/selection-copy");
 const {
   setupConnectionRecovery,
 } = require("../../services/connection-recovery");
-const { byId, queryAll } = require("../../core/dom");
-const { state, fmt, SURAH_META } = require("./state");
+const { byId } = require("../../core/dom");
+const { state, SURAH_META } = require("./state");
+const { loadFontSize, loadTranslation } = require("./storage");
 const {
   resolveNumerals,
   updateNumeralsUI,
   setNumerals,
 } = require("./numerals");
+const { renderLists, renderContinue, bindSurahList } = require("./surah-list");
 const {
-  switchTab,
-  onSearch,
-  renderSurahGrid,
-  renderJuzList,
-} = require("./surah-list");
+  toggleBookmark,
+  onBookmarksChange,
+  renderBookmarkCount,
+  renderBookmarkList,
+  bindBookmarkList,
+} = require("./bookmarks");
 const {
   updateReaderMeta,
   openSurah,
   loadAyahs,
   renderAyahs,
   showSurahList,
-  toggleSettings,
-  closeSettings,
   changeFontSize,
+  applyFontSize,
+  ayahCopyText,
+  updateBookmarkIcons,
+  bindReader,
 } = require("./reader");
 const {
   bindTranslationCombo,
   updateTranslationUI,
 } = require("./translation-picker");
+const { bindPanelFold } = require("./panel-fold");
+const { bindSelectionBar } = require("./selection-bar");
 const { handleOpenRequest } = require("./open-request");
+
+const TRANSLATION_IDS = new Set(["en.sahih", "en.asad", "fr.hamidullah"]);
 
 // Re-draws everything that shows a number after the user switches digit style.
 function refreshNumbers() {
-  renderSurahGrid(state.filteredSurahs);
-  renderJuzList();
-  const size = document.getElementById("fontSizeDisplay");
-  if (size) size.textContent = fmt(state.fontSize);
+  renderLists();
+  renderBookmarkCount();
   if (state.currentSurah) {
     updateReaderMeta();
-    // Skip while a surah is still loading (the list is empty then and will render with the new digits).
-    if (
-      state.currentAyahs.length &&
-      byId("ayahList", HTMLElement).children.length
-    ) {
-      renderAyahs(state.currentAyahs);
-    }
+    applyFontSize();
+    if (state.currentAyahs.length) renderAyahs();
   }
 }
 
-// Copies the part of the reader the user highlighted (Ctrl/Cmd+C or right-click > Copy).
-async function copySelectedText(text) {
+/** @param {string} text */
+async function copyAndTell(text) {
   const ok = await copyText(text);
   showToast(
     t(ok ? "copiedToClipboard" : "failedToCopy"),
@@ -72,86 +78,19 @@ async function copySelectedText(text) {
   );
 }
 
-function initQuranPage() {
-  // The surah list is bundled; only an open surah's text comes from the network.
-  setupConnectionRecovery(() => {
-    if (state.currentSurah) loadAyahs(state.currentSurah.n);
-  }, "Quran");
-  screenSizeManager.initPageScreenSize();
-  updateFullscreenButtons();
-  // also when the window is maximized/restored another way (title-bar double-click, Snap…)
-  screenSizeManager.onChange(updateFullscreenButtons);
-  initSelectionCopy(document.getElementById("readerContent"), copySelectedText);
-
-  // Back (list view), minimize and close are wired by the app shell from the header markup
-  // (components/page-header.js); both views have their own fullscreen button.
-  document
-    .getElementById("fullscreenBtn")
-    ?.addEventListener("click", toggleFullscreen);
-  document
-    .getElementById("readerFullscreenBtn")
-    ?.addEventListener("click", toggleFullscreen);
-
-  document
-    .getElementById("tabSurah")
-    ?.addEventListener("click", () => switchTab("surah"));
-  document
-    .getElementById("tabJuz")
-    ?.addEventListener("click", () => switchTab("juz"));
-
-  document
-    .getElementById("surahSearchInput")
-    ?.addEventListener("input", onSearch);
-
-  document
-    .getElementById("readerSettingsBtn")
-    ?.addEventListener("click", toggleSettings);
-  document
-    .getElementById("settingsPanelCloseBtn")
-    ?.addEventListener("click", closeSettings);
-
-  document
-    .getElementById("fontIncBtn")
-    ?.addEventListener("click", () => changeFontSize(2));
-  document
-    .getElementById("fontDecBtn")
-    ?.addEventListener("click", () => changeFontSize(-2));
-
-  bindTranslationCombo();
-
-  state.numerals = resolveNumerals();
-  queryAll(".numerals-btn", HTMLElement).forEach((btn) => {
-    btn.addEventListener("click", () =>
-      setNumerals(btn.dataset.numerals, refreshNumbers),
-    );
-  });
-
-  document.getElementById("prevSurahBtn")?.addEventListener("click", () => {
-    if (state.currentSurah && state.currentSurah.n > 1) {
-      openSurah(state.currentSurah.n - 1);
+/** The ayah icons in the reader: copy, and the bookmark (also the ﴿n﴾ number in running text). */
+function bindAyahActions() {
+  byId("ayahList", HTMLElement).addEventListener("click", (e) => {
+    const button = /** @type {Element} */ (e.target).closest("[data-action]");
+    if (!(button instanceof HTMLButtonElement) || !state.currentSurah) return;
+    const ayah = Number(button.dataset.ayah);
+    if (button.dataset.action === "copy") {
+      copyAndTell(ayahCopyText(ayah));
+      return;
     }
+    const on = toggleBookmark(state.currentSurah.n, ayah);
+    showToast(t(on ? "quranBookmarkAdded" : "quranBookmarkRemoved"), "success");
   });
-  document.getElementById("nextSurahBtn")?.addEventListener("click", () => {
-    if (state.currentSurah && state.currentSurah.n < 114) {
-      openSurah(state.currentSurah.n + 1);
-    }
-  });
-
-  updateQuranText();
-  updateNumeralsUI();
-  updateTranslationUI();
-
-  state.surahs = SURAH_META;
-  state.filteredSurahs = [...SURAH_META];
-  renderSurahGrid(state.filteredSurahs);
-  renderJuzList();
-  // opened at one ayah by another page, or on the surah list; wires the reader's back button
-  handleOpenRequest(openSurah, showSurahList);
-}
-
-function updateQuranText() {
-  const size = document.getElementById("fontSizeDisplay");
-  if (size) size.textContent = fmt(state.fontSize);
 }
 
 function updateFullscreenButtons() {
@@ -159,7 +98,6 @@ function updateFullscreenButtons() {
   const tipKey = isBig ? "tooltipExpand" : "tooltipCompress";
   const tipText = t(tipKey);
   const iconCls = isBig ? "fas fa-expand" : "fas fa-compress";
-
   ["fullscreenBtn", "readerFullscreenBtn"].forEach((id) => {
     const btn = document.getElementById(id);
     if (!btn) return;
@@ -171,8 +109,71 @@ function updateFullscreenButtons() {
   });
 }
 
-function toggleFullscreen() {
-  screenSizeManager.toggleScreenSize(); // the buttons update through onChange
+function initQuranPage() {
+  state.fontSize = loadFontSize();
+  state.translationId = loadTranslation(TRANSLATION_IDS);
+  state.numerals = resolveNumerals();
+  state.filteredSurahs = [...SURAH_META];
+
+  // translations other than the bundled one come back with the connection
+  setupConnectionRecovery(() => {
+    if (state.currentSurah) loadAyahs(state.currentSurah.n);
+  }, "Quran");
+  screenSizeManager.initPageScreenSize();
+  updateFullscreenButtons();
+  screenSizeManager.onChange(updateFullscreenButtons);
+  for (const id of ["fullscreenBtn", "readerFullscreenBtn"]) {
+    document
+      .getElementById(id)
+      ?.addEventListener("click", () => screenSizeManager.toggleScreenSize());
+  }
+
+  /** @param {number} surah @param {number} [ayah] */
+  const openAt = (surah, ayah) => openSurah(surah, ayah);
+  bindSurahList(openAt);
+  bindBookmarkList(openAt);
+  bindReader();
+  bindAyahActions();
+  bindPanelFold();
+  bindSelectionBar(copyAndTell);
+  bindTranslationCombo();
+
+  byId("fontIncBtn", HTMLButtonElement).addEventListener("click", () =>
+    changeFontSize(2),
+  );
+  byId("fontDecBtn", HTMLButtonElement).addEventListener("click", () =>
+    changeFontSize(-2),
+  );
+  for (const btn of document.querySelectorAll(".numerals-btn")) {
+    if (!(btn instanceof HTMLButtonElement)) continue;
+    btn.addEventListener("click", () =>
+      setNumerals(btn.dataset.numerals, refreshNumbers),
+    );
+  }
+  byId("prevSurahBtn", HTMLButtonElement).addEventListener("click", () => {
+    if (state.currentSurah) openSurah(state.currentSurah.n - 1);
+  });
+  byId("nextSurahBtn", HTMLButtonElement).addEventListener("click", () => {
+    if (state.currentSurah) openSurah(state.currentSurah.n + 1);
+  });
+
+  // a bookmark changed: its icon in the reader, the tab's count and list
+  onBookmarksChange(() => {
+    renderBookmarkCount();
+    if (state.activeTab === "bookmarks") renderBookmarkList();
+    updateBookmarkIcons();
+  });
+
+  updateNumeralsUI();
+  updateTranslationUI();
+  applyFontSize();
+  renderLists();
+  renderBookmarkCount();
+  // opened at one ayah by another page, or on the surah list; wires the reader's back button
+  handleOpenRequest(openAt, () => {
+    showSurahList();
+    renderContinue();
+  });
 }
 
 module.exports = { initQuranPage };
