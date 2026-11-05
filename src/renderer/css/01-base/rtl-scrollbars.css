@@ -1,0 +1,129 @@
+/*
+  Scrollbars on the right in every language.
+
+  A box's scrollbar sits on its "end" side, so on the left in Arabic. These scrolling boxes are
+  made left-to-right (the bar goes right) and what they hold is made right-to-left again, so
+  rows, text, grids and logical margins inside still mirror as before. Only boxes whose own
+  children stack in one column are listed: a box that lays its children out in a row or a grid
+  would put them in left-to-right order (the 99 Names grid scrolls in a wrapper for this).
+
+  The page layouts scroll only in a narrow window, where they are one column: listed there
+  (not when maximized: some pages keep two columns then, and those would swap sides).
+  In the base layer, so a page that sets a direction itself (a compass, a date, media
+  controls) still wins. A new scrolling box: add it here.
+*/
+[dir="rtl"]
+  :is(
+    .feedback-dialog__body,
+    .ac-list,
+    .ac-dialog,
+    .an-grid-scroll,
+    .an-detail-body,
+    .ak-list,
+    .ak-nav,
+    .ak-rail,
+    .vf-card,
+    .vf-panel,
+    .hc-panel,
+    .settings-container,
+    .lv-panel,
+    .mp-table-wrap,
+    .mp-panel,
+    .pl-list,
+    .pl-player,
+    .qb-panel,
+    .q-scroll,
+    .reader-content,
+    .q-panel,
+    .translation-list,
+    .rd-list,
+    .rd-panel,
+    .rm-table-wrap,
+    .rm-panel,
+    .settings-content,
+    .modal-content,
+    .locations-list,
+    .tb-counter,
+    .tb-panel-body,
+    .tb-editor
+  ) {
+  direction: ltr;
+}
+
+[dir="rtl"]
+  :is(
+    .feedback-dialog__body,
+    .ac-list,
+    .ac-dialog,
+    .an-grid-scroll,
+    .an-detail-body,
+    .ak-list,
+    .ak-nav,
+    .ak-rail,
+    .vf-card,
+    .vf-panel,
+    .hc-panel,
+    .settings-container,
+    .lv-panel,
+    .mp-table-wrap,
+    .mp-panel,
+    .pl-list,
+    .pl-player,
+    .qb-panel,
+    .q-scroll,
+    .reader-content,
+    .q-panel,
+    .translation-list,
+    .rd-list,
+    .rd-panel,
+    .rm-table-wrap,
+    .rm-panel,
+    .settings-content,
+    .modal-content,
+    .locations-list,
+    .tb-counter,
+    .tb-panel-body,
+    .tb-editor
+  )
+  > * {
+  direction: rtl;
+}
+
+@media (width <= 700px) {
+  [dir="rtl"]
+    body:not(.fullscreen-mode)
+    :is(
+      .an-layout,
+      .ak-layout,
+      .vf-layout,
+      .hc-layout,
+      .lv-layout,
+      .mp-layout,
+      .pl-layout,
+      .qb-layout,
+      .rd-layout,
+      .rm-layout,
+      .tb-layout
+    ) {
+    direction: ltr;
+  }
+
+  [dir="rtl"]
+    body:not(.fullscreen-mode)
+    :is(
+      .an-layout,
+      .ak-layout,
+      .vf-layout,
+      .hc-layout,
+      .lv-layout,
+      .mp-layout,
+      .pl-layout,
+      .qb-layout,
+      .rd-layout,
+      .rm-layout,
+      .tb-layout
+    )
+    > * {
+    direction: rtl;
+  }
+}

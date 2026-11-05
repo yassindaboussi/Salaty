@@ -1,21 +1,13 @@
 /*
-  Default scrollbar for every scrolling area (thin, theme accent on hover).
+  One scrollbar style for the whole app: thin, a soft white thumb, no track (the style of the
+  redesigned pages). scrollbar-color is inherited, so it is set once on the root; the width is
+  not, so every element gets it. Pages don't restyle their scrollbars (a page may hide one).
 */
 
-::-webkit-scrollbar {
-  width: 6px;
+:root {
+  scrollbar-color: var(--white-a20) transparent;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--white-a12);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--white-a35);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--white-a55);
+* {
+  scrollbar-width: thin;
 }

@@ -24,23 +24,7 @@
     overflow-y: auto;
     padding: 6px 0;
     -webkit-app-region: no-drag;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-    direction: ltr; /* Force LTR for scrollbar on right */
-  }
-
-  .features-content::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  .features-content::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 3px;
-  }
-
-  .features-content::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 3px;
+    direction: ltr; /* its scrollbar on the right in Arabic too */
   }
 
   /* Features Grid - 4 cards per row */

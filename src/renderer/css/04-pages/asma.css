@@ -159,17 +159,25 @@
   }
 
   /* The grid of the names */
-  .an-grid {
+  .an-grid-scroll {
     flex: 1;
     min-height: 0;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  /* no name matches: only the message under the search */
+  .an-grid-scroll:has(> .an-grid[hidden]) {
+    display: none;
+  }
+
+  .an-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     grid-auto-rows: max-content;
     gap: 6px;
     padding: 2px;
-    overflow: hidden auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--white-a20) transparent;
   }
 
   .an-grid[hidden] {
@@ -449,7 +457,7 @@
       order: -1;
     }
 
-    .an-grid,
+    .an-grid-scroll,
     .an-detail-body {
       overflow: visible;
     }
