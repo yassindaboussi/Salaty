@@ -397,6 +397,11 @@
     opacity: 0.5;
   }
 
+  /* "open": points forward, so to the left in Arabic */
+  [dir="rtl"] .juz-arrow {
+    transform: scaleX(-1);
+  }
+
   /* ── Footer ────────────────────────────────────────────────── */
   .quran-footer {
     padding-top: 8px;

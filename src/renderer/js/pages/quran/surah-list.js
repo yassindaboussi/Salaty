@@ -87,7 +87,7 @@ function renderJuzList() {
         <div class="juz-title">${t("juz")} ${fmt(j.n)}</div>
         <div class="juz-subtitle">${t("startingFrom")}: ${fmt(j.start)}</div>
       </div>
-      <i class="fas fa-chevron-left juz-arrow" aria-hidden="true"></i>
+      <i class="fas fa-chevron-right juz-arrow" aria-hidden="true"></i>
     </div>
   `,
     )}`,
