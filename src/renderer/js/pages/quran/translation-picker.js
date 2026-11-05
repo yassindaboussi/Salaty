@@ -4,7 +4,8 @@ const { t } = require("../../core/i18n");
 const { refreshTooltips } = require("../../core/tooltips");
 const { byId, queryAll } = require("../../core/dom");
 const { state } = require("./state");
-const { loadAyahs } = require("./reader");
+const { loadAyahs, revealAyah } = require("./reader");
+const { saveTranslation, loadLastRead } = require("./storage");
 
 // ---- Translation picker (custom combobox: trigger button + listbox) ----
 const translationOptions = () => queryAll(".translation-option", HTMLElement);
@@ -99,10 +100,14 @@ function openTranslationList() {
 async function setTranslation(id) {
   if (id === state.translationId) return;
   state.translationId = id;
+  saveTranslation(id);
   updateTranslationUI();
-  if (state.currentSurah) {
-    await loadAyahs(state.currentSurah.n);
-  }
+  const surah = state.currentSurah?.n;
+  if (!surah) return;
+  // the other layout: back to the ayah that was at the top
+  const at = loadLastRead();
+  await loadAyahs(surah);
+  if (at?.surah === surah && at.ayah > 1) revealAyah(at.ayah);
 }
 
 function chooseTranslationOption(opt) {

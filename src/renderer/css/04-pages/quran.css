@@ -1,179 +1,518 @@
 @layer pages {
-  /* ============================================================
-     QURAN NATIVE READER — quran.css
-     Professional book-style reader for Salaty app
-     ============================================================ */
+  /* The Quran page. The list: "Continue reading", then tabs (Surah, Juz, Bookmarks) with the
+     search beside them, and the rows. The reader: the text on one side, the display panel on the
+     other (mirrored in Arabic, folds to a strip, one column in a narrow window). As on the other
+     redesigned pages, chosen things are white, not the accent: on several themes the accent is
+     close to the background. The Quran text itself is never restyled letter by letter. */
 
-  /* KFGQPC Uthman Taha Naskh — the standard Mushaf-style Quran typeface
-     (King Fahd Glorious Quran Printing Complex), freely distributable per
-     its own embedded license (use/copy/distribute permitted). */
+  /* KFGQPC HAFS Uthmanic Script (King Fahd Glorious Quran Printing Complex), the font made for
+     the bundled Hafs text: it has every mark that text uses (alef wasla, the Uthmani sukun, small
+     waw/yeh, the stop marks...) and the end-of-ayah sign that draws the number inside it.
+     Free to use, copy and distribute unchanged: fonts/LICENSE-KFGQPC-Hafs.txt. */
   @font-face {
     font-family: QuranFont;
-    src: url("../../fonts/QuranUthmanTaha.ttf") format("truetype");
+    src: url("../../fonts/UthmanicHafs1Ver18.ttf") format("truetype");
     font-display: swap;
   }
 
-  /* ── Container ─────────────────────────────────────────────── */
-  .app-container {
-    display: flex;
-    flex-direction: column;
-  }
-
   .quran-container {
+    position: relative;
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 14px;
-    gap: 10px;
-    position: relative;
+    gap: 12px;
+    padding: 16px;
+    box-sizing: border-box;
     overflow: hidden;
   }
 
-  /* Header: layout comes from the shared .page-header component
-     (03-components/page-header.css). Only what is specific to this page is here. */
-  .quran-header {
-    padding-bottom: 10px;
-    flex-shrink: 0;
+  .quran-container[hidden] {
+    display: none;
   }
 
-  /* ── Search Bar ────────────────────────────────────────────── */
-  .quran-search-bar {
-    position: relative;
+  /* ── Shared pieces ─────────────────────────────────────────────────── */
+
+  .q-icon-btn,
+  .q-panel-toggle,
+  .q-step,
+  .q-btn {
     flex-shrink: 0;
+    min-width: 30px;
+    height: 30px;
+    display: inline-grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
   }
 
-  .quran-search-icon {
-    position: absolute;
-    inset-inline-start: 10px; /* left in English, right in Arabic */
-    top: 50%;
-    transform: translateY(-50%);
+  .q-panel-toggle {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+  }
+
+  .q-btn {
+    padding: 0 14px;
+    font-weight: 600;
+  }
+
+  .q-step:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .q-icon-btn:hover,
+  .q-panel-toggle:hover,
+  .q-step:hover:not(:disabled),
+  .q-btn:hover {
+    background: var(--surface-3);
+  }
+
+  /* "forward" and "back" arrows follow the reading direction */
+  [dir="rtl"] .q-forward,
+  [dir="rtl"] .q-back {
+    transform: scaleX(-1);
+  }
+
+  .q-num {
+    flex-shrink: 0;
+    min-width: 32px;
+    height: 32px;
+    display: inline-grid;
+    place-items: center;
+    padding: 0 4px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
     color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .q-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 40px 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .q-empty i {
+    font-size: 22px;
+    color: var(--text-faint);
+  }
+
+  .q-empty p {
+    max-width: 380px;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .q-empty-line {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 32px 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+    text-align: center;
+  }
+
+  /* ── The list ──────────────────────────────────────────────────────── */
+
+  .q-list {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    -webkit-app-region: no-drag;
+  }
+
+  .q-continue {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+    background: var(--surface-subtle);
+    color: var(--text-primary);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .q-continue[hidden] {
+    display: none;
+  }
+
+  .q-continue:hover {
+    background: var(--surface-hover);
+  }
+
+  .q-continue-icon {
+    font-size: 16px;
+    color: var(--text-secondary);
+  }
+
+  .q-continue-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .q-continue-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .q-continue-place {
+    font-size: 14px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .q-continue .q-forward {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .q-top {
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .q-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 3px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    background: var(--surface-1);
+  }
+
+  .q-tab {
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: none;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .q-tab:hover {
+    color: var(--text-primary);
+  }
+
+  .q-tab[aria-selected="true"] {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
+    color: var(--text-primary);
+  }
+
+  .q-tab-count {
+    min-width: 18px;
+    padding: 1px 6px;
+    box-sizing: border-box;
+    border-radius: 999px;
+    background: var(--white-a12);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  .q-tab-count[hidden] {
+    display: none;
+  }
+
+  .q-search {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .q-search[hidden] {
+    display: none;
+  }
+
+  .q-search-icon {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 12px;
+    translate: 0 -50%;
+    color: var(--text-muted);
     font-size: 12px;
     pointer-events: none;
   }
 
-  .quran-search-input {
+  .q-search-input {
     width: 100%;
-    background: var(--surface-1);
-    border: 1px solid var(--border-medium);
-    border-radius: 10px;
-    padding-block: 7px;
-    padding-inline: 30px 10px; /* room for the search icon on the start side */
-    color: var(--text-primary);
-    font-size: 13px;
-    outline: none;
+    min-height: 38px;
+    padding-block: 0;
+    padding-inline: 34px 12px;
     box-sizing: border-box;
-    transition: border-color 0.2s;
-  }
-
-  .quran-search-input::placeholder {
-    color: var(--text-secondary);
-    opacity: 0.6;
-  }
-
-  .quran-search-input:focus {
-    border-color: rgba(var(--accent-rgb), 0.5);
-  }
-
-  /* ── Tabs ──────────────────────────────────────────────────── */
-  .quran-tabs {
-    display: flex;
-    gap: 0;
-    background: var(--white-a04);
+    border: 1px solid var(--border-subtle);
     border-radius: 10px;
-    padding: 3px;
-    flex-shrink: 0;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
   }
 
-  .quran-tab {
+  .q-search-input::placeholder {
+    color: var(--text-faint);
+  }
+
+  .q-search-input:focus-visible {
+    outline: none;
+    border-color: var(--white-a40);
+  }
+
+  .q-scroll {
     flex: 1;
-    padding: 6px 0;
-    font-size: 12px;
-    font-weight: 600;
-    background: transparent;
-    border: none;
-    border-radius: 8px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .quran-tab.active {
-    background: var(--accent-color);
-    color: var(--text-bright);
-    box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.3);
-  }
-
-  /* ── Content Area ──────────────────────────────────────────── */
-  .quran-content {
-    flex: 1;
+    min-height: 0;
     overflow: hidden auto;
-    -webkit-app-region: no-drag;
+    padding-inline-end: 4px;
     scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-
-    /* Chromium places the scrollbar on the left for RTL-direction elements
-       by default — force it to always sit on the physical right (the
-       "start" side in Arabic) regardless of app language. The grid below
-       re-declares its own direction so Arabic text/card order is
-       unaffected; only the scrollbar's side is pinned here. */
-    direction: ltr;
+    scrollbar-color: var(--white-a20) transparent;
   }
 
-  .quran-content::-webkit-scrollbar {
-    width: 4px;
+  .surah-grid,
+  .juz-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 8px;
   }
 
-  .quran-content::-webkit-scrollbar-track {
-    background: transparent;
+  .surah-grid[hidden],
+  .juz-list[hidden],
+  .bookmark-list[hidden] {
+    display: none;
   }
 
-  .quran-content::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 2px;
-  }
-
-  /* ── Loading ───────────────────────────────────────────────── */
-  .quran-loading {
+  .surah-row {
+    min-width: 0;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    min-height: 120px;
-    color: var(--text-secondary);
-  }
-
-  .quran-loading-content {
-    display: flex;
-    flex-direction: column;
     align-items: center;
     gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--surface-subtle);
+    color: var(--text-primary);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .surah-row:hover {
+    background: var(--surface-hover);
+  }
+
+  .surah-row-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .surah-row-name {
+    font-size: 14px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .surah-row-meta {
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+
+  .surah-row-ar {
+    flex-shrink: 0;
+    font-family: var(--font-quran);
+    font-size: 20px;
+    line-height: 1.2;
+    color: var(--text-primary);
+  }
+
+  .juz-row .q-forward {
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  .bookmark-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .q-bookmark {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-inline-end: 10px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--surface-subtle);
+  }
+
+  .q-bookmark-open {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: var(--radius-lg);
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .q-bookmark:hover {
+    background: var(--surface-hover);
+  }
+
+  .q-bookmark-place {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .q-bookmark-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-quran);
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    text-align: right;
+  }
+
+  /* ── The reader ────────────────────────────────────────────────────── */
+
+  /* the surah's name and details in the middle of the header (the back and window buttons
+     stay on the sides; the room they take is kept free) */
+  .reader-surah-info {
+    position: absolute;
+    inset-block: 0 var(--space-3);
+    inset-inline: 0;
+    justify-content: center;
+    width: max-content;
+    max-width: calc(100% - 300px);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
     text-align: center;
+  }
+
+  .reader-surah-info .page-header__title {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .quran-header:has(.reader-surah-info) {
+    min-height: 54px;
+  }
+
+  /* the header row is left-to-right (buttons); its Arabic text reads right-to-left */
+  [dir="rtl"] .reader-surah-info {
+    direction: rtl;
+  }
+
+  .reader-surah-meta {
+    max-width: 100%;
+    font-size: 12px;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .q-reader-layout {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 250px;
+    gap: 12px;
+    -webkit-app-region: no-drag;
+  }
+
+  .q-reader-main,
+  .q-panel {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--surface-subtle);
+  }
+
+  .reader-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden auto;
+    padding: 16px 22px 24px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .quran-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 40px 0;
+    color: var(--text-muted);
     font-size: 13px;
   }
 
-  .quran-loading i {
-    font-size: 28px;
-    color: var(--accent-color);
-  }
-
-  /* Gentle, respectful loading state — a soft breathing glow instead of a spinning book */
-  .quran-loading-icon {
-    animation: quran-loading-breathe 1.8s ease-in-out infinite;
-  }
-
-  @keyframes quran-loading-breathe {
-    0%,
-    100% {
-      opacity: 0.55;
-      transform: scale(1);
-    }
-
-    50% {
-      opacity: 1;
-      transform: scale(1.08);
-    }
+  .quran-loading[hidden],
+  .reader-notice[hidden],
+  .bismillah[hidden] {
+    display: none;
   }
 
   .quran-loading-dots {
@@ -185,15 +524,9 @@
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: var(--accent-color);
+    background: var(--text-secondary);
     opacity: 0.35;
     animation: quran-loading-dot 1.2s ease-in-out infinite;
-  }
-
-  .reader-nav-btn span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 80px;
   }
 
   .quran-loading-dots span:nth-child(2) {
@@ -209,433 +542,452 @@
     80%,
     100% {
       opacity: 0.35;
-      transform: translateY(0);
     }
 
     40% {
       opacity: 1;
-      transform: translateY(-3px);
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .quran-loading-icon,
-    .quran-loading-dots span {
-      animation: none;
-    }
-  }
-
-  /* ── Surah Grid ────────────────────────────────────────────── */
-  .surah-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 2px 2px 8px;
-  }
-
-  /* Restore natural RTL grid/text order for the actual content — only the
-     scroll container above is pinned to `direction: ltr` (for scrollbar
-     placement), this brings Arabic layout back for everything inside it. */
-  [dir="rtl"] .surah-grid {
-    direction: rtl;
-  }
-
-  .surah-card {
-    background: var(--surface-subtle);
-    border: 1px solid var(--white-a07);
-    border-radius: 12px;
-    padding: 10px 12px;
-    cursor: pointer;
-    transition: all 0.22s ease;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    -webkit-app-region: no-drag;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .surah-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(var(--accent-rgb), 0.06),
-      transparent
-    );
-    opacity: 0;
-    transition: opacity 0.2s;
-    border-radius: 12px;
-  }
-
-  .surah-card:hover {
-    background: var(--white-a06);
-    border-color: rgba(var(--accent-rgb), 0.3);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px var(--black-a20);
-  }
-
-  .surah-card:hover::before {
-    opacity: 1;
-  }
-
-  .surah-card:active {
-    transform: scale(0.98);
-  }
-
-  .surah-number-badge {
-    width: 32px;
-    height: 32px;
-    background: rgba(var(--accent-rgb), 0.12);
-    border: 1px solid rgba(var(--accent-rgb), 0.2);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--accent-color);
-    flex-shrink: 0;
-  }
-
-  .surah-card-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .surah-arabic-name {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-bright);
-    direction: rtl;
-    text-align: right;
-    line-height: 1.3;
-    margin-bottom: 2px;
-  }
-
-  .surah-transliteration {
-    font-size: 10px;
-    color: var(--accent-color);
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .surah-ayah-count {
-    font-size: 9px;
+  .reader-notice {
+    margin: 0 0 12px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
     color: var(--text-secondary);
-    opacity: 0.7;
-    margin-top: 1px;
+    font-size: 12.5px;
   }
 
-  /* ── Juz List ──────────────────────────────────────────────── */
-  .juz-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 2px 2px 8px;
-  }
-
-  [dir="rtl"] .juz-list {
-    direction: rtl;
-  }
-
-  .juz-card {
-    background: var(--surface-subtle);
-    border: 1px solid var(--white-a07);
-    border-radius: 12px;
-    padding: 12px 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    -webkit-app-region: no-drag;
-  }
-
-  .juz-card:hover {
-    background: var(--white-a06);
-    border-color: rgba(var(--accent-rgb), 0.3);
-  }
-
-  .juz-badge {
-    width: 36px;
-    height: 36px;
-    background: rgba(var(--accent-rgb), 0.12);
-    border: 1px solid rgba(var(--accent-rgb), 0.2);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--accent-color);
-    flex-shrink: 0;
-  }
-
-  .juz-info {
-    flex: 1;
-  }
-
-  .juz-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-bright);
-  }
-
-  .juz-subtitle {
-    font-size: 11px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-  }
-
-  .juz-arrow {
-    color: var(--text-secondary);
-    font-size: 11px;
-    opacity: 0.5;
-  }
-
-  /* "open": points forward, so to the left in Arabic */
-  [dir="rtl"] .juz-arrow {
-    transform: scaleX(-1);
-  }
-
-  /* ── Footer ────────────────────────────────────────────────── */
-  .quran-footer {
-    padding-top: 8px;
-    border-top: 1px solid var(--border-color);
+  .bismillah {
+    margin: 4px 0 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    font-family: var(--font-quran);
+    font-size: calc(var(--q-ar-size, 28px) * 1.05);
+    line-height: 1.8;
+    color: var(--text-primary);
     text-align: center;
-    flex-shrink: 0;
   }
 
-  .quran-footer-text {
-    font-size: 11px;
-    color: var(--text-secondary);
-    font-style: italic;
-    opacity: 0.8;
-    background: linear-gradient(
-      135deg,
-      var(--text-secondary),
-      rgba(var(--accent-rgb), 0.8)
-    );
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  /* running text, as on a Mushaf page */
+  .surah-flow {
+    font-family: var(--font-quran);
+    font-size: var(--q-ar-size, 28px);
+    line-height: 2.25;
+    color: var(--text-primary);
+    text-align: justify;
+    text-align-last: center;
+    overflow-wrap: break-word;
   }
 
-  /* ╔══════════════════════════════════════════════════╗
-     ║           SURAH READER VIEW                      ║
-     ╚══════════════════════════════════════════════════╝ */
-
-  /* ── Reader Header ─────────────────────────────────────────── */
-  .reader-surah-info {
-    flex: 1;
-    text-align: center;
-    min-width: 0;
+  .ayah-text {
+    border-radius: 6px;
   }
 
-  .reader-surah-meta {
-    font-size: 10px;
-    color: var(--accent-color);
-    opacity: 0.8;
-    display: block;
-    margin-top: 1px;
-  }
-
-  .reader-settings-btn {
-    position: relative;
-  }
-
-  /* ── Reader Settings Panel ─────────────────────────────────── */
-  .reader-settings-panel {
-    position: relative;
-    background: var(--white-a04);
-    border: 1px solid var(--border-soft);
-    border-radius: 10px;
-    padding-block: 10px;
-    padding-inline: 12px 36px; /* room for the close X on the end side */
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex-shrink: 0;
-    animation: slide-down 0.2s ease;
-  }
-
-  /* The close X sits on the end side: right in English, left in Arabic */
-  .settings-panel-close {
-    position: absolute;
-    top: 8px;
-    inset-inline-end: 8px;
-    width: 22px;
-    height: 22px;
-    background: var(--white-a06);
+  /* the ayah's number: a button that bookmarks it */
+  .ayah-end {
+    display: inline-grid;
+    place-items: center;
+    vertical-align: middle;
+    margin: 0 2px;
+    padding: 0 2px;
     border: none;
-    border-radius: 50%;
+    border-radius: 6px;
+    background: none;
     color: var(--text-secondary);
+    font: inherit;
+    font-size: 1em;
+    line-height: 1.3;
+    white-space: nowrap;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    transition: all 0.15s ease;
   }
 
-  .settings-panel-close:hover {
-    background: var(--white-a14);
+  /* the Mushaf's end-of-ayah ornament, the number drawn in its middle */
+  .ayah-end-ring,
+  .ayah-end-num {
+    grid-area: 1 / 1;
+  }
+
+  .ayah-end-num {
+    font-family: system-ui, "Segoe UI", sans-serif;
+    font-size: 0.42em;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ayah-end:hover {
+    background: var(--white-a06);
     color: var(--text-primary);
   }
 
-  @keyframes slide-down {
-    from {
-      opacity: 0;
-      transform: translateY(-6px);
+  .ayah-end.is-on {
+    background: var(--white-a12);
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 6px;
+  }
+
+  /* opened at this ayah (Continue reading, a juz, a bookmark, another page): marked for a moment */
+  .ayah-text.is-target,
+  .ayah-card.is-target {
+    animation: q-target 2.4s ease-out;
+  }
+
+  @keyframes q-target {
+    0%,
+    40% {
+      background: var(--white-a12);
     }
 
-    to {
-      opacity: 1;
-      transform: translateY(0);
+    100% {
+      background: transparent;
     }
   }
 
-  .settings-toolbar {
+  /* one card per ayah, with a translation */
+  .ayah-list.is-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ayah-card {
+    padding: 10px 14px 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+  }
+
+  .ayah-card-head {
     display: flex;
     align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
   }
 
-  .settings-group {
+  .ayah-card-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ayah-card-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .ayah-card .q-icon-btn {
+    min-width: 28px;
+    height: 28px;
+    border-color: var(--border-subtle);
+    background: none;
+    color: var(--text-muted);
+  }
+
+  .ayah-card .q-icon-btn:hover,
+  .ayah-card .q-icon-btn.is-on {
+    color: var(--text-primary);
+  }
+
+  .ayah-card-ar {
+    margin: 6px 0 0;
+    font-family: var(--font-quran);
+    font-size: var(--q-ar-size, 28px);
+    line-height: 2.1;
+    color: var(--text-primary);
+    text-align: right;
+  }
+
+  .ayah-card-tr {
+    margin: 8px 0 0;
+    font-size: var(--q-tr-size, 16px);
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .reader-nav {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .reader-nav-btn {
+    min-width: 0;
+    max-width: 40%;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .reader-nav-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .reader-nav-btn i {
+    font-size: 10px;
+  }
+
+  .reader-nav-btn:disabled {
+    visibility: hidden;
+  }
+
+  .reader-nav-btn:hover:not(:disabled) {
+    background: var(--surface-3);
+  }
+
+  .reader-page-info {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Selecting text: the copy bar above the selection ──────────────── */
+
+  .q-selection-bar {
+    position: fixed;
+    z-index: var(--z-top);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    border: 1px solid var(--border-medium);
+    border-radius: 12px;
+    background: var(--bg-primary, #0a1128);
+    box-shadow: 0 10px 28px var(--black-a45);
+    user-select: none;
+    transition:
+      opacity 0.14s ease,
+      translate 0.14s ease;
+
+    @starting-style {
+      opacity: 0;
+      translate: 0 4px;
+    }
+  }
+
+  /* the small point towards the selection */
+  .q-selection-bar::after {
+    content: "";
+    position: absolute;
+    inset-block-end: -6px;
+    inset-inline-start: calc(50% - 5px);
+    width: 10px;
+    height: 10px;
+    border-inline-end: 1px solid var(--border-medium);
+    border-block-end: 1px solid var(--border-medium);
+    background: var(--bg-primary, #0a1128);
+    rotate: 45deg;
+  }
+
+  .q-selection-bar.is-below::after {
+    inset-block: -6px auto;
+    rotate: 225deg;
+  }
+
+  .q-selection-bar button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 11px;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .q-selection-bar button i {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .q-selection-bar button:hover,
+  .q-selection-bar button:focus-visible {
+    outline: none;
+    background: var(--surface-hover);
+  }
+
+  .q-selection-sep {
+    width: 1px;
+    height: 18px;
+    background: var(--border-subtle);
+  }
+
+  /* the app turns text selection off by default: the Quran text and translations can be selected */
+  .bismillah,
+  .surah-flow,
+  .ayah-card-ar,
+  .ayah-card-tr {
+    user-select: text;
+  }
+
+  /* the selected Quran text: a calm white tint, not the browser's blue */
+  .reader-content ::selection {
+    background: var(--white-a20);
+    color: inherit;
+  }
+
+  /* ── The display panel ─────────────────────────────────────────────── */
+
+  .q-panel {
+    gap: 14px;
+    padding: 12px;
+    overflow: hidden auto;
+  }
+
+  .q-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .q-panel-heading {
+    margin: 0;
+    padding-inline-start: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .q-panel-toggle i.fa-angles-right {
+    transition: transform 0.2s ease;
+  }
+
+  [dir="rtl"] .q-panel-toggle i.fa-angles-right {
+    transform: scaleX(-1);
+  }
+
+  .q-rail {
+    display: none;
+  }
+
+  .q-panel-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .q-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .q-field-label {
+    margin: 0;
+    padding-inline-start: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .q-stepper {
     display: flex;
     align-items: center;
     gap: 8px;
   }
 
-  .settings-group-icon {
-    font-size: 13px;
-    color: var(--accent-color);
-    opacity: 0.85;
-    flex-shrink: 0;
+  .q-step-value {
+    min-width: 36px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
   }
 
-  .settings-group-translation {
-    flex: 1;
-    min-width: 160px;
+  .q-panel-note {
+    margin: 0;
+    padding: 12px 4px 0;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--text-faint);
   }
 
-  .settings-divider {
-    width: 1px;
-    height: 20px;
-    background: var(--surface-3);
-    flex-shrink: 0;
-  }
-
-  /* Numerals switch: a two-option segmented control (Arabic-Indic ١٢٣ / Western 123).
-     The active option is tinted with the theme accent so it reads in every theme. */
+  /* Numerals: a two-option switch (Arabic-Indic ١٢٣ / Western 123), the chosen one in white */
   .numerals-toggle {
-    display: inline-flex;
-    align-items: center;
+    display: flex;
     gap: 2px;
     padding: 2px;
-    background: var(--white-a06);
-    border: 1px solid var(--white-a12);
+    border: 1px solid var(--border-subtle);
     border-radius: 8px;
+    background: var(--surface-1);
   }
 
   .numerals-btn {
-    min-width: 36px;
-    height: 24px;
+    flex: 1;
+    height: 28px;
     padding: 0 8px;
-    background: transparent;
     border: 1px solid transparent;
     border-radius: 6px;
-    color: var(--text-secondary);
+    background: transparent;
+    color: var(--text-muted);
     font-family: "Segoe UI", Tahoma, Inter, sans-serif;
     font-size: 13px;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
-    transition:
-      background 0.15s ease,
-      color 0.15s ease,
-      border-color 0.15s ease;
   }
 
   .numerals-btn:hover {
     color: var(--text-primary);
-    background: var(--surface-2);
   }
 
   .numerals-btn.active {
-    background: rgba(var(--accent-rgb), 0.25);
-    border-color: rgba(var(--accent-rgb), 0.7);
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
     color: var(--text-primary);
   }
 
-  .numerals-btn:focus-visible {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 1px;
-  }
-
-  .font-size-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .font-btn {
-    width: 26px;
-    height: 26px;
-    background: rgba(var(--accent-rgb), 0.12);
-    border: 1px solid rgba(var(--accent-rgb), 0.2);
-    border-radius: 6px;
-    color: var(--accent-color);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    transition: all 0.15s;
-  }
-
-  .font-btn:hover {
-    background: rgba(var(--accent-rgb), 0.22);
-  }
-
-  .font-size-display {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-bright);
-    min-width: 24px;
-    text-align: center;
-  }
-
-  /* Translation picker: a custom combobox (the native <select> list can't be themed and looks
-     out of place). Trigger shows the current choice; the list is grouped by language with a
-     check mark on the selected row. Same border/accent look as the numerals switch. */
+  /* Translation picker: a custom combobox (the native <select> list can't be themed). */
   .translation-combo {
     position: relative;
     min-width: 0;
   }
 
   .translation-combo-trigger {
-    display: inline-flex;
+    width: 100%;
+    height: 34px;
+    display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    min-width: 210px;
-    height: 30px;
+    gap: 10px;
     padding: 0 10px;
-    background: var(--white-a06);
-    border: 1px solid var(--white-a12);
-    border-radius: 8px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
     color: var(--text-primary);
-    font-size: 12px;
+    font: inherit;
+    font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
-    transition:
-      background 0.15s ease,
-      border-color 0.15s ease;
   }
 
   .translation-combo-trigger:hover {
@@ -645,15 +997,20 @@
   .translation-combo-trigger:focus-visible,
   .translation-combo-trigger[aria-expanded="true"] {
     outline: none;
-    border-color: rgba(var(--accent-rgb), 0.7);
-    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
+    border-color: var(--white-a40);
   }
 
   .combo-value {
+    min-width: 0;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    min-width: 0;
+  }
+
+  .combo-value .combo-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .combo-chevron {
@@ -668,25 +1025,21 @@
 
   .translation-list {
     position: absolute;
-    top: calc(100% + 6px);
-    inset-inline-start: 0;
+    inset-block-start: calc(100% + 6px);
+    inset-inline: 0;
     z-index: 60;
-    min-width: 100%;
-    width: max-content;
-    max-width: 300px;
     max-height: 280px;
-    overflow-y: auto;
     margin: 0;
     padding: 4px;
+    overflow-y: auto;
     list-style: none;
 
-    /* Follows the active theme (opaque so the Quran text behind never shows through) */
-    background: var(--bg-primary, #0a1128);
-    border: 1px solid var(--accent-color);
+    /* opaque, so the text behind never shows through */
+    border: 1px solid var(--border-medium);
     border-radius: 10px;
+    background: var(--bg-primary, #0a1128);
     box-shadow: 0 8px 24px var(--black-a45);
     scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
   }
 
   .translation-list[hidden] {
@@ -699,8 +1052,7 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--text-secondary);
-    opacity: 0.85;
+    color: var(--text-faint);
     user-select: none;
   }
 
@@ -724,16 +1076,7 @@
   .translation-option .combo-check {
     width: 12px;
     font-size: 10px;
-    color: var(--text-primary);
     visibility: hidden;
-  }
-
-  /* The selected row uses the theme's normal text colour (not the accent): in themes where the
-     accent is close to the background (pink, green) accent-coloured text would be hard to read.
-     The accent shows as a tint behind it instead. */
-  .translation-option[aria-selected="true"] {
-    background: rgba(var(--accent-rgb), 0.18);
-    font-weight: 700;
   }
 
   .translation-option[aria-selected="true"] .combo-check {
@@ -742,7 +1085,7 @@
 
   .translation-option.highlighted,
   .translation-option:hover:not([aria-disabled="true"]) {
-    background: rgba(var(--accent-rgb), 0.34);
+    background: var(--surface-hover);
   }
 
   .translation-option[aria-disabled="true"] {
@@ -753,310 +1096,121 @@
   /* Small language tag (EN / FR) */
   .pill-lang {
     padding: 2px 5px;
-    background: var(--white-a12);
     border-radius: 4px;
+    background: var(--white-a12);
+    color: var(--text-primary);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.04em;
-    color: var(--text-primary);
   }
 
   .pill-lang[hidden] {
     display: none;
   }
 
-  /* Inline SVG icons (e.g. the "123" digits icon) are sized by width; height follows the viewBox */
-  .settings-group-icon-svg {
-    width: 22px;
-    height: auto;
-    fill: currentcolor;
+  /* ── The panel folded to the edge: a strip with one icon ───────────── */
+
+  .q-reader-layout.is-panel-folded {
+    grid-template-columns: minmax(0, 1fr) 58px;
   }
 
-  /* ── Reader Content ────────────────────────────────────────── */
-  .reader-content {
-    flex: 1;
-    overflow: hidden auto;
-    -webkit-app-region: no-drag;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) transparent;
-    padding: 4px 0 8px;
-
-    /* Same fix as .quran-content: pin the scrollbar to the physical right
-       regardless of app language — Chromium otherwise moves it to the left
-       for RTL-direction containers. .ayah-list below restores RTL for the
-       actual content. */
-    direction: ltr;
+  .q-reader-layout.is-panel-folded .q-panel {
+    align-items: center;
+    padding: 12px 0;
   }
 
-  .reader-content::-webkit-scrollbar {
-    width: 4px;
+  .q-reader-layout.is-panel-folded .q-panel-heading,
+  .q-reader-layout.is-panel-folded .q-panel-body {
+    display: none;
   }
 
-  .reader-content::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .reader-content::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 2px;
-  }
-
-  /* ── Bismillah Header ──────────────────────────────────────── */
-  .bismillah-header {
-    text-align: center;
-    padding: 16px 8px 12px;
-    border-bottom: 1px solid rgba(var(--accent-rgb), 0.15);
-    margin-bottom: 8px;
-  }
-
-  .bismillah-text {
-    font-size: 30px;
-    color: var(--accent-color);
-    direction: rtl;
-    line-height: 1.8;
-    text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.25);
-    font-family: var(--font-quran);
-  }
-
-  /* ── Ayah content ──────────────────────────────────────────────
-     Continuous flowing Mushaf-style paragraph (like a printed page)
-     instead of one card per ayah — the whole surah renders as a single
-     centered block, with each ayah's number embedded inline as (N). */
-  .ayah-list {
-    display: block;
-  }
-
-  [dir="rtl"] .ayah-list,
-  [dir="rtl"] .bismillah-header {
-    direction: rtl;
-  }
-
-  .surah-flow-text {
-    direction: rtl;
-    text-align: center;
-    font-family: var(--font-quran);
-    font-size: 26px; /* default, overridden inline by the font-size setting */
-    line-height: 2.3;
-    color: var(--text-bright);
-    padding: 8px 18px 20px;
-    cursor: text;
-  }
-
-  /* Ayah number marker, embedded inline within the flowing text, drawn Mushaf-style as the
-     number between ornate brackets: ﴿٢﴾. The brackets (U+FD3F, U+FD3E) come from the Quran
-     font; the digits fall back to Inter when the font has none (Western digits). The marker
-     is its own right-to-left isolate so the brackets face the right way and multi-digit
-     numbers keep their order. (The official end-of-ayah sign U+06DD was tested and draws
-     the ring beside the number instead of around it, so it is not used.) */
-  .ayah-number-inline {
-    color: var(--accent-color);
-    font-family: QuranFont, Inter, "Segoe UI", sans-serif;
-    font-size: 0.85em;
-    font-weight: 700;
-    margin: 0 3px;
-    direction: rtl;
-    unicode-bidi: isolate;
-  }
-
-  /* The ayah another page asked for (the 99 Names verses): marked until the page closes */
-  .ayah-text.is-target,
-  .ayah-translation-row.is-target {
-    background: var(--surface-3);
-    border-radius: 6px;
-    box-decoration-break: clone;
-  }
-
-  .ayah-translation-row.is-target {
-    padding-inline: 6px;
-  }
-
-  /* ── Translations (shown separately below the Arabic flow, only when a
-     translation is selected — keeping the Arabic block itself unbroken) ── */
-  .ayah-translation-list {
-    padding: 16px 18px 18px;
+  .q-reader-layout.is-panel-folded .q-rail {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 8px;
   }
 
-  .ayah-translation-row {
-    color: var(--text-primary);
-    line-height: 1.7;
-    direction: ltr;
-    text-align: left;
-  }
-
-  /* Selectable text. The app is user-select:none so clicks and drags on controls never
-     highlight anything; only the reading text opts back in: the Bismillah, the Arabic
-     flow and the translation rows. Verse numbers are selectable too, so a copied passage
-     keeps its "(2)" markers and shows where each verse ends. Surah cards, buttons and
-     the settings panel are not selectable. */
-  .bismillah-text,
-  .surah-flow-text,
-  .ayah-translation-row {
-    user-select: text;
-    cursor: text;
-  }
-
-  .bismillah-text::selection,
-  .surah-flow-text::selection,
-  .surah-flow-text *::selection,
-  .ayah-translation-row::selection,
-  .ayah-translation-row *::selection {
-    background: rgba(var(--accent-rgb), 0.45);
-    color: var(--text-bright);
-  }
-
-  .ayah-translation-row .ayah-translation-num {
-    color: var(--accent-color);
-    font-weight: 700;
-    margin-inline-end: 2px; /* a real space follows the number in the markup so copied text reads "1. text" */
-  }
-
-  /* ── Reader Bottom Nav ─────────────────────────────────────── */
-  .reader-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 8px;
-    border-top: 1px solid var(--border-color);
-    gap: 6px;
-    flex-shrink: 0;
-    direction: ltr;
-  }
-
-  .reader-nav-btn {
-    background: rgba(var(--accent-rgb), 0.1);
-    border: 1px solid rgba(var(--accent-rgb), 0.18);
-    border-radius: 8px;
-    padding: 5px 10px;
-    color: var(--accent-color);
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.2s;
-    white-space: nowrap;
-    max-width: 110px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .reader-nav-btn:hover {
-    background: rgba(var(--accent-rgb), 0.2);
-  }
-
-  .reader-nav-btn:disabled {
-    opacity: 0.25;
-    cursor: not-allowed;
-  }
-
-  /* In Arabic, reading flows right-to-left, so "next" (moving forward
-     through the Quran) should sit on the left and "previous" on the right —
-     the mirror image of the English/French layout. The row itself stays
-     `direction: ltr` above (so the surah-name text inside each button
-     doesn't get bidi-reordered), only the *order* of the two buttons and
-     their arrow icons flip. */
-  [dir="rtl"] .reader-nav {
-    flex-direction: row-reverse;
-  }
-
-  [dir="rtl"] .reader-nav-btn {
-    flex-direction: row-reverse;
-  }
-
-  .quran-error i {
-    font-size: 32px;
-    color: var(--color-danger);
-  }
-
-  [dir="rtl"] .reader-nav-btn i {
+  .q-reader-layout.is-panel-folded .q-panel-toggle i.fa-angles-right {
     transform: scaleX(-1);
   }
 
-  .reader-progress {
-    flex: 1;
-    text-align: center;
+  [dir="rtl"]
+    .q-reader-layout.is-panel-folded
+    .q-panel-toggle
+    i.fa-angles-right {
+    transform: none;
   }
 
-  .reader-page-info {
-    font-size: 11px;
-    color: var(--text-secondary);
-    opacity: 0.7;
+  /* ── Maximized: more room ──────────────────────────────────────────── */
+
+  @media (width > 1000px) {
+    .fullscreen-mode .q-reader-layout:not(.is-panel-folded) {
+      grid-template-columns: minmax(0, 1fr) 290px;
+      gap: 16px;
+    }
+
+    .fullscreen-mode .reader-content {
+      padding-inline: 48px;
+    }
   }
 
-  /* ── Error State ───────────────────────────────────────────── */
-  .quran-error {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    text-align: center;
-    padding: 24px;
-    gap: 12px;
-    color: var(--text-secondary);
+  /* ── Narrow window: one column, the panel on top, nothing folds ───── */
+
+  @media (width <= 700px) {
+    .q-reader-layout,
+    .q-reader-layout.is-panel-folded {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .q-panel {
+      order: -1;
+      padding: 10px 12px;
+    }
+
+    .q-panel-head,
+    .q-reader-layout.is-panel-folded .q-rail,
+    .q-panel-note,
+    .q-field-label {
+      display: none;
+    }
+
+    .q-reader-layout.is-panel-folded .q-panel {
+      align-items: stretch;
+      padding: 10px 12px;
+    }
+
+    .q-panel-body,
+    .q-reader-layout.is-panel-folded .q-panel-body {
+      display: flex;
+      flex-flow: row wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .q-panel-body .q-field:nth-child(2) {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .reader-content {
+      padding-inline: 14px;
+    }
   }
 
-  .quran-error p {
-    font-size: 13px;
-    margin: 0;
-    line-height: 1.5;
+  @media (width <= 480px) {
+    .quran-container {
+      padding: 8px;
+      gap: 8px;
+    }
   }
 
-  .retry-button {
-    background: linear-gradient(
-      135deg,
-      var(--accent-color),
-      rgba(var(--accent-rgb), 0.8)
-    );
-    border: none;
-    border-radius: 10px;
-    padding: 8px 18px;
-    color: var(--text-bright);
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .retry-button:hover {
-    transform: scale(1.04);
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.25);
-  }
-
-  /* ── Fullscreen adjustments ────────────────────────────────── */
-  body.fullscreen-mode .surah-arabic-name {
-    font-size: 18px;
-  }
-
-  body.fullscreen-mode .surah-card {
-    padding: 12px 14px;
-  }
-
-  body.fullscreen-mode .surah-flow-text {
-    line-height: 2.5;
-  }
-
-  /* ── RTL language support ──────────────────────────────────── */
-
-  /* Loading text in Arabic (its container is forced LTR for the scrollbar) */
-  [dir="rtl"] .quran-loading span {
-    direction: rtl;
-    text-align: right;
-  }
-
-  /* ── No results ─────────────────────────────────────────────── */
-  .no-results {
-    text-align: center;
-    padding: 24px;
-    color: var(--text-secondary);
-    font-size: 13px;
-    opacity: 0.7;
+  @media (prefers-reduced-motion: reduce) {
+    .quran-loading-dots span,
+    .q-selection-bar,
+    .ayah-text.is-target,
+    .ayah-card.is-target {
+      animation: none;
+    }
   }
 }
