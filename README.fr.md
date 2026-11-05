@@ -55,11 +55,14 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 <img src="docs/screenshots/fr/index.webp" width="49%" alt="Heures de prière" />
 <img src="docs/screenshots/fr/features.webp" width="49%" alt="Toutes les fonctionnalités" />
 <br/>
-<img src="docs/screenshots/fr/quran.webp" width="49%" alt="Saint Coran" />
+<img src="docs/screenshots/fr/qibla.webp" width="49%" alt="Boussole Qibla" />
 <img src="docs/screenshots/fr/athkar.webp" width="49%" alt="Athkar" />
 <br/>
+<img src="docs/screenshots/fr/tasbih.webp" width="49%" alt="Tasbih" />
+<img src="docs/screenshots/fr/hijri-calendar.webp" width="49%" alt="Calendrier hégirien" />
+<br/>
 <img src="docs/screenshots/fr/albums.webp" width="49%" alt="Archive audio" />
-<img src="docs/screenshots/fr/settings.webp" width="49%" alt="Paramètres" />
+<img src="docs/screenshots/fr/quran.webp" width="49%" alt="Saint Coran" />
 </div>
 
 ---
@@ -70,32 +73,34 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 - Détection de votre position au démarrage (désactivable), avec plusieurs lieux enregistrés
 - Adhan à l'heure de la prière, et rappel facultatif un nombre de minutes choisi avant
 - Un petit widget sur le bureau qui affiche le temps restant avant la prochaine prière
+- Un calendrier mensuel des horaires
 
 ### 📖 Saint Coran
 - Un lecteur qui affiche les versets en texte continu, comme dans le Mushaf, et non une carte par verset
+- Navigation par sourate ou par juz
 - Traductions anglaise et française, avec l'option de n'afficher que la traduction
 - Une copie complète du Coran dans l'application, utilisée automatiquement hors connexion
 - Réglage de la taille du texte et mode plein écran
 
 ### 🎧 Archive audio
-- Récitation du Coran : plus de 200 récitateurs, classés par ordre alphabétique avec un index pour naviguer rapidement
+- Récitation du Coran : plus de 240 récitateurs avec leur photo, filtres par riwaya (Hafs, Warsh, Qalun…), favoris et liste de lecture
 - Tadabbur : des méditations audio pour chaque sourate
 - Tafsir : des livres de tafsir audio (comme le Tafsir d'al-Tabari), classés par sourate
 
 ### 🤲 Adoration et outils islamiques
-- Athkar du matin et du soir avec des rappels réguliers 📿
-- Tasbih numérique 🔢
-- Les 99 noms d'Allah 🌟
-- Calendrier hégirien 🗓️
-- Direction de la Qibla 🧭
-- Outils pour le Ramadan 🌙
-- Radio islamique et diffusions en direct 📻
+- **Athkar** 📿 : matin, soir, après la prière, coucher et plus, avec un compteur pour chacun, des références vérifiées sur sunnah.com, et des rappels
+- **Tasbih** 🔢 : le tasbih après la prière étape par étape, les dhikr de la Sunna, et les vôtres
+- **Les 99 noms d'Allah** 🌟 avec les versets d'où ils viennent
+- **Calendrier hégirien** 🗓️ avec les événements islamiques et les Jours blancs
+- **Jeûnes surérogatoires** 🌙 : lundis et jeudis, Jours blancs, Arafat, Achoura et plus, avec des rappels
+- **Boussole Qibla** 🧭 : la direction et la distance de la Kaaba sur une carte, par le chemin le plus court ; déplacez votre repère à votre position exacte, et vérifiez la direction avec le soleil deux fois par an
+- Outils pour le **Ramadan**, **radio islamique** 📻 et les **directs officiels de La Mecque et Médine**
 
 ### ⚙️ Paramètres
 - 12 thèmes de couleurs
 - 3 langues (arabe, anglais, français)
 - Chaque modification est enregistrée automatiquement, sans bouton « Enregistrer »
-- Mises à jour automatiques
+- Mises à jour dans l'application : suivez le téléchargement, continuez à utiliser l'application, et redémarrez quand cela vous convient
 - « Envoyer un avis » depuis l'application : signalez un problème ou proposez une idée en quelques clics
 
 ---
