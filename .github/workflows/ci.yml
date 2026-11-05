@@ -30,28 +30,59 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 2 # a pull request's merge commit and its parent (the base branch now)
+
+      # Only Markdown files or the website (docs/) changed: nothing below checks them, so the
+      # job ends green in seconds. The job itself still runs: a required check that is skipped
+      # (paths-ignore) stays "Expected" and blocks the merge.
+      # Pull request: compared with the merge commit's first parent (the base branch as merged;
+      # the event's base.sha can be older). Push: with the commit before the push. Unknown base
+      # (new branch, force push): everything runs.
+      - name: Detect a docs-only change
+        id: changes
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          docs_only=false
+          if [ "$EVENT" = "pull_request" ]; then BASE=HEAD^1; else BASE="$BEFORE"; fi
+          if [ -n "$BASE" ] && [ "$BASE" != "0000000000000000000000000000000000000000" ] &&
+            { [ "$BASE" = "HEAD^1" ] || git fetch --quiet --depth=1 origin "$BASE"; }; then
+            files=$(git diff --name-only "$BASE" HEAD)
+            if [ -n "$files" ] && ! grep -qvE '(\.md$|^docs/)' <<< "$files"; then
+              docs_only=true
+            fi
+            echo "Changed files:"; echo "$files"
+          fi
+          echo "docs-only: $docs_only"
+          echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node.js ${{ matrix.node-version }}
+        if: steps.changes.outputs.docs_only != 'true'
         uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
       - name: Install dependencies
+        if: steps.changes.outputs.docs_only != 'true'
         run: npm ci
 
       - name: Lint (JavaScript + CSS)
+        if: steps.changes.outputs.docs_only != 'true'
         run: npm run lint
 
       # once per run is enough: the report is the same on every OS
       - name: Security audit (npm advisories)
-        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24.x'
+        if: steps.changes.outputs.docs_only != 'true' && matrix.os == 'ubuntu-latest' && matrix.node-version == '24.x'
         run: npm run audit:check
 
       # Packaging check (the unpacked app, no installers), once per OS: the installers are built
       # and install-tested by release.yml before every release.
       - name: Package the app
-        if: matrix.node-version == '24.x'
+        if: steps.changes.outputs.docs_only != 'true' && matrix.node-version == '24.x'
         run: npm run build -- --dir --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
