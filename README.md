@@ -55,11 +55,14 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 <img src="docs/screenshots/en/index.webp" width="49%" alt="Prayer times" />
 <img src="docs/screenshots/en/features.webp" width="49%" alt="All features" />
 <br/>
-<img src="docs/screenshots/en/quran.webp" width="49%" alt="Holy Quran" />
+<img src="docs/screenshots/en/qibla.webp" width="49%" alt="Qibla finder" />
 <img src="docs/screenshots/en/athkar.webp" width="49%" alt="Athkar" />
 <br/>
+<img src="docs/screenshots/en/tasbih.webp" width="49%" alt="Tasbih" />
+<img src="docs/screenshots/en/hijri-calendar.webp" width="49%" alt="Hijri calendar" />
+<br/>
 <img src="docs/screenshots/en/albums.webp" width="49%" alt="Audio archive" />
-<img src="docs/screenshots/en/settings.webp" width="49%" alt="Settings" />
+<img src="docs/screenshots/en/quran.webp" width="49%" alt="Holy Quran" />
 </div>
 
 ---
@@ -70,32 +73,34 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 - Detects your location at start-up (can be turned off), and keeps several saved locations
 - Adhan when the prayer time comes in, and an optional reminder a chosen number of minutes before
 - A small desktop widget showing the time left until the next prayer
+- A monthly timetable
 
 ### 📖 Holy Quran
 - A reader that shows the verses as continuous Mushaf text, not one card per verse
+- Browse by surah or by juz
 - English and French translations, with an option to show only the translation
 - A complete copy of the Quran inside the app, used automatically when you are offline
 - Font size control and full-screen mode
 
 ### 🎧 Audio archive
-- Quran recitation: more than 200 reciters, sorted alphabetically with an index for quick navigation
+- Quran recitation: more than 240 reciters with their photos, filters by riwaya (Hafs, Warsh, Qalun…), favourites and a playlist
 - Tadabbur: audio reflections for every surah
 - Tafsir: audio books of tafsir (such as Tafsir al-Tabari), organised by surah
 
 ### 🤲 Worship and Islamic tools
-- Morning and evening athkar with periodic reminders 📿
-- Digital tasbih 🔢
-- The 99 Names of Allah 🌟
-- Hijri calendar 🗓️
-- Qibla direction 🧭
-- Ramadan tools 🌙
-- Islamic radio and live streams 📻
+- **Athkar** 📿: morning, evening, after prayer, sleep and more, with a counter for each one, references checked against sunnah.com, and reminders
+- **Tasbih** 🔢: the after-prayer tasbih step by step, the dhikr of the Sunnah, and your own
+- **The 99 Names of Allah** 🌟 with the verses they come from
+- **Hijri calendar** 🗓️ with Islamic events and the White Days
+- **Sunnah fasting** 🌙: Mondays and Thursdays, the White Days, Arafah, Ashura and more, with reminders
+- **Qibla finder** 🧭: the direction and distance to the Kaaba on a map, along the shortest route; drag your marker to your exact place, and check the direction with the sun twice a year
+- **Ramadan** tools, **Muslim radio** 📻 and the official **live streams from Makkah and Madinah**
 
 ### ⚙️ Settings
 - 12 colour themes
 - 3 languages (Arabic, English, French)
 - Every change is saved automatically, with no "Save" button
-- Automatic updates
+- Updates inside the app: see the download progress, keep using the app meanwhile, and restart when it suits you
 - "Send feedback" from inside the app: report a problem or suggest an idea in a few clicks
 
 ---
