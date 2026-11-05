@@ -7,7 +7,7 @@
 
   vendor      third-party CSS (Font Awesome; Tom Select is imported by settings.css)
   tokens      design tokens: colours, layers (z-index), fonts, spacing   00-settings/tokens.css
-  base        reset, scrollbar, shared animations, bundled web fonts     01-base/
+  base        reset, scrollbar (right side in Arabic too), animations, fonts 01-base/
   themes      the 13 colour themes                                       00-settings/themes.css
   layout      frameless-window chrome                                    02-layout/
   components  reusable pieces (buttons, page header, cards, toasts...)   03-components/
@@ -38,6 +38,7 @@
 @import url("./01-base/scrollbar.css") layer(base);
 @import url("./01-base/animations.css") layer(base);
 @import url("./01-base/web-fonts.css") layer(base);
+@import url("./01-base/rtl-scrollbars.css") layer(base);
 @import url("./00-settings/themes.css") layer(themes);
 @import url("./02-layout/window.css") layer(layout);
 @import url("./03-components/buttons.css") layer(components);

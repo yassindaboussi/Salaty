@@ -36,25 +36,6 @@
     -webkit-app-region: no-drag;
   }
 
-  /* Scrollbar */
-  .settings-content::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .settings-content::-webkit-scrollbar-track {
-    background: var(--surface-1);
-    border-radius: 3px;
-  }
-
-  .settings-content::-webkit-scrollbar-thumb {
-    background: var(--surface-active);
-    border-radius: 3px;
-  }
-
-  .settings-content::-webkit-scrollbar-thumb:hover {
-    background: var(--white-a30);
-  }
-
   /* ========================================
      SETTINGS SECTIONS
      ======================================== */
@@ -1451,20 +1432,6 @@
     padding: 20px 24px;
   }
 
-  .modal-content::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .modal-content::-webkit-scrollbar-track {
-    background: var(--surface-1);
-    border-radius: 3px;
-  }
-
-  .modal-content::-webkit-scrollbar-thumb {
-    background: var(--surface-active);
-    border-radius: 3px;
-  }
-
   /* Locations List */
   .locations-list {
     display: flex;
@@ -1474,24 +1441,6 @@
     max-height: 400px;
     overflow-y: auto;
     padding-inline-end: 4px; /* scrollbar side (left in Arabic) */
-  }
-
-  .locations-list::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .locations-list::-webkit-scrollbar-track {
-    background: var(--surface-1);
-    border-radius: 3px;
-  }
-
-  .locations-list::-webkit-scrollbar-thumb {
-    background: var(--surface-active);
-    border-radius: 3px;
-  }
-
-  .locations-list::-webkit-scrollbar-thumb:hover {
-    background: var(--white-a30);
   }
 
   .location-item {
