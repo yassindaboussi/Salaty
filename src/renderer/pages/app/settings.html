@@ -122,6 +122,58 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
+
+            <!-- How the prayer times are calculated (pages/settings/calculation.js) -->
+            <div class="notif-list calc-settings">
+              <div class="notif-row">
+                <div class="toggle-info">
+                  <label
+                    class="subsection-label"
+                    for="prayerMethodInput"
+                    data-i18n="mpMethod"
+                    >Calculation method</label
+                  >
+                  <span class="toggle-description" id="prayerMethodDesc"></span>
+                </div>
+                <select id="prayerMethodInput" class="field-input calc-select">
+                  <option value="auto" data-i18n="calcMethodAuto">
+                    Automatic (by location)
+                  </option>
+                </select>
+              </div>
+              <div class="notif-row">
+                <div class="toggle-info">
+                  <span
+                    class="subsection-label"
+                    id="asrSchoolLabel"
+                    data-i18n="calcAsrLabel"
+                    >Asr time</span
+                  >
+                  <span class="toggle-description" data-i18n="calcAsrDesc"
+                    >Hanafi: Asr starts later (about 30–60 min). Only Asr
+                    changes.</span
+                  >
+                </div>
+                <div
+                  class="segmented"
+                  role="radiogroup"
+                  aria-labelledby="asrSchoolLabel"
+                >
+                  <label class="segmented-option">
+                    <input type="radio" name="asrSchool" value="standard" />
+                    <span class="segmented-label" data-i18n="calcAsrStandard"
+                      >Standard</span
+                    >
+                  </label>
+                  <label class="segmented-option">
+                    <input type="radio" name="asrSchool" value="hanafi" />
+                    <span class="segmented-label" data-i18n="calcAsrHanafi"
+                      >Hanafi</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Appearance Section -->

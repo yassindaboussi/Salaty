@@ -276,6 +276,22 @@
     min-width: 0;
   }
 
+  /* Calculation method: a fixed-width list beside its label (like the Asr switch) */
+  .calc-settings {
+    margin-block-start: 4px;
+    border-block-start: 1px solid var(--white-a05);
+  }
+
+  .calc-settings .toggle-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .calc-select {
+    flex: 0 0 auto;
+    width: min(320px, 50%);
+  }
+
   .notif-row .toggle-info {
     flex: 1;
     min-width: 0;

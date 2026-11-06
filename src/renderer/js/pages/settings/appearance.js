@@ -15,10 +15,12 @@ const { queryAll } = require("../../core/dom");
 const { pageState } = require("./state");
 const { persistSettings } = require("./persist");
 const { updateHijriText } = require("./hijri");
+const { updateCalculationText } = require("./calculation");
 
 function updateAllText() {
   applyTranslations(); // every [data-i18n] text on the page (they follow the language switch)
   updateHijriText(); // weekday names and today's Hijri date
+  updateCalculationText(); // method names
 
   const aboutStatusEl = document.getElementById("aboutStatusText");
   const aboutIconEl = document.getElementById("aboutStatusIcon");

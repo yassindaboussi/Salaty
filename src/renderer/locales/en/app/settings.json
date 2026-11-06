@@ -32,5 +32,15 @@
   "hijriAdjustmentLabel": "Correct the Hijri date",
   "hijriAdjustmentDesc": "Leave at 0. Change it only if the date below is a day off from your country’s official date. Example: the app shows 1 Ramadan, but your country starts Ramadan tomorrow → choose −1.",
   "hijriAdjustmentUnit": "days",
-  "hijriTodayPreview": "Today: {date}"
+  "hijriTodayPreview": "Today: {date}",
+  "calcMethodAuto": "Automatic (by location)",
+  "calcMethodAutoDesc": "Your location uses: {method}",
+  "calcMethodAutoHint": "The authority closest to your location",
+  "calcMethodFixedDesc": "Used instead of your location's method",
+  "calcAsrLabel": "Asr time",
+  "calcAsrDesc": "Hanafi: Asr starts later (about 30–60 min). Only Asr changes.",
+  "calcAsrStandard": "Standard",
+  "calcAsrHanafi": "Hanafi",
+  "calcAsrLineStandard": "Asr: standard",
+  "calcAsrLineHanafi": "Asr: Hanafi"
 }

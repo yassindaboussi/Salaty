@@ -33,7 +33,8 @@ function registerSettingsHandlers({
   secureIpc.handle("save-settings", (_e, changes) => {
     const changed = store.update(check.settingsChanges(changes, store.get()));
     const settings = store.get();
-    if (changed.location) onLocationChange?.();
+    // other prayer times: the same reload as a new location (home page, adhan, fasting)
+    if (changed.location || changed.calculation) onLocationChange?.();
     // a new location reloads the prayer times already, with the correction
     else if (changed.hijriAdjustment) onHijriAdjustmentChange?.();
     if (changed.fastingReminders) onFastingRemindersChange?.();

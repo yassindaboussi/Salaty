@@ -47,6 +47,8 @@ let settingsData = {
     suhoorMinutes: 30,
   },
   hijriAdjustment: 0, // days added to the Hijri date (-2…+2), see services/islamic-calendar.js
+  prayerMethod: "auto", // calculation method: "auto" (by location) or an Aladhan id (shared/aladhan.js)
+  asrSchool: "standard", // "standard" (Shafi'i, Maliki, Hanbali) or "hanafi"
   weekStart: "auto", // first day of the calendar's week: "auto" (by country), "sat", "sun", "mon"
   analyticsEnabled: false, // opt-in, see PRIVACY.md
 };
@@ -220,6 +222,11 @@ function update(changes) {
       settingsData.country !== before.country,
     hijriAdjustment:
       (settingsData.hijriAdjustment ?? 0) !== (before.hijriAdjustment ?? 0),
+    calculation:
+      (settingsData.prayerMethod ?? "auto") !==
+        (before.prayerMethod ?? "auto") ||
+      (settingsData.asrSchool ?? "standard") !==
+        (before.asrSchool ?? "standard"),
     fastingReminders:
       JSON.stringify(settingsData.fastingReminders) !==
       JSON.stringify(before.fastingReminders),

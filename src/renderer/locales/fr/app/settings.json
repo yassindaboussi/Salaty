@@ -32,5 +32,15 @@
   "hijriAdjustmentLabel": "Corriger la date hégirienne",
   "hijriAdjustmentDesc": "Laissez sur 0. Changez-la seulement si la date ci-dessous diffère d’un jour de la date officielle de votre pays. Exemple : l’application affiche 1 Ramadan, mais votre pays commence le Ramadan demain → choisissez −1.",
   "hijriAdjustmentUnit": "jours",
-  "hijriTodayPreview": "Aujourd’hui : {date}"
+  "hijriTodayPreview": "Aujourd’hui : {date}",
+  "calcMethodAuto": "Automatique (selon le lieu)",
+  "calcMethodAutoDesc": "Votre lieu utilise : {method}",
+  "calcMethodAutoHint": "L'autorité la plus proche de votre lieu",
+  "calcMethodFixedDesc": "Utilisée à la place de la méthode de votre lieu",
+  "calcAsrLabel": "Heure du Asr",
+  "calcAsrDesc": "Hanafite : le Asr commence plus tard (environ 30 à 60 min). Seul le Asr change.",
+  "calcAsrStandard": "Standard",
+  "calcAsrHanafi": "Hanafite",
+  "calcAsrLineStandard": "Asr : standard",
+  "calcAsrLineHanafi": "Asr : hanafite"
 }
