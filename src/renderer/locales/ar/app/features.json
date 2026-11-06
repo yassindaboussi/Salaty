@@ -1,10 +1,20 @@
 {
   "islamicFeatures": "المزايا الإسلامية",
-  "moreFeaturesComingSoon": "المزيد من المزايا قريباً، إن شاء الله",
-  "holyQuranDesc": "قراءة واستماع القرآن الكريم",
   "hijriCalendarDesc": "التواريخ الهجرية والمناسبات الإسلامية",
-  "asmaDesc": "أسماء الله الحسنى التسعة والتسعون",
-  "qiblaDesc": "تحديد اتجاه القبلة",
-  "ramadhanDesc": "مواقيت الصلاة في رمضان",
-  "prayerTimesMonthlyDesc": "جدول مواقيت الصلاة الشهري"
+  "featQuranDesc": "اقرأ برواية حفص أو قالون أو ورش",
+  "featAthkarDesc": "الصباح والمساء وغيرها",
+  "featTasbihDesc": "عُدّ أذكارك",
+  "featAsmaDesc": "معانيها وآياتها",
+  "featMonthlyDesc": "الشهر كاملًا في جدول",
+  "featQiblaDesc": "اتجاه الكعبة",
+  "featRamadanDesc": "السحور والإفطار وصيامك",
+  "featFastingDesc": "الاثنين والخميس والأيام البيض",
+  "featArchiveDesc": "مئات القرّاء",
+  "featRadioDesc": "إذاعات القرآن مباشرة",
+  "featLiveDesc": "مكة والمدينة على مدار الساعة",
+  "featHintContinue": "تابع: {place}",
+  "featHintToday": "اليوم: {date}",
+  "featHintRamadanIn": "رمضان {when}",
+  "featHintRamadanDay": "اليوم {day} من رمضان",
+  "moreFeaturesComingSoon": "المزيد من المزايا قريباً، إن شاء الله"
 }

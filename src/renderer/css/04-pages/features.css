@@ -79,22 +79,33 @@
   }
 
   /* Feature Icon */
+
+  /* The icon keeps its own colour on every theme: it sits on a darker square of its own (a
+     tint of its colour over a dark base), so a purple icon still shows on the purple theme, a
+     green one on the green themes... --ic is set per tool below. */
   .feature-icon {
+    --ic: var(--accent-color);
+
     width: 44px;
     height: 44px;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--white-a06);
-    border: 1px solid var(--border-medium);
+    background:
+      linear-gradient(
+        color-mix(in srgb, var(--ic) 16%, transparent),
+        color-mix(in srgb, var(--ic) 16%, transparent)
+      ),
+      rgb(8 12 28 / 55%);
+    border: 1px solid color-mix(in srgb, var(--ic) 35%, transparent);
     transition: all 0.3s ease;
   }
 
   .feature-icon i,
   .feature-icon svg {
     font-size: 22px;
-    color: var(--accent-color);
+    color: var(--ic);
     transition: transform 0.3s ease;
   }
 
@@ -105,52 +116,7 @@
 
   .feature-card:hover .feature-icon {
     transform: scale(1.05);
-    background: var(--surface-3);
-  }
-
-  .quran-icon i {
-    color: var(--green-500);
-  }
-
-  .athkar-icon i {
-    color: #9c27b0;
-  }
-
-  .monthly-icon i {
-    color: #ffc107;
-  }
-
-  .tasbih-icon i,
-  .tasbih-icon svg {
-    color: var(--blue-500);
-  }
-
-  .calendar-icon i {
-    color: var(--orange-500);
-  }
-
-  .ramadhan-icon i {
-    color: #3f51b5;
-  }
-
-  .fasting-icon i {
-    color: #00bfa5;
-  }
-
-  .asma-icon i {
-    color: #e91e63;
-  }
-
-  .qibla-icon i {
-    color: #009688;
-  }
-
-  .radio-icon i {
-    color: #f50;
-  }
-
-  .livestreams-icon i {
-    color: #25981b;
+    border-color: color-mix(in srgb, var(--ic) 60%, transparent);
   }
 
   .feature-card:hover .feature-icon i,
@@ -158,60 +124,53 @@
     transform: scale(1.1);
   }
 
-  /* Specific Icon Colors */
+  /* each tool's colour, light enough to read on the dark square */
   .quran-icon {
-    background: rgba(76, 175, 80, 0.1);
-    border-color: rgba(76, 175, 80, 0.2);
+    --ic: #66bb6a;
   }
 
   .athkar-icon {
-    background: rgba(156, 39, 176, 0.1);
-    border-color: rgba(156, 39, 176, 0.2);
-  }
-
-  .monthly-icon {
-    background: rgba(255, 193, 7, 0.1);
-    border-color: rgba(255, 193, 7, 0.2);
+    --ic: #c77dde;
   }
 
   .tasbih-icon {
-    background: rgba(33, 150, 243, 0.1);
-    border-color: rgba(33, 150, 243, 0.2);
-  }
-
-  .calendar-icon {
-    background: rgba(255, 152, 0, 0.1);
-    border-color: rgba(255, 152, 0, 0.2);
-  }
-
-  .ramadhan-icon {
-    background: rgba(63, 81, 181, 0.1);
-    border-color: rgba(63, 81, 181, 0.2);
-  }
-
-  .fasting-icon {
-    background: rgba(0, 191, 165, 0.1);
-    border-color: rgba(0, 191, 165, 0.2);
+    --ic: #42a5f5;
   }
 
   .asma-icon {
-    background: rgba(233, 30, 99, 0.1);
-    border-color: rgba(233, 30, 99, 0.2);
+    --ic: #f06292;
+  }
+
+  .calendar-icon {
+    --ic: #ffa726;
+  }
+
+  .playlist-icon {
+    --ic: #4fc3f7;
+  }
+
+  .ramadhan-icon {
+    --ic: #8c9eff;
+  }
+
+  .fasting-icon {
+    --ic: #1de9b6;
   }
 
   .qibla-icon {
-    background: rgba(0, 150, 136, 0.1);
-    border-color: rgba(0, 150, 136, 0.2);
+    --ic: #4db6ac;
+  }
+
+  .monthly-icon {
+    --ic: #ffca28;
   }
 
   .radio-icon {
-    background: rgba(179, 84, 50, 0.1);
-    border-color: rgba(194, 16, 16, 0.2);
+    --ic: #ff7043;
   }
 
   .livestreams-icon {
-    background: rgba(20, 201, 35, 0.1);
-    border-color: rgba(53, 225, 40, 0.2);
+    --ic: #4cd964;
   }
 
   /* Feature Name */
@@ -225,13 +184,21 @@
   }
 
   /* Feature Description */
-  .feature-description {
+  .feature-description,
+  .feature-hint {
     font-size: 10px;
     color: var(--text-secondary);
     margin: 0;
     text-align: center;
     line-height: 1.3;
     opacity: 0.8;
+  }
+
+  /* A live line (where the Quran reading stopped, today's Hijri date, Ramadan) replaces the
+     description: it reads a little stronger. */
+  .feature-hint {
+    font-weight: 600;
+    opacity: 1;
   }
 
   /* Features Footer */
@@ -317,7 +284,8 @@
     font-size: 14px;
   }
 
-  .features-container.fullscreen .feature-description {
+  .features-container.fullscreen .feature-description,
+  .features-container.fullscreen .feature-hint {
     font-size: 11px;
   }
 
@@ -351,7 +319,8 @@
       font-size: 12px;
     }
 
-    .feature-description {
+    .feature-description,
+    .feature-hint {
       font-size: 9px;
     }
   }
@@ -409,7 +378,8 @@
       font-size: 12px;
     }
 
-    .feature-description {
+    .feature-description,
+    .feature-hint {
       font-size: 9px;
     }
   }
