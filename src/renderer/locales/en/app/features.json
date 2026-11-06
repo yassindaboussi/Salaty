@@ -1,10 +1,20 @@
 {
   "islamicFeatures": "Islamic Features",
-  "moreFeaturesComingSoon": "More features coming soon, In Sha Allah",
-  "holyQuranDesc": "Read & listen to the Quran",
   "hijriCalendarDesc": "Hijri dates & Islamic events",
-  "asmaDesc": "99 Names of Allah",
-  "qiblaDesc": "Find the Qibla direction",
-  "ramadhanDesc": "Ramadan prayer times",
-  "prayerTimesMonthlyDesc": "Monthly prayer schedule"
+  "featQuranDesc": "Read in Hafs, Qalun or Warsh",
+  "featAthkarDesc": "Morning, evening and more",
+  "featTasbihDesc": "Count your dhikr",
+  "featAsmaDesc": "Meanings and verses",
+  "featMonthlyDesc": "The whole month at a glance",
+  "featQiblaDesc": "Direction of the Kaaba",
+  "featRamadanDesc": "Suhoor, iftar and your fasts",
+  "featFastingDesc": "Mondays, Thursdays, white days",
+  "featArchiveDesc": "Hundreds of reciters",
+  "featRadioDesc": "Quran radio, live",
+  "featLiveDesc": "Makkah and Madinah, 24/7",
+  "featHintContinue": "Continue: {place}",
+  "featHintToday": "Today: {date}",
+  "featHintRamadanIn": "Ramadan {when}",
+  "featHintRamadanDay": "Day {day} of Ramadan",
+  "moreFeaturesComingSoon": "More features coming soon, In Sha Allah"
 }
