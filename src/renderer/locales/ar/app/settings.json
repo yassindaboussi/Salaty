@@ -32,5 +32,15 @@
   "hijriAdjustmentLabel": "تصحيح التاريخ الهجري",
   "hijriAdjustmentDesc": "اتركه على 0. غيّره فقط إذا كان التاريخ أدناه يختلف بيوم عن التاريخ الرسمي في بلدك. مثال: يعرض التطبيق 1 رمضان وبلدك يبدأ رمضان غدًا ← اختر ⁦−1⁩.",
   "hijriAdjustmentUnit": "أيام",
-  "hijriTodayPreview": "اليوم: {date}"
+  "hijriTodayPreview": "اليوم: {date}",
+  "calcMethodAuto": "تلقائي (حسب الموقع)",
+  "calcMethodAutoDesc": "موقعك يستخدم: {method}",
+  "calcMethodAutoHint": "الجهة الأقرب إلى موقعك",
+  "calcMethodFixedDesc": "تُستخدم بدل طريقة موقعك",
+  "calcAsrLabel": "وقت العصر",
+  "calcAsrDesc": "الحنفي: يبدأ العصر متأخرًا (نحو 30 إلى 60 دقيقة). يتغيّر العصر فقط.",
+  "calcAsrStandard": "الجمهور",
+  "calcAsrHanafi": "الحنفي",
+  "calcAsrLineStandard": "العصر: الجمهور",
+  "calcAsrLineHanafi": "العصر: الحنفي"
 }

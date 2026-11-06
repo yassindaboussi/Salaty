@@ -5,12 +5,13 @@
 // a check returns the cleaned value, or `undefined` when the value is not acceptable.
 const log = require("../services/logger").logger("IPC");
 const { TYPES: FAST_TYPES } = require("../../shared/fasting-rules");
+const { METHOD_IDS } = require("../../shared/aladhan");
 
 const THEMES = new Set([
   "brown",
   "classic",
+  "dark",
   "emerald",
-  "gold",
   "green",
   "indigo",
   "navy",
@@ -126,6 +127,8 @@ const SETTINGS_SCHEMA = {
   adhanEnabledByPrayer: adhanByPrayer,
   fastingReminders,
   hijriAdjustment: (v) => int(v, -2, 2),
+  prayerMethod: (v) => (v === "auto" || METHOD_IDS.includes(v) ? v : undefined),
+  asrSchool: (v) => (v === "standard" || v === "hanafi" ? v : undefined),
   weekStart: oneOf(WEEK_STARTS),
   position,
   locations,

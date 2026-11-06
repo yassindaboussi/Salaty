@@ -70,13 +70,13 @@
     border-bottom-color: rgba(180, 83, 9, 0.3);
   }
 
-  .offline-banner.theme-gold {
+  .offline-banner.theme-dark {
     background: linear-gradient(
       90deg,
-      rgba(50, 45, 20, 0.98) 0%,
-      rgba(50, 45, 20, 0.95) 100%
+      rgba(24, 24, 27, 0.98) 0%,
+      rgba(24, 24, 27, 0.95) 100%
     );
-    border-bottom-color: rgba(217, 119, 6, 0.3);
+    border-bottom-color: rgba(79, 143, 232, 0.3);
   }
 
   .offline-banner.theme-ramadan {

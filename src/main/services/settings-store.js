@@ -47,6 +47,8 @@ let settingsData = {
     suhoorMinutes: 30,
   },
   hijriAdjustment: 0, // days added to the Hijri date (-2…+2), see services/islamic-calendar.js
+  prayerMethod: "auto", // calculation method: "auto" (by location) or an Aladhan id (shared/aladhan.js)
+  asrSchool: "standard", // "standard" (Shafi'i, Maliki, Hanbali) or "hanafi"
   weekStart: "auto", // first day of the calendar's week: "auto" (by country), "sat", "sun", "mon"
   analyticsEnabled: false, // opt-in, see PRIVACY.md
 };
@@ -122,9 +124,17 @@ function load() {
 
     migrateToMultiLocation();
     migrateFastingReminders();
+    migrateGoldTheme();
   } catch (err) {
     log.error("loading failed, using the defaults:", err);
   }
+}
+
+// The Gold theme was replaced by Dark (1.3.0): users who had Gold get Dark.
+function migrateGoldTheme() {
+  if (settingsData.theme !== "gold") return;
+  settingsData.theme = "dark";
+  save();
 }
 
 // Settings from before saved locations existed: turn city/country into a "Home" location.
@@ -212,6 +222,11 @@ function update(changes) {
       settingsData.country !== before.country,
     hijriAdjustment:
       (settingsData.hijriAdjustment ?? 0) !== (before.hijriAdjustment ?? 0),
+    calculation:
+      (settingsData.prayerMethod ?? "auto") !==
+        (before.prayerMethod ?? "auto") ||
+      (settingsData.asrSchool ?? "standard") !==
+        (before.asrSchool ?? "standard"),
     fastingReminders:
       JSON.stringify(settingsData.fastingReminders) !==
       JSON.stringify(before.fastingReminders),

@@ -71,16 +71,20 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 
 ### 🕌 Prayer times
 - Detects your location at start-up (can be turned off), and keeps several saved locations
-- Adhan when the prayer time comes in, and an optional reminder a chosen number of minutes before
+- Adhan when the prayer time comes in, set per prayer (sound, notification only, or off), and an optional reminder a chosen number of minutes before
+- Calculation method chosen automatically for your location, or picked from 23 methods (Muslim World League, Umm al-Qura, Karachi, ISNA…), and Asr by the standard or the Hanafi rule
+- Jumu'ah shown in place of Dhuhr on Fridays
 - A small desktop widget showing the time left until the next prayer
 - A monthly timetable
 
 ### 📖 Holy Quran
 - A reader that shows the verses as continuous Mushaf text, not one card per verse
 - Browse by surah or by juz
-- English and French translations, with an option to show only the translation
+- Three riwayat: Hafs, Qalun and Warsh (Qalun and Warsh text from the King Fahd Complex), all available offline
+- English (Sahih International, Muhammad Asad) and French (Hamidullah) translations, with an option to show only the translation
+- Continue reading where you stopped, and bookmark any ayah
 - A complete copy of the Quran inside the app, used automatically when you are offline
-- Font size control and full-screen mode
+- Font size control, Arabic or Western numerals, and full-screen mode
 
 ### 🎧 Audio archive
 - Quran recitation: more than 240 reciters with their photos, filters by riwaya (Hafs, Warsh, Qalun…), favourites and a playlist
@@ -97,7 +101,7 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 - **Ramadan** tools, **Muslim radio** 📻 and the official **live streams from Makkah and Madinah**
 
 ### ⚙️ Settings
-- 12 colour themes
+- 12 colour themes, including a dark theme
 - 3 languages (Arabic, English, French)
 - Every change is saved automatically, with no "Save" button
 - Updates inside the app: see the download progress, keep using the app meanwhile, and restart when it suits you
@@ -112,7 +116,7 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 | Desktop app | Electron |
 | Interface | HTML / CSS / JavaScript (no framework) |
 | Prayer times | Aladhan API, cached for offline use |
-| Quran data | AlQuran Cloud API + bundled offline copy |
+| Quran data | Bundled Hafs, Qalun and Warsh text (offline) + AlQuran Cloud API for translations |
 | Audio | mp3quran.net API |
 | Build and distribution | electron-builder, GitHub Actions |
 | Code quality | ESLint, Stylelint, Prettier, TypeScript type checks (JSDoc) |
@@ -125,7 +129,7 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 src/
 ├── main/            # Electron main process (windows, IPC, settings, services)
 ├── preload/         # bridge between the pages and the system
-├── shared/          # shared by both sides (list of IPC channels)
+├── shared/          # shared by both sides (IPC channels, prayer and fasting rules, Aladhan requests)
 ├── assets/          # icons, images, adhan sound, Microsoft Store tiles
 └── renderer/
     ├── pages/       # HTML pages

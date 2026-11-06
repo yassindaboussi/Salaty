@@ -71,16 +71,20 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 
 ### 🕌 Heures de prière
 - Détection de votre position au démarrage (désactivable), avec plusieurs lieux enregistrés
-- Adhan à l'heure de la prière, et rappel facultatif un nombre de minutes choisi avant
+- Adhan à l'heure de la prière, réglable pour chaque prière (avec son, notification seule ou désactivé), et rappel facultatif un nombre de minutes choisi avant
+- Méthode de calcul choisie automatiquement selon votre lieu, ou parmi 23 méthodes (Ligue islamique mondiale, Umm al-Qura, Karachi, ISNA…), et Asr selon l'avis majoritaire ou hanafite
+- Jumu'a affichée à la place de Dhuhr le vendredi
 - Un petit widget sur le bureau qui affiche le temps restant avant la prochaine prière
 - Un calendrier mensuel des horaires
 
 ### 📖 Saint Coran
 - Un lecteur qui affiche les versets en texte continu, comme dans le Mushaf, et non une carte par verset
 - Navigation par sourate ou par juz
-- Traductions anglaise et française, avec l'option de n'afficher que la traduction
+- Trois riwayat : Hafs, Qalun et Warsh (texte de Qalun et Warsh du Complexe du Roi Fahd), toutes disponibles hors connexion
+- Traductions anglaises (Sahih International, Muhammad Asad) et française (Hamidullah), avec l'option de n'afficher que la traduction
+- Reprise de la lecture là où vous vous êtes arrêté, et signets sur n'importe quel verset
 - Une copie complète du Coran dans l'application, utilisée automatiquement hors connexion
-- Réglage de la taille du texte et mode plein écran
+- Réglage de la taille du texte, chiffres arabes ou occidentaux, et mode plein écran
 
 ### 🎧 Archive audio
 - Récitation du Coran : plus de 240 récitateurs avec leur photo, filtres par riwaya (Hafs, Warsh, Qalun…), favoris et liste de lecture
@@ -97,7 +101,7 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 - Outils pour le **Ramadan**, **radio islamique** 📻 et les **directs officiels de La Mecque et Médine**
 
 ### ⚙️ Paramètres
-- 12 thèmes de couleurs
+- 12 thèmes de couleurs, dont un thème sombre
 - 3 langues (arabe, anglais, français)
 - Chaque modification est enregistrée automatiquement, sans bouton « Enregistrer »
 - Mises à jour dans l'application : suivez le téléchargement, continuez à utiliser l'application, et redémarrez quand cela vous convient
@@ -112,7 +116,7 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 | Application de bureau | Electron |
 | Interface | HTML / CSS / JavaScript (sans framework) |
 | Heures de prière | API Aladhan, mise en cache pour le mode hors connexion |
-| Données du Coran | API AlQuran Cloud + copie locale de secours |
+| Données du Coran | Texte Hafs, Qalun et Warsh intégré (hors connexion) + API AlQuran Cloud pour les traductions |
 | Audio | API mp3quran.net |
 | Build et distribution | electron-builder, GitHub Actions |
 | Qualité du code | ESLint, Stylelint, Prettier, vérification des types TypeScript (JSDoc) |
@@ -125,7 +129,7 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 src/
 ├── main/            # processus principal Electron (fenêtres, IPC, paramètres, services)
 ├── preload/         # pont entre les pages et le système
-├── shared/          # partagé par les deux côtés (liste des canaux IPC)
+├── shared/          # partagé par les deux côtés (canaux IPC, règles de prière et de jeûne, requêtes Aladhan)
 ├── assets/          # icônes, images, son de l'adhan, images du Microsoft Store
 └── renderer/
     ├── pages/       # pages HTML

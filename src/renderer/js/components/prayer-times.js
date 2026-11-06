@@ -1,7 +1,7 @@
 "use strict";
 
 const { ipcRenderer } = require("electron");
-const { t } = require("../core/i18n");
+const { t, getLanguage } = require("../core/i18n");
 const { showToast } = require("../core/toast");
 const {
   PRAYER_KEYS,
@@ -240,7 +240,12 @@ function _renderMethod() {
   const method = prayerData?.meta?.method;
   const key = `mpMethod${method?.id}`;
   const name = !method?.name ? "" : t(key) === key ? method.name : t(key);
-  nameEl.textContent = name;
+  // and the Asr rule, from the same data (Settings → Asr time)
+  const hanafi =
+    String(prayerData?.meta?.school ?? "").toUpperCase() === "HANAFI";
+  const asr = t(hanafi ? "calcAsrLineHanafi" : "calcAsrLineStandard");
+  const sep = getLanguage() === "ar" ? "، " : " · ";
+  nameEl.textContent = name ? `${name}${sep}${asr}` : "";
   box.hidden = !name;
 }
 

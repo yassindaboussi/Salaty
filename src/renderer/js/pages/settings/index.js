@@ -29,6 +29,10 @@ const {
 } = require("./appearance");
 const { initAthkarAlerts, initPreAdhanNotification } = require("./alerts");
 const { initHijriSettings, updateHijriText } = require("./hijri");
+const {
+  initCalculationSettings,
+  updateCalculationText,
+} = require("./calculation");
 const { initTravelModeToggle, initAnalyticsToggle } = require("./toggles");
 const { initAboutSection } = require("./about");
 
@@ -41,6 +45,7 @@ function initSettingsPage() {
     state.settings.city = location.city;
     persistSettings();
     updateHijriText(); // the automatic first day of the week follows the country
+    setTimeout(updateCalculationText, 1500); // the automatic method follows it too
   });
   // Only the country/city lists come from the network. Re-running the whole init here would
   // add every listener twice and fail on the already-created Tom Select pickers.
@@ -59,6 +64,7 @@ function initSettingsPage() {
   initAthkarAlerts();
   initPreAdhanNotification();
   initHijriSettings();
+  initCalculationSettings();
   initTravelModeToggle();
   initAnalyticsToggle();
   initScreenSizeSetting();
