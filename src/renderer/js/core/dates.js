@@ -11,7 +11,11 @@ function getGregorianDate(prayerData) {
 function getHijriDate(prayerData) {
   if (!prayerData?.date?.hijri) return "";
   const hijri = prayerData.date.hijri;
-  const hijriMonth = getLanguage() === "ar" ? hijri.month.ar : hijri.month.en;
+  // The app's own month names in the UI language (the same as the Hijri calendar page),
+  // not Aladhan's: its English names carry accents ("Jumādá al-ūlá") and French had none.
+  const hijriMonth =
+    hijriMonthName(hijri.month?.number) ||
+    (getLanguage() === "ar" ? hijri.month?.ar : hijri.month?.en);
   return `${hijri.day} ${hijriMonth} ${hijri.year} ${t("ah")}`;
 }
 

@@ -6,7 +6,7 @@
 const { ipcRenderer } = require("electron");
 const { t } = require("../../core/i18n");
 const { byId } = require("../../core/dom");
-const { renderToast } = require("../../core/toast");
+const { showToast } = require("../../core/toast");
 const { copyText } = require("../../core/clipboard");
 const analytics = require("../../services/analytics");
 const { html, setHtml } = require("../../utils/html");
@@ -58,21 +58,13 @@ function renderDetail() {
     ?.scrollTo(0, 0);
 }
 
-function showToast(message, isError = false) {
-  renderToast(
-    `success-toast ${isError ? "error" : ""}`,
-    html`<i class="fas fa-${isError ? "exclamation-circle" : "check-circle"}" aria-hidden="true"></i><span>${message}</span>`,
-    { duration: 2000, removeDelay: 200 },
-  );
-}
-
 /** @param {string} text */
 async function copy(text) {
   if (await copyText(text)) {
     analytics.asmaCopied();
-    showToast(t("copiedToClipboard"));
+    showToast(t("copiedToClipboard"), "success"); // the app's toast, as in the Quran reader
   } else {
-    showToast(t("failedToCopy"), true);
+    showToast(t("failedToCopy"), "error");
   }
 }
 

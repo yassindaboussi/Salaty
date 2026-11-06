@@ -190,7 +190,14 @@ class ScreenSizeManager {
       const cs = window.getComputedStyle(prayerTimes);
       const padTop = parseFloat(cs.paddingTop) || 0;
       const padBottom = parseFloat(cs.paddingBottom) || 16;
-      h += padTop + prayerList.offsetHeight + padBottom;
+      // the list and the calculation method line under it
+      const method = document.getElementById("prayerMethodBox");
+      const methodH =
+        method && !method.hidden
+          ? method.offsetHeight +
+            (parseFloat(getComputedStyle(method).marginTop) || 0)
+          : 0;
+      h += padTop + prayerList.offsetHeight + methodH + padBottom;
     } else {
       h += prayerList.offsetHeight + 16;
     }

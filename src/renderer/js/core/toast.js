@@ -46,11 +46,17 @@ function renderToast(className, content, opts = {}) {
   return toast;
 }
 
-function showToast(message, type = "info") {
+/**
+ * The app's toast (one look on every page). duration: how long it stays, in ms.
+ * @param {string} message
+ * @param {string} [type] "info" | "success" | "error" | …
+ * @param {{ duration?: number }} [opts]
+ */
+function showToast(message, type = "info", { duration = 2500 } = {}) {
   const toast = renderToast(
     `toast ${type}`,
     html`<i class="fas fa-${ICONS[type] ?? ICONS.info}" aria-hidden="true"></i><span>${message}</span>`,
-    { duration: 2500 },
+    { duration },
   );
   if (type === "error") toast.style.background = ERROR_BG;
 }
