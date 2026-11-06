@@ -60,8 +60,22 @@ function initTooltipSystem() {
     if (!text) return;
     tip.textContent = text;
     const r = el.getBoundingClientRect();
-    tip.style.left = `${r.left + r.width / 2}px`;
-    tip.style.top = `${r.bottom + 8}px`;
+    // Centred under the element, but always inside the window: a button at the edge
+    // (e.g. the adhan buttons) would push a long text off-screen. With no room below, above.
+    const EDGE = 8;
+    const half = tip.offsetWidth / 2;
+    const center = r.left + r.width / 2;
+    const left = Math.min(
+      Math.max(center, EDGE + half),
+      window.innerWidth - EDGE - half,
+    );
+    const below = r.bottom + 8;
+    const top =
+      below + tip.offsetHeight + EDGE > window.innerHeight
+        ? r.top - 8 - tip.offsetHeight
+        : below;
+    tip.style.left = `${left}px`;
+    tip.style.top = `${top}px`;
     tip.style.opacity = "1";
     tip.style.transform = "translateX(-50%) scale(1)";
   };

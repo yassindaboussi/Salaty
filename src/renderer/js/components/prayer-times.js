@@ -20,6 +20,7 @@ const { state, prayerIcons } = require("../core/store");
 const { updateRamadanCountdown } = require("./ramadan-countdown");
 const screenSizeManager = require("../core/screen-size");
 const { html, setHtml } = require("../utils/html");
+const { refreshTooltips } = require("../core/tooltips");
 
 /** @type {any} */
 let prayerData = null;
@@ -132,17 +133,19 @@ function _renderPrayerUI() {
       const icon = prayerIcons[key] ?? "clock";
       const cur = key === currentActivePrayer;
       const state_ = adhanByPrayer[key] ?? true;
-      const [btnIcon, btnTitle] =
-        state_ === true
-          ? ["volume-up", `${t("soundAdhan")} – ${t("disableAdhan")}`]
-          : state_ === "silent"
-            ? ["bell", `${t("silentAdhan")} – ${t("disableAdhan")}`]
-            : ["volume-mute", `${t("disableAdhan")} – ${t("enableAdhan")}`];
+      const look =
+        ADHAN_LOOK[
+          state_ === true ? "sound" : state_ === "silent" ? "silent" : "off"
+        ];
+      const btnIcon = look.icon;
+      // tooltip: the mode now and what a click does; name: which prayer and its mode
+      const btnTip = t(look.tip);
+      const btnLabel = t(look.label).replace("{prayer}", name);
       return html`<div class="prayer-item${cur ? " current-prayer" : ""}" data-prayer="${key}">
       <i class="fas fa-${icon}" aria-hidden="true"></i>
       <span class="prayer-name">${name}</span>
       <span class="prayer-time">${cur ? html`<span class="current-indicator">${t("now")}</span>` : ""}${time}</span>
-      <button type="button" class="adhan-toggle-btn" data-prayer="${key}" title="${btnTitle}">
+      <button type="button" class="adhan-toggle-btn" data-prayer="${key}" aria-label="${btnLabel}" data-tip="${btnTip}">
         <i class="fas fa-${btnIcon} adhan-toggle-icon" aria-hidden="true"></i>
       </button>
     </div>`;
@@ -150,6 +153,8 @@ function _renderPrayerUI() {
   );
 
   _renderMethod();
+
+  refreshTooltips(); // binds the app tooltip to the new adhan buttons
 
   listEl.onclick = (e) => {
     if (!(e.target instanceof Element)) return;
@@ -205,6 +210,13 @@ function updateCurrentAndNextPrayer() {
   }
 }
 
+// The adhan of a prayer: sound → notification only → off → sound (see _toggleAdhan).
+const ADHAN_LOOK = {
+  sound: { icon: "volume-up", tip: "adhanTipSound", label: "adhanLabelSound" },
+  silent: { icon: "bell", tip: "adhanTipSilent", label: "adhanLabelSilent" },
+  off: { icon: "volume-mute", tip: "adhanTipOff", label: "adhanLabelOff" },
+};
+
 function _toggleAdhan(key) {
   const cur = adhanByPrayer[key];
   adhanByPrayer[key] =
@@ -212,6 +224,11 @@ function _toggleAdhan(key) {
   state.settings.adhanEnabledByPrayer = adhanByPrayer;
   ipcRenderer.invoke("save-settings", state.settings);
   _renderPrayerUI();
+  // the list is drawn again: keep the focus on the same button, its tooltip shows the new mode
+  document
+    .querySelector(`.adhan-toggle-btn[data-prayer="${key}"]`)
+    ?.closest("button")
+    ?.focus();
 }
 
 // The calculation method of today's times, in the UI language (Aladhan's own name for a

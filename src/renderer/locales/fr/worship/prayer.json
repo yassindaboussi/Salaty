@@ -5,11 +5,13 @@
   "endTime": "Heure de fin",
   "locationNotSet": "Localisation non définie",
   "stopAdhan": "Arrêter l'Adhan",
-  "enableAdhan": "Activer l'Adhan",
-  "disableAdhan": "Désactiver l'Adhan",
-  "silentAdhan": "Mode Silencieux",
-  "soundAdhan": "Mode Sonore",
   "adhanInXmin": "L'Adhan pour {prayer} est dans {minutes} minutes",
   "daysUntilRamadan": "Jours avant Ramadan : {days}",
-  "adhanAlertTitle": "Alerte de prière"
+  "adhanAlertTitle": "Alerte de prière",
+  "adhanTipSound": "Adhan avec son · Clic : notification seule",
+  "adhanTipSilent": "Notification seule · Clic : désactiver",
+  "adhanTipOff": "Adhan désactivé · Clic : activer avec son",
+  "adhanLabelSound": "Adhan de {prayer} : avec son",
+  "adhanLabelSilent": "Adhan de {prayer} : notification seule",
+  "adhanLabelOff": "Adhan de {prayer} : désactivé"
 }
