@@ -42,6 +42,18 @@
   box-shadow: 0 4px 20px rgba(var(--accent-rgb, 74, 107, 255), 0.2);
 }
 
+/* Dark theme: no big colour fill on a neutral page. The prayer of now is a lighter, raised
+   surface with an accent edge (dark UIs show elevation with lighter surfaces and use colour
+   sparingly: https://m2.material.io/design/color/dark-theme). */
+.theme-dark .prayer-card.current {
+  background: linear-gradient(145deg, #2a2c31, #222327);
+  border: 1px solid rgba(var(--accent-rgb), 0.55);
+  box-shadow:
+    inset 0 3px 0 var(--accent-color),
+    0 4px 16px rgba(0, 0, 0, 0.35);
+  color: var(--text-primary);
+}
+
 .prayer-card.next {
   background: var(--surface-1);
   color: var(--text-soft);
