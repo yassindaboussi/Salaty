@@ -456,11 +456,14 @@
 
   /* the surah's name and details in the middle of the header (the back and window buttons
      stay on the sides; the room they take is kept free) */
+
+  /* centred over the text column, not the window: --title-shift is set by title-align.js */
   .reader-surah-info {
     position: absolute;
     inset-block: 0 var(--space-3);
     inset-inline: 0;
     justify-content: center;
+    translate: var(--title-shift, 0) 0;
     width: max-content;
     max-width: calc(100% - 300px);
     margin-inline: auto;
