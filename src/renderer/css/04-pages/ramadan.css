@@ -747,9 +747,11 @@
 
   /* ── Maximized window: more room, bigger numbers ───────────────────────── */
 
-  .fullscreen-mode .rm-layout {
-    grid-template-columns: minmax(0, 1fr) 320px;
-    gap: 16px;
+  @media (width > 1000px) {
+    .fullscreen-mode .rm-layout {
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 16px;
+    }
   }
 
   .fullscreen-mode .rm-hero-big {

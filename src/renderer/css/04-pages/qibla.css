@@ -542,9 +542,11 @@
 
   /* ── Maximized window: more room ───────────────────────────────────── */
 
-  .fullscreen-mode .qb-layout:not(.is-panel-folded) {
-    grid-template-columns: minmax(0, 1fr) 320px;
-    gap: 16px;
+  @media (width > 1000px) {
+    .fullscreen-mode .qb-layout:not(.is-panel-folded) {
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 16px;
+    }
   }
 
   /* ── Narrow window: one column, the map first, the page scrolls ────── */
