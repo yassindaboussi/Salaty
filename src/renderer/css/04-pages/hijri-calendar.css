@@ -2,7 +2,7 @@
   /* Hijri calendar: the month on one side, the selected day and the month's occasions on the
      other (mirrored in Arabic), the panel under the month in a narrow window.
      "Today" and "selected" are drawn in white, not the theme's accent: on several themes the
-     accent is close to the background (pink, gold, green), and these two must always show. */
+     accent is close to the background (pink, green), and these two must always show. */
 
   .calendar-container {
     display: flex;

@@ -52,18 +52,21 @@
   --border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Gold Theme */
-.theme-gold {
-  background: linear-gradient(145deg, #6b5b1e, #b5982c);
+/* Dark Theme: near-black grey, not pure black (less glare, room for lighter raised
+   surfaces); soft white text; a calm blue accent that reads on the dark background
+   (5.7:1) and under white text in the cards (3.3:1, like Navy).
+   https://m2.material.io/design/color/dark-theme */
+.theme-dark {
+  background: linear-gradient(145deg, #0f1011, #1a1b1e);
 
-  --accent-color: #d4af37;
-  --accent-rgb: 212, 175, 55;
-  --text-primary: #2c2100;
-  --text-secondary: #4a3d00;
-  --bg-primary: #8e6e19;
-  --bg-secondary: #d4af37;
-  --bg-surface: rgba(212, 175, 55, 0.7);
-  --border-color: rgba(0, 0, 0, 0.15);
+  --accent-color: #4f8fe8;
+  --accent-rgb: 79, 143, 232;
+  --text-primary: #e8eaed;
+  --text-secondary: #bdc1c6;
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-surface: rgba(30, 30, 30, 0.85);
+  --border-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Pink Theme */
@@ -264,9 +267,9 @@ body.theme-brown,
   background: linear-gradient(145deg, #4e342e, #6d4c41);
 }
 
-body.theme-gold,
-.app-container.theme-gold {
-  background: linear-gradient(145deg, #6b5b1e, #b5982c);
+body.theme-dark,
+.app-container.theme-dark {
+  background: linear-gradient(145deg, #0f1011, #1a1b1e);
 }
 
 body.theme-pink,

@@ -122,9 +122,17 @@ function load() {
 
     migrateToMultiLocation();
     migrateFastingReminders();
+    migrateGoldTheme();
   } catch (err) {
     log.error("loading failed, using the defaults:", err);
   }
+}
+
+// The Gold theme was replaced by Dark (1.3.0): users who had Gold get Dark.
+function migrateGoldTheme() {
+  if (settingsData.theme !== "gold") return;
+  settingsData.theme = "dark";
+  save();
 }
 
 // Settings from before saved locations existed: turn city/country into a "Home" location.

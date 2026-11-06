@@ -9,8 +9,8 @@ const { TYPES: FAST_TYPES } = require("../../shared/fasting-rules");
 const THEMES = new Set([
   "brown",
   "classic",
+  "dark",
   "emerald",
-  "gold",
   "green",
   "indigo",
   "navy",
