@@ -149,6 +149,8 @@ function _renderPrayerUI() {
     })}`,
   );
 
+  _renderMethod();
+
   listEl.onclick = (e) => {
     if (!(e.target instanceof Element)) return;
     const btn = e.target.closest(".adhan-toggle-btn");
@@ -210,6 +212,19 @@ function _toggleAdhan(key) {
   state.settings.adhanEnabledByPrayer = adhanByPrayer;
   ipcRenderer.invoke("save-settings", state.settings);
   _renderPrayerUI();
+}
+
+// The calculation method of today's times, in the UI language (Aladhan's own name for a
+// method newer than the app), under the list. Same names as the monthly times page.
+function _renderMethod() {
+  const box = document.getElementById("prayerMethodBox");
+  const nameEl = document.getElementById("prayerMethod");
+  if (!box || !nameEl) return;
+  const method = prayerData?.meta?.method;
+  const key = `mpMethod${method?.id}`;
+  const name = !method?.name ? "" : t(key) === key ? method.name : t(key);
+  nameEl.textContent = name;
+  box.hidden = !name;
 }
 
 function _setText(id, text) {
