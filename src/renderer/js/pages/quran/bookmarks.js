@@ -9,7 +9,7 @@ const { html, setHtml } = require("../../utils/html");
 const { showConfirmDialog } = require("../../components/confirm-dialog");
 const { ayahArabic } = require("../../services/api/alquran-cloud");
 const { loadBookmarks, saveBookmarks } = require("./storage");
-const { fmt, ayahPlace } = require("./state");
+const { state, fmt, ayahPlace, isRiwaya } = require("./state");
 
 /** @typedef {import("./storage").AyahRef} AyahRef */
 
@@ -22,9 +22,15 @@ const listeners = new Set();
 /** @param {() => void} fn  called after every change */
 const onBookmarksChange = (fn) => listeners.add(fn);
 
-/** @param {number} surah @param {number} ayah */
-const isBookmarked = (surah, ayah) =>
-  bookmarks.some((b) => b.surah === surah && b.ayah === ayah);
+/** @typedef {import("./state").Riwaya} Riwaya */
+
+/** @param {AyahRef} b @param {number} surah @param {number} ayah @param {Riwaya} riwaya */
+const same = (b, surah, ayah, riwaya) =>
+  b.surah === surah && b.ayah === ayah && b.riwaya === riwaya;
+
+/** @param {number} surah @param {number} ayah @param {Riwaya} [riwaya]  default: the one read */
+const isBookmarked = (surah, ayah, riwaya = state.riwaya) =>
+  bookmarks.some((b) => same(b, surah, ayah, riwaya));
 
 /** @param {AyahRef[]} next */
 function commit(next) {
@@ -33,13 +39,16 @@ function commit(next) {
   listeners.forEach((fn) => fn());
 }
 
-/** Adds or removes the ayah; returns whether it is bookmarked now. @param {number} surah @param {number} ayah */
-function toggleBookmark(surah, ayah) {
-  const on = isBookmarked(surah, ayah);
+/**
+ * Adds or removes the ayah; returns whether it is bookmarked now.
+ * @param {number} surah @param {number} ayah @param {Riwaya} [riwaya]  default: the one read
+ */
+function toggleBookmark(surah, ayah, riwaya = state.riwaya) {
+  const on = isBookmarked(surah, ayah, riwaya);
   commit(
     on
-      ? bookmarks.filter((b) => !(b.surah === surah && b.ayah === ayah))
-      : [{ surah, ayah }, ...bookmarks],
+      ? bookmarks.filter((b) => !same(b, surah, ayah, riwaya))
+      : [{ surah, ayah, riwaya }, ...bookmarks],
   );
   return !on;
 }
@@ -67,18 +76,18 @@ async function renderBookmarkList() {
     return;
   }
   const texts = await Promise.all(
-    bookmarks.map((b) => ayahArabic(b.surah, b.ayah)),
+    bookmarks.map((b) => ayahArabic(b.surah, b.ayah, b.riwaya)),
   );
   if (id !== renderId) return;
   setHtml(
     list,
     html`${bookmarks.map(
       (b, i) => html`<div class="q-bookmark">
-        <button type="button" class="q-bookmark-open" data-surah="${b.surah}" data-ayah="${b.ayah}">
-          <span class="q-bookmark-place">${ayahPlace(b.surah, b.ayah)}</span>
-          <span class="q-bookmark-text" lang="ar" dir="rtl">${texts[i]}</span>
+        <button type="button" class="q-bookmark-open" data-surah="${b.surah}" data-ayah="${b.ayah}" data-riwaya="${b.riwaya}">
+          <span class="q-bookmark-place">${ayahPlace(b.surah, b.ayah, b.riwaya)}</span>
+          <span class="q-bookmark-text" lang="ar" dir="rtl" data-riwaya="${b.riwaya}">${texts[i]}</span>
         </button>
-        <button type="button" class="q-icon-btn q-bookmark-remove" data-surah="${b.surah}" data-ayah="${b.ayah}" aria-label="${t("quranRemoveBookmark")}" data-tip="${t("quranRemoveBookmark")}">
+        <button type="button" class="q-icon-btn q-bookmark-remove" data-surah="${b.surah}" data-ayah="${b.ayah}" data-riwaya="${b.riwaya}" aria-label="${t("quranRemoveBookmark")}" data-tip="${t("quranRemoveBookmark")}">
           <i class="fas fa-trash-can" aria-hidden="true"></i>
         </button>
       </div>`,
@@ -86,7 +95,7 @@ async function renderBookmarkList() {
   );
 }
 
-/** @param {(surah: number, ayah: number) => void} openAt */
+/** @param {(surah: number, ayah: number, riwaya: Riwaya) => void} openAt */
 function bindBookmarkList(openAt) {
   const list = byId("bookmarkList", HTMLElement);
   list.addEventListener("click", async (e) => {
@@ -94,19 +103,23 @@ function bindBookmarkList(openAt) {
     if (!(button instanceof HTMLButtonElement)) return;
     const surah = Number(button.dataset.surah);
     const ayah = Number(button.dataset.ayah);
+    const riwaya = isRiwaya(button.dataset.riwaya)
+      ? button.dataset.riwaya
+      : "hafs";
     if (!surah || !ayah) return;
     if (button.classList.contains("q-bookmark-open")) {
-      openAt(surah, ayah);
+      openAt(surah, ayah, riwaya);
       return;
     }
     const ok = await showConfirmDialog(
       t("quranRemoveBookmarkConfirm").replace(
         "{place}",
-        ayahPlace(surah, ayah),
+        ayahPlace(surah, ayah, riwaya),
       ),
       { confirmClass: "btn-danger" },
     );
-    if (ok && isBookmarked(surah, ayah)) toggleBookmark(surah, ayah);
+    if (ok && isBookmarked(surah, ayah, riwaya))
+      toggleBookmark(surah, ayah, riwaya);
   });
 }
 

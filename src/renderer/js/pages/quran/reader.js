@@ -18,6 +18,7 @@ const {
   revelationPlace,
   ayahCount,
   ayahPlace,
+  surahCount,
 } = require("./state");
 const { saveFontSize, clampFont } = require("./storage");
 const { isBookmarked } = require("./bookmarks");
@@ -32,7 +33,7 @@ function updateReaderMeta() {
   const parts = [
     surahName(meta) === meta.ar ? "" : meta.ar,
     `${t("surah")} ${fmt(meta.n)}`,
-    ayahCount(meta.count),
+    ayahCount(surahCount(meta)),
     revelationPlace(meta),
   ];
   byId("readerSurahName", HTMLElement).textContent = surahName(meta);
@@ -75,8 +76,10 @@ async function openSurah(surahNum, ayah) {
 
   byId("viewSurahList", HTMLElement).hidden = true;
   byId("viewSurahReader", HTMLElement).hidden = false;
+  // Hafs counts the Bismillah of Al-Fatiha as its first ayah; Qalun and Warsh do not, so there
+  // it is written above the surah like for the others. At-Tawba has none.
   byId("bismillahHeader", HTMLElement).hidden =
-    surahNum === 1 || surahNum === 9;
+    surahNum === 9 || (surahNum === 1 && state.riwaya === "hafs");
   updateReaderMeta();
 
   await loadAyahs(surahNum);
@@ -102,12 +105,17 @@ async function loadAyahs(surahNum) {
   setHtml(list, html``);
 
   try {
-    const { ayahs, translationMissing } = await fetchQuranSurah(
+    const { ayahs, translationMissing, bismillah } = await fetchQuranSurah(
       surahNum,
       state.translationId,
+      state.riwaya,
     );
     if (id !== loadId) return;
     state.currentAyahs = ayahs;
+    // the Bismillah as the riwaya's text writes it (the page's own line is the Hafs one)
+    const header = byId("bismillahHeader", HTMLElement);
+    header.dataset.hafs ??= header.textContent?.trim() ?? "";
+    header.textContent = bismillah ?? header.dataset.hafs;
     loading.hidden = true;
     notice.textContent = translationMissing ? t("quranTranslationOffline") : "";
     notice.hidden = !translationMissing;
@@ -206,7 +214,11 @@ function changeFontSize(delta) {
 function ayahCopyText(n) {
   const a = state.currentAyahs.find((x) => x.number === n);
   if (!a || !state.currentSurah) return "";
-  return [a.arabic, a.translation, `(${ayahPlace(state.currentSurah.n, n)})`]
+  return [
+    a.arabic,
+    a.translation,
+    `(${ayahPlace(state.currentSurah.n, n, state.riwaya)})`,
+  ]
     .filter(Boolean)
     .join("\n");
 }

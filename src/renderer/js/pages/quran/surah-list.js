@@ -17,7 +17,10 @@ const {
   ayahCount,
   ayahPlace,
   SURAH_META,
-  JUZ_META,
+  surahCount,
+  juzStarts,
+  riwayaName,
+  isRiwaya,
 } = require("./state");
 const { loadLastRead } = require("./storage");
 const { renderBookmarkList } = require("./bookmarks");
@@ -71,7 +74,7 @@ function renderSurahGrid() {
         <span class="q-num">${fmt(s.n)}</span>
         <span class="surah-row-text">
           <span class="surah-row-name">${surahName(s)}</span>
-          <span class="surah-row-meta">${ayahCount(s.count)}${sep()}${revelationPlace(s)}</span>
+          <span class="surah-row-meta">${ayahCount(surahCount(s))}${sep()}${revelationPlace(s)}</span>
         </span>
         ${surahName(s) === s.ar ? "" : html`<span class="surah-row-ar" lang="ar" dir="rtl">${s.ar}</span>`}
       </button>`,
@@ -82,7 +85,7 @@ function renderSurahGrid() {
 function renderJuzList() {
   setHtml(
     byId("juzList", HTMLElement),
-    html`${JUZ_META.map(
+    html`${juzStarts().map(
       (
         j,
       ) => html`<button type="button" class="surah-row juz-row" data-surah="${j.surah}" data-ayah="${j.ayah}">
@@ -106,8 +109,14 @@ function renderContinue() {
   if (!last || !meta) return;
   card.dataset.surah = String(last.surah);
   card.dataset.ayah = String(last.ayah);
-  byId("qContinuePlace", HTMLElement).textContent =
-    `${surahName(meta)}${sep()}${t("quranAyah")} ${fmt(last.ayah)}`;
+  card.dataset.riwaya = last.riwaya;
+  byId("qContinuePlace", HTMLElement).textContent = [
+    surahName(meta),
+    `${t("quranAyah")} ${fmt(last.ayah)}`,
+    last.riwaya === "hafs" ? "" : riwayaName(last.riwaya),
+  ]
+    .filter(Boolean)
+    .join(sep());
 }
 
 /** Re-draws what shows numbers or names (digits or language changed). */
@@ -118,13 +127,20 @@ function renderLists() {
   if (state.activeTab === "bookmarks") renderBookmarkList();
 }
 
-/** @param {(surah: number, ayah?: number) => void} openAt */
+/** @param {(surah: number, ayah?: number, riwaya?: import("./state").Riwaya) => void} openAt */
 function bindSurahList(openAt) {
   /** @param {Event} e */
   const openRow = (e) => {
     const row = /** @type {Element} */ (e.target).closest("[data-surah]");
     if (!(row instanceof HTMLElement) || row.closest(".bookmark-list")) return;
-    openAt(Number(row.dataset.surah), Number(row.dataset.ayah) || undefined);
+    const riwaya = isRiwaya(row.dataset.riwaya)
+      ? row.dataset.riwaya
+      : undefined;
+    openAt(
+      Number(row.dataset.surah),
+      Number(row.dataset.ayah) || undefined,
+      riwaya,
+    );
   };
   byId("surahGrid", HTMLElement).addEventListener("click", openRow);
   byId("juzList", HTMLElement).addEventListener("click", openRow);

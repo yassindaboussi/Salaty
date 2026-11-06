@@ -211,6 +211,44 @@
             </div>
 
             <div class="q-panel-body" id="qPanelBody">
+              <div
+                class="q-field"
+                id="riwayaGroup"
+                role="group"
+                data-i18n-aria-label="quranRiwaya"
+              >
+                <p class="q-field-label" data-i18n="quranRiwaya">Riwaya</p>
+                <div class="numerals-toggle">
+                  <button
+                    type="button"
+                    class="riwaya-btn"
+                    data-riwaya="hafs"
+                    aria-pressed="true"
+                    data-i18n="quranRiwayaHafs"
+                  >
+                    Hafs
+                  </button>
+                  <button
+                    type="button"
+                    class="riwaya-btn"
+                    data-riwaya="qalun"
+                    aria-pressed="false"
+                    data-i18n="quranRiwayaQalun"
+                  >
+                    Qalun
+                  </button>
+                  <button
+                    type="button"
+                    class="riwaya-btn"
+                    data-riwaya="warsh"
+                    aria-pressed="false"
+                    data-i18n="quranRiwayaWarsh"
+                  >
+                    Warsh
+                  </button>
+                </div>
+              </div>
+
               <div class="q-field">
                 <p class="q-field-label" data-i18n="quranFontSize">Text size</p>
                 <div class="q-stepper">
@@ -346,6 +384,15 @@
                     </li>
                   </ul>
                 </div>
+                <p
+                  class="q-field-hint"
+                  id="riwayaTranslationNote"
+                  data-i18n="quranRiwayaTranslationNote"
+                  hidden
+                >
+                  Translations follow the Hafs numbering, so they show with Hafs
+                  only.
+                </p>
               </div>
 
               <div
@@ -378,8 +425,8 @@
               </div>
 
               <p class="q-panel-note" data-i18n="quranSourceNote">
-                The Arabic text (Hafs) works offline. Translations other than
-                Sahih International need the internet.
+                The Arabic text works offline. Translations other than Sahih
+                International need the internet.
               </p>
             </div>
           </aside>

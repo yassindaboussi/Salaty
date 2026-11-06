@@ -7,12 +7,13 @@
 //   reading-position.js     where the reader stopped (for "Continue reading")
 //   panel-fold.js           folding the reader's display panel to a strip
 //   translation-picker.js   the translation combobox
+//   riwaya.js               Hafs, Qalun or Warsh (text, font, ayah numbers)
 //   numerals.js             Arabic-Indic or Western digits
 //   open-request.js         opened at one ayah by another page (99 Names, Athkar)
 //   storage.js              what the page remembers (localStorage)
 //   state.js                what is shown now, the surah/juz tables, numbers and names
-// The Arabic text is bundled (data/Quran.json); translations other than Sahih International come
-// from services/api/alquran-cloud.js.
+// The Arabic text is bundled (data/Quran.json for Hafs, quran-qalun.json, quran-warsh.json);
+// translations other than Sahih International come from services/api/alquran-cloud.js.
 const { t } = require("../../core/i18n");
 const screenSizeManager = require("../../core/screen-size");
 const { showToast } = require("../../core/toast");
@@ -21,8 +22,14 @@ const {
   setupConnectionRecovery,
 } = require("../../services/connection-recovery");
 const { byId } = require("../../core/dom");
-const { state, SURAH_META } = require("./state");
-const { loadFontSize, loadTranslation } = require("./storage");
+const { state, SURAH_META, surahMeta, surahCount } = require("./state");
+const {
+  loadFontSize,
+  loadTranslation,
+  loadRiwaya,
+  loadLastRead,
+} = require("./storage");
+const { updateRiwayaUI, setRiwaya, bindRiwaya } = require("./riwaya");
 const {
   resolveNumerals,
   updateNumeralsUI,
@@ -109,9 +116,21 @@ function updateFullscreenButtons() {
   });
 }
 
+/** Another riwaya was chosen: its ayah counts and juz, and the open surah in its text, near the
+ * ayah that was at the top (the numbers differ a little between the riwayat). */
+function onRiwayaChange() {
+  renderLists();
+  const meta = state.currentSurah && surahMeta(state.currentSurah.n);
+  if (!meta) return;
+  const at = loadLastRead();
+  const ayah = at?.surah === meta.n ? Math.min(at.ayah, surahCount(meta)) : 1;
+  openSurah(meta.n, ayah);
+}
+
 function initQuranPage() {
   state.fontSize = loadFontSize();
   state.translationId = loadTranslation(TRANSLATION_IDS);
+  state.riwaya = loadRiwaya();
   state.numerals = resolveNumerals();
   state.filteredSurahs = [...SURAH_META];
 
@@ -128,8 +147,14 @@ function initQuranPage() {
       ?.addEventListener("click", () => screenSizeManager.toggleScreenSize());
   }
 
-  /** @param {number} surah @param {number} [ayah] */
-  const openAt = (surah, ayah) => openSurah(surah, ayah);
+  /**
+   * A bookmark or "Continue reading" opens in its own riwaya (and makes it the chosen one).
+   * @param {number} surah @param {number} [ayah] @param {import("./state").Riwaya} [riwaya]
+   */
+  const openAt = (surah, ayah, riwaya) => {
+    if (riwaya && setRiwaya(riwaya)) renderLists();
+    return openSurah(surah, ayah);
+  };
   bindSurahList(openAt);
   bindBookmarkList(openAt);
   bindReader();
@@ -137,6 +162,7 @@ function initQuranPage() {
   bindPanelFold();
   bindSelectionBar(copyAndTell);
   bindTranslationCombo();
+  bindRiwaya(onRiwayaChange);
 
   byId("fontIncBtn", HTMLButtonElement).addEventListener("click", () =>
     changeFontSize(2),
@@ -166,11 +192,12 @@ function initQuranPage() {
 
   updateNumeralsUI();
   updateTranslationUI();
+  updateRiwayaUI();
   applyFontSize();
   renderLists();
   renderBookmarkCount();
   // opened at one ayah by another page, or on the surah list; wires the reader's back button
-  handleOpenRequest(openAt, () => {
+  handleOpenRequest(openAt, setRiwaya, () => {
     showSurahList();
     renderContinue();
   });

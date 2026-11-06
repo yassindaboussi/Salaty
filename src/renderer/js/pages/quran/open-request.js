@@ -3,7 +3,8 @@
 // Another page can open the Quran at one ayah: the 99 Names page (the verses where a name
 // appears) and the Athkar page (the verse a dua comes from). It leaves { surah, ayah, back } in
 // sessionStorage and opens this page; the request is used once. The ayah is scrolled to and
-// marked, and both back buttons return to that page.
+// marked, and both back buttons return to that page. Those pages give Hafs numbers, so the ayah
+// opens in Hafs (without changing the riwaya the user chose for later).
 const { ipcRenderer } = require("electron");
 const { byId } = require("../../core/dom");
 const { SURAH_META } = require("./state");
@@ -29,9 +30,10 @@ function takeOpenRequest() {
 
 /**
  * @param {(surah: number, ayah?: number) => Promise<void>} openSurah
+ * @param {(riwaya: "hafs", options: { save: boolean }) => boolean} setRiwaya
  * @param {() => void} showSurahList  the reader's own back (to the surah list)
  */
-function handleOpenRequest(openSurah, showSurahList) {
+function handleOpenRequest(openSurah, setRiwaya, showSurahList) {
   const request = takeOpenRequest();
   const readerBack = byId("readerBackBtn", HTMLButtonElement);
   if (!request) {
@@ -42,6 +44,7 @@ function handleOpenRequest(openSurah, showSurahList) {
   readerBack.addEventListener("click", () =>
     ipcRenderer.invoke("navigate-to", request.back),
   );
+  setRiwaya("hafs", { save: false });
   openSurah(request.surah, request.ayah);
 }
 

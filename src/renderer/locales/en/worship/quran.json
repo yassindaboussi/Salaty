@@ -24,7 +24,7 @@
   "quranPanelHide": "Hide the panel",
   "quranPanelShow": "Show the panel",
   "quranFontSize": "Text size",
-  "quranSourceNote": "The Arabic text (Hafs) works offline. Translations other than Sahih International need the internet.",
+  "quranSourceNote": "The Arabic text works offline. Translations other than Sahih International need the internet.",
   "quranAyahCount": "Ayahs: {count}",
   "quranAyah": "Ayah",
   "quranNoBookmarks": "No bookmarks yet. In a surah, click an ayah's number or its bookmark icon to save it here.",
@@ -35,5 +35,10 @@
   "quranBookmarkRemoved": "Bookmark removed",
   "quranCopyAyah": "Copy the ayah",
   "quranTranslationOffline": "This translation needs the internet. Showing the Arabic text only.",
-  "quranCopyWithRef": "Copy with reference"
+  "quranCopyWithRef": "Copy with reference",
+  "quranRiwaya": "Riwaya",
+  "quranRiwayaHafs": "Hafs",
+  "quranRiwayaQalun": "Qalun",
+  "quranRiwayaWarsh": "Warsh",
+  "quranRiwayaTranslationNote": "Translations follow the Hafs numbering, so they show with Hafs only."
 }
