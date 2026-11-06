@@ -24,7 +24,7 @@
   "quranPanelHide": "إخفاء اللوحة",
   "quranPanelShow": "إظهار اللوحة",
   "quranFontSize": "حجم الخط",
-  "quranSourceNote": "النص العربي (رواية حفص) يعمل دون اتصال. الترجمات غير Sahih International تحتاج إلى الإنترنت.",
+  "quranSourceNote": "النص العربي يعمل دون اتصال. الترجمات غير Sahih International تحتاج إلى الإنترنت.",
   "quranAyahCount": "عدد الآيات: {count}",
   "quranAyah": "الآية",
   "quranNoBookmarks": "لا توجد علامات بعد. داخل السورة، انقر على رقم الآية أو على أيقونة العلامة لحفظها هنا.",
@@ -35,5 +35,10 @@
   "quranBookmarkRemoved": "تمت إزالة العلامة",
   "quranCopyAyah": "نسخ الآية",
   "quranTranslationOffline": "هذه الترجمة تحتاج إلى الإنترنت. يُعرض النص العربي فقط.",
-  "quranCopyWithRef": "نسخ مع المرجع"
+  "quranCopyWithRef": "نسخ مع المرجع",
+  "quranRiwaya": "الرواية",
+  "quranRiwayaHafs": "حفص",
+  "quranRiwayaQalun": "قالون",
+  "quranRiwayaWarsh": "ورش",
+  "quranRiwayaTranslationNote": "الترجمات مرقّمة على رواية حفص، لذلك تظهر مع حفص فقط."
 }

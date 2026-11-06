@@ -4,7 +4,9 @@
 // offline, matches the bundled Quran font, and has the Bismillah only where it is an ayah (1:1).
 // (AlQuran Cloud's text puts it at the start of ayah 1 of every surah, which doubled it under
 // the page's own Bismillah line.) Translations come from AlQuran Cloud; Sahih International is
-// also bundled, so it works offline too.
+// also bundled, so it works offline too. Qalun and Warsh (data/quran-qalun.json, quran-warsh.json,
+// from the King Fahd Complex) are bundled too; they count the ayahs the Madani way, so the
+// translations (numbered like Hafs) are not offered with them.
 
 const ALQURAN_CLOUD_API = "https://api.alquran.cloud/v1";
 
@@ -21,6 +23,7 @@ const BUNDLED_TRANSLATION = "en.sahih";
  * @typedef {object} SurahText
  * @property {Ayah[]} ayahs
  * @property {boolean} translationMissing  a translation was asked for but could not be loaded
+ * @property {string | null} bismillah      the riwaya's own Bismillah (null: the page's Hafs one)
  */
 
 /** @type {Promise<any[]> | null} */
@@ -46,6 +49,43 @@ async function localVerses(surahNum) {
   const entry = data.find((s) => s.Number === surahNum);
   if (!entry) throw new Error(`Surah ${surahNum} not found in offline data`);
   return (entry.Array_Verses && entry.Array_Verses[0]) || [];
+}
+
+/** @typedef {{ bismillah: string, surahs: string[][] }} RiwayaText */
+
+/** @type {Map<string, Promise<RiwayaText>>} */
+const riwayaData = new Map();
+
+/** @param {"qalun" | "warsh"} riwaya @returns {Promise<RiwayaText>} */
+function getRiwayaData(riwaya) {
+  let data = riwayaData.get(riwaya);
+  if (!data) {
+    data = fetch(`../../data/quran-${riwaya}.json`).then((res) => {
+      if (!res.ok)
+        throw new Error(`Failed to load ${riwaya} text (${res.status})`);
+      return res.json();
+    });
+    data.catch(() => riwayaData.delete(riwaya)); // try again next time
+    riwayaData.set(riwaya, data);
+  }
+  return data;
+}
+
+/**
+ * The ayahs of a surah in a riwaya, numbered from 1, and the Bismillah as that text writes it.
+ * @param {number} surahNum @param {string} riwaya
+ * @returns {Promise<{ verses: { id: number, ar: string, en?: string }[], bismillah: string | null }>}
+ */
+async function versesOf(surahNum, riwaya) {
+  if (riwaya !== "qalun" && riwaya !== "warsh")
+    return { verses: await localVerses(surahNum), bismillah: null };
+  const data = await getRiwayaData(riwaya);
+  const ayahs = data.surahs[surahNum - 1];
+  if (!ayahs) throw new Error(`Surah ${surahNum} not found in ${riwaya} text`);
+  return {
+    verses: ayahs.map((ar, i) => ({ id: i + 1, ar })),
+    bismillah: data.bismillah,
+  };
 }
 
 /** @type {Map<string, string[]>} */
@@ -76,14 +116,16 @@ async function onlineTranslation(surahNum, edition) {
 
 /**
  * @param {number} surahNum
- * @param {string} translationId  an edition id, or "none"
+ * @param {string} translationId  an edition id, or "none" (ignored outside Hafs)
+ * @param {string} [riwaya]       "hafs" (default), "qalun" or "warsh"
  * @returns {Promise<SurahText>}
  */
-async function fetchQuranSurah(surahNum, translationId) {
-  const verses = await localVerses(surahNum);
+async function fetchQuranSurah(surahNum, translationId, riwaya = "hafs") {
+  const { verses, bismillah } = await versesOf(surahNum, riwaya);
+  const wanted = riwaya === "hafs" && TRANSLATIONS.has(translationId);
   /** @type {(string | null)[] | null} */
   let translations = null;
-  if (TRANSLATIONS.has(translationId)) {
+  if (wanted) {
     // the bundled copy first for Sahih International; the network for the others
     translations =
       translationId === BUNDLED_TRANSLATION
@@ -96,14 +138,16 @@ async function fetchQuranSurah(surahNum, translationId) {
       arabic: v.ar,
       translation: translations?.[i] || null,
     })),
-    translationMissing: TRANSLATIONS.has(translationId) && !translations,
+    translationMissing: wanted && !translations,
+    bismillah,
   };
 }
 
-/** The Arabic of one ayah (bookmarks list), "" when it can't be read. */
-async function ayahArabic(surahNum, ayahNum) {
+/** The Arabic of one ayah (bookmarks list), "" when it can't be read.
+ * @param {number} surahNum @param {number} ayahNum @param {string} [riwaya] */
+async function ayahArabic(surahNum, ayahNum, riwaya = "hafs") {
   try {
-    const verses = await localVerses(surahNum);
+    const { verses } = await versesOf(surahNum, riwaya);
     return verses.find((v) => v.id === ayahNum)?.ar ?? "";
   } catch {
     return "";

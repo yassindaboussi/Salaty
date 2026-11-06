@@ -15,6 +15,32 @@
     font-display: swap;
   }
 
+  /* The KFGQPC fonts made for the bundled Qalun and Warsh texts (same licence as the Hafs one:
+     fonts/LICENSE-KFGQPC-Hafs.txt). The text of each riwaya is drawn with its own font. */
+  @font-face {
+    font-family: QuranQalun;
+    src: url("../../fonts/QaloonV10.woff2") format("woff2");
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: QuranWarsh;
+    src: url("../../fonts/WarshV10.woff2") format("woff2");
+    font-display: swap;
+  }
+
+  [data-riwaya="hafs"] {
+    --font-quran: "QuranFont", "Traditional Arabic", serif;
+  }
+
+  [data-riwaya="qalun"] {
+    --font-quran: "QuranQalun", "Traditional Arabic", serif;
+  }
+
+  [data-riwaya="warsh"] {
+    --font-quran: "QuranWarsh", "Traditional Arabic", serif;
+  }
+
   .quran-container {
     position: relative;
     height: 100%;
@@ -941,7 +967,8 @@
     background: var(--surface-1);
   }
 
-  .numerals-btn {
+  .numerals-btn,
+  .riwaya-btn {
     flex: 1;
     height: 28px;
     padding: 0 8px;
@@ -956,11 +983,13 @@
     cursor: pointer;
   }
 
-  .numerals-btn:hover {
+  .numerals-btn:hover,
+  .riwaya-btn:hover {
     color: var(--text-primary);
   }
 
-  .numerals-btn.active {
+  .numerals-btn.active,
+  .riwaya-btn.active {
     border-color: var(--white-a40);
     background: var(--surface-hover);
     color: var(--text-primary);
@@ -1212,5 +1241,21 @@
     .ayah-card.is-target {
       animation: none;
     }
+  }
+
+  /* Under the translation picker when the riwaya is not Hafs (the picker is off then) */
+  .q-field-hint {
+    margin-top: 6px;
+    color: var(--text-faint);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .translation-combo.is-off {
+    opacity: 0.5;
+  }
+
+  .translation-combo.is-off .translation-combo-trigger {
+    cursor: not-allowed;
   }
 }

@@ -24,7 +24,7 @@
   "quranPanelHide": "Masquer le panneau",
   "quranPanelShow": "Afficher le panneau",
   "quranFontSize": "Taille du texte",
-  "quranSourceNote": "Le texte arabe (Hafs) fonctionne hors ligne. Les traductions autres que Sahih International nécessitent Internet.",
+  "quranSourceNote": "Le texte arabe fonctionne hors ligne. Les traductions autres que Sahih International nécessitent Internet.",
   "quranAyahCount": "Versets : {count}",
   "quranAyah": "Verset",
   "quranNoBookmarks": "Aucun signet pour l'instant. Dans une sourate, cliquez sur le numéro d'un verset ou sur son icône de signet pour l'enregistrer ici.",
@@ -35,5 +35,10 @@
   "quranBookmarkRemoved": "Signet retiré",
   "quranCopyAyah": "Copier le verset",
   "quranTranslationOffline": "Cette traduction nécessite Internet. Seul le texte arabe est affiché.",
-  "quranCopyWithRef": "Copier avec la référence"
+  "quranCopyWithRef": "Copier avec la référence",
+  "quranRiwaya": "Lecture",
+  "quranRiwayaHafs": "Hafs",
+  "quranRiwayaQalun": "Qalun",
+  "quranRiwayaWarsh": "Warsh",
+  "quranRiwayaTranslationNote": "Les traductions suivent la numérotation de Hafs : elles s’affichent avec Hafs uniquement."
 }

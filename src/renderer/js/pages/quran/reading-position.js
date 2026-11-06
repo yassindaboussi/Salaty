@@ -5,8 +5,9 @@
 const { state } = require("./state");
 const { saveLastRead } = require("./storage");
 
-/** @param {number} surah @param {number} ayah */
-const rememberAyah = (surah, ayah) => saveLastRead({ surah, ayah });
+/** @param {number} surah @param {number} ayah  in the riwaya being read */
+const rememberAyah = (surah, ayah) =>
+  saveLastRead({ surah, ayah, riwaya: state.riwaya });
 
 /** The number of the first ayah still showing at the top of the reader. @param {HTMLElement} content */
 function topAyah(content) {

@@ -4,13 +4,16 @@
 // where the reader stopped, and the bookmarked ayahs. Every read and write survives a storage
 // that is full or blocked (the page then simply forgets).
 
-/** @typedef {{ surah: number, ayah: number }} AyahRef */
+/** An ayah, numbered as its riwaya counts (Qalun and Warsh number some ayahs differently).
+ * @typedef {{ surah: number, ayah: number, riwaya: import("./state").Riwaya }} AyahRef */
+const { isRiwaya } = require("./state");
 
 const KEYS = {
   fontSize: "quranFontSize",
   translation: "quranTranslation",
   lastRead: "quranLastRead",
   bookmarks: "quranBookmarks",
+  riwaya: "quranRiwaya",
 };
 
 const FONT_MIN = 18;
@@ -45,6 +48,13 @@ const isRef = (v) =>
   v.ayah >= 1 &&
   v.ayah <= 286;
 
+/** A saved ayah; one saved before riwayat existed is Hafs. @param {any} v @returns {AyahRef} */
+const toRef = (v) => ({
+  surah: v.surah,
+  ayah: v.ayah,
+  riwaya: isRiwaya(v.riwaya) ? v.riwaya : "hafs",
+});
+
 /** @param {number} n */
 const clampFont = (n) => Math.max(FONT_MIN, Math.min(FONT_MAX, n));
 
@@ -68,7 +78,7 @@ const saveTranslation = (id) => write(KEYS.translation, id);
 /** @returns {AyahRef | null} */
 function loadLastRead() {
   const v = read(KEYS.lastRead);
-  return isRef(v) ? { surah: v.surah, ayah: v.ayah } : null;
+  return isRef(v) ? toRef(v) : null;
 }
 
 /** @param {AyahRef} ref */
@@ -77,15 +87,24 @@ const saveLastRead = (ref) => write(KEYS.lastRead, ref);
 /** Newest first. @returns {AyahRef[]} */
 function loadBookmarks() {
   const list = read(KEYS.bookmarks);
-  return Array.isArray(list)
-    ? list.filter(isRef).map((b) => ({ surah: b.surah, ayah: b.ayah }))
-    : [];
+  return Array.isArray(list) ? list.filter(isRef).map(toRef) : [];
 }
 
 /** @param {AyahRef[]} list */
 const saveBookmarks = (list) => write(KEYS.bookmarks, list);
 
+/** @returns {import("./state").Riwaya} */
+function loadRiwaya() {
+  const v = read(KEYS.riwaya);
+  return isRiwaya(v) ? v : "hafs";
+}
+
+/** @param {import("./state").Riwaya} riwaya */
+const saveRiwaya = (riwaya) => write(KEYS.riwaya, riwaya);
+
 module.exports = {
+  loadRiwaya,
+  saveRiwaya,
   FONT_MIN,
   FONT_MAX,
   clampFont,

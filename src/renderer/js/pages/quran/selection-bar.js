@@ -9,7 +9,14 @@ const { t } = require("../../core/i18n");
 const { byId } = require("../../core/dom");
 const { html, setHtml } = require("../../utils/html");
 const { formatNumerals } = require("../../utils/numerals");
-const { state, fmt, surahMeta, surahName } = require("./state");
+const {
+  state,
+  fmt,
+  surahMeta,
+  surahName,
+  sep,
+  riwayaName,
+} = require("./state");
 
 /** @type {HTMLElement | null} */
 let bar = null;
@@ -64,7 +71,9 @@ function reference(range) {
   const b = ayahOf(range.endContainer) || a;
   const [from, to] = a <= b ? [a, b] : [b, a];
   const ayahs = from === to ? fmt(from) : `${fmt(from)}–${fmt(to)}`;
-  return `(${surahName(meta)} ${fmt(meta.n)}:${ayahs})`;
+  const riwaya =
+    state.riwaya === "hafs" ? "" : `${sep()}${riwayaName(state.riwaya)}`;
+  return `(${surahName(meta)} ${fmt(meta.n)}:${ayahs}${riwaya})`;
 }
 
 function closeBar() {
