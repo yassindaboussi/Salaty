@@ -552,9 +552,11 @@
 
   /* ── Maximized window: more room ───────────────────────────────────── */
 
-  .fullscreen-mode .rd-layout:not(.is-panel-folded) {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 16px;
+  @media (width > 1000px) {
+    .fullscreen-mode .rd-layout:not(.is-panel-folded) {
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 16px;
+    }
   }
 
   /* ── Narrow window: one column, the player first, the page scrolls ─── */

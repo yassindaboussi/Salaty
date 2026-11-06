@@ -501,9 +501,11 @@
 
   /* ── Maximized window: more room, bigger numbers ───────────────────────── */
 
-  .fullscreen-mode .hc-layout {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 16px;
+  @media (width > 1000px) {
+    .fullscreen-mode .hc-layout {
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 16px;
+    }
   }
 
   .fullscreen-mode .hc-title {

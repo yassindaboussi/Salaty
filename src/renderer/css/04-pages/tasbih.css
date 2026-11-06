@@ -972,9 +972,11 @@
 
   /* ── Maximized window ──────────────────────────────────────────────────── */
 
-  .fullscreen-mode .tb-layout {
-    grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 16px;
+  @media (width > 1000px) {
+    .fullscreen-mode .tb-layout {
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 16px;
+    }
   }
 
   .fullscreen-mode .tb-ring-wrap {
