@@ -141,7 +141,7 @@ function _renderPrayerUI() {
       return html`<div class="prayer-item${cur ? " current-prayer" : ""}" data-prayer="${key}">
       <i class="fas fa-${icon}" aria-hidden="true"></i>
       <span class="prayer-name">${name}</span>
-      <span class="prayer-time">${time}${cur ? html` <span class="current-indicator">${t("now")}</span>` : ""}</span>
+      <span class="prayer-time">${cur ? html`<span class="current-indicator">${t("now")}</span>` : ""}${time}</span>
       <button type="button" class="adhan-toggle-btn" data-prayer="${key}" title="${btnTitle}">
         <i class="fas fa-${btnIcon} adhan-toggle-icon" aria-hidden="true"></i>
       </button>

@@ -87,6 +87,16 @@
   font-weight: 600;
   color: var(--text-bright);
   flex-shrink: 0;
+
+  /* "Now" on the name side of the time, the time next to the adhan button */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prayer-row-gap);
+  direction: ltr;
+}
+
+[dir="rtl"] .prayer-item .prayer-time {
+  flex-direction: row-reverse;
 }
 
 .prayer-card.next .prayer-name,
@@ -126,6 +136,8 @@
 
 /* Prayer Items */
 .prayer-item {
+  --prayer-row-gap: 12px; /* "Now" · time · adhan button: one even rhythm */
+
   display: flex;
   align-items: center;
   padding: 8px 12px;
@@ -178,10 +190,11 @@
   flex-shrink: 0;
 }
 
-/* Space between the time and the adhan button. It sits on the button (not the time)
-   because the time is LTR in every language, while the button follows the row. */
+/* Space between the time and the adhan button, the same as between "Now" and the time.
+   It sits on the button (not the time) because the time is LTR in every language, while
+   the button follows the row. */
 .prayer-item .adhan-toggle-btn {
-  margin-inline-start: 4px;
+  margin-inline-start: var(--prayer-row-gap);
 }
 
 /* Current Indicator */
@@ -193,7 +206,6 @@
   font-weight: 600;
   padding: 2px 6px;
   border-radius: 10px;
-  margin-inline-start: 8px;
   vertical-align: middle;
   animation: pulse 2s infinite;
 }
