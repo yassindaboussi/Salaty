@@ -3,8 +3,7 @@
 // The list view: "Continue reading", and three tabs: the 114 surahs (searchable), the 30 juz
 // (each opens the reader at the ayah it starts with) and the bookmarks.
 const { t } = require("../../core/i18n");
-const { toWestern } = require("../../utils/numerals");
-const { normalizeForSearch } = require("../../utils/search-text");
+const { findSurahs } = require("./surah-search");
 const { byId, queryAll } = require("../../core/dom");
 const { html, setHtml } = require("../../utils/html");
 const {
@@ -41,17 +40,7 @@ function switchTab(tab) {
 }
 
 /** @param {string} query */
-function filterSurahs(query) {
-  // Arabic-Indic digits too (٢ finds surah 2); no harakat, alif forms or accents needed
-  const q = normalizeForSearch(toWestern(query).trim());
-  if (!q) return [...SURAH_META];
-  return SURAH_META.filter(
-    (s) =>
-      normalizeForSearch(s.en).includes(q) ||
-      normalizeForSearch(s.ar).includes(q) ||
-      String(s.n) === q,
-  );
-}
+const filterSurahs = (query) => findSurahs(SURAH_META, query);
 
 function onSearch() {
   state.filteredSurahs = filterSurahs(

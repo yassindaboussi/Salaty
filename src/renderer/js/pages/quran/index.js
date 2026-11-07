@@ -56,6 +56,7 @@ const {
   updateBookmarkIcons,
   bindReader,
 } = require("./reader");
+const { bindPinchSize } = require("./pinch-size");
 const {
   bindTranslationCombo,
   updateTranslationUI,
@@ -160,6 +161,7 @@ function initQuranPage() {
   bindSurahList(openAt);
   bindBookmarkList(openAt);
   bindReader();
+  bindPinchSize();
   bindTitleAlign();
   bindAyahActions();
   bindPanelFold();
