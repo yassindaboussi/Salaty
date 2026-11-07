@@ -3,7 +3,8 @@
 // The Quran page. Its parts:
 //   surah-list.js           "Continue reading", the 114 surahs (searchable), the 30 juz, the tabs
 //   bookmarks.js            bookmarked ayahs: toggling them, the Bookmarks tab
-//   reader.js               one surah: running text, or ayah cards with a translation
+//   reader.js               one surah: opening it, its title, footer, size and keys
+//   reader-text.js          its text: running text, or ayah cards with a translation
 //   reading-position.js     where the reader stopped (for "Continue reading")
 //   panel-fold.js           folding the reader's display panel to a strip
 //   title-align.js          the reader's title centred over the text, like the Bismillah
@@ -11,6 +12,9 @@
 //   riwaya.js               Hafs, Qalun or Warsh (text, font, ayah numbers)
 //   numerals.js             Arabic-Indic or Western digits
 //   open-request.js         opened at one ayah by another page (99 Names, Athkar)
+//   recitation*.js          listening: the background player, the ayah marked, the player bar
+//   reciter-dialog.js       the reciter list
+//   ayah-menu.js            the menu of an ayah's number ﴿n﴾: play from here, bookmark, copy
 //   storage.js              what the page remembers (localStorage)
 //   state.js                what is shown now, the surah/juz tables, numbers and names
 // The Arabic text is bundled (data/Quran.json for Hafs, quran-qalun.json, quran-warsh.json);
@@ -65,6 +69,11 @@ const { bindPanelFold } = require("./panel-fold");
 const { bindSelectionBar } = require("./selection-bar");
 const { handleOpenRequest } = require("./open-request");
 const { bindTitleAlign } = require("./title-align");
+const { bindRecitation } = require("./recitation");
+const { bindFollow } = require("./recitation-follow");
+const { bindRecitationBar, listenFrom } = require("./recitation-bar");
+const { bindReciterDialog } = require("./reciter-dialog");
+const { openAyahMenu, bindAyahMenu } = require("./ayah-menu");
 
 const { TRANSLATIONS } = require("../../services/api/alquran-cloud");
 
@@ -88,18 +97,29 @@ async function copyAndTell(text) {
   );
 }
 
-/** The ayah icons in the reader: copy, and the bookmark (also the ﴿n﴾ number in running text). */
+/** @param {number} ayah */
+function bookmarkAndTell(ayah) {
+  if (!state.currentSurah) return;
+  const on = toggleBookmark(state.currentSurah.n, ayah);
+  showToast(t(on ? "quranBookmarkAdded" : "quranBookmarkRemoved"), "success");
+}
+
+/** What an ayah offers: play from it, bookmark it, copy it. */
+const AYAH_ACTIONS = {
+  play: (/** @type {number} */ ayah) => listenFrom(ayah),
+  bookmark: bookmarkAndTell,
+  copy: (/** @type {number} */ ayah) => copyAndTell(ayahCopyText(ayah)),
+};
+
+/** The ayah icons in the cards (play, copy, bookmark) and the ﴿n﴾ numbers (their menu). */
 function bindAyahActions() {
   byId("ayahList", HTMLElement).addEventListener("click", (e) => {
     const button = /** @type {Element} */ (e.target).closest("[data-action]");
     if (!(button instanceof HTMLButtonElement) || !state.currentSurah) return;
-    const ayah = Number(button.dataset.ayah);
-    if (button.dataset.action === "copy") {
-      copyAndTell(ayahCopyText(ayah));
-      return;
-    }
-    const on = toggleBookmark(state.currentSurah.n, ayah);
-    showToast(t(on ? "quranBookmarkAdded" : "quranBookmarkRemoved"), "success");
+    const action = button.dataset.action;
+    if (action === "menu") openAyahMenu(button, AYAH_ACTIONS);
+    else if (action === "play" || action === "copy" || action === "bookmark")
+      AYAH_ACTIONS[action](Number(button.dataset.ayah));
   });
 }
 
@@ -168,6 +188,10 @@ function initQuranPage() {
   bindSelectionBar(copyAndTell);
   bindTranslationCombo();
   bindRiwaya(onRiwayaChange);
+  bindAyahMenu();
+  bindReciterDialog();
+  bindFollow();
+  bindRecitationBar();
 
   byId("fontIncBtn", HTMLButtonElement).addEventListener("click", () =>
     changeFontSize(2),
@@ -198,6 +222,14 @@ function initQuranPage() {
   handleOpenRequest(openAt, setRiwaya, () => {
     showSurahList();
     renderContinue();
+  });
+  // the mini player's "go to" button: the reader opens on the surah playing. Opened any other
+  // way (the Features page), the page starts on the surah list as always.
+  const openPlaying = sessionStorage.getItem("quranOpenPlaying") === "1";
+  sessionStorage.removeItem("quranOpenPlaying");
+  bindRecitation((track) => {
+    if (openPlaying && !state.currentSurah)
+      openAt(track.surah, undefined, track.riwaya);
   });
 }
 

@@ -40,5 +40,22 @@
   "quranRiwayaHafs": "Hafs",
   "quranRiwayaQalun": "Qalun",
   "quranRiwayaWarsh": "Warsh",
-  "quranRiwayaTranslationNote": "Les traductions suivent la numérotation de Hafs : elles s’affichent avec Hafs uniquement."
+  "quranRiwayaTranslationNote": "Les traductions suivent la numérotation de Hafs : elles s’affichent avec Hafs uniquement.",
+  "quranListen": "Écouter",
+  "quranListenOffline": "L'écoute nécessite une connexion Internet",
+  "quranPlayFromHere": "Écouter à partir de ce verset",
+  "quranAyahActions": "Verset {n}",
+  "quranBookmarked": "Enregistré",
+  "quranPlay": "Lecture",
+  "quranPause": "Pause",
+  "quranPrevAyah": "Verset précédent",
+  "quranNextAyah": "Verset suivant",
+  "quranStopListening": "Arrêter l'écoute",
+  "quranPosition": "Position",
+  "quranChooseReciter": "Choisir un récitateur",
+  "quranNoReciters": "Aucun récitateur trouvé",
+  "quranMujawwad": "Mujawwad",
+  "quranBackToAyah": "Revenir au verset",
+  "quranAudioError": "Impossible de lire la récitation. Vérifiez votre connexion Internet.",
+  "quranNoFollow": "Cette récitation est lue sans suivre les versets."
 }

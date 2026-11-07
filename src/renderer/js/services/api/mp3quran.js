@@ -276,6 +276,9 @@ function getTafsirTracksForSura(entries, suraName, bookName) {
 
 module.exports = {
   apiLanguage,
+  cacheGet,
+  cacheSet,
+  fetchJson,
   getReciters,
   getRadios,
   getSurahNames,

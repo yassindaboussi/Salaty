@@ -1,8 +1,7 @@
 "use strict";
 
-// The reader view: one surah. Without a translation the ayahs run on like a Mushaf page, each
-// ending with its number ﴿n﴾ (a button: it bookmarks the ayah). With a translation each ayah is a
-// card: its number, copy and bookmark icons, the Arabic, then the translation under it.
+// The reader view: one surah, its title and footer, opening it at an ayah, the text size, the
+// ← / → keys. The text itself is drawn by reader-text.js (running text or ayah cards).
 const { t } = require("../../core/i18n");
 const analytics = require("../../services/analytics");
 const { fetchQuranSurah } = require("../../services/api/alquran-cloud");
@@ -23,9 +22,9 @@ const {
 const { saveFontSize, clampFont } = require("./storage");
 const { isBookmarked } = require("./bookmarks");
 const { trackReading, rememberAyah } = require("./reading-position");
-
-/** The language of the chosen translation, for its `lang` attribute. */
-const translationLang = () => state.translationId.split(".")[0] || "en";
+const { flowHtml, cardsHtml, ayahEndLabel } = require("./reader-text");
+const { rec } = require("./recitation");
+const { recitedAyah, setFollow } = require("./recitation-follow");
 
 function updateReaderMeta() {
   const meta = state.currentSurah;
@@ -40,8 +39,6 @@ function updateReaderMeta() {
   byId("readerSurahMeta", HTMLElement).textContent = parts
     .filter(Boolean)
     .join(sep());
-  byId("readerPageInfo", HTMLElement).textContent =
-    `${fmt(meta.n)} / ${fmt(114)}`;
 
   /** @param {"prev" | "next"} side @param {number} n */
   const navTo = (side, n) => {
@@ -90,9 +87,19 @@ async function openSurah(surahNum, ayah) {
   if (state.currentSurah !== meta) return; // another surah was opened meanwhile
 
   const content = byId("readerContent", HTMLElement);
+  // the surah being recited, opened without an ayah: at the ayah recited, followed from there
+  // (its timings not loaded yet: the follow brings the text to it when they are)
+  const playing =
+    rec.track?.surah === surahNum && rec.track.riwaya === state.riwaya;
+  const recited = ayah ? 0 : recitedAyah(surahNum);
+  if (playing && !ayah) setFollow(true);
   if (ayah && ayah > 1) revealAyah(ayah);
-  else content.scrollTop = 0;
-  rememberAyah(surahNum, ayah || 1);
+  else if (recited) {
+    document
+      .getElementById(`ayah-${recited}`)
+      ?.scrollIntoView({ block: "center" });
+  } else content.scrollTop = 0;
+  rememberAyah(surahNum, ayah || recited || 1);
   analytics.featureOpen("quran-surah");
 }
 
@@ -140,45 +147,6 @@ async function loadAyahs(surahNum) {
       loadAyahs(surahNum),
     );
   }
-}
-
-/** @param {number} n */
-function bookmarkButton(n) {
-  const on = isBookmarked(state.currentSurah?.n ?? 0, n);
-  const label = t(on ? "quranRemoveBookmark" : "quranAddBookmark");
-  return html`<button type="button" class="q-icon-btn ayah-bookmark${on ? " is-on" : ""}" data-action="bookmark" data-ayah="${n}" aria-pressed="${String(on)}" aria-label="${label}" data-tip="${label}"><i class="${on ? "fas" : "far"} fa-bookmark" aria-hidden="true"></i></button>`;
-}
-
-/** The running text of the surah (no translation). */
-function flowHtml() {
-  return html`<div class="surah-flow" lang="ar" dir="rtl">${state.currentAyahs.map(
-    (a) => {
-      const on = isBookmarked(state.currentSurah?.n ?? 0, a.number);
-      const label = `${t(on ? "quranRemoveBookmark" : "quranAddBookmark")}${sep()}${fmt(a.number)}`;
-      return html`<span class="ayah-text" id="ayah-${a.number}" data-ayah="${a.number}">${a.arabic}</span> <button type="button" class="ayah-end${on ? " is-on" : ""}" data-action="bookmark" data-ayah="${a.number}" aria-pressed="${String(on)}" aria-label="${label}" data-tip="${label}"><span class="ayah-end-ring" aria-hidden="true">۝</span><span class="ayah-end-num">${fmt(a.number)}</span></button> `;
-    },
-  )}</div>`;
-}
-
-/** One card per ayah: Arabic, then the translation. */
-function cardsHtml() {
-  const surah = state.currentSurah?.n ?? 0;
-  const lang = translationLang();
-  return html`${state.currentAyahs.map(
-    (
-      a,
-    ) => html`<article class="ayah-card" id="ayah-${a.number}" data-ayah="${a.number}">
-      <div class="ayah-card-head">
-        <span class="ayah-card-num">${fmt(surah)}:${fmt(a.number)}</span>
-        <span class="ayah-card-actions">
-          <button type="button" class="q-icon-btn" data-action="copy" data-ayah="${a.number}" aria-label="${t("quranCopyAyah")}" data-tip="${t("quranCopyAyah")}"><i class="far fa-copy" aria-hidden="true"></i></button>
-          ${bookmarkButton(a.number)}
-        </span>
-      </div>
-      <p class="ayah-card-ar" lang="ar" dir="rtl">${a.arabic}</p>
-      ${a.translation ? html`<p class="ayah-card-tr" lang="${lang}" dir="auto">${a.translation}</p>` : ""}
-    </article>`,
-  )}`;
 }
 
 function renderAyahs() {
@@ -231,19 +199,19 @@ function ayahCopyText(n) {
 function updateBookmarkIcons() {
   const surah = state.currentSurah?.n ?? 0;
   for (const el of byId("ayahList", HTMLElement).querySelectorAll(
-    "[data-action='bookmark']",
+    "[data-action='bookmark'], .ayah-end",
   )) {
     if (!(el instanceof HTMLButtonElement)) continue;
     const n = Number(el.dataset.ayah);
     const on = isBookmarked(surah, n);
-    const label = t(on ? "quranRemoveBookmark" : "quranAddBookmark");
     el.classList.toggle("is-on", on);
-    el.setAttribute("aria-pressed", String(on));
-    const full = el.classList.contains("ayah-end")
-      ? `${label}${sep()}${fmt(n)}`
-      : label;
-    el.setAttribute("aria-label", full);
-    el.setAttribute("data-tip", full);
+    const label = el.classList.contains("ayah-end")
+      ? ayahEndLabel(n, on)
+      : t(on ? "quranRemoveBookmark" : "quranAddBookmark");
+    if (!el.classList.contains("ayah-end"))
+      el.setAttribute("aria-pressed", String(on));
+    el.setAttribute("aria-label", label);
+    el.setAttribute("data-tip", label);
     const icon = el.querySelector("i");
     if (icon) icon.className = `${on ? "fas" : "far"} fa-bookmark`;
   }
