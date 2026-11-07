@@ -40,5 +40,22 @@
   "quranRiwayaHafs": "Hafs",
   "quranRiwayaQalun": "Qalun",
   "quranRiwayaWarsh": "Warsh",
-  "quranRiwayaTranslationNote": "Translations follow the Hafs numbering, so they show with Hafs only."
+  "quranRiwayaTranslationNote": "Translations follow the Hafs numbering, so they show with Hafs only.",
+  "quranListen": "Listen",
+  "quranListenOffline": "Listening needs an internet connection",
+  "quranPlayFromHere": "Play from this ayah",
+  "quranAyahActions": "Ayah {n}",
+  "quranBookmarked": "Bookmarked",
+  "quranPlay": "Play",
+  "quranPause": "Pause",
+  "quranPrevAyah": "Previous ayah",
+  "quranNextAyah": "Next ayah",
+  "quranStopListening": "Stop listening",
+  "quranPosition": "Position",
+  "quranChooseReciter": "Choose a reciter",
+  "quranNoReciters": "No reciters found",
+  "quranMujawwad": "Mujawwad",
+  "quranBackToAyah": "Back to the ayah",
+  "quranAudioError": "Couldn't play the recitation. Check your internet connection.",
+  "quranNoFollow": "This recitation plays without following the ayahs."
 }

@@ -93,11 +93,15 @@ function setupMiniPlayer() {
   nextBtn.addEventListener("click", () =>
     ipcRenderer.send("player-command", { type: "next" }),
   );
-  // back to what is playing: the radio page for a radio, else the playlist
+  // back to what is playing: the radio page for a radio, the Quran reader for a surah, else
+  // the playlist
+  const OWN_PAGES = new Set(["radio", "quran"]);
   let page = "playlist";
-  playlistBtn.addEventListener("click", () =>
-    ipcRenderer.invoke("navigate-to", page, 850, 600),
-  );
+  playlistBtn.addEventListener("click", () => {
+    // the Quran page opens its reader on the surah playing (only when asked from here)
+    if (page === "quran") sessionStorage.setItem("quranOpenPlaying", "1");
+    ipcRenderer.invoke("navigate-to", page, 850, 600);
+  });
 
   function trackKeyOf(track) {
     return track ? track.url || `${track.title}|${track.artist}` : null;
@@ -121,6 +125,7 @@ function setupMiniPlayer() {
     const dismissedTrackKey = sessionStorage.getItem(
       "miniPlayerDismissedTrackKey",
     );
+    // (a page showing its own player for it hides this one: body.has-own-player, CSS)
     const visible =
       Boolean(state.currentTrack) && lastTrackKey !== dismissedTrackKey;
     if (visible) {
@@ -129,7 +134,9 @@ function setupMiniPlayer() {
       hideMiniPlayer();
       return;
     }
-    page = state.currentTrack.page === "radio" ? "radio" : "playlist";
+    page = OWN_PAGES.has(state.currentTrack.page)
+      ? state.currentTrack.page
+      : "playlist";
     // a live radio has no previous / next
     prevBtn.hidden = nextBtn.hidden = Boolean(state.currentTrack.live);
     title.textContent = state.currentTrack.title;
