@@ -133,3 +133,21 @@
     font-size: 13px;
   }
 }
+
+/* The title bar's drag area again, after the page's content (components/title-bar-guard.js):
+   keeps it draggable when scrolled content slides under it. Invisible, lets clicks through. */
+.title-bar-guard {
+  position: fixed;
+  pointer-events: none;
+  -webkit-app-region: drag;
+}
+
+.title-bar-guard__hole {
+  position: absolute;
+  -webkit-app-region: no-drag;
+}
+
+/* a modal dialog may sit over the title bar: it stays clickable */
+:root:has(dialog:modal) .title-bar-guard {
+  display: none;
+}

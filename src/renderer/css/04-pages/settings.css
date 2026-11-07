@@ -983,24 +983,22 @@
     padding: 13px 16px;
   }
 
+  /* the app's own icon (multi-colour) on a neutral tile: the same in every theme */
   .about-app-icon {
     width: 40px;
     height: 40px;
     border-radius: 11px;
-    background: linear-gradient(
-      135deg,
-      var(--accent-color),
-      rgba(var(--accent-rgb), 0.6)
-    );
+    background: var(--surface-1);
+    border: 1px solid var(--border-medium);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 17px;
-    color: var(--text-bright);
     flex-shrink: 0;
-    box-shadow:
-      0 4px 12px rgba(var(--accent-rgb), 0.4),
-      0 0 0 1px var(--white-a08) inset;
+  }
+
+  .about-app-icon img {
+    width: 30px;
+    height: 30px;
   }
 
   .about-app-info {
