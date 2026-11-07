@@ -57,7 +57,7 @@
     "leaflet": "1.9.4",
     "prettier": "^3.9.10",
     "stylelint": "^17.16.0",
-    "stylelint-config-standard": "^40.0.0",
+    "stylelint-config-standard": "^41.0.0",
     "tom-select": "^2.4.3",
     "typescript": "7.0.2"
   },
