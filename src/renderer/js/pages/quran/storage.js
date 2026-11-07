@@ -14,6 +14,7 @@ const KEYS = {
   lastRead: "quranLastRead",
   bookmarks: "quranBookmarks",
   riwaya: "quranRiwaya",
+  reciters: "quranReciters",
 };
 
 const FONT_MIN = 18;
@@ -102,7 +103,24 @@ function loadRiwaya() {
 /** @param {import("./state").Riwaya} riwaya */
 const saveRiwaya = (riwaya) => write(KEYS.riwaya, riwaya);
 
+/** The recording chosen for a riwaya (its mp3quran "read" id), or null. @param {string} riwaya */
+function loadReciter(riwaya) {
+  const v = read(KEYS.reciters)?.[riwaya];
+  return Number.isInteger(v) ? v : null;
+}
+
+/** @param {string} riwaya @param {number} readId */
+function saveReciter(riwaya, readId) {
+  const all = read(KEYS.reciters);
+  write(KEYS.reciters, {
+    ...(all && typeof all === "object" ? all : {}),
+    [riwaya]: readId,
+  });
+}
+
 module.exports = {
+  loadReciter,
+  saveReciter,
   loadRiwaya,
   saveRiwaya,
   FONT_MIN,

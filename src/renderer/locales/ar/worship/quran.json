@@ -40,5 +40,22 @@
   "quranRiwayaHafs": "حفص",
   "quranRiwayaQalun": "قالون",
   "quranRiwayaWarsh": "ورش",
-  "quranRiwayaTranslationNote": "الترجمات مرقّمة على رواية حفص، لذلك تظهر مع حفص فقط."
+  "quranRiwayaTranslationNote": "الترجمات مرقّمة على رواية حفص، لذلك تظهر مع حفص فقط.",
+  "quranListen": "استماع",
+  "quranListenOffline": "الاستماع يحتاج إلى اتصال بالإنترنت",
+  "quranPlayFromHere": "تشغيل من هذه الآية",
+  "quranAyahActions": "الآية {n}",
+  "quranBookmarked": "محفوظة",
+  "quranPlay": "تشغيل",
+  "quranPause": "إيقاف مؤقت",
+  "quranPrevAyah": "الآية السابقة",
+  "quranNextAyah": "الآية التالية",
+  "quranStopListening": "إيقاف الاستماع",
+  "quranPosition": "الموضع",
+  "quranChooseReciter": "اختر القارئ",
+  "quranNoReciters": "لا يوجد قرّاء",
+  "quranMujawwad": "مجوّد",
+  "quranBackToAyah": "العودة إلى الآية",
+  "quranAudioError": "تعذّر تشغيل التلاوة. تحقّق من اتصالك بالإنترنت.",
+  "quranNoFollow": "تُشغَّل هذه التلاوة دون تتبّع الآيات."
 }

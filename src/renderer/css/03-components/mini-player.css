@@ -118,3 +118,8 @@
   display: inline-block;
   transform: scaleX(-1);
 }
+
+/* A page that shows its own player for what plays (the Quran reader's bar) hides this one */
+body.has-own-player .mini-player.visible {
+  display: none;
+}
