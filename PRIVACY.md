@@ -1,6 +1,6 @@
 # Privacy Policy – Salaty Time
 
-**Effective Date:** July 2, 2026  
+**Effective Date:** November 7, 2026  
 **Last Updated:** October 9, 2026  
 **App Version:** 1.1.3+
 
@@ -22,6 +22,7 @@ Salaty Time ("App", "we", "us", "our") is a lightweight Electron-based Islamic p
    - You manually enter your city and country in Settings to fetch accurate prayer times
    - These locations are stored **only on your device**
    - They are **never sent to us** — only to the [Aladhan API](https://aladhan.com) to calculate prayer times
+   - Once per city, the app sends the city name to [Open-Meteo](https://open-meteo.com) to find its coordinates, so prayer times can still be calculated on your device when Aladhan can't be reached
    - The Qibla page sends your city and country to [Photon](https://photon.komoot.io) (OpenStreetMap) to find its coordinates (if it can't, [ipapi.co](https://ipapi.co) guesses them from your IP address), and loads [OpenStreetMap](https://www.openstreetmap.org) map tiles
    - **Auto Detect Location** (only when you press it) asks [freeipapi.com](https://freeipapi.com) to guess your city from your IP address
    - All of these requests use encrypted HTTPS connections
@@ -88,13 +89,20 @@ The App communicates with external services **only when you interact with them:*
    - Data received: prayer times, Islamic month info
    - Aladhan's privacy: see [aladhan.com/privacy](https://aladhan.com)
 
-2. **[Leaflet.js](https://leafletjs.com/) & [OpenStreetMap](https://www.openstreetmap.org/)**
+2. **[Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api)**
+   - The coordinates of your city (location data from [GeoNames](https://www.geonames.org), CC BY 4.0)
+   - Triggered when: once per city, after Aladhan first answers for it
+   - Data sent: your city name
+   - Data received: the city's coordinates, kept only on your device
+   - Open-Meteo's terms: see [open-meteo.com/en/terms](https://open-meteo.com/en/terms)
+
+3. **[Leaflet.js](https://leafletjs.com/) & [OpenStreetMap](https://www.openstreetmap.org/)**
    - Qibla direction map (interactive)
    - Triggered when: you open the Qibla feature
    - Data sent: none (map tiles are cached)
    - Leaflet and OSM have their own privacy policies
 
-3. **[Google Analytics 4](https://policies.google.com/privacy)**
+4. **[Google Analytics 4](https://policies.google.com/privacy)**
    - Optional analytics (see Analytics section above)
    - Events sent only when online
    - Google's privacy policy applies to GA4 data
@@ -161,6 +169,7 @@ Data is shared only in these scenarios:
 
 1. **Third-Party Service Providers** (as listed above)
    - Aladhan API (prayer times)
+   - Open-Meteo (city coordinates)
    - Google Analytics (optional analytics)
    - GitHub (update checks)
    - OpenStreetMap (Qibla map)
