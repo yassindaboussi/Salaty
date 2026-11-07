@@ -117,7 +117,7 @@
 | --- | --- |
 | تطبيق سطح المكتب | Electron |
 | الواجهة | HTML / CSS / JavaScript (دون إطار عمل) |
-| مواقيت الصلاة | Aladhan API، مع حفظ محلي للعمل دون إنترنت |
+| مواقيت الصلاة | Aladhan API، مع حفظ محلي للعمل دون إنترنت، وتُحسب على الجهاز بمكتبة [PrayTimes](https://praytimes.org) عند تعذّر الوصول إلى Aladhan (إحداثيات المدن: [Open-Meteo](https://open-meteo.com)، بيانات GeoNames) |
 | بيانات القرآن | نص حفص وقالون وورش داخل التطبيق (دون إنترنت) وAlQuran Cloud API للترجمات |
 | الصوتيات | mp3quran.net API |
 | البناء والتوزيع | electron-builder وGitHub Actions |
