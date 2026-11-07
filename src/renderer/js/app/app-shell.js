@@ -14,6 +14,7 @@ const { queryAll } = require("../core/dom");
 const { initTooltipSystem } = require("../core/tooltips");
 const { setupMiniPlayer } = require("../components/mini-player");
 const { renderPageHeaders } = require("../components/page-header");
+const { guardTitleBars } = require("../components/title-bar-guard");
 const { initAdhanPlayer } = require("../components/adhan-player");
 const analytics = require("../services/analytics");
 
@@ -107,6 +108,7 @@ async function startPage({
     initAdhanPlayer();
 
     renderPageHeaders();
+    guardTitleBars();
     setupHeaderButtons();
     setupKeyboardActivation();
     if (screenSize) setupScreenSizeToggle(screenSize);
