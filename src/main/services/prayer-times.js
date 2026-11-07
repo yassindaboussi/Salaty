@@ -12,6 +12,8 @@
 // The days' Hijri dates follow the Settings correction (islamic-calendar.js, -2…+2 days).
 const aladhan = require("./aladhan");
 const islamicCalendar = require("./islamic-calendar");
+const offline = require("./offline-prayer-times");
+const prayerCalc = require("./prayer-calc");
 const { locationQuery } = require("../../shared/aladhan");
 
 /**
@@ -81,9 +83,15 @@ const monthKey = (settings, year, month) =>
  * @param {number} month 1-12
  * @returns {Promise<PrayerDay[] | null>} null when offline with nothing cached
  */
-function getMonth(settings, year, month) {
-  if (!settings?.city || !settings?.country) return Promise.resolve(null);
-  return timetable(monthKey(settings, year, month));
+async function getMonth(settings, year, month) {
+  if (!settings?.city || !settings?.country) return null;
+  const days = await timetable(monthKey(settings, year, month));
+  if (days) {
+    offline.remember(settings, days);
+    return days;
+  }
+  // Aladhan unreachable and nothing cached: the same times, calculated here
+  return offline.calculate(settings, year, month);
 }
 
 /**
@@ -97,18 +105,22 @@ async function getHijriMonth(settings, hijriYear, hijriMonth) {
   if (!settings?.city || !settings?.country) return null;
   const adjustment = islamicCalendar.adjustmentOf(settings);
   if (!adjustment) {
-    return timetable(
+    const month = await timetable(
       `/hijriCalendarByCity/${hijriYear}/${hijriMonth}?${locationQuery(settings)}`,
     );
+    if (month) return month;
   }
   // A corrected month starts on other Gregorian days than Aladhan's: take those days from
-  // the Gregorian months they fall in (one or two, usually cached already).
-  const days = await islamicCalendar.hijriMonthCalendar(
-    hijriMonth,
-    hijriYear,
-    adjustment,
-  );
-  if (!days) return null;
+  // the Gregorian months they fall in (one or two, usually cached already). Offline, the
+  // month's days come from the Umm al-Qura calendar.
+  const days =
+    (await islamicCalendar.hijriMonthCalendar(
+      hijriMonth,
+      hijriYear,
+      adjustment,
+    )) ??
+    (adjustment ? null : prayerCalc.hijriMonthDays(hijriYear, hijriMonth));
+  if (!days?.length) return null;
   /** @type {Map<string, PrayerDay[] | null>} */
   const months = new Map();
   /** @type {PrayerDay[]} */

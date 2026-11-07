@@ -165,7 +165,8 @@
   },
   "dependencies": {
     "electron-log": "5.4.4",
-    "electron-updater": "^6.8.11"
+    "electron-updater": "^6.8.11",
+    "praytime": "3.2.0"
   },
   "overrides": {
     "brace-expansion": "^5.0.12",
