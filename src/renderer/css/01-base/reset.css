@@ -46,3 +46,17 @@ body {
   user-select: none;
   transition: opacity 0.18s ease;
 }
+
+/* A <select>'s list is drawn by Windows on a white background, but its options inherit the
+   theme's light text: white on white. Every dropdown gets the theme's colours instead, and
+   its list a dark scrollbar with the app's soft white thumb (01-base/scrollbar.css). */
+select {
+  color-scheme: dark;
+  scrollbar-color: var(--white-a20, rgb(255 255 255 / 20%))
+    var(--bg-primary, #0b1220);
+}
+
+select option {
+  background: var(--bg-primary, #0b1220);
+  color: var(--text-primary, #fff);
+}

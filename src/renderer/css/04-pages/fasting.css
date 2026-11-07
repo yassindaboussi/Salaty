@@ -486,11 +486,6 @@
     opacity: 0.5;
   }
 
-  .vf-select option {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-  }
-
   .vf-done-btn:focus-visible,
   .vf-action-btn:focus-visible,
   .vf-source:focus-visible,
