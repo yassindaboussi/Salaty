@@ -66,7 +66,7 @@ const { bindSelectionBar } = require("./selection-bar");
 const { handleOpenRequest } = require("./open-request");
 const { bindTitleAlign } = require("./title-align");
 
-const TRANSLATION_IDS = new Set(["en.sahih", "en.asad", "fr.hamidullah"]);
+const { TRANSLATIONS } = require("../../services/api/alquran-cloud");
 
 // Re-draws everything that shows a number after the user switches digit style.
 function refreshNumbers() {
@@ -132,7 +132,7 @@ function onRiwayaChange() {
 
 function initQuranPage() {
   state.fontSize = loadFontSize();
-  state.translationId = loadTranslation(TRANSLATION_IDS);
+  state.translationId = loadTranslation(TRANSLATIONS);
   state.riwaya = loadRiwaya();
   state.numerals = resolveNumerals();
   state.filteredSurahs = [...SURAH_META];
@@ -181,13 +181,6 @@ function initQuranPage() {
       setNumerals(btn.dataset.numerals, refreshNumbers),
     );
   }
-  byId("prevSurahBtn", HTMLButtonElement).addEventListener("click", () => {
-    if (state.currentSurah) openSurah(state.currentSurah.n - 1);
-  });
-  byId("nextSurahBtn", HTMLButtonElement).addEventListener("click", () => {
-    if (state.currentSurah) openSurah(state.currentSurah.n + 1);
-  });
-
   // a bookmark changed: its icon in the reader, the tab's count and list
   onBookmarksChange(() => {
     renderBookmarkCount();

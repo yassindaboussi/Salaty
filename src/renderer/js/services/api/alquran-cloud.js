@@ -13,6 +13,8 @@ const ALQURAN_CLOUD_API = "https://api.alquran.cloud/v1";
 /** The translations offered (AlQuran Cloud edition ids). */
 const TRANSLATIONS = new Set(["en.sahih", "en.asad", "fr.hamidullah"]);
 const BUNDLED_TRANSLATION = "en.sahih";
+// a slow or dead network gives up after this, and the reader says the translation is offline
+const FETCH_TIMEOUT_MS = 15000;
 
 /**
  * @typedef {object} Ayah
@@ -100,6 +102,7 @@ async function onlineTranslation(surahNum, edition) {
   try {
     const res = await fetch(
       `${ALQURAN_CLOUD_API}/surah/${surahNum}/${edition}`,
+      { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) },
     );
     if (!res.ok) throw new Error(`alquran.cloud ${res.status}`);
     const json = await res.json();
@@ -162,4 +165,4 @@ function stripHtmlTags(str) {
     .trim();
 }
 
-module.exports = { fetchQuranSurah, ayahArabic };
+module.exports = { fetchQuranSurah, ayahArabic, TRANSLATIONS };

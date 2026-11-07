@@ -75,7 +75,11 @@ async function openSurah(surahNum, ayah) {
   state.currentSurah = meta;
 
   byId("viewSurahList", HTMLElement).hidden = true;
-  byId("viewSurahReader", HTMLElement).hidden = false;
+  const reader = byId("viewSurahReader", HTMLElement);
+  reader.hidden = false;
+  // the keys scroll the text (focus was left on the hidden list); the prev/next buttons keep it
+  if (!reader.contains(document.activeElement))
+    byId("readerContent", HTMLElement).focus({ preventScroll: true });
   // Hafs counts the Bismillah of Al-Fatiha as its first ayah; Qalun and Warsh do not, so there
   // it is written above the surah like for the others. At-Tawba has none.
   byId("bismillahHeader", HTMLElement).hidden =
@@ -246,13 +250,57 @@ function updateBookmarkIcons() {
 }
 
 function showSurahList() {
+  const n = state.currentSurah?.n;
   byId("viewSurahReader", HTMLElement).hidden = true;
-  byId("viewSurahList", HTMLElement).hidden = false;
+  const list = byId("viewSurahList", HTMLElement);
+  list.hidden = false;
   state.currentSurah = null;
+  // focus back on the row that was opened (else the tabs), not lost on the hidden reader
+  const row = [...list.querySelectorAll(`.surah-row[data-surah="${n}"]`)].find(
+    (el) => el instanceof HTMLElement && el.offsetParent,
+  );
+  const target = row ?? list.querySelector(".q-tab[aria-selected='true']");
+  if (!(target instanceof HTMLElement)) return;
+  target.focus({ preventScroll: true });
+  target.scrollIntoView({ block: "nearest" });
+}
+
+// ← / → are left alone where they already mean something: typing, a list, the tabs
+const OWNS_ARROWS =
+  "input, textarea, select, [contenteditable], [role='listbox'], [role='tablist'], [role='slider']";
+
+/** Next is on the left in a right-to-left page (the buttons follow the reading direction). */
+const nextKey = () => (document.dir === "rtl" ? "ArrowLeft" : "ArrowRight");
+const prevKey = () => (document.dir === "rtl" ? "ArrowRight" : "ArrowLeft");
+
+/** ← / → press the previous or next surah button. @param {KeyboardEvent} e */
+function onArrowKey(e) {
+  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+  if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.defaultPrevented)
+    return;
+  if (!state.currentSurah) return;
+  if (e.target instanceof Element && e.target.closest(OWNS_ARROWS)) return;
+  const side = e.key === nextKey() ? "next" : "prev";
+  const button = byId(`${side}SurahBtn`, HTMLButtonElement);
+  if (button.disabled) return;
+  e.preventDefault();
+  button.click();
 }
 
 function bindReader() {
   trackReading(byId("readerContent", HTMLElement));
+  const prev = byId("prevSurahBtn", HTMLButtonElement);
+  const next = byId("nextSurahBtn", HTMLButtonElement);
+  prev.addEventListener("click", () => {
+    if (state.currentSurah) openSurah(state.currentSurah.n - 1);
+  });
+  next.addEventListener("click", () => {
+    if (state.currentSurah) openSurah(state.currentSurah.n + 1);
+  });
+  // tells screen readers about the keys
+  prev.setAttribute("aria-keyshortcuts", prevKey());
+  next.setAttribute("aria-keyshortcuts", nextKey());
+  document.addEventListener("keydown", onArrowKey);
 }
 
 module.exports = {
