@@ -528,6 +528,11 @@
     scrollbar-color: var(--white-a20) transparent;
   }
 
+  /* focused on open so ↑ ↓, Page Up/Down and Space scroll the text; no ring around the page */
+  .reader-content:focus {
+    outline: none;
+  }
+
   .quran-loading {
     display: flex;
     align-items: center;
