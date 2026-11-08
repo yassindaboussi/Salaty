@@ -61,10 +61,14 @@ function createMainWindowOptions(settings = {}) {
   };
 }
 
+// The floating mini player (the background player's window when the main window is hidden)
+const PLAYER_WIDTH = 340;
+const PLAYER_HEIGHT = 124;
+
 function createBackgroundPlayerOptions() {
   return {
-    width: 300,
-    height: 120,
+    width: PLAYER_WIDTH,
+    height: PLAYER_HEIGHT,
     frame: false,
     transparent: true,
     show: false,
@@ -81,4 +85,6 @@ module.exports = {
   shouldOpenDevTools,
   createMainWindowOptions,
   createBackgroundPlayerOptions,
+  PLAYER_WIDTH,
+  PLAYER_HEIGHT,
 };

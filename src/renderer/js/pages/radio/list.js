@@ -45,14 +45,37 @@ function rowHtml(item) {
   </div>`;
 }
 
+/** The radios of the open tab as the list shows them: the search's matches, favourites first.
+ * @returns {{ favs: import("./state").RadioItem[], others: import("./state").RadioItem[] } | null}  null: still loading */
+function shownGroups() {
+  const items = view.tab === "stations" ? view.stations : view.reciters;
+  if (!items) return null;
+  const query = normalizeForSearch(view.query);
+  const found = query
+    ? items.filter((r) =>
+        normalizeForSearch(`${r.name} ${r.sub}`).includes(query),
+      )
+    : items;
+  return {
+    favs: found.filter((r) => view.favourites.has(r.key)),
+    others: found.filter((r) => !view.favourites.has(r.key)),
+  };
+}
+
+/** The radios in the list's order (what previous / next go through in the mini players). */
+function shownItems() {
+  const groups = shownGroups();
+  return groups ? [...groups.favs, ...groups.others] : [];
+}
+
 /** @param {string} text @param {boolean} [retry] */
 const messageHtml = (text, retry = false) =>
   html`<p class="rd-message">${text}${retry ? html` <button type="button" class="rd-retry" data-action="retry">${t("rdRetry")}</button>` : ""}</p>`;
 
 function renderList() {
   const list = byId("rdList", HTMLElement);
-  const items = view.tab === "stations" ? view.stations : view.reciters;
-  if (!items) {
+  const groups = shownGroups();
+  if (!groups) {
     setHtml(
       list,
       view.recitersFailed
@@ -61,18 +84,11 @@ function renderList() {
     );
     return;
   }
-  const query = normalizeForSearch(view.query);
-  const found = query
-    ? items.filter((r) =>
-        normalizeForSearch(`${r.name} ${r.sub}`).includes(query),
-      )
-    : items;
-  if (!found.length) {
+  const { favs, others } = groups;
+  if (!favs.length && !others.length) {
     setHtml(list, messageHtml(t("rdNoMatch")));
     return;
   }
-  const favs = found.filter((r) => view.favourites.has(r.key));
-  const others = found.filter((r) => !view.favourites.has(r.key));
   setHtml(
     list,
     html`${favs.length ? html`<h3 class="rd-group">${t("rdFavourites")}</h3>${favs.map(rowHtml)}` : ""}
@@ -95,4 +111,4 @@ function refreshList() {
   if (again instanceof HTMLElement) again.focus();
 }
 
-module.exports = { renderList, refreshList, artHtml };
+module.exports = { renderList, refreshList, artHtml, shownItems };

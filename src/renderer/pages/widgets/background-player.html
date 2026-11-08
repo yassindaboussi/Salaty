@@ -10,48 +10,103 @@
     <title>Salaty Player</title>
     <link rel="stylesheet" href="../../vendor/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="../../css/05-widgets/widget-base.css" />
+    <link rel="stylesheet" href="../../css/03-components/reciter-photo.css" />
     <link rel="stylesheet" href="../../css/05-widgets/background-player.css" />
   </head>
   <!-- background-player.js applies the saved theme on load -->
   <body>
-    <div class="track-info">
-      <div id="title" class="title">Salaty Player</div>
-      <div id="artist" class="artist" data-i18n="waitingForTrack">
-        Waiting for track...
+    <!-- The floating mini player. Only the head (artwork and names) drags the window: the
+         controls never do, so their clicks, hover and tooltips always work. -->
+    <div class="fp-head">
+      <span class="fp-art" id="fpArt" aria-hidden="true"
+        ><i class="fas fa-music"></i
+      ></span>
+      <div class="fp-info">
+        <div id="title" class="fp-title" dir="auto">Salaty Player</div>
+        <div
+          id="artist"
+          class="fp-artist"
+          dir="auto"
+          data-i18n="waitingForTrack"
+        >
+          Waiting for track...
+        </div>
+      </div>
+      <span class="fp-live" id="fpLive" data-i18n="live" hidden>Live</span>
+      <button
+        type="button"
+        id="closeBtn"
+        class="fp-btn fp-close"
+        data-tooltip="tooltipClose"
+      >
+        <i class="fas fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- how far the track is (not shown for a live radio) -->
+    <div class="fp-progress" id="fpProgress" aria-hidden="true">
+      <span class="fp-progress-fill" id="fpProgressFill"></span>
+    </div>
+
+    <div class="fp-controls">
+      <div class="fp-transport">
+        <button
+          type="button"
+          id="prevBtn"
+          class="fp-btn"
+          data-tooltip="tooltipPrev"
+        >
+          <i class="fas fa-backward-step" aria-hidden="true"></i>
+        </button>
+        <button
+          type="button"
+          id="playBtn"
+          class="fp-btn fp-play"
+          data-tooltip="tooltipPlayPause"
+        >
+          <i class="fas fa-play" aria-hidden="true"></i>
+        </button>
+        <button
+          type="button"
+          id="nextBtn"
+          class="fp-btn"
+          data-tooltip="tooltipNext"
+        >
+          <i class="fas fa-forward-step" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="fp-extras">
+        <!-- the app's one volume: the speaker mutes; hovering or focusing it shows the slider -->
+        <div class="fp-volume" id="volumeBox">
+          <input
+            type="range"
+            class="fp-volume-range"
+            id="volumeRange"
+            min="0"
+            max="100"
+            value="100"
+            data-i18n-aria-label="volume"
+            aria-label="Volume"
+          />
+          <button
+            type="button"
+            id="volumeBtn"
+            class="fp-btn"
+            data-tooltip="tooltipMute"
+          >
+            <i class="fas fa-volume-high" aria-hidden="true"></i>
+          </button>
+        </div>
+        <button
+          type="button"
+          id="miniPlaylistBtn"
+          class="fp-btn"
+          data-tooltip="tooltipPlaylist"
+        >
+          <i class="fas fa-list" aria-hidden="true"></i>
+        </button>
       </div>
     </div>
-    <div class="controls">
-      <button type="button" id="prevBtn" class="btn" data-tooltip="tooltipPrev">
-        <i class="fas fa-step-backward" aria-hidden="true"></i>
-      </button>
-      <button
-        type="button"
-        id="playBtn"
-        class="btn btn-play"
-        data-tooltip="tooltipPlayPause"
-      >
-        <i class="fas fa-play" aria-hidden="true"></i>
-      </button>
-      <button type="button" id="nextBtn" class="btn" data-tooltip="tooltipNext">
-        <i class="fas fa-step-forward" aria-hidden="true"></i>
-      </button>
-      <button
-        type="button"
-        id="miniPlaylistBtn"
-        class="mini-btn"
-        data-tooltip="tooltipPlaylist"
-      >
-        <i class="fas fa-list" aria-hidden="true"></i>
-      </button>
-    </div>
-    <button
-      type="button"
-      id="closeBtn"
-      class="btn btn-close"
-      data-tooltip="tooltipClose"
-    >
-      <i class="fas fa-times" aria-hidden="true"></i>
-    </button>
 
     <script src="../../vendor/howler/howler.min.js"></script>
     <script src="../../js-bundled/background-player.bundle.js"></script>

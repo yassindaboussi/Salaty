@@ -6,7 +6,11 @@ const { pages } = require("../config/paths");
 const {
   createBackgroundPlayerOptions,
   shouldOpenDevTools,
+  visiblePosition,
+  PLAYER_WIDTH,
+  PLAYER_HEIGHT,
 } = require("../config/window-options");
+const settings = require("./settings-store");
 const log = require("./logger").logger("Player");
 
 /** @type {BrowserWindow | null} */
@@ -51,6 +55,12 @@ function createPlayerWindow() {
     queued.forEach((cmd) => win.webContents.send("player-command", cmd));
   });
 
+  // moved by the user: it opens there next time
+  win.on("moved", () => {
+    const [x, y] = win.getPosition();
+    settings.savePlayerPosition(x, y);
+  });
+
   win.on("closed", () => {
     playerWindow = null;
     isPlayerReady = false;
@@ -72,14 +82,14 @@ function showMiniPlayer() {
   const win = playerWindow;
   if (!win) return;
   try {
+    // where the user left it, if still on a connected screen; else the bottom-right corner
+    const saved = visiblePosition(settings.get().playerPosition, PLAYER_WIDTH);
     const { x, y, width, height } = screen.getPrimaryDisplay().workArea;
-    const w = 300,
-      h = 100;
     win.setBounds({
-      x: x + width - w - 20,
-      y: y + height - h - 20,
-      width: w,
-      height: h,
+      x: saved.x ?? x + width - PLAYER_WIDTH - 20,
+      y: saved.y ?? y + height - PLAYER_HEIGHT - 20,
+      width: PLAYER_WIDTH,
+      height: PLAYER_HEIGHT,
     });
     win.setAlwaysOnTop(true, "screen-saver");
     win.show();

@@ -1,6 +1,6 @@
 "use strict";
 
-// The mini player while a Quran surah plays (a track from the Quran reader): previous / next
+// The mini players (the one in the pages and the floating window) while a Quran surah plays (a track from the Quran reader): previous / next
 // move by ayah (from the ayah timings, like the reader's bar; off at the first and last ayah),
 // the list button becomes "Open in the reader" (a book), and the riwaya follows the reciter's
 // name when it is not Hafs. Other tracks keep the mini player as it is.
@@ -120,7 +120,39 @@ function quranMiniPlayer(ui) {
     return true;
   }
 
-  return { apply, onTime, step };
+  return { apply, onTime, step, isOn: () => on };
 }
 
-module.exports = { quranMiniPlayer };
+/**
+ * A mini player's buttons: previous / next by ayah for a surah, else `other`'s; the list button
+ * opens the Quran reader for a surah, else does `other.open`.
+ * @param {{ prev: HTMLButtonElement, next: HTMLButtonElement, open: HTMLButtonElement, artist: HTMLElement }} ui
+ * @param {{ prev: () => void, next: () => void, open: () => void }} other
+ */
+function bindQuranMiniPlayer(ui, other) {
+  const quran = quranMiniPlayer(ui);
+  ui.prev.addEventListener("click", () => quran.step(-1) || other.prev());
+  ui.next.addEventListener("click", () => quran.step(1) || other.next());
+  ui.open.addEventListener("click", () => {
+    if (quran.isOn()) openQuranReader();
+    other.open();
+  });
+  return quran;
+}
+
+/**
+ * Asks the Quran page to open its reader on the surah playing, then opens it in the main
+ * window. The page reads the request once: in this window's sessionStorage, or (from the
+ * floating window, another window) a fresh time in localStorage.
+ */
+function openQuranReader() {
+  try {
+    sessionStorage.setItem("quranOpenPlaying", "1");
+    localStorage.setItem("quranOpenPlayingAt", String(Date.now()));
+  } catch {
+    // storage unavailable: the page opens on its surah list
+  }
+  ipcRenderer.invoke("navigate-to", "quran", 850, 600);
+}
+
+module.exports = { bindQuranMiniPlayer };

@@ -1,119 +1,323 @@
-:root {
-  --bg-navy: rgba(26, 35, 126, 0.95);
-  --glass-white: rgba(255, 255, 255, 0.1);
-  --glass-hover: rgba(255, 255, 255, 0.2);
-  --accent-blue: #4a90e2;
-  --text-dim: rgba(255, 255, 255, 0.7);
-  --transition: all 0.2s ease;
-}
+/*
+  The floating mini player (windows/background-player.js, components/floating-player.js): a
+  small always-on-top card shown while the main window is hidden.
 
+  Head: the artwork (reciter photo, radio logo or an icon), what plays, close. Only the head
+  drags the window (-webkit-app-region): the controls never do, so their clicks, hover and
+  tooltips always work. Then a thin progress line (none for a live radio), then the controls:
+  previous / play / next on the left, the volume (slider on hover / focus) and the list button
+  on the right. Square buttons like the app's; the play button is drawn in white, not an accent.
+*/
 body {
   margin: 0;
-  padding: 10px 15px;
-  background: var(--bg-primary, var(--bg-navy));
-  color: white;
+  height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 14px;
+  background: var(--bg-primary, #0a1128);
+  color: var(--text-primary, #fff);
   font-family:
     system-ui,
     -apple-system,
+    "Segoe UI",
     sans-serif;
-  height: 100vh;
-  overflow: hidden;
-  box-sizing: border-box;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  -webkit-app-region: drag;
   user-select: none;
 }
 
-/* Text group */
-.track-info {
+/* ── Head: the drag area ───────────────────────────────────────────── */
+
+.fp-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px 6px 10px;
+  -webkit-app-region: drag;
+}
+
+.fp-art {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+}
+
+.fp-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* the reciter's photo fills the square */
+.fp-art .reciter-photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.fp-info {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
+  gap: 2px;
 }
 
-.title,
-.artist {
-  white-space: nowrap;
+.fp-title,
+.fp-artist {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.title {
+.fp-title {
   font-size: 14px;
   font-weight: 600;
-  margin-bottom: 2px;
 }
 
-.artist {
-  font-size: 11px;
-  color: var(--text-dim);
+.fp-artist {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11.5px;
 }
 
-/* Controls */
-.controls {
-  display: flex;
-  gap: 12px;
+.fp-live {
+  flex-shrink: 0;
+  display: inline-flex;
   align-items: center;
-  -webkit-app-region: no-drag;
+  gap: 5px;
+  padding: 2px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-/* Shared base for all buttons */
-.btn,
-.mini-btn {
-  background: var(--glass-white);
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* on air: a white dot that pulses gently (white, not red: it suits every theme, and the
+   word "Live" carries the meaning) */
+.fp-live::before {
+  content: "";
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  transition: var(--transition);
+  background: var(--text-primary, #fff);
+  animation: fp-on-air 1.6s ease-in-out infinite;
+}
+
+@keyframes fp-on-air {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.fp-live[hidden] {
+  display: none;
+}
+
+/* ── Buttons (never drag) ──────────────────────────────────────────── */
+
+.fp-btn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary, #fff);
+  font-size: 12px;
+  cursor: pointer;
   -webkit-app-region: no-drag;
 }
 
-.btn:hover,
-.mini-btn:hover {
-  background: var(--glass-hover);
+.fp-btn[hidden] {
+  display: none;
 }
 
-/* Variants */
-.btn-play {
-  background: var(--accent-color, var(--accent-blue));
+.fp-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.fp-btn:focus-visible {
+  outline: 2px solid var(--text-primary, #fff);
+  outline-offset: 1px;
+}
+
+.fp-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* play / pause: the main action, in white (accents clash with some themes) */
+.fp-play {
   width: 36px;
-  height: 36px;
-  font-size: 16px;
-  box-shadow: 0 4px 10px rgba(74, 144, 226, 0.4);
+  height: 34px;
+  border-color: transparent;
+  background: var(--text-primary, #fff);
+  color: var(--bg-primary, #0a1128);
+  font-size: 13px;
 }
 
-.btn-play:hover {
-  background: var(--accent-color, #5b9eed);
-  opacity: 0.85;
-  transform: scale(1.05);
+.fp-play:hover:not(:disabled) {
+  background: var(--text-primary, #fff);
+  opacity: 0.88;
 }
 
-.btn-close {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  font-size: 10px;
-  width: 18px;
-  height: 18px;
-  color: rgba(255, 255, 255, 0.5);
+.fp-close {
+  align-self: flex-start;
+  width: 24px;
+  height: 24px;
+  border-color: transparent;
   background: transparent;
-  z-index: 10;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
 }
 
-.btn-close:hover {
-  color: white;
-  background: rgba(255, 60, 60, 0.8);
+.fp-close:hover:not(:disabled) {
+  background: rgba(255, 82, 82, 0.85);
+  color: #fff;
+}
+
+/* ── Progress ──────────────────────────────────────────────────────── */
+
+.fp-progress {
+  height: 3px;
+  margin: 2px 12px 0;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.fp-progress[hidden] {
+  visibility: hidden;
+}
+
+.fp-progress-fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--text-primary, #fff);
+  transition: width 1s linear;
+}
+
+/* ── Controls ──────────────────────────────────────────────────────── */
+
+.fp-controls {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 10px 2px;
+  direction: ltr; /* media controls keep their direction in Arabic */
+}
+
+.fp-transport,
+.fp-extras {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* the volume: the speaker, and a slider sliding out to its left on hover / focus */
+.fp-volume {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fp-volume-range {
+  --fill: 100%;
+
+  width: 0;
+  height: 14px;
+  margin: 0;
+  opacity: 0;
+  visibility: hidden;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    width 0.18s ease,
+    opacity 0.18s ease,
+    visibility 0.18s;
+}
+
+.fp-volume-range::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--text-primary, #fff) var(--fill),
+    rgba(255, 255, 255, 0.2) var(--fill)
+  );
+}
+
+.fp-volume-range::-webkit-slider-thumb {
+  width: 10px;
+  height: 10px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: var(--text-primary, #fff);
+  appearance: none;
+}
+
+.fp-volume-range:focus-visible {
+  outline: 1px solid var(--text-primary, #fff);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.fp-volume:hover .fp-volume-range,
+.fp-volume:focus-within .fp-volume-range {
+  width: 96px;
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fp-volume-range,
+  .fp-progress-fill {
+    transition: none;
+  }
+
+  .fp-live::before {
+    animation: none;
+  }
+}
+
+/* Windows contrast themes: system colours, outlines instead of fills */
+@media (forced-colors: active) {
+  .fp-btn,
+  .fp-art {
+    border: 1px solid ButtonText;
+  }
+
+  .fp-play {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .fp-progress-fill,
+  .fp-live::before {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
 }
