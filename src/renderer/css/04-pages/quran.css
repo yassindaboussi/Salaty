@@ -619,7 +619,7 @@
     border-radius: 6px;
   }
 
-  /* the ayah's number: a button that bookmarks it */
+  /* the ayah's number: a button that opens the ayah's menu */
   .ayah-end {
     display: inline-grid;
     place-items: center;
@@ -637,18 +637,9 @@
     cursor: pointer;
   }
 
-  /* the Mushaf's end-of-ayah ornament, the number drawn in its middle */
-  .ayah-end-ring,
-  .ayah-end-num {
-    grid-area: 1 / 1;
-  }
-
-  .ayah-end-num {
-    font-family: system-ui, "Segoe UI", sans-serif;
-    font-size: 0.42em;
-    font-weight: 700;
+  /* the number in the Quran font: the font draws it as the riwaya's framed ayah mark */
+  .ayah-end-mark {
     line-height: 1;
-    font-variant-numeric: tabular-nums;
   }
 
   .ayah-end:hover {

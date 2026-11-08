@@ -1,10 +1,15 @@
 "use strict";
 
 // The reader's text, as markup: without a translation the ayahs run on like a Mushaf page, each
-// ending with its number ﴿n﴾ (a button: it opens the ayah's menu); with a translation each ayah
+// ending with its number (a button: it opens the ayah's menu). The number is written in
+// Arabic-Indic digits in the riwaya's Quran font, which draws them as the riwaya's own ayah mark
+// (round for Hafs, a star for Qalun, a pendant for Warsh) sized for one to three digits, as in a
+// printed Mushaf; with Western digits the font would leave them bare, so the mark keeps
+// Arabic-Indic digits whatever the digits setting (its spoken name follows the setting); with a translation each ayah
 // is a card (its number, play, copy and bookmark icons, the Arabic, the translation under it).
 const { t } = require("../../core/i18n");
 const { html } = require("../../utils/html");
+const { formatNumerals } = require("../../utils/numerals");
 const { state, fmt, sep } = require("./state");
 const { isBookmarked } = require("./bookmarks");
 
@@ -34,7 +39,7 @@ function flowHtml() {
     (a) => {
       const on = isBookmarked(state.currentSurah?.n ?? 0, a.number);
       const label = ayahEndLabel(a.number, on);
-      return html`<span class="ayah-text" id="ayah-${a.number}" data-ayah="${a.number}">${a.arabic}</span> <button type="button" class="ayah-end${on ? " is-on" : ""}" data-action="menu" data-ayah="${a.number}" aria-haspopup="menu" aria-expanded="false" aria-label="${label}" data-tip="${label}"><span class="ayah-end-ring" aria-hidden="true">۝</span><span class="ayah-end-num">${fmt(a.number)}</span></button> `;
+      return html`<span class="ayah-text" id="ayah-${a.number}" data-ayah="${a.number}">${a.arabic}</span> <button type="button" class="ayah-end${on ? " is-on" : ""}" data-action="menu" data-ayah="${a.number}" aria-haspopup="menu" aria-expanded="false" aria-label="${label}" data-tip="${label}"><span class="ayah-end-mark" aria-hidden="true">${formatNumerals(a.number, "arabic")}</span></button> `;
     },
   )}</div>`;
 }
