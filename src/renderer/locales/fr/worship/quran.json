@@ -57,5 +57,6 @@
   "quranMujawwad": "Mujawwad",
   "quranBackToAyah": "Revenir au verset",
   "quranAudioError": "Impossible de lire la récitation. Vérifiez votre connexion Internet.",
-  "quranNoFollow": "Cette récitation est lue sans suivre les versets."
+  "quranNoFollow": "Cette récitation est lue sans suivre les versets.",
+  "quranOpenInReader": "Ouvrir dans le lecteur du Coran"
 }

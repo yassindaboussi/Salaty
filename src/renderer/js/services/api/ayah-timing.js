@@ -107,8 +107,32 @@ async function getAyahTimings(read, surah) {
   return times;
 }
 
+/** The ayah recited at a time (0 during the opening before ayah 1).
+ * @param {AyahTime[]} timings @param {number} t  seconds */
+function ayahAt(timings, t) {
+  let found = 0;
+  for (const a of timings) {
+    if (a.start > t) break;
+    found = a.ayah;
+  }
+  return found;
+}
+
+/** Where the ayah before or after the one recited at a time starts, or null (none there).
+ * @param {AyahTime[]} timings @param {number} t @param {-1 | 1} step */
+function ayahStep(timings, t, step) {
+  const target = Math.max(1, ayahAt(timings, t) + step);
+  return timings.find((a) => a.ayah === target)?.start ?? null;
+}
+
 /** The surah's file in a recording. @param {TimedReciter} reciter @param {number} surah */
 const surahUrl = (reciter, surah) =>
   `${reciter.server}${String(surah).padStart(3, "0")}.mp3`;
 
-module.exports = { getTimedReciters, getAyahTimings, surahUrl };
+module.exports = {
+  getTimedReciters,
+  getAyahTimings,
+  surahUrl,
+  ayahAt,
+  ayahStep,
+};

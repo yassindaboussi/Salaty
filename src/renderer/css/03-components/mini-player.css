@@ -85,7 +85,13 @@
   transition: background 0.2s;
 }
 
-.mini-btn:hover {
+/* previous / next ayah at the first or last ayah of a surah */
+.mini-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.mini-btn:hover:not(:disabled) {
   background: var(--surface-3);
 }
 

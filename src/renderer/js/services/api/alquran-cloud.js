@@ -157,6 +157,13 @@ async function ayahArabic(surahNum, ayahNum, riwaya = "hafs") {
   }
 }
 
+/** The Arabic of every ayah of a surah in a riwaya (numbered from 1).
+ * @param {number} surahNum @param {string} [riwaya] @returns {Promise<string[]>} */
+async function surahArabic(surahNum, riwaya = "hafs") {
+  const { verses } = await versesOf(surahNum, riwaya);
+  return verses.map((v) => v.ar);
+}
+
 /** @param {string} str */
 function stripHtmlTags(str) {
   return str
@@ -165,4 +172,4 @@ function stripHtmlTags(str) {
     .trim();
 }
 
-module.exports = { fetchQuranSurah, ayahArabic, TRANSLATIONS };
+module.exports = { fetchQuranSurah, ayahArabic, surahArabic, TRANSLATIONS };
