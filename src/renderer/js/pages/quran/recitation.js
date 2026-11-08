@@ -11,7 +11,10 @@ const {
   getTimedReciters,
   getAyahTimings,
   surahUrl,
+  ayahAt: ayahAtIn,
+  ayahStep,
 } = require("../../services/api/ayah-timing");
+const { mapAyah } = require("../../services/quran-ayah-map");
 const { state, surahMeta, surahName } = require("./state");
 const { loadReciter, saveReciter } = require("./storage");
 
@@ -63,14 +66,7 @@ function currentTime() {
 }
 
 /** The ayah recited at a time (0 for the opening before ayah 1). @param {number} t */
-function ayahAt(t) {
-  let found = 0;
-  for (const a of rec.timings) {
-    if (a.start > t) break;
-    found = a.ayah;
-  }
-  return found;
-}
+const ayahAt = (/** @type {number} */ t) => ayahAtIn(rec.timings, t);
 
 /** @param {number} ayah @returns {AyahTime | undefined} */
 const timingOf = (ayah) => rec.timings.find((a) => a.ayah === ayah);
@@ -129,12 +125,14 @@ function trackOf(reciter, surah) {
 
 /**
  * Plays a surah of the reader (the open one by default) from an ayah.
- * @param {{ surah?: number, ayah?: number, reciter?: TimedReciter | null }} [options]
+ * autoplay false: it is loaded paused there, and starts there on "play".
+ * @param {{ surah?: number, ayah?: number, reciter?: TimedReciter | null, autoplay?: boolean }} [options]
  */
 async function listen({
   surah = state.currentSurah?.n,
   ayah = 1,
   reciter,
+  autoplay = true,
 } = {}) {
   if (!surah) return;
   const chosen = reciter ?? (await chosenReciter());
@@ -144,9 +142,9 @@ async function listen({
   if (!sameTrack) {
     // the surah alone: it stops at its end (the next surah is the user's choice)
     const track = trackOf(chosen, surah);
-    send("set-playlist", { tracks: [track], startIndex: 0 });
+    send("set-playlist", { tracks: [track], startIndex: 0, autoplay });
     rec.track = track;
-    rec.loading = true;
+    rec.loading = autoplay;
     rec.time = 0;
     rec.playing = false;
   }
@@ -161,11 +159,10 @@ async function listen({
       rec.stamp = performance.now();
     }
   }
-  if (sameTrack && !rec.playing) send("resume");
+  if (sameTrack && !rec.playing && autoplay) send("resume");
   changed();
 }
 
-/** @param {number} seconds */
 /** Until when a reported time far from the one jumped to is a late report (taken before the
  * jump) and is not shown. performance.now() ms. */
 let seekGuardUntil = 0;
@@ -186,9 +183,8 @@ const believable = (reported) =>
 
 /** The ayah before or after the one recited. @param {-1 | 1} step */
 function stepAyah(step) {
-  const now = ayahAt(currentTime());
-  const target = timingOf(Math.max(1, now + step));
-  if (target) seek(target.start);
+  const start = ayahStep(rec.timings, currentTime(), step);
+  if (start !== null) seek(start);
 }
 
 const togglePlay = () => send(rec.playing ? "pause" : "resume");
@@ -206,7 +202,38 @@ async function chooseReciter(reciter) {
   const track = rec.track;
   if (!track || track.riwaya !== reciter.riwaya) return changed();
   const ayah = ayahAt(currentTime()) || 1;
-  await listen({ surah: track.surah, ayah, reciter });
+  await listen({
+    surah: track.surah,
+    ayah,
+    reciter,
+    autoplay: rec.playing || rec.loading,
+  });
+}
+
+/**
+ * The riwaya read changed: the surah playing goes on in it, with its reciter, from the same
+ * words (the ayah numbers differ between the counts, services/quran-ayah-map.js), playing or
+ * paused as it was. Text and recitation stay in one riwaya, so the ayah stays marked.
+ * @param {Riwaya} to
+ */
+async function followRiwaya(to) {
+  const track = rec.track;
+  if (!track || track.riwaya === to) return;
+  const playing = rec.playing || rec.loading;
+  const ayah = Math.max(1, ayahAt(currentTime()));
+  const [mapped, reciter] = await Promise.all([
+    mapAyah(track.surah, ayah, track.riwaya, to),
+    chosenReciter(to),
+  ]);
+  // stopped or another surah meanwhile (each state report brings a new copy of the same track)
+  const now = rec.track;
+  if (!reciter || now?.read !== track.read || now.surah !== track.surah) return;
+  await listen({
+    surah: track.surah,
+    ayah: mapped,
+    reciter,
+    autoplay: playing,
+  });
 }
 
 /** @param {any} t @returns {t is QuranTrack} */
@@ -291,6 +318,7 @@ module.exports = {
   togglePlay,
   stop,
   chooseReciter,
+  followRiwaya,
   onRecitationChange,
   bindRecitation,
 };

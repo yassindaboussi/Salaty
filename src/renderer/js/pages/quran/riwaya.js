@@ -41,12 +41,13 @@ function setRiwaya(riwaya, { save = true } = {}) {
   return true;
 }
 
-/** @param {() => void} onChange  re-draws what depends on the riwaya */
+/** @param {(from: Riwaya) => void} onChange  re-draws what depends on the riwaya (from: the one before) */
 function bindRiwaya(onChange) {
   for (const btn of queryAll(".riwaya-btn", HTMLButtonElement)) {
     btn.addEventListener("click", () => {
+      const from = state.riwaya;
       if (isRiwaya(btn.dataset.riwaya) && setRiwaya(btn.dataset.riwaya))
-        onChange();
+        onChange(from);
     });
   }
 }

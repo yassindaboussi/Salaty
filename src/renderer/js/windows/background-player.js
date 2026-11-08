@@ -69,17 +69,18 @@ class BackgroundPlayer {
           this.sendState();
           break;
         case "set-playlist":
-          this.setPlaylist(arg.tracks, arg.startIndex);
+          this.setPlaylist(arg.tracks, arg.startIndex, arg.autoplay !== false);
           break;
       }
     };
     ipcRenderer.on("player-command", playerCommandListener);
   }
 
-  setPlaylist(tracks, startIndex = 0) {
+  // autoplay false: the track is loaded paused (the Quran reader switching riwaya while paused)
+  setPlaylist(tracks, startIndex = 0, autoplay = true) {
     this.tracks = tracks;
     this.retried = false;
-    this.playTrack(startIndex);
+    this.playTrack(startIndex, autoplay);
   }
 
   initUI() {
@@ -164,7 +165,7 @@ class BackgroundPlayer {
     this.sendState();
   }
 
-  playTrack(index) {
+  playTrack(index, autoplay = true) {
     if (index < 0 || index >= this.tracks.length) return;
 
     const track = this.tracks[index];
@@ -194,9 +195,9 @@ class BackgroundPlayer {
 
     this.currentTrackIndex = index;
     this.currentTrackUrl = track.url;
-    this.isPlaying = true;
+    this.isPlaying = autoplay;
     this.failed = false;
-    this.loading = true;
+    this.loading = autoplay;
 
     this.sendState();
 
@@ -248,7 +249,8 @@ class BackgroundPlayer {
       },
     });
 
-    this.sound.play();
+    if (autoplay) this.sound.play();
+    else this.sendState();
   }
 
   togglePlay(shouldPlay) {
@@ -287,7 +289,11 @@ class BackgroundPlayer {
     if (this.currentTrackIndex < this.tracks.length - 1) {
       this.playTrack(this.currentTrackIndex + 1);
     } else {
+      // the end of the list (or "next" on its last track): the sound stops too, not only
+      // the play button
+      if (this.sound?.playing()) this.sound.pause();
       this.isPlaying = false;
+      this.stopStepLoop();
       this.sendState();
     }
   }

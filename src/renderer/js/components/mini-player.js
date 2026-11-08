@@ -2,6 +2,7 @@
 const { ipcRenderer } = require("electron");
 const { hideTooltip } = require("../core/tooltips");
 const { html, setHtml } = require("../utils/html");
+const { quranMiniPlayer } = require("./mini-player-quran");
 
 function setupMiniPlayer() {
   const wrap = document.createElement("div");
@@ -60,6 +61,13 @@ function setupMiniPlayer() {
   controls.append(prevBtn, playBtn, nextBtn, playlistBtn, closeBtn);
 
   wrap.append(info, controls);
+  // a Quran surah: ⏮ ⏭ by ayah, "Open in the reader", the riwaya (mini-player-quran.js)
+  const quran = quranMiniPlayer({
+    prev: prevBtn,
+    next: nextBtn,
+    open: playlistBtn,
+    artist,
+  });
   (document.getElementById("app") ?? document.body).appendChild(wrap);
 
   function showMiniPlayer() {
@@ -87,12 +95,12 @@ function setupMiniPlayer() {
       ipcRenderer.send("player-command", { type: "pause" });
     }
   });
-  prevBtn.addEventListener("click", () =>
-    ipcRenderer.send("player-command", { type: "prev" }),
-  );
-  nextBtn.addEventListener("click", () =>
-    ipcRenderer.send("player-command", { type: "next" }),
-  );
+  prevBtn.addEventListener("click", () => {
+    if (!quran.step(-1)) ipcRenderer.send("player-command", { type: "prev" });
+  });
+  nextBtn.addEventListener("click", () => {
+    if (!quran.step(1)) ipcRenderer.send("player-command", { type: "next" });
+  });
   // back to what is playing: the radio page for a radio, the Quran reader for a surah, else
   // the playlist
   const OWN_PAGES = new Set(["radio", "quran"]);
@@ -119,7 +127,8 @@ function setupMiniPlayer() {
     hideMiniPlayer();
   });
 
-  ipcRenderer.on("player-update", (_e, { type, state }) => {
+  ipcRenderer.on("player-update", (_e, { type, state, currentTime }) => {
+    if (type === "time-update") quran.onTime(currentTime || 0);
     if (type !== "state") return;
     lastTrackKey = trackKeyOf(state.currentTrack);
     const dismissedTrackKey = sessionStorage.getItem(
@@ -141,6 +150,7 @@ function setupMiniPlayer() {
     prevBtn.hidden = nextBtn.hidden = Boolean(state.currentTrack.live);
     title.textContent = state.currentTrack.title;
     artist.textContent = state.currentTrack.artist;
+    quran.apply(state); // after the title and artist: it adds the riwaya
     const icon = playBtn.querySelector("i");
     if (icon) icon.className = `fas fa-${state.isPlaying ? "pause" : "play"}`;
   });

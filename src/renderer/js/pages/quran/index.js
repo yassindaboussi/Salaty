@@ -69,7 +69,8 @@ const { bindPanelFold } = require("./panel-fold");
 const { bindSelectionBar } = require("./selection-bar");
 const { handleOpenRequest } = require("./open-request");
 const { bindTitleAlign } = require("./title-align");
-const { bindRecitation } = require("./recitation");
+const { bindRecitation, followRiwaya } = require("./recitation");
+const { mapAyah } = require("../../services/quran-ayah-map");
 const { bindFollow } = require("./recitation-follow");
 const { bindRecitationBar, listenFrom } = require("./recitation-bar");
 const { bindReciterDialog } = require("./reciter-dialog");
@@ -139,14 +140,24 @@ function updateFullscreenButtons() {
   });
 }
 
-/** Another riwaya was chosen: its ayah counts and juz, and the open surah in its text, near the
- * ayah that was at the top (the numbers differ a little between the riwayat). */
-function onRiwayaChange() {
+/** Another riwaya was chosen: its ayah counts and juz; the surah playing goes on in it (its
+ * reciter, the same words); the open surah in its text at the same words as before (the ayah at
+ * the top, numbered as the riwaya before counts it). */
+async function onRiwayaChange() {
   renderLists();
+  followRiwaya(state.riwaya).catch((err) => {
+    console.error("Following the riwaya failed:", err);
+    showToast(t("quranAudioError"), "error");
+  });
   const meta = state.currentSurah && surahMeta(state.currentSurah.n);
   if (!meta) return;
   const at = loadLastRead();
-  const ayah = at?.surah === meta.n ? Math.min(at.ayah, surahCount(meta)) : 1;
+  const ayah =
+    at?.surah === meta.n
+      ? await mapAyah(meta.n, at.ayah, at.riwaya, state.riwaya).catch(() =>
+          Math.min(at.ayah, surahCount(meta)),
+        )
+      : 1;
   openSurah(meta.n, ayah);
 }
 
@@ -175,7 +186,10 @@ function initQuranPage() {
    * @param {number} surah @param {number} [ayah] @param {import("./state").Riwaya} [riwaya]
    */
   const openAt = (surah, ayah, riwaya) => {
-    if (riwaya && setRiwaya(riwaya)) renderLists();
+    if (riwaya && setRiwaya(riwaya)) {
+      renderLists();
+      followRiwaya(riwaya).catch(() => {});
+    }
     return openSurah(surah, ayah);
   };
   bindSurahList(openAt);

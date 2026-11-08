@@ -171,7 +171,8 @@ function bindRecitationBar() {
     render();
   });
   byId("qPlayerReciter", HTMLButtonElement).addEventListener("click", () =>
-    openReciterDialog(rec.track?.riwaya ?? state.riwaya),
+    // the reciters of the riwaya being read (the audio follows it)
+    openReciterDialog(state.riwaya),
   );
 
   const slider = byId("qPlayerSeek", HTMLInputElement);

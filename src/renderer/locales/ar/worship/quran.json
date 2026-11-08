@@ -57,5 +57,6 @@
   "quranMujawwad": "مجوّد",
   "quranBackToAyah": "العودة إلى الآية",
   "quranAudioError": "تعذّر تشغيل التلاوة. تحقّق من اتصالك بالإنترنت.",
-  "quranNoFollow": "تُشغَّل هذه التلاوة دون تتبّع الآيات."
+  "quranNoFollow": "تُشغَّل هذه التلاوة دون تتبّع الآيات.",
+  "quranOpenInReader": "فتح في المصحف"
 }

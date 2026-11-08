@@ -57,5 +57,6 @@
   "quranMujawwad": "Mujawwad",
   "quranBackToAyah": "Back to the ayah",
   "quranAudioError": "Couldn't play the recitation. Check your internet connection.",
-  "quranNoFollow": "This recitation plays without following the ayahs."
+  "quranNoFollow": "This recitation plays without following the ayahs.",
+  "quranOpenInReader": "Open in the Quran reader"
 }

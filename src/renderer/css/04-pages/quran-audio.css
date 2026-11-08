@@ -293,6 +293,8 @@
   /* ── The reciter list (dialog) ─────────────────────────────────────── */
 
   .q-dialog {
+    /* the column layout stays while it fades out after closing (only "display" waits) */
+    flex-direction: column;
     width: 90%;
     max-width: 450px;
     max-height: 80vh;
@@ -312,7 +314,12 @@
 
   .q-dialog[open] {
     display: flex;
-    flex-direction: column;
+  }
+
+  /* closing: fades and shrinks a little, like it opened */
+  .q-dialog:not([open]) {
+    opacity: 0;
+    transform: scale(0.94);
   }
 
   @starting-style {
