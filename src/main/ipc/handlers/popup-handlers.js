@@ -3,7 +3,11 @@ const { BrowserWindow, screen } = require("electron");
 const secureIpc = require("../secure-ipc");
 const check = require("../validate");
 const { pages } = require("../../config/paths");
-const { secureWebPreferences } = require("../../config/window-options");
+const {
+  secureWebPreferences,
+  visiblePosition,
+} = require("../../config/window-options");
+const settings = require("../../services/settings-store");
 const prayerTimerManager = require("../../services/prayer-timer-manager");
 
 /** @import { BrowserWindow as Window } from "electron" */
@@ -17,8 +21,11 @@ let prayerWidgetWindow = null;
 /** @type {() => Window | null} */
 let getMainWindow = () => null;
 
-const WIDGET_WIDTH = 360;
-const WIDGET_HEIGHT = 36;
+// small bar: the five prayer names + times fit in en/ar/fr (checked)
+const WIDGET_WIDTH = 380;
+const WIDGET_HEIGHT = 40; // Windows keeps windows at least ~39px high at 125% scale
+// closer than this to a screen edge when dropped: it snaps to the edge
+const WIDGET_SNAP = 16;
 const POPUP_WIDTH = 340;
 const POPUP_MARGIN = 16;
 // The widget page normally reports "prayer-widget-ready" within ~0.2 s; this only covers a
@@ -50,18 +57,44 @@ function closePrayerWidget() {
   openWidget()?.destroy();
 }
 
+/**
+ * After a drag: snaps to the edges of the screen it was dropped on, then remembers the spot.
+ * @param {Window} widget
+ */
+function snapAndSave(widget) {
+  if (widget.isDestroyed()) return;
+  const b = widget.getBounds();
+  const a = screen.getDisplayMatching(b).workArea;
+  const snap = (
+    /** @type {number} */ v,
+    /** @type {number} */ min,
+    /** @type {number} */ max,
+  ) =>
+    Math.abs(v - min) < WIDGET_SNAP
+      ? min
+      : Math.abs(v - max) < WIDGET_SNAP
+        ? max
+        : v;
+  const x = snap(b.x, a.x, a.x + a.width - b.width);
+  const y = snap(b.y, a.y, a.y + a.height - b.height);
+  if (x !== b.x || y !== b.y) widget.setPosition(x, y);
+  settings.saveWidgetPosition(x, y);
+}
+
 function createPrayerWidget() {
   const existing = openWidget();
   if (existing) {
     existing.focus();
     return;
   }
-  const { bounds, workArea } = screen.getPrimaryDisplay();
+  // where the user left it, if still on a connected screen; else top centre, against the edge
+  const { workArea } = screen.getPrimaryDisplay();
+  const saved = visiblePosition(settings.get().widgetPosition, WIDGET_WIDTH);
   const widget = new BrowserWindow({
     width: WIDGET_WIDTH,
     height: WIDGET_HEIGHT,
-    x: bounds.x + Math.round((bounds.width - WIDGET_WIDTH) / 2),
-    y: workArea.y,
+    x: saved.x ?? workArea.x + Math.round((workArea.width - WIDGET_WIDTH) / 2),
+    y: saved.y ?? workArea.y,
     frame: false,
     transparent: true,
     resizable: false,
@@ -89,6 +122,7 @@ function createPrayerWidget() {
   };
   const fallback = setTimeout(reveal, WIDGET_SHOW_FALLBACK_MS);
   revealPrayerWidget = reveal;
+  widget.on("moved", () => snapAndSave(widget));
   widget.on("closed", () => {
     clearTimeout(fallback);
     // a quick close + reopen must not forget the new widget

@@ -7,38 +7,34 @@ const {
   cleanTime,
   secondsFromTime,
   secondsSinceMidnight,
-  formatTime,
   isFridayIn,
   displayPrayerKey,
 } = require("../../../shared/prayerUtils");
 const { t } = require("../core/i18n");
 const { loadSettings } = require("../core/bootstrap");
 const { setThemeClass } = require("../core/theme");
+const { duration } = require("../core/date-format");
 const { html, setHtml } = require("../utils/html");
 const { byId } = require("../core/dom");
+const { initWidgetTips } = require("../components/widget-tip");
 
-const PRAYER_ICONS = {
-  Fajr: "fa-cloud-moon",
-  Dhuhr: "fa-sun",
-  Asr: "fa-cloud-sun",
-  Maghrib: "fa-cloud",
-  Isha: "fa-moon",
-};
-
-/** @type {Awaited<ReturnType<typeof loadSettings>> | null} */
-let settings = null;
 /** @type {any} */
 let prayerData = null;
 let lang = "en";
-/** @type {ReturnType<typeof setInterval> | null} */
-let tickTimer = null;
 let isPinned = true;
+/** minute the list was last drawn for, so it is redrawn once a minute */
+let drawnMinute = -1;
 
 const appEl = byId("app", HTMLElement);
+const nextBlockEl = byId("nextBlock", HTMLElement);
 const timerEl = byId("timerDisplay", HTMLElement);
 const prayerListEl = byId("prayerList", HTMLElement);
 const closeBtnEl = byId("closeBtn", HTMLButtonElement);
 const pinBtnEl = byId("pinBtn", HTMLButtonElement);
+
+const SPINNER = html`<li class="pw-spin">
+  <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+</li>`;
 
 function applyTheme(theme) {
   if (!theme) return;
@@ -47,97 +43,101 @@ function applyTheme(theme) {
   document.documentElement.lang = lang;
 }
 
+/** "2:14:33", or "14:33" under an hour: short like a clock, no leading zero hour. */
+function countdown(total) {
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const mm = String(m).padStart(h ? 2 : 1, "0");
+  const ss = String(s).padStart(2, "0");
+  return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+
+// Today's prayers in time order, which one is next, and the seconds until it. After Isha
+// the next one is tomorrow's Fajr (same time as today's, close enough for a countdown).
 function computePrayers() {
   if (!prayerData?.timings) return null;
   const now = secondsSinceMidnight();
-  const prayers = PRAYER_KEYS.map((key) => {
-    const raw = prayerData.timings[key];
-    if (!raw) return null;
-    const sec = secondsFromTime(raw);
-    return {
-      key,
-      time: cleanTime(raw),
-      sec,
-      wrapped: sec < now ? sec + 86400 : sec,
-    };
-  })
-    .filter((p) => p !== null)
-    .sort((a, b) => a.wrapped - b.wrapped);
-
+  const prayers = PRAYER_KEYS.filter((k) => prayerData.timings[k]).map(
+    (key) => {
+      const raw = prayerData.timings[key];
+      return { key, time: cleanTime(raw), sec: secondsFromTime(raw) };
+    },
+  );
   if (!prayers.length) return null;
-  const nextIdx = prayers.findIndex((p) => p.wrapped > now);
-  const nextPrayer = nextIdx >= 0 ? prayers[nextIdx] : prayers[0];
-  const activePrayer =
-    nextIdx > 0 ? prayers[nextIdx - 1] : prayers[prayers.length - 1];
-  return {
-    prayers,
-    nextPrayer,
-    activePrayer,
-    timeRemaining: nextPrayer.wrapped - now,
-  };
+  const next = prayers.find((p) => p.sec > now) ?? prayers[0];
+  const remaining = (next.sec - now + 86400) % 86400 || 86400;
+  return { prayers, next, remaining, now };
 }
 
-function renderList() {
-  const result = computePrayers();
-  if (!result) {
-    prayerListEl.innerHTML =
-      '<div class="tb-spin"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i></div>';
-    return;
-  }
-  const { nextPrayer, activePrayer } = result;
-  const ordered = PRAYER_KEYS.map((k) =>
-    result.prayers.find((p) => p.key === k),
-  ).filter((p) => p !== undefined);
-
-  // Tooltip text for each column: the prayer's name in the app language. On Fridays
-  // (in the location's own time zone) Dhuhr reads "Jumu'ah", like the rest of the app.
+function prayerName(key) {
   const isFriday = isFridayIn(prayerData?.meta?.timezone);
-  const prayerName = (key) => {
-    const shownKey = displayPrayerKey(key, { isFriday });
-    return t(shownKey, "prayerNames");
-  };
+  return t(displayPrayerKey(key, { isFriday }), "prayerNames");
+}
 
+function renderList(result) {
+  const { prayers, next, now } = result;
   setHtml(
     prayerListEl,
-    html`${ordered.map((p) => {
-      const isActive = p.key === activePrayer.key;
-      const isNext = p.key === nextPrayer.key && !isActive;
+    html`${prayers.map((p) => {
+      const isNext = p.key === next.key;
+      const isPast = !isNext && p.sec <= now;
+      const cls = isNext ? " is-next" : isPast ? " is-past" : "";
       const name = prayerName(p.key);
-      return html`<div class="tb-col${isActive ? " active" : ""}${isNext ? " next" : ""}" data-tip="${name}" aria-label="${name}">
-      <i class="fas ${PRAYER_ICONS[p.key] ?? "fa-clock"} tb-col-icon" aria-hidden="true"></i>
-      <span class="tb-col-time">${p.time}</span>
-      <div class="tb-col-dot"></div>
-    </div>`;
+      return html`<li class="pw-col${cls}"${isNext ? html` aria-current="time"` : ""}>
+        <span class="pw-col-name">${name}</span>
+        <span class="pw-col-time">${p.time}</span>
+      </li>`;
     })}`,
   );
 }
 
 function tick() {
   const result = computePrayers();
-  if (!result) return;
-  timerEl.textContent = formatTime(Math.max(0, result.timeRemaining));
-  if (result.timeRemaining % 60 === 0) renderList();
+  if (!result) {
+    setHtml(prayerListEl, SPINNER);
+    return;
+  }
+  timerEl.textContent = countdown(result.remaining);
+  const minute = Math.floor(result.now / 60);
+  if (minute === drawnMinute) return;
+  drawnMinute = minute;
+  renderList(result);
+  // screen readers: a sentence per minute, not a number changing every second
+  const left = Math.ceil(result.remaining / 60);
+  const remaining = duration(
+    { hours: Math.floor(left / 60), minutes: left % 60 },
+    "long",
+  );
+  nextBlockEl.setAttribute(
+    "aria-label",
+    t("widgetNextLabel")
+      .replace("{prayer}", prayerName(result.next.key))
+      .replace("{time}", result.next.time)
+      .replace("{remaining}", remaining),
+  );
+}
+
+function setPrayerData(data) {
+  if (!data?.timings) return false;
+  prayerData = data;
+  drawnMinute = -1;
+  tick();
+  return true;
 }
 
 // Today's times from the main process (saved on disk, so also offline).
 async function showPrayerData() {
   try {
-    const data = await ipcRenderer.invoke("get-prayer-data");
-    if (data?.timings) {
-      prayerData = data;
-      renderList();
-      tick();
-      return true;
-    }
+    return setPrayerData(await ipcRenderer.invoke("get-prayer-data"));
   } catch (e) {
     console.error("[widget] reading prayer times failed:", e);
+    return false;
   }
-  return false;
 }
 
-// Starts the slide-in and tells main to show the window (see popup-handlers.js). Called
-// once the bar has its theme, direction and times, so it never appears in the wrong
-// colours or the wrong direction first.
+// Starts the fade-in and tells main to show the window (see popup-handlers.js), once the
+// bar has its theme, direction and times: it never appears in the wrong colours first.
 function reveal() {
   if (appEl.classList.contains("is-shown")) return;
   appEl.classList.add("is-shown");
@@ -147,141 +147,24 @@ function reveal() {
 pinBtnEl.addEventListener("click", () => {
   isPinned = !isPinned;
   ipcRenderer.send("widget-set-always-on-top", isPinned);
-  pinBtnEl.classList.toggle("pinned", isPinned);
+  pinBtnEl.classList.toggle("is-pinned", isPinned);
+  pinBtnEl.setAttribute("aria-pressed", String(isPinned));
 });
 
 closeBtnEl.addEventListener("click", () => {
   appEl.classList.add("closing");
-  setTimeout(() => ipcRenderer.send("close-prayer-widget"), 230);
+  setTimeout(() => ipcRenderer.send("close-prayer-widget"), 200);
 });
 
 ipcRenderer.on("theme-changed", (_e, theme) => applyTheme(theme));
-
-ipcRenderer.on("prayer-data-from-main", (_e, data) => {
-  if (data?.timings) {
-    prayerData = data;
-    renderList();
-    tick();
-  }
-});
-
-function initWidgetTooltips() {
-  document.querySelectorAll("[data-tooltip]").forEach((el) => {
-    const key = el.getAttribute("data-tooltip");
-    el.setAttribute("data-tip", t(key));
-  });
-
-  let tip = document.getElementById("appTooltip");
-  if (!tip) {
-    tip = document.createElement("div");
-    tip.id = "appTooltip";
-    tip.style.cssText = [
-      "position:fixed",
-      "z-index:99999",
-      "pointer-events:none",
-      "opacity:0",
-      "transition:opacity 0.15s ease,transform 0.15s ease",
-      "transform:translateY(-50%) scale(0.85)",
-      "background:rgba(10,15,35,0.92)",
-      "backdrop-filter:blur(8px)",
-      "-webkit-backdrop-filter:blur(8px)",
-      "color:#fff",
-      "font-size:11px",
-      "font-weight:600",
-      "letter-spacing:0.03em",
-      "white-space:nowrap",
-      "padding:5px 10px",
-      "border-radius:7px",
-      "border:1px solid rgba(255,255,255,0.1)",
-      "box-shadow:0 4px 16px rgba(0,0,0,0.4)",
-    ].join(";");
-    document.body.appendChild(tip);
-  }
-
-  // Horizontal edges of what the user actually sees under the pointer. A plain prayer column
-  // is wider than its centred icon + time, so measuring the column itself would leave a
-  // bigger gap than on the pin/close buttons; highlighted columns (active/next) show their
-  // whole pill, and buttons are only as wide as they look.
-  function visibleEdges(el) {
-    const plainCol =
-      el.classList.contains("tb-col") &&
-      !el.classList.contains("active") &&
-      !el.classList.contains("next");
-    if (plainCol) {
-      const parts = [...el.querySelectorAll(".tb-col-icon, .tb-col-time")]
-        .map((n) => n.getBoundingClientRect())
-        .filter((p) => p.width > 0);
-      if (parts.length) {
-        return {
-          left: Math.min(...parts.map((p) => p.left)),
-          right: Math.max(...parts.map((p) => p.right)),
-        };
-      }
-    }
-    return el.getBoundingClientRect();
-  }
-
-  const show = (el) => {
-    const text = el.getAttribute("data-tip");
-    if (!text) return;
-    tip.textContent = text;
-    tip.style.visibility = "hidden";
-    tip.style.opacity = "1";
-    const tipW = tip.offsetWidth;
-    const r = el.getBoundingClientRect();
-    const edges = visibleEdges(el);
-    tip.style.visibility = "";
-    const isRTL = document.documentElement.dir === "rtl";
-    // The widget is a 36px-high bar, so the tip goes beside the element, never above or
-    // below, at the same 8px gap for every element. Keep it inside the bar: flip sides when
-    // the preferred side has no room (e.g. the first prayer column is next to the edge).
-    const gap = 8;
-    const pad = 4;
-    const leftSide = edges.left - tipW - gap;
-    const rightSide = edges.right + gap;
-    let x = isRTL ? rightSide : leftSide;
-    if (x < pad) x = rightSide;
-    if (x + tipW > window.innerWidth - pad) x = Math.max(pad, leftSide);
-    tip.style.left = `${x}px`;
-    tip.style.top = `${r.top + r.height / 2}px`;
-    tip.style.transform = "translateY(-50%) scale(1)";
-    tip.style.opacity = "1";
-  };
-  const hide = () => {
-    tip.style.opacity = "0";
-    tip.style.transform = "translateY(-50%) scale(0.85)";
-  };
-
-  document.querySelectorAll("[data-tip]").forEach((el) => {
-    el.addEventListener("mouseenter", () => show(el));
-    el.addEventListener("mouseleave", hide);
-    el.addEventListener("click", hide);
-  });
-
-  // Prayer columns are re-rendered every minute (renderList), so they can't keep their own
-  // listeners; one delegated listener on the list covers whatever columns exist now.
-  prayerListEl.addEventListener("mouseover", (e) => {
-    if (!(e.target instanceof Element)) return;
-    const col = e.target.closest(".tb-col[data-tip]");
-    if (col) show(col);
-  });
-  prayerListEl.addEventListener("mouseout", (e) => {
-    const to = e.relatedTarget;
-    if (
-      !(to instanceof Element) ||
-      !prayerListEl.contains(to) ||
-      !to.closest(".tb-col[data-tip]")
-    )
-      hide();
-  });
-}
+ipcRenderer.on("prayer-data-from-main", (_e, data) => setPrayerData(data));
 
 async function init() {
   try {
-    settings = await loadSettings();
+    const settings = await loadSettings();
     lang = settings.language || "en";
     applyTheme(settings.theme || "navy");
-    initWidgetTooltips();
+    initWidgetTips();
 
     // Main usually has today's times already (a few ms). On a first run it may still be
     // downloading them: show the bar with its spinner meanwhile, the times fill in after.
@@ -289,9 +172,7 @@ async function init() {
     await Promise.race([times, new Promise((r) => setTimeout(r, 300))]);
     reveal();
     await times;
-
-    if (tickTimer) clearInterval(tickTimer);
-    tickTimer = setInterval(tick, 1000);
+    setInterval(tick, 1000);
   } catch (e) {
     console.error("[widget] init error:", e);
   } finally {

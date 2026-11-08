@@ -23,6 +23,7 @@ const log = require("./logger").logger("Settings");
  * checked by ipc/validate.js when a page saves them.
  * @typedef {{ city: string, country: string, theme: string, language: string,
  *   position: { x: number, y: number }, playerPosition?: { x: number, y: number },
+ *   widgetPosition?: { x: number, y: number },
  *   bigScreen: boolean, locations: SavedLocation[],
  *   openAtLogin: boolean, travelMode: boolean, analyticsEnabled: boolean,
  *   hijriAdjustment: number, weekStart: string, [key: string]: any }} Settings
@@ -244,6 +245,12 @@ function savePosition(x, y) {
   saveSoon();
 }
 
+// Where the prayer widget was moved to (it opens there next time).
+function saveWidgetPosition(x, y) {
+  settingsData.widgetPosition = { x, y };
+  saveSoon();
+}
+
 // Where the floating mini player was moved to (it opens there next time).
 function savePlayerPosition(x, y) {
   settingsData.playerPosition = { x, y };
@@ -324,6 +331,7 @@ module.exports = {
   update,
   savePosition,
   savePlayerPosition,
+  saveWidgetPosition,
   setTravelMode,
   syncOpenAtLogin,
   getLocations,

@@ -13,5 +13,6 @@
   "adhanTipOff": "الأذان متوقف، انقر: تشغيل بالصوت",
   "adhanLabelSound": "أذان {prayer}: بالصوت",
   "adhanLabelSilent": "أذان {prayer}: تنبيه فقط",
-  "adhanLabelOff": "أذان {prayer}: متوقف"
+  "adhanLabelOff": "أذان {prayer}: متوقف",
+  "widgetNextLabel": "{prayer} الساعة {time}، بعد {remaining}"
 }

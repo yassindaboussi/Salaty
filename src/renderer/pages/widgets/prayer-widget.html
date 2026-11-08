@@ -10,47 +10,48 @@
     <title>Prayer Widget</title>
     <link rel="stylesheet" href="../../vendor/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="../../css/05-widgets/widget-base.css" />
+    <link rel="stylesheet" href="../../css/00-settings/tokens.css" />
     <link rel="stylesheet" href="../../css/05-widgets/prayer-widget.css" />
   </head>
   <body>
     <div id="app" class="theme-navy">
-      <!-- Logo (drag handle) -->
-      <i class="fas fa-mosque tb-logo" aria-hidden="true"></i>
-
-      <div class="tb-div"></div>
-
-      <!-- Five prayer columns -->
-      <div class="tb-prayers" id="prayerList">
-        <div class="tb-spin">
-          <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
-        </div>
+      <!-- Countdown to the next prayer (the white column says which one) -->
+      <div class="pw-next" id="nextBlock" role="timer" aria-live="off">
+        <span class="pw-next-count" id="timerDisplay">-:--:--</span>
       </div>
 
-      <div class="tb-div"></div>
+      <div class="pw-div" aria-hidden="true"></div>
 
-      <!-- Countdown -->
-      <span class="tb-timer" id="timerDisplay">--:--</span>
+      <!-- The day's five prayers, in time order -->
+      <ol class="pw-prayers" id="prayerList">
+        <li class="pw-spin">
+          <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+        </li>
+      </ol>
 
-      <!-- Controls -->
-      <div class="tb-controls">
+      <div class="pw-div" aria-hidden="true"></div>
+
+      <div class="pw-controls">
         <button
           type="button"
-          class="tb-btn pinned"
+          class="pw-btn is-pinned"
           id="pinBtn"
+          aria-pressed="true"
           data-tooltip="tooltipPin"
         >
           <i class="fas fa-thumbtack" aria-hidden="true"></i>
         </button>
         <button
           type="button"
-          class="tb-btn tb-btn--close"
+          class="pw-btn pw-btn--close"
           id="closeBtn"
           data-tooltip="tooltipClose"
         >
-          <i class="fas fa-times" aria-hidden="true"></i>
+          <i class="fas fa-xmark" aria-hidden="true"></i>
         </button>
       </div>
     </div>
+    <div class="pw-tip" id="widgetTip" aria-hidden="true"></div>
     <script src="../../js-bundled/prayer-widget.bundle.js"></script>
   </body>
 </html>
