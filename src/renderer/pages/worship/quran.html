@@ -207,6 +207,27 @@
                   ></i>
                 </button>
                 <span class="q-player-time" id="qPlayerTime"></span>
+                <!-- the app's one volume (the radio and the archive share it) -->
+                <div class="q-player-volume">
+                  <button
+                    type="button"
+                    class="q-icon-btn"
+                    id="qPlayerMute"
+                    data-tooltip="tooltipMute"
+                  >
+                    <i class="fas fa-volume-high" aria-hidden="true"></i>
+                  </button>
+                  <input
+                    type="range"
+                    class="q-player-range"
+                    id="qPlayerVolume"
+                    min="0"
+                    max="100"
+                    value="100"
+                    data-i18n-aria-label="volume"
+                    aria-label="Volume"
+                  />
+                </div>
                 <div class="q-player-controls">
                   <button
                     type="button"

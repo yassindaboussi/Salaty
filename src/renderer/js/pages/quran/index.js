@@ -13,6 +13,7 @@
 //   numerals.js             Arabic-Indic or Western digits
 //   open-request.js         opened at one ayah by another page (99 Names, Athkar)
 //   recitation*.js          listening: the background player, the ayah marked, the player bar
+//   recitation-volume.js    the volume in the player bar (the app's one volume)
 //   reciter-dialog.js       the reciter list
 //   ayah-menu.js            the menu of an ayah's number ﴿n﴾: play from here, bookmark, copy
 //   storage.js              what the page remembers (localStorage)
@@ -74,6 +75,7 @@ const { mapAyah } = require("../../services/quran-ayah-map");
 const { bindFollow } = require("./recitation-follow");
 const { bindRecitationBar, listenFrom } = require("./recitation-bar");
 const { bindReciterDialog } = require("./reciter-dialog");
+const { bindRecitationVolume } = require("./recitation-volume");
 const { openAyahMenu, bindAyahMenu } = require("./ayah-menu");
 
 const { TRANSLATIONS } = require("../../services/api/alquran-cloud");
@@ -206,6 +208,7 @@ function initQuranPage() {
   bindReciterDialog();
   bindFollow();
   bindRecitationBar();
+  bindRecitationVolume();
 
   byId("fontIncBtn", HTMLButtonElement).addEventListener("click", () =>
     changeFontSize(2),
@@ -239,8 +242,18 @@ function initQuranPage() {
   });
   // the mini player's "go to" button: the reader opens on the surah playing. Opened any other
   // way (the Features page), the page starts on the surah list as always.
-  const openPlaying = sessionStorage.getItem("quranOpenPlaying") === "1";
-  sessionStorage.removeItem("quranOpenPlaying");
+  // (from the floating mini player, another window: a request made in the last seconds)
+  let openPlaying = false;
+  try {
+    const at = Number(localStorage.getItem("quranOpenPlayingAt")) || 0;
+    openPlaying =
+      sessionStorage.getItem("quranOpenPlaying") === "1" ||
+      Date.now() - at < 15000;
+    sessionStorage.removeItem("quranOpenPlaying");
+    localStorage.removeItem("quranOpenPlayingAt");
+  } catch {
+    // storage unavailable: the surah list
+  }
   bindRecitation((track) => {
     if (openPlaying && !state.currentSurah)
       openAt(track.surah, undefined, track.riwaya);

@@ -22,7 +22,8 @@ const log = require("./logger").logger("Settings");
  * The keys every part of the app relies on; the others (adhan, athkar, reminders...) are
  * checked by ipc/validate.js when a page saves them.
  * @typedef {{ city: string, country: string, theme: string, language: string,
- *   position: { x: number, y: number }, bigScreen: boolean, locations: SavedLocation[],
+ *   position: { x: number, y: number }, playerPosition?: { x: number, y: number },
+ *   bigScreen: boolean, locations: SavedLocation[],
  *   openAtLogin: boolean, travelMode: boolean, analyticsEnabled: boolean,
  *   hijriAdjustment: number, weekStart: string, [key: string]: any }} Settings
  */
@@ -243,6 +244,12 @@ function savePosition(x, y) {
   saveSoon();
 }
 
+// Where the floating mini player was moved to (it opens there next time).
+function savePlayerPosition(x, y) {
+  settingsData.playerPosition = { x, y };
+  saveSoon();
+}
+
 function setTravelMode(enabled) {
   settingsData.travelMode = enabled;
   save();
@@ -316,6 +323,7 @@ module.exports = {
   get,
   update,
   savePosition,
+  savePlayerPosition,
   setTravelMode,
   syncOpenAtLogin,
   getLocations,

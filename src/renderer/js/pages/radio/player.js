@@ -13,7 +13,7 @@ const { updateTooltip } = require("../../core/tooltips");
 const { showToast } = require("../../core/toast");
 const analytics = require("../../services/analytics");
 const { view, toggleFavourite, findItem } = require("./state");
-const { refreshList, artHtml } = require("./list");
+const { refreshList, artHtml, shownItems } = require("./list");
 
 const MUTED_KEY = "radioVolumeBeforeMute";
 let toldFailure = false; // the error is said once, not at every later report
@@ -91,6 +91,18 @@ function render() {
   refreshList();
 }
 
+/** A radio as the background player's track. @param {import("./state").RadioItem} item */
+const trackOf = (item) => ({
+  title: item.name,
+  artist: item.sub,
+  url: item.url,
+  live: true,
+  page: "radio",
+  key: item.key,
+  image: item.image,
+  reciterId: item.reciterId,
+});
+
 /** A click on a row: plays it, or pauses / resumes it if it is the one playing. @param {string} key */
 function playItem(key) {
   const item = findItem(key);
@@ -102,20 +114,12 @@ function playItem(key) {
   view.current = item;
   view.connecting = true;
   view.playing = false;
+  // the list as shown goes with it: previous / next in the mini players change station
+  const shown = shownItems();
+  const list = shown.some((r) => r.key === key) ? shown : [item];
   send("set-playlist", {
-    tracks: [
-      {
-        title: item.name,
-        artist: item.sub,
-        url: item.url,
-        live: true,
-        page: "radio",
-        key: item.key,
-        image: item.image,
-        reciterId: item.reciterId,
-      },
-    ],
-    startIndex: 0,
+    tracks: list.map(trackOf),
+    startIndex: list.findIndex((r) => r.key === key),
   });
   analytics.radioStationPlay();
   render();

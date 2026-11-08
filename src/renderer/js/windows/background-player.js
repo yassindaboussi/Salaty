@@ -6,9 +6,9 @@ require("../core/error-watch"); // first: errors while the page starts are logge
 const { ipcRenderer } = require("electron");
 const { setThemeClass } = require("../core/theme");
 const { loadSettings } = require("../core/bootstrap");
-const { t, applyTranslations } = require("../core/i18n");
+const { applyTranslations } = require("../core/i18n");
 const { initTooltipSystem } = require("../core/tooltips");
-const { byId } = require("../core/dom");
+const { createPlayerUi } = require("../components/floating-player");
 
 class BackgroundPlayer {
   constructor() {
@@ -84,38 +84,14 @@ class BackgroundPlayer {
   }
 
   initUI() {
-    this.ui = {
-      title: document.getElementById("title"),
-      artist: byId("artist", HTMLElement),
-      playBtn: byId("playBtn", HTMLButtonElement),
-      prevBtn: byId("prevBtn", HTMLButtonElement),
-      nextBtn: byId("nextBtn", HTMLButtonElement),
-      closeBtn: document.getElementById("closeBtn"),
-      playlistBtn: document.getElementById("miniPlaylistBtn"),
-    };
-
-    if (this.ui.playBtn) {
-      this.ui.playBtn.addEventListener("click", () => this.togglePlay());
-      this.ui.prevBtn.addEventListener("click", () => this.playPrevious());
-      this.ui.nextBtn.addEventListener("click", () => this.playNext());
-
-      if (this.ui.closeBtn) {
-        this.ui.closeBtn.addEventListener("click", () => {
-          ipcRenderer.send("close-mini-player");
-        });
-      }
-      if (this.ui.playlistBtn) {
-        this.ui.playlistBtn.addEventListener("click", () => {
-          ipcRenderer.send("show-main-window");
-        });
-      }
-    }
+    this.ui = createPlayerUi(this); // components/floating-player.js
   }
 
   sendState() {
     const state = {
       isPlaying: this.isPlaying,
       currentTrackIndex: this.currentTrackIndex,
+      trackCount: this.tracks.length,
       currentTrack: this.tracks[this.currentTrackIndex] || null,
       duration: this.sound ? this.sound.duration() : 0,
       currentTime: this.sound ? this.sound.seek() : 0,
@@ -130,6 +106,7 @@ class BackgroundPlayer {
   sendTimeUpdate() {
     if (this.sound && this.isPlaying) {
       const seek = this.sound.seek() || 0;
+      this.ui?.onTime(seek);
       ipcRenderer.send("player-update", {
         type: "time-update",
         currentTime: seek,
@@ -139,24 +116,7 @@ class BackgroundPlayer {
   }
 
   updateLocalUI() {
-    if (!this.ui || !this.ui.title) return;
-
-    if (this.currentTrackIndex !== -1 && this.tracks[this.currentTrackIndex]) {
-      const track = this.tracks[this.currentTrackIndex];
-      this.ui.title.innerText = track.title;
-      this.ui.artist.innerText = track.artist;
-    } else {
-      this.ui.title.innerText = "Salaty Player";
-      this.ui.artist.innerText = t("waitingForTrack");
-    }
-
-    if (this.isPlaying) {
-      this.ui.playBtn.innerHTML =
-        '<i class="fas fa-pause" aria-hidden="true"></i>';
-    } else {
-      this.ui.playBtn.innerHTML =
-        '<i class="fas fa-play" aria-hidden="true"></i>';
-    }
+    this.ui?.render();
   }
 
   async loadLocalTracks() {
@@ -218,9 +178,8 @@ class BackgroundPlayer {
         this.sendState();
         this.stopStepLoop();
       },
-      onend: () => {
-        this.playNext();
-      },
+      // a live radio that ends or fails stays on its station (no jump to the next one)
+      onend: () => !track.live && this.playNext(),
       onloaderror: (id, err) => {
         console.error("Load error", err);
         // a radio server sometimes drops the first connection: try once more before failing
@@ -239,7 +198,7 @@ class BackgroundPlayer {
         this.loading = false;
         this.failed = true;
         this.sendState();
-        this.playNext();
+        if (!track.live) this.playNext();
       },
       onplayerror: (id, err) => {
         console.error("Play error", err);

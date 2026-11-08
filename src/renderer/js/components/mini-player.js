@@ -2,7 +2,7 @@
 const { ipcRenderer } = require("electron");
 const { hideTooltip } = require("../core/tooltips");
 const { html, setHtml } = require("../utils/html");
-const { quranMiniPlayer } = require("./mini-player-quran");
+const { bindQuranMiniPlayer } = require("./mini-player-quran");
 
 function setupMiniPlayer() {
   const wrap = document.createElement("div");
@@ -61,13 +61,6 @@ function setupMiniPlayer() {
   controls.append(prevBtn, playBtn, nextBtn, playlistBtn, closeBtn);
 
   wrap.append(info, controls);
-  // a Quran surah: ⏮ ⏭ by ayah, "Open in the reader", the riwaya (mini-player-quran.js)
-  const quran = quranMiniPlayer({
-    prev: prevBtn,
-    next: nextBtn,
-    open: playlistBtn,
-    artist,
-  });
   (document.getElementById("app") ?? document.body).appendChild(wrap);
 
   function showMiniPlayer() {
@@ -95,21 +88,21 @@ function setupMiniPlayer() {
       ipcRenderer.send("player-command", { type: "pause" });
     }
   });
-  prevBtn.addEventListener("click", () => {
-    if (!quran.step(-1)) ipcRenderer.send("player-command", { type: "prev" });
-  });
-  nextBtn.addEventListener("click", () => {
-    if (!quran.step(1)) ipcRenderer.send("player-command", { type: "next" });
-  });
   // back to what is playing: the radio page for a radio, the Quran reader for a surah, else
   // the playlist
   const OWN_PAGES = new Set(["radio", "quran"]);
   let page = "playlist";
-  playlistBtn.addEventListener("click", () => {
-    // the Quran page opens its reader on the surah playing (only when asked from here)
-    if (page === "quran") sessionStorage.setItem("quranOpenPlaying", "1");
-    ipcRenderer.invoke("navigate-to", page, 850, 600);
-  });
+  // a Quran surah: previous / next by ayah, its reader, the riwaya (mini-player-quran.js)
+  const quran = bindQuranMiniPlayer(
+    { prev: prevBtn, next: nextBtn, open: playlistBtn, artist },
+    {
+      prev: () => ipcRenderer.send("player-command", { type: "prev" }),
+      next: () => ipcRenderer.send("player-command", { type: "next" }),
+      open: () => {
+        if (page !== "quran") ipcRenderer.invoke("navigate-to", page, 850, 600);
+      },
+    },
+  );
 
   function trackKeyOf(track) {
     return track ? track.url || `${track.title}|${track.artist}` : null;
@@ -146,11 +139,16 @@ function setupMiniPlayer() {
     page = OWN_PAGES.has(state.currentTrack.page)
       ? state.currentTrack.page
       : "playlist";
-    // a live radio has no previous / next
-    prevBtn.hidden = nextBtn.hidden = Boolean(state.currentTrack.live);
     title.textContent = state.currentTrack.title;
     artist.textContent = state.currentTrack.artist;
-    quran.apply(state); // after the title and artist: it adds the riwaya
+    // after the title and artist: a surah adds the riwaya; previous / next go by ayah
+    if (!quran.apply(state)) {
+      // off where the list has nothing before / after (radios: the stations as the radio
+      // page lists them)
+      const at = state.currentTrackIndex ?? 0;
+      prevBtn.disabled = at <= 0;
+      nextBtn.disabled = at >= (state.trackCount ?? 1) - 1;
+    }
     const icon = playBtn.querySelector("i");
     if (icon) icon.className = `fas fa-${state.isPlaying ? "pause" : "play"}`;
   });

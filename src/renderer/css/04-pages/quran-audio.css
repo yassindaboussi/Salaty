@@ -180,6 +180,51 @@
     white-space: nowrap;
   }
 
+  /* the volume: mute / unmute, and a short slider (left out in a narrow window) */
+  .q-player-volume {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    direction: ltr;
+  }
+
+  .q-player-range {
+    --fill: 100%;
+
+    width: 84px;
+    height: 18px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    appearance: none;
+  }
+
+  .q-player-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(
+      to right,
+      var(--text-primary) var(--fill),
+      var(--white-a15) var(--fill)
+    );
+  }
+
+  .q-player-range::-webkit-slider-thumb {
+    width: 12px;
+    height: 12px;
+    margin-top: -4px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    appearance: none;
+  }
+
+  .q-player-range:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
   /* media controls keep their direction in Arabic (previous on the left) */
   .q-player-controls {
     display: flex;
@@ -426,6 +471,12 @@
 
   @media (width <= 560px) {
     .q-player-time {
+      display: none;
+    }
+  }
+
+  @media (width <= 680px) {
+    .q-player-range {
       display: none;
     }
   }

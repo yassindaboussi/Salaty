@@ -56,9 +56,13 @@ function markCurrent() {
 /** @param {number} index  plays it, the whole list as the playlist */
 function playTrack(index) {
   if (!state.tracks[index]) return;
+  // the reciter goes with each track: the mini players show his photo
+  const reciterId = state.album?.reciterId;
   ipcRenderer.send("player-command", {
     type: "set-playlist",
-    tracks: state.tracks,
+    tracks: reciterId
+      ? state.tracks.map((track) => ({ ...track, reciterId }))
+      : state.tracks,
     startIndex: index,
   });
   analytics.playlistTrackPlay();
