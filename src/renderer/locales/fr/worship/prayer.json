@@ -13,5 +13,6 @@
   "adhanTipOff": "Adhan désactivé · Clic : activer avec son",
   "adhanLabelSound": "Adhan de {prayer} : avec son",
   "adhanLabelSilent": "Adhan de {prayer} : notification seule",
-  "adhanLabelOff": "Adhan de {prayer} : désactivé"
+  "adhanLabelOff": "Adhan de {prayer} : désactivé",
+  "widgetNextLabel": "{prayer} à {time}, dans {remaining}"
 }
