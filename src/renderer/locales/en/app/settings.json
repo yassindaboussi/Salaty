@@ -12,7 +12,7 @@
   "frenchLanguage": "French",
   "screenSizeSettingLabel": "Screen Size",
   "bigScreen": "Big Screen",
-  "notification": "Notification",
+  "notification": "Notifications",
   "athkarAlerts": "Athkar Alerts (Tasbih)",
   "enableAthkarAlerts": "Enable Alerts",
   "athkarInterval": "Interval (minutes)",
@@ -42,5 +42,16 @@
   "calcAsrStandard": "Standard",
   "calcAsrHanafi": "Hanafi",
   "calcAsrLineStandard": "Asr: standard",
-  "calcAsrLineHanafi": "Asr: Hanafi"
+  "calcAsrLineHanafi": "Asr: Hanafi",
+  "stNavPrayer": "Prayer times",
+  "stCategories": "Settings categories",
+  "stSearchPlaceholder": "Search settings",
+  "stPanelHide": "Hide the menu",
+  "stPanelShow": "Show the menu",
+  "stSaved": "Saved",
+  "stNoResults": "No setting matches “{query}”",
+  "stViewLabel": "Settings view",
+  "stViewDesc": "Menu: one category at a time. One page: everything in one list.",
+  "stViewMenu": "Menu",
+  "stViewPage": "One page"
 }

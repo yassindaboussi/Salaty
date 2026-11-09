@@ -42,5 +42,16 @@
   "calcAsrStandard": "Standard",
   "calcAsrHanafi": "Hanafite",
   "calcAsrLineStandard": "Asr : standard",
-  "calcAsrLineHanafi": "Asr : hanafite"
+  "calcAsrLineHanafi": "Asr : hanafite",
+  "stNavPrayer": "Heures de prière",
+  "stCategories": "Catégories des paramètres",
+  "stSearchPlaceholder": "Rechercher un paramètre",
+  "stPanelHide": "Masquer le menu",
+  "stPanelShow": "Afficher le menu",
+  "stSaved": "Enregistré",
+  "stNoResults": "Aucun paramètre ne correspond à « {query} »",
+  "stViewLabel": "Affichage des paramètres",
+  "stViewDesc": "Menu : une catégorie à la fois. Une page : tout dans une seule liste.",
+  "stViewMenu": "Menu",
+  "stViewPage": "Une page"
 }

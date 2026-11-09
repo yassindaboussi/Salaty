@@ -1,6 +1,11 @@
 "use strict";
 
 // The settings page. Its parts:
+//   nav.js          the side menu: one category shown at a time (remembered)
+//   search.js       the search box over every category
+//   panel-fold.js   the menu folded to a strip of icons (remembered)
+//   saved-status.js the "Saved" note after each change
+//   view.js         the page's layout: the menu, or every category on one page
 //   steppers.js     the − / + buttons of the number inputs
 //   appearance.js   theme, language and window size (and the page text after a language switch)
 //   alerts.js       athkar alerts and the notification before the adhan
@@ -35,8 +40,16 @@ const {
 } = require("./calculation");
 const { initTravelModeToggle, initAnalyticsToggle } = require("./toggles");
 const { initAboutSection } = require("./about");
+const { initPaneNav } = require("./nav");
+const { initSettingsSearch, clearSearch } = require("./search");
+const { bindPanelFold } = require("./panel-fold");
+const { initViewSetting } = require("./view");
 
 function initSettingsPage() {
+  initPaneNav(clearSearch); // first: the About category must be open for #check-updates
+  initSettingsSearch();
+  bindPanelFold();
+  initViewSetting();
   initNumberSteppers();
 
   const locationPicker = initSelectLocation((location) => {
