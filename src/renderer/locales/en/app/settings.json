@@ -53,5 +53,7 @@
   "stViewLabel": "Settings view",
   "stViewDesc": "Menu: one category at a time. One page: everything in one list.",
   "stViewMenu": "Menu",
-  "stViewPage": "One page"
+  "stViewPage": "One page",
+  "showTimesLabel": "Show times",
+  "showTimesDesc": "Extra times on the home page and the widget. The five prayers are always shown. Midnight is the middle of the night, when Isha time ends."
 }

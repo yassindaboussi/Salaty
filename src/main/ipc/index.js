@@ -108,6 +108,11 @@ function registerIpcHandlers({ getMainWindow }) {
         .catch((err) => log.error("reloading prayer times failed:", err));
       fastingReminders.reload();
     },
+    // Settings → Show times: the home page draws its list again, the widget too (and resizes)
+    onExtraTimesChange: (extraTimes) => {
+      sendToMain("extra-times-changed", extraTimes);
+      popupHandlers.applyExtraTimes(extraTimes);
+    },
     onLanguageChange: () => refreshTrayMenu(),
     onAnalyticsChange: (enabled) => analytics.applyConsent(enabled),
   });

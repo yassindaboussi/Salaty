@@ -6,6 +6,11 @@ const prayerIcons = {
   Asr: "cloud-sun",
   Maghrib: "cloud",
   Isha: "moon",
+  // extra times (Settings → Show times)
+  Sunrise: "mountain-sun",
+  Sunset: "circle-half-stroke",
+  Midnight: "hourglass-half",
+  Lastthird: "star",
 };
 
 const state = {

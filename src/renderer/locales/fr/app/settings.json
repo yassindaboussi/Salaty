@@ -53,5 +53,7 @@
   "stViewLabel": "Affichage des paramètres",
   "stViewDesc": "Menu : une catégorie à la fois. Une page : tout dans une seule liste.",
   "stViewMenu": "Menu",
-  "stViewPage": "Une page"
+  "stViewPage": "Une page",
+  "showTimesLabel": "Horaires affichés",
+  "showTimesDesc": "Horaires en plus sur l'accueil et le widget. Les cinq prières sont toujours affichées. Minuit est le milieu de la nuit, où finit le temps d'Icha."
 }

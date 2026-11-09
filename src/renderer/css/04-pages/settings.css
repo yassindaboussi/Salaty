@@ -299,6 +299,81 @@
     outline-offset: 1px;
   }
 
+  /* Show times: the four chips go under the text (they don't fit beside it) */
+  .show-times-row {
+    flex-wrap: wrap;
+  }
+
+  .show-times-row .toggle-info {
+    flex-basis: 100%;
+  }
+
+  /* Show times: separate chips, each with its own tick box, so several can be on (a joined
+     bar reads as "pick one") */
+  .check-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .check-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-block: 6px;
+    padding-inline: 8px 12px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+
+  /* the real checkbox covers the chip, invisible: clicks, Space and screen readers work */
+  .check-chip input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* the tick box: empty when off, white with a tick when on */
+  .check-chip-box {
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--white-a40);
+    border-radius: 4px;
+    font-size: 9px;
+    color: transparent;
+  }
+
+  .check-chip:hover {
+    background: var(--surface-2);
+  }
+
+  .check-chip:has(input:checked) {
+    background: var(--surface-hover);
+    border-color: var(--white-a40);
+    color: var(--text-primary);
+  }
+
+  .check-chip:has(input:checked) .check-chip-box {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    color: var(--bg-primary);
+  }
+
+  .check-chip:has(input:focus-visible) {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 1px;
+  }
+
   /* "Today: 8 Jumada al-Awwal 1448 AH" under the Hijri date adjustment */
   .hijri-today-preview {
     margin-top: 4px;

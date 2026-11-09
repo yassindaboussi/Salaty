@@ -9,6 +9,8 @@ const {
   secondsSinceMidnight,
   isFridayIn,
   displayPrayerKey,
+  shownTimeKeys,
+  isExtraTime,
 } = require("../../../shared/prayerUtils");
 const { t } = require("../core/i18n");
 const { loadSettings } = require("../core/bootstrap");
@@ -22,6 +24,9 @@ const { initWidgetTips } = require("../components/widget-tip");
 let prayerData = null;
 let lang = "en";
 let isPinned = true;
+/** Settings → Show times: Sunrise, Midnight... as extra columns (main resizes the bar) */
+/** @type {Record<string, boolean> | undefined} */
+let extraTimes;
 /** minute the list was last drawn for, so it is redrawn once a minute */
 let drawnMinute = -1;
 
@@ -67,22 +72,35 @@ function computePrayers() {
   if (!prayers.length) return null;
   const next = prayers.find((p) => p.sec > now) ?? prayers[0];
   const remaining = (next.sec - now + 86400) % 86400 || 86400;
-  return { prayers, next, remaining, now };
+  // the columns: prayers and extra times. Midnight and the last third can fall after 00:00:
+  // they belong to tonight (later than Isha), not to this morning.
+  const fajr = prayers[0].sec;
+  const columns = shownTimeKeys(extraTimes)
+    .filter((k) => prayerData.timings[k])
+    .map((key) => {
+      const raw = prayerData.timings[key];
+      let sec = secondsFromTime(raw);
+      if (isExtraTime(key) && key !== "Sunrise" && sec < fajr) sec += 86400;
+      return { key, time: cleanTime(raw), sec };
+    });
+  return { prayers, columns, next, remaining, now };
 }
 
 function prayerName(key) {
+  if (isExtraTime(key)) return t(`widget${key}`);
   const isFriday = isFridayIn(prayerData?.meta?.timezone);
   return t(displayPrayerKey(key, { isFriday }), "prayerNames");
 }
 
 function renderList(result) {
-  const { prayers, next, now } = result;
+  const { columns, next, now } = result;
   setHtml(
     prayerListEl,
-    html`${prayers.map((p) => {
+    html`${columns.map((p) => {
       const isNext = p.key === next.key;
       const isPast = !isNext && p.sec <= now;
-      const cls = isNext ? " is-next" : isPast ? " is-past" : "";
+      const extra = isExtraTime(p.key) ? " is-extra" : "";
+      const cls = (isNext ? " is-next" : isPast ? " is-past" : "") + extra;
       const name = prayerName(p.key);
       return html`<li class="pw-col${cls}"${isNext ? html` aria-current="time"` : ""}>
         <span class="pw-col-name">${name}</span>
@@ -158,11 +176,17 @@ closeBtnEl.addEventListener("click", () => {
 
 ipcRenderer.on("theme-changed", (_e, theme) => applyTheme(theme));
 ipcRenderer.on("prayer-data-from-main", (_e, data) => setPrayerData(data));
+ipcRenderer.on("extra-times-changed", (_e, value) => {
+  extraTimes = value;
+  drawnMinute = -1;
+  tick();
+});
 
 async function init() {
   try {
     const settings = await loadSettings();
     lang = settings.language || "en";
+    extraTimes = settings.extraTimes;
     applyTheme(settings.theme || "navy");
     initWidgetTips();
 

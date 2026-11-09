@@ -225,3 +225,34 @@
 [dir="rtl"] .current-indicator {
   direction: rtl;
 }
+
+/* Extra times (Settings → Show times): Sunrise, Midnight... are not prayers. A slimmer,
+   quieter row with no background, so the five prayers still lead the list. */
+.prayer-item.is-extra {
+  padding-block: 2px;
+  margin-block: 2px;
+  background: transparent;
+  border-color: transparent;
+}
+
+.prayer-item.is-extra:hover {
+  background: transparent;
+  transform: none;
+}
+
+.prayer-item.is-extra i {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.prayer-item.is-extra .prayer-name,
+.prayer-item.is-extra .prayer-time {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* keeps the extra row's time under the prayers' times, where their adhan button is */
+.prayer-item .adhan-toggle-btn.is-placeholder {
+  height: 0;
+  visibility: hidden;
+}

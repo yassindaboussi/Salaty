@@ -80,6 +80,7 @@ export type ReceiveChannel =
   | "connection-lost"
   | "connection-restored"
   | "download-progress"
+  | "extra-times-changed"
   | "force-hide-tooltip"
   | "force-stop-adhan"
   | "init-themed-popup"

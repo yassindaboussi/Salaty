@@ -14,5 +14,9 @@
   "adhanLabelSound": "أذان {prayer}: بالصوت",
   "adhanLabelSilent": "أذان {prayer}: تنبيه فقط",
   "adhanLabelOff": "أذان {prayer}: متوقف",
-  "widgetNextLabel": "{prayer} الساعة {time}، بعد {remaining}"
+  "widgetNextLabel": "{prayer} الساعة {time}، بعد {remaining}",
+  "widgetSunrise": "الشروق",
+  "widgetSunset": "الغروب",
+  "widgetMidnight": "منتصف الليل",
+  "widgetLastthird": "الثلث الأخير"
 }

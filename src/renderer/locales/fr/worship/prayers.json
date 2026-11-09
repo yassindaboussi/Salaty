@@ -5,5 +5,8 @@
   "Jumuah": "Jumu'a",
   "Asr": "Asr",
   "Maghrib": "Maghrib",
-  "Isha": "Icha"
+  "Isha": "Icha",
+  "Sunset": "Coucher du soleil",
+  "Midnight": "Minuit",
+  "Lastthird": "Dernier tiers de la nuit"
 }

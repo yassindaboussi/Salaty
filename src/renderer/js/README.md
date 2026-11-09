@@ -62,6 +62,7 @@ together (see `pages/quran/`):
 
   So text from the network, the user or a translation never becomes markup. (Prettier leaves
   the template contents alone: `embeddedLanguageFormatting` is off.)
+
 - Prayer times and Hijri dates come from the main process (offline cache), never from Aladhan
   directly.
 

@@ -16,6 +16,7 @@ let registered = false;
  * @param {Function} [callbacks.onThemeChange]     (theme)
  * @param {Function} [callbacks.onLanguageChange]  (language)
  * @param {Function} [callbacks.onAnalyticsChange] (enabled)
+ * @param {Function} [callbacks.onExtraTimesChange] (extraTimes)
  */
 function registerSettingsHandlers({
   onLocationChange,
@@ -24,6 +25,7 @@ function registerSettingsHandlers({
   onThemeChange,
   onLanguageChange,
   onAnalyticsChange,
+  onExtraTimesChange,
 }) {
   if (registered) return;
   registered = true;
@@ -38,6 +40,7 @@ function registerSettingsHandlers({
     // a new location reloads the prayer times already, with the correction
     else if (changed.hijriAdjustment) onHijriAdjustmentChange?.();
     if (changed.fastingReminders) onFastingRemindersChange?.();
+    if (changed.extraTimes) onExtraTimesChange?.(settings.extraTimes);
     if (changed.theme) onThemeChange?.(settings.theme);
     if (changed.language) onLanguageChange?.(settings.language);
     if (changed.analytics)
