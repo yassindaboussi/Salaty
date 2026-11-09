@@ -4,7 +4,7 @@
   "quranError": "Failed to load. Please check your internet connection.",
   "surah": "Surah",
   "juz": "Juz",
-  "searchSurah": "Search surah...",
+  "searchSurah": "Search a surah or a word...",
   "translation": "Translation",
   "translationNone": "Arabic only",
   "translationOnlineOnly": "Needs an internet connection",
@@ -58,5 +58,14 @@
   "quranBackToAyah": "Back to the ayah",
   "quranAudioError": "Couldn't play the recitation. Check your internet connection.",
   "quranNoFollow": "This recitation plays without following the ayahs.",
-  "quranOpenInReader": "Open in the Quran reader"
+  "quranOpenInReader": "Open in the Quran reader",
+  "quranVersesWith": "Verses with “{query}”",
+  "quranNoVerses": "No verses with “{query}”",
+  "quranSearchTip": "Try another form of the word, or fewer letters.",
+  "quranSearchOfflineEnglish": "Offline: searching the English translation.",
+  "quranFindLabel": "Find in this surah",
+  "quranFindPlaceholder": "A word...",
+  "quranFindPrev": "Previous (Shift+Enter)",
+  "quranFindNext": "Next (Enter)",
+  "quranFindNone": "None"
 }

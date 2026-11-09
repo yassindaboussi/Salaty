@@ -45,10 +45,19 @@ function bindPanelFold() {
   });
 
   byId("qRail", HTMLElement).addEventListener("click", (e) => {
-    if (!(/** @type {Element} */ (e.target).closest("[data-rail]"))) return;
+    const button = /** @type {Element} */ (e.target).closest("[data-rail]");
+    if (!(button instanceof HTMLElement)) return;
     setFolded(false);
-    toggle.focus();
+    // the strip's search icon: straight to "Find in this surah"
+    if (button.dataset.rail === "find")
+      byId("qFindInput", HTMLInputElement).focus();
+    else toggle.focus();
   });
 }
 
-module.exports = { bindPanelFold };
+/** Unfolds the panel (Ctrl+F). */
+const unfoldPanel = () => {
+  if (isFolded()) setFolded(false);
+};
+
+module.exports = { bindPanelFold, unfoldPanel };

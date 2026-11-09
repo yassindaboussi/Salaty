@@ -4,7 +4,7 @@
   "quranError": "فشل التحميل. يرجى التحقق من اتصالك بالإنترنت.",
   "surah": "سورة",
   "juz": "جزء",
-  "searchSurah": "ابحث عن سورة...",
+  "searchSurah": "ابحث عن سورة أو كلمة...",
   "translation": "الترجمة",
   "translationNone": "العربية فقط",
   "translationOnlineOnly": "يتطلب اتصالاً بالإنترنت",
@@ -58,5 +58,14 @@
   "quranBackToAyah": "العودة إلى الآية",
   "quranAudioError": "تعذّر تشغيل التلاوة. تحقّق من اتصالك بالإنترنت.",
   "quranNoFollow": "تُشغَّل هذه التلاوة دون تتبّع الآيات.",
-  "quranOpenInReader": "فتح في المصحف"
+  "quranOpenInReader": "فتح في المصحف",
+  "quranVersesWith": "الآيات التي فيها «{query}»",
+  "quranNoVerses": "لا توجد آيات فيها «{query}»",
+  "quranSearchTip": "جرّب صيغة أخرى للكلمة، أو حروفًا أقل.",
+  "quranSearchOfflineEnglish": "دون اتصال: البحث في الترجمة الإنجليزية.",
+  "quranFindLabel": "بحث في هذه السورة",
+  "quranFindPlaceholder": "كلمة...",
+  "quranFindPrev": "السابق (Shift+Enter)",
+  "quranFindNext": "التالي (Enter)",
+  "quranFindNone": "لا شيء"
 }

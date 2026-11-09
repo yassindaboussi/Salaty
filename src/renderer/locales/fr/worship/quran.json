@@ -4,7 +4,7 @@
   "quranError": "Échec du chargement. Vérifiez votre connexion internet.",
   "surah": "Sourate",
   "juz": "Juz",
-  "searchSurah": "Rechercher une sourate...",
+  "searchSurah": "Rechercher une sourate ou un mot...",
   "translation": "Traduction",
   "translationNone": "Arabe uniquement",
   "translationOnlineOnly": "Nécessite une connexion Internet",
@@ -58,5 +58,14 @@
   "quranBackToAyah": "Revenir au verset",
   "quranAudioError": "Impossible de lire la récitation. Vérifiez votre connexion Internet.",
   "quranNoFollow": "Cette récitation est lue sans suivre les versets.",
-  "quranOpenInReader": "Ouvrir dans le lecteur du Coran"
+  "quranOpenInReader": "Ouvrir dans le lecteur du Coran",
+  "quranVersesWith": "Versets avec « {query} »",
+  "quranNoVerses": "Aucun verset avec « {query} »",
+  "quranSearchTip": "Essayez une autre forme du mot, ou moins de lettres.",
+  "quranSearchOfflineEnglish": "Hors ligne : recherche dans la traduction anglaise.",
+  "quranFindLabel": "Rechercher dans la sourate",
+  "quranFindPlaceholder": "Un mot...",
+  "quranFindPrev": "Précédent (Maj+Entrée)",
+  "quranFindNext": "Suivant (Entrée)",
+  "quranFindNone": "Aucun"
 }

@@ -7,6 +7,7 @@
 //   reader-text.js          its text: running text, or ayah cards with a translation
 //   reading-position.js     where the reader stopped (for "Continue reading")
 //   panel-fold.js           folding the reader's display panel to a strip
+//   reader-find.js          "Find in this surah": the words marked, from one to the next
 //   title-align.js          the reader's title centred over the text, like the Bismillah
 //   translation-picker.js   the translation combobox
 //   riwaya.js               Hafs, Qalun or Warsh (text, font, ayah numbers)
@@ -66,7 +67,8 @@ const {
   bindTranslationCombo,
   updateTranslationUI,
 } = require("./translation-picker");
-const { bindPanelFold } = require("./panel-fold");
+const { bindPanelFold, unfoldPanel } = require("./panel-fold");
+const { bindReaderFind } = require("./reader-find");
 const { bindSelectionBar } = require("./selection-bar");
 const { handleOpenRequest } = require("./open-request");
 const { bindTitleAlign } = require("./title-align");
@@ -201,6 +203,7 @@ function initQuranPage() {
   bindTitleAlign();
   bindAyahActions();
   bindPanelFold();
+  bindReaderFind(unfoldPanel);
   bindSelectionBar(copyAndTell);
   bindTranslationCombo();
   bindRiwaya(onRiwayaChange);
