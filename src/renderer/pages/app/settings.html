@@ -10,6 +10,7 @@
     <title data-i18n="settings">Settings - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/settings.css" />
+    <link rel="stylesheet" href="../../css/04-pages/settings-layout.css" />
     <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
     <link rel="stylesheet" href="../../css/03-components/feedback-dialog.css" />
   </head>
@@ -34,918 +35,1163 @@
           </h1>
         </header>
 
-        <main class="settings-content">
-          <!-- Location Section -->
-          <div class="settings-section">
-            <div class="section-header">
-              <div class="section-icon">
-                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+        <main class="st-layout" id="stLayout">
+          <!-- The categories: one is shown at a time (pages/settings/nav.js) -->
+          <nav class="st-panel" data-i18n-aria-label="stCategories">
+            <div class="st-panel-head">
+              <div class="st-search">
+                <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                <input
+                  type="search"
+                  id="stSearch"
+                  class="st-search-input"
+                  autocomplete="off"
+                  spellcheck="false"
+                  data-i18n-placeholder="stSearchPlaceholder"
+                  data-i18n-aria-label="stSearchPlaceholder"
+                />
               </div>
-              <h3
-                class="section-title"
-                id="locationSectionTitle"
-                data-i18n="location"
-              >
-                Location
-              </h3>
-            </div>
-
-            <div class="location-grid">
-              <div class="form-field">
-                <label
-                  class="field-label"
-                  id="countryLabel"
-                  data-i18n="country"
-                  for="countryInput"
-                  >Country</label
-                >
-                <select
-                  id="countryInput"
-                  class="field-input"
-                  dir="ltr"
-                ></select>
-              </div>
-
-              <div class="form-field">
-                <label
-                  class="field-label"
-                  id="cityLabel"
-                  data-i18n="city"
-                  for="cityInput"
-                  >City</label
-                >
-                <select id="cityInput" class="field-input" dir="ltr"></select>
-              </div>
-            </div>
-
-            <div class="location-actions-row">
-              <button type="button" id="detectLocationBtn" class="detect-btn">
-                <i class="fas fa-location-crosshairs" aria-hidden="true"></i>
-                <span id="detectLocationLabel" data-i18n="detectLocation"
-                  >Auto Detect Location</span
-                >
-              </button>
-
               <button
                 type="button"
-                id="manageLocationsBtn"
-                class="manage-locations-btn"
+                class="st-panel-toggle"
+                id="stPanelToggle"
+                aria-controls="stPanelBody"
+                aria-expanded="true"
+                data-tooltip="stPanelHide"
               >
-                <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
-                <span id="manageLocationsLabel" data-i18n="manageLocationsLabel"
-                  >Manage Saved Locations</span
-                >
+                <i class="fas fa-angles-left" aria-hidden="true"></i>
               </button>
             </div>
 
-            <!-- Auto-detect on launch: silently checks IP-based location and
-                 offers to switch if it differs from the active location.
-                 Toggle lets the user opt out of that on-launch prompt. -->
-            <div class="toggle-field location-travel-toggle">
-              <div class="toggle-info">
-                <label
-                  class="subsection-label"
-                  id="travelModeLabel"
-                  for="travelModeToggle"
-                  data-i18n="travelModeSectionTitle"
-                  >Travel Mode</label
-                >
-                <span
-                  class="toggle-description"
-                  id="travelModeDescription"
-                  data-i18n="travelModeDescription"
-                  >Automatically detect and switch location when traveling</span
-                >
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="travelModeToggle" checked />
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-
-            <!-- How the prayer times are calculated (pages/settings/calculation.js) -->
-            <div class="notif-list calc-settings">
-              <div class="notif-row">
-                <div class="toggle-info">
-                  <label
-                    class="subsection-label"
-                    for="prayerMethodInput"
-                    data-i18n="mpMethod"
-                    >Calculation method</label
-                  >
-                  <span class="toggle-description" id="prayerMethodDesc"></span>
-                </div>
-                <select id="prayerMethodInput" class="field-input calc-select">
-                  <option value="auto" data-i18n="calcMethodAuto">
-                    Automatic (by location)
-                  </option>
-                </select>
-              </div>
-              <div class="notif-row">
-                <div class="toggle-info">
-                  <span
-                    class="subsection-label"
-                    id="asrSchoolLabel"
-                    data-i18n="calcAsrLabel"
-                    >Asr time</span
-                  >
-                  <span class="toggle-description" data-i18n="calcAsrDesc"
-                    >Hanafi: Asr starts later (about 30–60 min). Only Asr
-                    changes.</span
-                  >
-                </div>
-                <div
-                  class="segmented"
-                  role="radiogroup"
-                  aria-labelledby="asrSchoolLabel"
-                >
-                  <label class="segmented-option">
-                    <input type="radio" name="asrSchool" value="standard" />
-                    <span class="segmented-label" data-i18n="calcAsrStandard"
-                      >Standard</span
-                    >
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="asrSchool" value="hanafi" />
-                    <span class="segmented-label" data-i18n="calcAsrHanafi"
-                      >Hanafi</span
-                    >
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Appearance Section -->
-          <div class="settings-section">
-            <div class="section-header">
-              <div class="section-icon">
-                <i class="fas fa-palette" aria-hidden="true"></i>
-              </div>
-              <h3
-                class="section-title"
-                id="appearanceSectionTitle"
-                data-i18n="appearance"
+            <div class="st-rail" id="stRail">
+              <button
+                type="button"
+                class="st-rail-btn"
+                data-rail="search"
+                data-tooltip="stSearchPlaceholder"
               >
-                Appearance
-              </h3>
-            </div>
-
-            <!-- Theme Selection -->
-            <div class="subsection">
-              <label class="subsection-label" id="themeLabel" data-i18n="theme"
-                >Theme</label
+                <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                class="st-rail-btn"
+                data-pane="prayer"
+                data-tooltip="stNavPrayer"
               >
-              <div class="theme-grid" id="themeOptions">
-                <div
-                  class="theme-card"
-                  data-theme="navy"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Navy"
-                  data-i18n-aria-label="themes:navy"
-                >
-                  <div class="theme-preview theme-navy-preview"></div>
-                  <span class="theme-name" data-i18n="themes:navy">Navy</span>
-                </div>
-                <div
-                  class="theme-card"
-                  data-theme="green"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Green"
-                  data-i18n-aria-label="themes:green"
-                >
-                  <div class="theme-preview theme-green-preview"></div>
-                  <span class="theme-name" data-i18n="themes:green">Green</span>
-                </div>
-                <div
-                  class="theme-card"
-                  data-theme="brown"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Brown"
-                  data-i18n-aria-label="themes:brown"
-                >
-                  <div class="theme-preview theme-brown-preview"></div>
-                  <span class="theme-name" data-i18n="themes:brown">Brown</span>
-                </div>
-                <div
-                  class="theme-card"
-                  data-theme="dark"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Dark"
-                  data-i18n-aria-label="themes:dark"
-                >
-                  <div class="theme-preview theme-dark-preview"></div>
-                  <span class="theme-name" data-i18n="themes:dark">Dark</span>
-                </div>
-                <div
-                  class="theme-card"
-                  data-theme="pink"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Pink"
-                  data-i18n-aria-label="themes:pink"
-                >
-                  <div class="theme-preview theme-pink-preview"></div>
-                  <span class="theme-name" data-i18n="themes:pink">Pink</span>
-                </div>
-                <div
-                  class="theme-card"
-                  data-theme="purple"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Purple"
-                  data-i18n-aria-label="themes:purple"
-                >
-                  <div class="theme-preview theme-purple-preview"></div>
-                  <span class="theme-name" data-i18n="themes:purple"
-                    >Purple</span
-                  >
-                </div>
-                <div
-                  class="theme-card"
-                  data-theme="emerald"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Emerald"
-                  data-i18n-aria-label="themes:emerald"
-                >
-                  <div class="theme-preview theme-emerald-preview"></div>
-                  <span class="theme-name" data-i18n="themes:emerald"
-                    >Emerald</span
-                  >
-                </div>
-                <div
-                  class="theme-card"
-                  data-theme="ocean"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Ocean"
-                  data-i18n-aria-label="themes:ocean"
-                >
-                  <div class="theme-preview theme-ocean-preview"></div>
-                  <span class="theme-name" data-i18n="themes:ocean">Ocean</span>
-                </div>
-                <div
-                  class="theme-card"
-                  data-theme="royal"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Royal"
-                  data-i18n-aria-label="themes:royal"
-                >
-                  <div class="theme-preview theme-royal-preview"></div>
-                  <span class="theme-name" data-i18n="themes:royal">Royal</span>
-                </div>
-                <div
-                  class="theme-card"
-                  data-theme="indigo"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Indigo"
-                  data-i18n-aria-label="themes:indigo"
-                >
-                  <div class="theme-preview theme-indigo-preview"></div>
-                  <span class="theme-name" data-i18n="themes:indigo"
-                    >Indigo</span
-                  >
-                </div>
-                <div
-                  class="theme-card"
-                  data-theme="classic"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Classic"
-                  data-i18n-aria-label="themes:classic"
-                >
-                  <div class="theme-preview theme-classic-preview"></div>
-                  <span class="theme-name" data-i18n="themes:classic"
-                    >Classic</span
-                  >
-                </div>
-                <div
-                  class="theme-card"
-                  data-theme="ramadan"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Ramadan"
-                  data-i18n-aria-label="themes:ramadan"
-                >
-                  <div class="theme-preview theme-ramadan-preview"></div>
-                  <span class="theme-name" data-i18n="themes:ramadan"
-                    >Ramadan</span
-                  >
-                </div>
-              </div>
-            </div>
-
-            <!-- Language Selection -->
-            <div class="subsection">
-              <label
-                class="subsection-label"
-                id="languageLabel"
-                data-i18n="language"
-                >Language</label
+                <i class="fas fa-clock" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                class="st-rail-btn"
+                data-pane="alerts"
+                data-tooltip="notification"
               >
-              <div class="language-grid" id="languageOptions">
-                <div
-                  class="language-card"
-                  data-lang="en"
-                  role="button"
-                  tabindex="0"
-                >
-                  <i class="fas fa-globe" aria-hidden="true"></i>
-                  <div class="language-info">
-                    <span
-                      class="lang-name"
-                      id="langNameEn"
-                      data-i18n="englishLanguage"
-                      >English</span
-                    >
-                    <span class="lang-native">English</span>
-                  </div>
-                </div>
-                <div
-                  class="language-card"
-                  data-lang="ar"
-                  role="button"
-                  tabindex="0"
-                >
-                  <i class="fas fa-globe" aria-hidden="true"></i>
-                  <div class="language-info">
-                    <span
-                      class="lang-name"
-                      id="langNameAr"
-                      data-i18n="arabicLanguage"
-                      >Arabic</span
-                    >
-                    <span class="lang-native">العربية</span>
-                  </div>
-                </div>
-                <div
-                  class="language-card"
-                  data-lang="fr"
-                  role="button"
-                  tabindex="0"
-                >
-                  <i class="fas fa-globe" aria-hidden="true"></i>
-                  <div class="language-info">
-                    <span
-                      class="lang-name"
-                      id="langNameFr"
-                      data-i18n="frenchLanguage"
-                      >French</span
-                    >
-                    <span class="lang-native">Français</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Screen Size -->
-            <div class="subsection">
-              <label
-                class="subsection-label"
-                id="screenSizeSettingLabel"
-                data-i18n="screenSizeSettingLabel"
-                >Screen Size</label
-              >
-              <div class="screen-size-grid" id="screenSizeOptions">
-                <div
-                  class="size-card"
-                  data-size="big"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Big Screen"
-                  data-i18n-aria-label="bigScreen"
-                >
-                  <div class="size-icon">
-                    <i class="fas fa-desktop" aria-hidden="true"></i>
-                  </div>
-                  <div class="size-info">
-                    <span
-                      class="size-name"
-                      id="bigScreenLabel"
-                      data-i18n="bigScreen"
-                      >Big Screen</span
-                    >
-                  </div>
-                  <div class="size-check">
-                    <i class="fas fa-check" aria-hidden="true"></i>
-                  </div>
-                </div>
-                <div
-                  class="size-card"
-                  data-size="fullscreen"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Full Screen"
-                  data-i18n-aria-label="fullScreen"
-                >
-                  <div class="size-icon">
-                    <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
-                  </div>
-                  <div class="size-info">
-                    <span
-                      class="size-name"
-                      id="smallScreenLabel"
-                      data-i18n="fullScreen"
-                      >Full Screen</span
-                    >
-                  </div>
-                  <div class="size-check">
-                    <i class="fas fa-check" aria-hidden="true"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Notifications Section -->
-          <div class="settings-section">
-            <div class="section-header">
-              <div class="section-icon">
                 <i class="fas fa-bell" aria-hidden="true"></i>
-              </div>
-              <h3
-                class="section-title"
-                id="notificationsSectionTitle"
-                data-i18n="notification"
+              </button>
+              <button
+                type="button"
+                class="st-rail-btn"
+                data-pane="appearance"
+                data-tooltip="appearance"
               >
-                Notifications
-              </h3>
-            </div>
-
-            <!-- Grouped list: each notification type is a single row
-                 (label + inline stepper + toggle) instead of a toggle row
-                 stacked above a separate full stepper row. -->
-            <div class="notif-list">
-              <!-- Athkar Alerts -->
-              <div class="notif-row">
-                <div class="toggle-info">
-                  <label
-                    class="subsection-label"
-                    id="athkarAlertsLabel"
-                    for="athkarAlertsToggle"
-                    data-i18n="athkarAlerts"
-                    >Athkar Alerts</label
-                  >
-                  <span
-                    class="toggle-description"
-                    id="enableAthkarAlertsLabel"
-                    data-i18n="enableAthkarAlerts"
-                    >Enable periodic reminders</span
-                  >
-                </div>
-
-                <div
-                  class="conditional-field notif-inline-stepper"
-                  id="athkarIntervalContainer"
-                >
-                  <div class="num-spinner-wrap compact">
-                    <button
-                      type="button"
-                      class="num-spinner-btn"
-                      data-target="athkarIntervalInput"
-                      data-delta="-1"
-                      tabindex="-1"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                        stroke-linecap="round"
-                        aria-hidden="true"
-                      >
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                      </svg>
-                    </button>
-                    <input
-                      type="number"
-                      id="athkarIntervalInput"
-                      data-i18n-aria-label="athkarInterval"
-                      class="num-spinner-input"
-                      min="1"
-                      max="1440"
-                      value="30"
-                    />
-                    <button
-                      type="button"
-                      class="num-spinner-btn"
-                      data-target="athkarIntervalInput"
-                      data-delta="1"
-                      tabindex="-1"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                        stroke-linecap="round"
-                        aria-hidden="true"
-                      >
-                        <line x1="12" y1="5" x2="12" y2="19" />
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                      </svg>
-                    </button>
-                    <span
-                      class="num-spinner-unit"
-                      id="minutesLabel"
-                      data-i18n="minutes"
-                      >min</span
-                    >
-                  </div>
-                </div>
-
-                <label class="toggle-switch">
-                  <input type="checkbox" id="athkarAlertsToggle" />
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-
-              <!-- Pre-Adhan Notification -->
-              <div class="notif-row">
-                <div class="toggle-info">
-                  <label
-                    class="subsection-label"
-                    id="preAdhanNotificationLabel"
-                    for="preAdhanNotificationToggle"
-                    data-i18n="preAdhanNotification"
-                    >Pre-Adhan Notification</label
-                  >
-                  <span
-                    class="toggle-description"
-                    id="enablePreAdhanNotificationLabel"
-                    data-i18n="enablePreAdhanNotification"
-                    >Alert before Adhan</span
-                  >
-                </div>
-
-                <div
-                  class="conditional-field notif-inline-stepper"
-                  id="preAdhanMinutesContainer"
-                >
-                  <div class="num-spinner-wrap compact">
-                    <button
-                      type="button"
-                      class="num-spinner-btn"
-                      data-target="preAdhanMinutesInput"
-                      data-delta="-1"
-                      tabindex="-1"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                        stroke-linecap="round"
-                        aria-hidden="true"
-                      >
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                      </svg>
-                    </button>
-                    <input
-                      type="number"
-                      id="preAdhanMinutesInput"
-                      data-i18n-aria-label="minutesBeforeAdhan"
-                      class="num-spinner-input"
-                      min="1"
-                      max="60"
-                      value="5"
-                    />
-                    <button
-                      type="button"
-                      class="num-spinner-btn"
-                      data-target="preAdhanMinutesInput"
-                      data-delta="1"
-                      tabindex="-1"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                        stroke-linecap="round"
-                        aria-hidden="true"
-                      >
-                        <line x1="12" y1="5" x2="12" y2="19" />
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                      </svg>
-                    </button>
-                    <span
-                      class="num-spinner-unit"
-                      id="minutesLabel2"
-                      data-i18n="minutes"
-                      >min</span
-                    >
-                  </div>
-                </div>
-
-                <label class="toggle-switch">
-                  <input type="checkbox" id="preAdhanNotificationToggle" />
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Hijri calendar: first day of the week, and the Hijri date correction -->
-          <div class="settings-section">
-            <div class="section-header">
-              <div class="section-icon">
+                <i class="fas fa-palette" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                class="st-rail-btn"
+                data-pane="hijri"
+                data-tooltip="hijriCalendar"
+              >
                 <i class="fas fa-moon" aria-hidden="true"></i>
-              </div>
-              <h3 class="section-title" data-i18n="hijriCalendar">
-                Hijri Calendar
-              </h3>
-            </div>
-
-            <div class="notif-list">
-              <div class="notif-row">
-                <div class="toggle-info">
-                  <span
-                    class="subsection-label"
-                    id="weekStartLabel"
-                    data-i18n="weekStartLabel"
-                    >First day of the week</span
-                  >
-                  <span class="toggle-description" id="weekStartDesc"></span>
-                </div>
-                <div
-                  class="segmented"
-                  role="radiogroup"
-                  aria-labelledby="weekStartLabel"
-                >
-                  <label class="segmented-option">
-                    <input type="radio" name="weekStart" value="auto" />
-                    <span class="segmented-label" data-i18n="weekStartAuto"
-                      >Auto</span
-                    >
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="weekStart" value="sat" />
-                    <span class="segmented-label" data-weekday="6">Sat</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="weekStart" value="sun" />
-                    <span class="segmented-label" data-weekday="0">Sun</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="weekStart" value="mon" />
-                    <span class="segmented-label" data-weekday="1">Mon</span>
-                  </label>
-                </div>
-              </div>
-
-              <div class="notif-row">
-                <div class="toggle-info">
-                  <label
-                    class="subsection-label"
-                    for="hijriAdjustmentInput"
-                    data-i18n="hijriAdjustmentLabel"
-                    >Correct the Hijri date</label
-                  >
-                  <span
-                    class="toggle-description"
-                    data-i18n="hijriAdjustmentDesc"
-                    >Leave at 0. Change it only if the date below is a day off
-                    from your country’s official date.</span
-                  >
-                  <span
-                    class="toggle-description hijri-today-preview"
-                    id="hijriTodayPreview"
-                  ></span>
-                </div>
-                <div class="num-spinner-wrap compact">
-                  <button
-                    type="button"
-                    class="num-spinner-btn"
-                    data-target="hijriAdjustmentInput"
-                    data-delta="-1"
-                    tabindex="-1"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                      stroke-linecap="round"
-                      aria-hidden="true"
-                    >
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                    </svg>
-                  </button>
-                  <input
-                    type="number"
-                    id="hijriAdjustmentInput"
-                    class="num-spinner-input"
-                    min="-2"
-                    max="2"
-                    value="0"
-                  />
-                  <button
-                    type="button"
-                    class="num-spinner-btn"
-                    data-target="hijriAdjustmentInput"
-                    data-delta="1"
-                    tabindex="-1"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                      stroke-linecap="round"
-                      aria-hidden="true"
-                    >
-                      <line x1="12" y1="5" x2="12" y2="19" />
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                    </svg>
-                  </button>
-                  <span class="num-spinner-unit" data-i18n="hijriAdjustmentUnit"
-                    >days</span
-                  >
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Privacy Section: analytics are opt-in (off until the user turns them on) -->
-          <div class="settings-section">
-            <div class="section-header">
-              <div class="section-icon">
-                <i class="fas fa-shield-halved" aria-hidden="true"></i>
-              </div>
-              <h3
-                class="section-title"
-                id="privacySectionTitle"
-                data-i18n="privacySectionTitle"
+              </button>
+              <button
+                type="button"
+                class="st-rail-btn"
+                data-pane="privacy"
+                data-tooltip="privacySectionTitle"
               >
-                Privacy
-              </h3>
-            </div>
-
-            <div class="toggle-field">
-              <div class="toggle-info">
-                <label
-                  class="subsection-label"
-                  id="analyticsLabel"
-                  data-i18n="analyticsLabel"
-                  for="analyticsToggle"
-                  >Anonymous usage statistics</label
-                >
-                <span
-                  class="toggle-description"
-                  id="analyticsDescription"
-                  data-i18n="analyticsDescription"
-                  >Share which features are used and app errors to help improve
-                  Salaty Time. Your location and what you listen to are never
-                  sent.</span
-                >
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="analyticsToggle" />
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-
-          <!-- About Section -->
-          <div class="settings-section" id="aboutSection">
-            <div class="section-header">
-              <div class="section-icon">
+                <i class="fas fa-shield-halved" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                class="st-rail-btn"
+                data-pane="about"
+                data-tooltip="aboutTitle"
+              >
                 <i class="fas fa-circle-info" aria-hidden="true"></i>
-              </div>
-              <h3
-                class="section-title"
-                id="aboutSectionTitle"
-                data-i18n="aboutTitle"
-              ></h3>
+              </button>
             </div>
 
-            <div class="about-card">
-              <!-- App identity -->
-              <div class="about-identity">
-                <div class="about-app-icon">
-                  <img
-                    src="../../../assets/images/app-icon.png"
-                    alt=""
-                    width="30"
-                    height="30"
-                  />
-                </div>
-                <div class="about-app-info">
-                  <div class="about-name-row">
-                    <span class="about-app-name">Salaty Time</span>
-                    <span
-                      class="about-app-version"
-                      id="appVersionDisplay"
-                    ></span>
-                  </div>
-                  <span
-                    class="about-app-tagline"
-                    id="aboutTagline"
-                    data-i18n="aboutTagline"
-                    >Prayer times, Quran &amp; Islamic tools in one place</span
+            <div class="st-panel-body" id="stPanelBody">
+              <ul class="st-nav" id="stNav">
+                <li>
+                  <button type="button" class="st-nav-item" data-pane="prayer">
+                    <i class="fas fa-clock st-nav-icon" aria-hidden="true"></i>
+                    <span class="st-nav-label" data-i18n="stNavPrayer"></span>
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="st-nav-item" data-pane="alerts">
+                    <i class="fas fa-bell st-nav-icon" aria-hidden="true"></i>
+                    <span class="st-nav-label" data-i18n="notification"></span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    class="st-nav-item"
+                    data-pane="appearance"
                   >
-                </div>
-              </div>
-
-              <div class="about-divider"></div>
-
-              <!-- Update row -->
-              <div class="about-update-row">
-                <div class="about-update-status">
-                  <span class="about-status-badge">
                     <i
-                      class="fas fa-circle-check about-status-icon"
-                      id="aboutStatusIcon"
+                      class="fas fa-palette st-nav-icon"
                       aria-hidden="true"
                     ></i>
-                  </span>
-                  <span id="aboutStatusText"></span>
-                </div>
-                <button
-                  type="button"
-                  class="about-check-btn"
-                  id="aboutCheckUpdateBtn"
+                    <span class="st-nav-label" data-i18n="appearance"></span>
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="st-nav-item" data-pane="hijri">
+                    <i class="fas fa-moon st-nav-icon" aria-hidden="true"></i>
+                    <span class="st-nav-label" data-i18n="hijriCalendar"></span>
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="st-nav-item" data-pane="privacy">
+                    <i
+                      class="fas fa-shield-halved st-nav-icon"
+                      aria-hidden="true"
+                    ></i>
+                    <span
+                      class="st-nav-label"
+                      data-i18n="privacySectionTitle"
+                    ></span>
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="st-nav-item" data-pane="about">
+                    <i
+                      class="fas fa-circle-info st-nav-icon"
+                      aria-hidden="true"
+                    ></i>
+                    <span class="st-nav-label" data-i18n="aboutTitle"></span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </nav>
+
+          <div class="st-main" id="stMain">
+            <p class="st-saved" id="stSaved" role="status"></p>
+            <p class="st-empty" id="stEmpty" hidden>
+              <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+              <span id="stEmptyText"></span>
+            </p>
+
+            <!-- Location Section -->
+            <div
+              class="settings-section st-pane"
+              data-pane="prayer"
+              role="region"
+              aria-labelledby="locationSectionTitle"
+            >
+              <div class="section-header">
+                <h2
+                  class="section-title"
+                  id="locationSectionTitle"
+                  data-i18n="stNavPrayer"
                 >
-                  <i class="fas fa-rotate" aria-hidden="true"></i>
-                  <span id="aboutCheckLabel" data-i18n="checkForUpdates"></span>
-                </button>
+                  Prayer times
+                </h2>
               </div>
 
-              <!-- Progress bar (hidden until downloading) -->
-              <div class="about-progress-wrap hidden" id="aboutProgressWrap">
-                <div class="about-progress-bar">
-                  <div class="about-progress-fill" id="aboutProgressFill"></div>
+              <div class="st-item st-location">
+                <div class="location-grid">
+                  <div class="form-field">
+                    <label
+                      class="field-label"
+                      id="countryLabel"
+                      data-i18n="country"
+                      for="countryInput"
+                      >Country</label
+                    >
+                    <select
+                      id="countryInput"
+                      class="field-input"
+                      dir="ltr"
+                    ></select>
+                  </div>
+
+                  <div class="form-field">
+                    <label
+                      class="field-label"
+                      id="cityLabel"
+                      data-i18n="city"
+                      for="cityInput"
+                      >City</label
+                    >
+                    <select
+                      id="cityInput"
+                      class="field-input"
+                      dir="ltr"
+                    ></select>
+                  </div>
                 </div>
-                <span class="about-progress-text" id="aboutProgressText"
-                  >0%</span
-                >
-              </div>
 
-              <!-- Install button (hidden until downloaded) -->
-              <button
-                type="button"
-                class="about-install-btn hidden"
-                id="aboutInstallBtn"
-              >
-                <i class="fas fa-bolt" aria-hidden="true"></i>
-                <span
-                  id="aboutInstallLabel"
-                  data-i18n="restartAndInstall"
-                ></span>
-              </button>
-
-              <div class="about-divider"></div>
-
-              <!-- Links row -->
-              <div class="about-links-row">
-                <button
-                  type="button"
-                  class="about-link-btn"
-                  id="aboutGithubBtn"
-                >
-                  <i class="fab fa-github" aria-hidden="true"></i>
-                  <span id="aboutGithubLabel" data-i18n="viewOnGithub"
-                    >View on GitHub</span
+                <div class="location-actions-row">
+                  <button
+                    type="button"
+                    id="detectLocationBtn"
+                    class="detect-btn"
                   >
-                </button>
-                <button
-                  type="button"
-                  class="about-link-btn"
-                  id="aboutContactBtn"
-                  data-email="salatytime@gmail.com"
-                >
-                  <i
-                    class="fas fa-envelope"
-                    id="aboutContactIcon"
-                    aria-hidden="true"
-                  ></i>
-                  <span>salatytime@gmail.com</span>
-                </button>
-                <button
-                  type="button"
-                  class="about-link-btn"
-                  id="aboutFeedbackBtn"
-                >
-                  <i class="fas fa-comment-dots" aria-hidden="true"></i>
-                  <span data-i18n="sendFeedback">Send feedback</span>
-                </button>
+                    <i
+                      class="fas fa-location-crosshairs"
+                      aria-hidden="true"
+                    ></i>
+                    <span id="detectLocationLabel" data-i18n="detectLocation"
+                      >Auto Detect Location</span
+                    >
+                  </button>
+
+                  <button
+                    type="button"
+                    id="manageLocationsBtn"
+                    class="manage-locations-btn"
+                  >
+                    <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+                    <span
+                      id="manageLocationsLabel"
+                      data-i18n="manageLocationsLabel"
+                      >Manage Saved Locations</span
+                    >
+                  </button>
+                </div>
+              </div>
+
+              <!-- Auto-detect on launch: silently checks IP-based location and
+                 offers to switch if it differs from the active location.
+                 Toggle lets the user opt out of that on-launch prompt. -->
+              <div class="toggle-field st-item">
+                <div class="toggle-info">
+                  <label
+                    class="subsection-label"
+                    id="travelModeLabel"
+                    for="travelModeToggle"
+                    data-i18n="travelModeSectionTitle"
+                    >Travel Mode</label
+                  >
+                  <span
+                    class="toggle-description"
+                    id="travelModeDescription"
+                    data-i18n="travelModeDescription"
+                    >Automatically detect and switch location when
+                    traveling</span
+                  >
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="travelModeToggle" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <!-- How the prayer times are calculated (pages/settings/calculation.js) -->
+              <div class="notif-list calc-settings">
+                <div class="notif-row st-item">
+                  <div class="toggle-info">
+                    <label
+                      class="subsection-label"
+                      for="prayerMethodInput"
+                      data-i18n="mpMethod"
+                      >Calculation method</label
+                    >
+                    <span
+                      class="toggle-description"
+                      id="prayerMethodDesc"
+                    ></span>
+                  </div>
+                  <select
+                    id="prayerMethodInput"
+                    class="field-input calc-select"
+                  >
+                    <option value="auto" data-i18n="calcMethodAuto">
+                      Automatic (by location)
+                    </option>
+                  </select>
+                </div>
+                <div class="notif-row st-item">
+                  <div class="toggle-info">
+                    <span
+                      class="subsection-label"
+                      id="asrSchoolLabel"
+                      data-i18n="calcAsrLabel"
+                      >Asr time</span
+                    >
+                    <span class="toggle-description" data-i18n="calcAsrDesc"
+                      >Hanafi: Asr starts later (about 30–60 min). Only Asr
+                      changes.</span
+                    >
+                  </div>
+                  <div
+                    class="segmented"
+                    role="radiogroup"
+                    aria-labelledby="asrSchoolLabel"
+                  >
+                    <label class="segmented-option">
+                      <input type="radio" name="asrSchool" value="standard" />
+                      <span class="segmented-label" data-i18n="calcAsrStandard"
+                        >Standard</span
+                      >
+                    </label>
+                    <label class="segmented-option">
+                      <input type="radio" name="asrSchool" value="hanafi" />
+                      <span class="segmented-label" data-i18n="calcAsrHanafi"
+                        >Hanafi</span
+                      >
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Footer -->
-          <div class="settings-footer">
-            <p class="footer-text" id="footerText" data-i18n="madeWith">
-              Made with ❤️ for the Muslim Ummah
-            </p>
+            <!-- Notifications Section -->
+            <div
+              class="settings-section st-pane"
+              data-pane="alerts"
+              role="region"
+              aria-labelledby="notificationsSectionTitle"
+            >
+              <div class="section-header">
+                <h2
+                  class="section-title"
+                  id="notificationsSectionTitle"
+                  data-i18n="notification"
+                >
+                  Notifications
+                </h2>
+              </div>
+
+              <!-- Grouped list: each notification type is a single row
+                 (label + inline stepper + toggle) instead of a toggle row
+                 stacked above a separate full stepper row. -->
+              <div class="notif-list">
+                <!-- Athkar Alerts -->
+                <div class="notif-row st-item">
+                  <div class="toggle-info">
+                    <label
+                      class="subsection-label"
+                      id="athkarAlertsLabel"
+                      for="athkarAlertsToggle"
+                      data-i18n="athkarAlerts"
+                      >Athkar Alerts</label
+                    >
+                    <span
+                      class="toggle-description"
+                      id="enableAthkarAlertsLabel"
+                      data-i18n="enableAthkarAlerts"
+                      >Enable periodic reminders</span
+                    >
+                  </div>
+
+                  <div
+                    class="conditional-field notif-inline-stepper"
+                    id="athkarIntervalContainer"
+                  >
+                    <div class="num-spinner-wrap compact">
+                      <button
+                        type="button"
+                        class="num-spinner-btn"
+                        data-target="athkarIntervalInput"
+                        data-delta="-1"
+                        tabindex="-1"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          aria-hidden="true"
+                        >
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      </button>
+                      <input
+                        type="number"
+                        id="athkarIntervalInput"
+                        data-i18n-aria-label="athkarInterval"
+                        class="num-spinner-input"
+                        min="1"
+                        max="1440"
+                        value="30"
+                      />
+                      <button
+                        type="button"
+                        class="num-spinner-btn"
+                        data-target="athkarIntervalInput"
+                        data-delta="1"
+                        tabindex="-1"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          aria-hidden="true"
+                        >
+                          <line x1="12" y1="5" x2="12" y2="19" />
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      </button>
+                      <span
+                        class="num-spinner-unit"
+                        id="minutesLabel"
+                        data-i18n="minutes"
+                        >min</span
+                      >
+                    </div>
+                  </div>
+
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="athkarAlertsToggle" />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <!-- Pre-Adhan Notification -->
+                <div class="notif-row st-item">
+                  <div class="toggle-info">
+                    <label
+                      class="subsection-label"
+                      id="preAdhanNotificationLabel"
+                      for="preAdhanNotificationToggle"
+                      data-i18n="preAdhanNotification"
+                      >Pre-Adhan Notification</label
+                    >
+                    <span
+                      class="toggle-description"
+                      id="enablePreAdhanNotificationLabel"
+                      data-i18n="enablePreAdhanNotification"
+                      >Alert before Adhan</span
+                    >
+                  </div>
+
+                  <div
+                    class="conditional-field notif-inline-stepper"
+                    id="preAdhanMinutesContainer"
+                  >
+                    <div class="num-spinner-wrap compact">
+                      <button
+                        type="button"
+                        class="num-spinner-btn"
+                        data-target="preAdhanMinutesInput"
+                        data-delta="-1"
+                        tabindex="-1"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          aria-hidden="true"
+                        >
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      </button>
+                      <input
+                        type="number"
+                        id="preAdhanMinutesInput"
+                        data-i18n-aria-label="minutesBeforeAdhan"
+                        class="num-spinner-input"
+                        min="1"
+                        max="60"
+                        value="5"
+                      />
+                      <button
+                        type="button"
+                        class="num-spinner-btn"
+                        data-target="preAdhanMinutesInput"
+                        data-delta="1"
+                        tabindex="-1"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          aria-hidden="true"
+                        >
+                          <line x1="12" y1="5" x2="12" y2="19" />
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      </button>
+                      <span
+                        class="num-spinner-unit"
+                        id="minutesLabel2"
+                        data-i18n="minutes"
+                        >min</span
+                      >
+                    </div>
+                  </div>
+
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="preAdhanNotificationToggle" />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Appearance Section -->
+            <div
+              class="settings-section st-pane"
+              data-pane="appearance"
+              role="region"
+              aria-labelledby="appearanceSectionTitle"
+            >
+              <div class="section-header">
+                <h2
+                  class="section-title"
+                  id="appearanceSectionTitle"
+                  data-i18n="appearance"
+                >
+                  Appearance
+                </h2>
+              </div>
+
+              <!-- Theme Selection -->
+              <div class="subsection st-item">
+                <label
+                  class="subsection-label"
+                  id="themeLabel"
+                  data-i18n="theme"
+                  >Theme</label
+                >
+                <div class="theme-grid" id="themeOptions">
+                  <div
+                    class="theme-card"
+                    data-theme="navy"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Navy"
+                    data-i18n-aria-label="themes:navy"
+                  >
+                    <div class="theme-preview theme-navy-preview"></div>
+                    <span class="theme-name" data-i18n="themes:navy">Navy</span>
+                  </div>
+                  <div
+                    class="theme-card"
+                    data-theme="ocean"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Ocean"
+                    data-i18n-aria-label="themes:ocean"
+                  >
+                    <div class="theme-preview theme-ocean-preview"></div>
+                    <span class="theme-name" data-i18n="themes:ocean"
+                      >Ocean</span
+                    >
+                  </div>
+                  <div
+                    class="theme-card"
+                    data-theme="royal"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Royal"
+                    data-i18n-aria-label="themes:royal"
+                  >
+                    <div class="theme-preview theme-royal-preview"></div>
+                    <span class="theme-name" data-i18n="themes:royal"
+                      >Royal</span
+                    >
+                  </div>
+                  <div
+                    class="theme-card"
+                    data-theme="indigo"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Indigo"
+                    data-i18n-aria-label="themes:indigo"
+                  >
+                    <div class="theme-preview theme-indigo-preview"></div>
+                    <span class="theme-name" data-i18n="themes:indigo"
+                      >Indigo</span
+                    >
+                  </div>
+                  <div
+                    class="theme-card"
+                    data-theme="emerald"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Emerald"
+                    data-i18n-aria-label="themes:emerald"
+                  >
+                    <div class="theme-preview theme-emerald-preview"></div>
+                    <span class="theme-name" data-i18n="themes:emerald"
+                      >Emerald</span
+                    >
+                  </div>
+                  <div
+                    class="theme-card"
+                    data-theme="green"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Green"
+                    data-i18n-aria-label="themes:green"
+                  >
+                    <div class="theme-preview theme-green-preview"></div>
+                    <span class="theme-name" data-i18n="themes:green"
+                      >Green</span
+                    >
+                  </div>
+                  <div
+                    class="theme-card"
+                    data-theme="dark"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Dark"
+                    data-i18n-aria-label="themes:dark"
+                  >
+                    <div class="theme-preview theme-dark-preview"></div>
+                    <span class="theme-name" data-i18n="themes:dark">Dark</span>
+                  </div>
+                  <div
+                    class="theme-card"
+                    data-theme="classic"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Classic"
+                    data-i18n-aria-label="themes:classic"
+                  >
+                    <div class="theme-preview theme-classic-preview"></div>
+                    <span class="theme-name" data-i18n="themes:classic"
+                      >Classic</span
+                    >
+                  </div>
+                  <div
+                    class="theme-card"
+                    data-theme="purple"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Purple"
+                    data-i18n-aria-label="themes:purple"
+                  >
+                    <div class="theme-preview theme-purple-preview"></div>
+                    <span class="theme-name" data-i18n="themes:purple"
+                      >Purple</span
+                    >
+                  </div>
+                  <div
+                    class="theme-card"
+                    data-theme="pink"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Pink"
+                    data-i18n-aria-label="themes:pink"
+                  >
+                    <div class="theme-preview theme-pink-preview"></div>
+                    <span class="theme-name" data-i18n="themes:pink">Pink</span>
+                  </div>
+                  <div
+                    class="theme-card"
+                    data-theme="brown"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Brown"
+                    data-i18n-aria-label="themes:brown"
+                  >
+                    <div class="theme-preview theme-brown-preview"></div>
+                    <span class="theme-name" data-i18n="themes:brown"
+                      >Brown</span
+                    >
+                  </div>
+                  <div
+                    class="theme-card"
+                    data-theme="ramadan"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Ramadan"
+                    data-i18n-aria-label="themes:ramadan"
+                  >
+                    <div class="theme-preview theme-ramadan-preview"></div>
+                    <span class="theme-name" data-i18n="themes:ramadan"
+                      >Ramadan</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Language Selection -->
+              <div class="subsection st-item">
+                <label
+                  class="subsection-label"
+                  id="languageLabel"
+                  data-i18n="language"
+                  >Language</label
+                >
+                <div class="language-grid" id="languageOptions">
+                  <div
+                    class="language-card"
+                    data-lang="en"
+                    role="button"
+                    tabindex="0"
+                  >
+                    <i class="fas fa-globe" aria-hidden="true"></i>
+                    <div class="language-info">
+                      <span
+                        class="lang-name"
+                        id="langNameEn"
+                        data-i18n="englishLanguage"
+                        >English</span
+                      >
+                      <span class="lang-native">English</span>
+                    </div>
+                  </div>
+                  <div
+                    class="language-card"
+                    data-lang="ar"
+                    role="button"
+                    tabindex="0"
+                  >
+                    <i class="fas fa-globe" aria-hidden="true"></i>
+                    <div class="language-info">
+                      <span
+                        class="lang-name"
+                        id="langNameAr"
+                        data-i18n="arabicLanguage"
+                        >Arabic</span
+                      >
+                      <span class="lang-native">العربية</span>
+                    </div>
+                  </div>
+                  <div
+                    class="language-card"
+                    data-lang="fr"
+                    role="button"
+                    tabindex="0"
+                  >
+                    <i class="fas fa-globe" aria-hidden="true"></i>
+                    <div class="language-info">
+                      <span
+                        class="lang-name"
+                        id="langNameFr"
+                        data-i18n="frenchLanguage"
+                        >French</span
+                      >
+                      <span class="lang-native">Français</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Screen Size -->
+              <div class="subsection st-item">
+                <label
+                  class="subsection-label"
+                  id="screenSizeSettingLabel"
+                  data-i18n="screenSizeSettingLabel"
+                  >Screen Size</label
+                >
+                <div class="screen-size-grid" id="screenSizeOptions">
+                  <div
+                    class="size-card"
+                    data-size="big"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Big Screen"
+                    data-i18n-aria-label="bigScreen"
+                  >
+                    <div class="size-icon">
+                      <i class="fas fa-desktop" aria-hidden="true"></i>
+                    </div>
+                    <div class="size-info">
+                      <span
+                        class="size-name"
+                        id="bigScreenLabel"
+                        data-i18n="bigScreen"
+                        >Big Screen</span
+                      >
+                    </div>
+                    <div class="size-check">
+                      <i class="fas fa-check" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                  <div
+                    class="size-card"
+                    data-size="fullscreen"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Full Screen"
+                    data-i18n-aria-label="fullScreen"
+                  >
+                    <div class="size-icon">
+                      <i
+                        class="fas fa-expand-arrows-alt"
+                        aria-hidden="true"
+                      ></i>
+                    </div>
+                    <div class="size-info">
+                      <span
+                        class="size-name"
+                        id="smallScreenLabel"
+                        data-i18n="fullScreen"
+                        >Full Screen</span
+                      >
+                    </div>
+                    <div class="size-check">
+                      <i class="fas fa-check" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- How this page is laid out (pages/settings/view.js) -->
+              <div class="notif-row st-item">
+                <div class="toggle-info">
+                  <span
+                    class="subsection-label"
+                    id="settingsViewLabel"
+                    data-i18n="stViewLabel"
+                    >Settings view</span
+                  >
+                  <span class="toggle-description" data-i18n="stViewDesc"
+                    >Menu: one category at a time. One page: everything in one
+                    list.</span
+                  >
+                </div>
+                <div
+                  class="segmented"
+                  role="radiogroup"
+                  aria-labelledby="settingsViewLabel"
+                >
+                  <label class="segmented-option">
+                    <input type="radio" name="settingsView" value="menu" />
+                    <span class="segmented-label" data-i18n="stViewMenu"
+                      >Menu</span
+                    >
+                  </label>
+                  <label class="segmented-option">
+                    <input type="radio" name="settingsView" value="page" />
+                    <span class="segmented-label" data-i18n="stViewPage"
+                      >One page</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hijri calendar: first day of the week, and the Hijri date correction -->
+            <div
+              class="settings-section st-pane"
+              data-pane="hijri"
+              role="region"
+              aria-labelledby="hijriSectionTitle"
+            >
+              <div class="section-header">
+                <h2
+                  class="section-title"
+                  id="hijriSectionTitle"
+                  data-i18n="hijriCalendar"
+                >
+                  Hijri Calendar
+                </h2>
+              </div>
+
+              <div class="notif-list">
+                <div class="notif-row st-item">
+                  <div class="toggle-info">
+                    <span
+                      class="subsection-label"
+                      id="weekStartLabel"
+                      data-i18n="weekStartLabel"
+                      >First day of the week</span
+                    >
+                    <span class="toggle-description" id="weekStartDesc"></span>
+                  </div>
+                  <div
+                    class="segmented"
+                    role="radiogroup"
+                    aria-labelledby="weekStartLabel"
+                  >
+                    <label class="segmented-option">
+                      <input type="radio" name="weekStart" value="auto" />
+                      <span class="segmented-label" data-i18n="weekStartAuto"
+                        >Auto</span
+                      >
+                    </label>
+                    <label class="segmented-option">
+                      <input type="radio" name="weekStart" value="sat" />
+                      <span class="segmented-label" data-weekday="6">Sat</span>
+                    </label>
+                    <label class="segmented-option">
+                      <input type="radio" name="weekStart" value="sun" />
+                      <span class="segmented-label" data-weekday="0">Sun</span>
+                    </label>
+                    <label class="segmented-option">
+                      <input type="radio" name="weekStart" value="mon" />
+                      <span class="segmented-label" data-weekday="1">Mon</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="notif-row st-item">
+                  <div class="toggle-info">
+                    <label
+                      class="subsection-label"
+                      for="hijriAdjustmentInput"
+                      data-i18n="hijriAdjustmentLabel"
+                      >Correct the Hijri date</label
+                    >
+                    <span
+                      class="toggle-description"
+                      data-i18n="hijriAdjustmentDesc"
+                      >Leave at 0. Change it only if the date below is a day off
+                      from your country’s official date.</span
+                    >
+                    <span
+                      class="toggle-description hijri-today-preview"
+                      id="hijriTodayPreview"
+                    ></span>
+                  </div>
+                  <div class="num-spinner-wrap compact">
+                    <button
+                      type="button"
+                      class="num-spinner-btn"
+                      data-target="hijriAdjustmentInput"
+                      data-delta="-1"
+                      tabindex="-1"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        aria-hidden="true"
+                      >
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                    </button>
+                    <input
+                      type="number"
+                      id="hijriAdjustmentInput"
+                      class="num-spinner-input"
+                      min="-2"
+                      max="2"
+                      value="0"
+                    />
+                    <button
+                      type="button"
+                      class="num-spinner-btn"
+                      data-target="hijriAdjustmentInput"
+                      data-delta="1"
+                      tabindex="-1"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        aria-hidden="true"
+                      >
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                    </button>
+                    <span
+                      class="num-spinner-unit"
+                      data-i18n="hijriAdjustmentUnit"
+                      >days</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Privacy Section: analytics are opt-in (off until the user turns them on) -->
+            <div
+              class="settings-section st-pane"
+              data-pane="privacy"
+              role="region"
+              aria-labelledby="privacySectionTitle"
+            >
+              <div class="section-header">
+                <h2
+                  class="section-title"
+                  id="privacySectionTitle"
+                  data-i18n="privacySectionTitle"
+                >
+                  Privacy
+                </h2>
+              </div>
+
+              <div class="toggle-field st-item">
+                <div class="toggle-info">
+                  <label
+                    class="subsection-label"
+                    id="analyticsLabel"
+                    data-i18n="analyticsLabel"
+                    for="analyticsToggle"
+                    >Anonymous usage statistics</label
+                  >
+                  <span
+                    class="toggle-description"
+                    id="analyticsDescription"
+                    data-i18n="analyticsDescription"
+                    >Share which features are used and app errors to help
+                    improve Salaty Time. Your location and what you listen to
+                    are never sent.</span
+                  >
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="analyticsToggle" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- About Section -->
+            <div
+              class="settings-section st-pane"
+              id="aboutSection"
+              data-pane="about"
+              role="region"
+              aria-labelledby="aboutSectionTitle"
+            >
+              <div class="section-header">
+                <h2
+                  class="section-title"
+                  id="aboutSectionTitle"
+                  data-i18n="aboutTitle"
+                ></h2>
+              </div>
+
+              <div class="about-card st-item">
+                <!-- App identity -->
+                <div class="about-identity">
+                  <div class="about-app-icon">
+                    <img
+                      src="../../../assets/images/app-icon.png"
+                      alt=""
+                      width="30"
+                      height="30"
+                    />
+                  </div>
+                  <div class="about-app-info">
+                    <div class="about-name-row">
+                      <span class="about-app-name">Salaty Time</span>
+                      <span
+                        class="about-app-version"
+                        id="appVersionDisplay"
+                      ></span>
+                    </div>
+                    <span
+                      class="about-app-tagline"
+                      id="aboutTagline"
+                      data-i18n="aboutTagline"
+                      >Prayer times, Quran &amp; Islamic tools in one
+                      place</span
+                    >
+                  </div>
+                </div>
+
+                <div class="about-divider"></div>
+
+                <!-- Update row -->
+                <div class="about-update-row">
+                  <div class="about-update-status">
+                    <span class="about-status-badge">
+                      <i
+                        class="fas fa-circle-check about-status-icon"
+                        id="aboutStatusIcon"
+                        aria-hidden="true"
+                      ></i>
+                    </span>
+                    <span id="aboutStatusText"></span>
+                  </div>
+                  <button
+                    type="button"
+                    class="about-check-btn"
+                    id="aboutCheckUpdateBtn"
+                  >
+                    <i class="fas fa-rotate" aria-hidden="true"></i>
+                    <span
+                      id="aboutCheckLabel"
+                      data-i18n="checkForUpdates"
+                    ></span>
+                  </button>
+                </div>
+
+                <!-- Progress bar (hidden until downloading) -->
+                <div class="about-progress-wrap hidden" id="aboutProgressWrap">
+                  <div class="about-progress-bar">
+                    <div
+                      class="about-progress-fill"
+                      id="aboutProgressFill"
+                    ></div>
+                  </div>
+                  <span class="about-progress-text" id="aboutProgressText"
+                    >0%</span
+                  >
+                </div>
+
+                <!-- Install button (hidden until downloaded) -->
+                <button
+                  type="button"
+                  class="about-install-btn hidden"
+                  id="aboutInstallBtn"
+                >
+                  <i class="fas fa-bolt" aria-hidden="true"></i>
+                  <span
+                    id="aboutInstallLabel"
+                    data-i18n="restartAndInstall"
+                  ></span>
+                </button>
+
+                <div class="about-divider"></div>
+
+                <!-- Links row -->
+                <div class="about-links-row">
+                  <button
+                    type="button"
+                    class="about-link-btn"
+                    id="aboutGithubBtn"
+                  >
+                    <i class="fab fa-github" aria-hidden="true"></i>
+                    <span id="aboutGithubLabel" data-i18n="viewOnGithub"
+                      >View on GitHub</span
+                    >
+                  </button>
+                  <button
+                    type="button"
+                    class="about-link-btn"
+                    id="aboutContactBtn"
+                    data-email="salatytime@gmail.com"
+                  >
+                    <i
+                      class="fas fa-envelope"
+                      id="aboutContactIcon"
+                      aria-hidden="true"
+                    ></i>
+                    <span>salatytime@gmail.com</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="about-link-btn"
+                    id="aboutFeedbackBtn"
+                  >
+                    <i class="fas fa-comment-dots" aria-hidden="true"></i>
+                    <span data-i18n="sendFeedback">Send feedback</span>
+                  </button>
+                </div>
+
+                <p class="footer-text" id="footerText" data-i18n="madeWith">
+                  Made with ❤️ for the Muslim Ummah
+                </p>
+              </div>
+            </div>
           </div>
         </main>
       </div>

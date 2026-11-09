@@ -6,10 +6,12 @@ const { t } = require("../../core/i18n");
 const { state } = require("../../core/store");
 const { showToast } = require("../../core/toast");
 const analytics = require("../../services/analytics");
+const { showSaved } = require("./saved-status");
 
 async function persistSettings() {
   try {
     await ipcRenderer.invoke("save-settings", state.settings);
+    showSaved();
     analytics.settingsSaved(state.settings);
   } catch (err) {
     console.error("Error auto-saving settings:", err);

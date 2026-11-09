@@ -28,80 +28,6 @@
     -webkit-app-region: no-drag;
   }
 
-  /* Settings Content - Scrollable Area */
-  .settings-content {
-    flex: 1;
-    overflow: hidden auto;
-    padding: 6px 0; /* same padding as the other pages */
-    -webkit-app-region: no-drag;
-  }
-
-  /* ========================================
-     SETTINGS SECTIONS
-     ======================================== */
-
-  .settings-section {
-    background: var(--surface-subtle);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
-    /* stylelint-disable-next-line property-disallowed-list -- space from the scrollbar, which stays on the right in every language */
-    margin-right: 8px;
-    transition: all 0.3s ease;
-  }
-
-  .settings-section:hover {
-    background: var(--surface-1);
-    border-color: var(--border-strong);
-  }
-
-  /* Section Header */
-  .section-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
-    gap: 10px;
-  }
-
-  .section-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: rgba(var(--accent-rgb), 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--accent-color);
-    font-size: 14px;
-    flex-shrink: 0;
-  }
-
-  .section-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-    letter-spacing: -0.2px;
-  }
-
-  /* ========================================
-     SUBSECTIONS
-     ======================================== */
-
-  .subsection {
-    margin-top: 16px;
-  }
-
-  .subsection:first-child {
-    margin-top: 0;
-  }
-
-  .subsection + .subsection {
-    padding-top: 16px;
-    border-top: 1px solid var(--white-a05);
-  }
-
   .subsection-label {
     display: block;
     font-size: 13px;
@@ -125,12 +51,10 @@
 
   .field-label {
     display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
     margin-bottom: 6px;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
   }
 
   .field-input {
@@ -267,25 +191,12 @@
     padding: 11px 0;
   }
 
-  .notif-row + .notif-row {
-    border-top: 1px solid var(--white-a05);
-  }
-
   .toggle-info {
     flex: 1;
     min-width: 0;
   }
 
   /* Calculation method: a fixed-width list beside its label (like the Asr switch) */
-  .calc-settings {
-    margin-block-start: 4px;
-    border-block-start: 1px solid var(--white-a05);
-  }
-
-  .calc-settings .toggle-info {
-    flex: 1;
-    min-width: 0;
-  }
 
   .calc-select {
     flex: 0 0 auto;
@@ -378,8 +289,8 @@
   }
 
   .segmented-option input:checked + .segmented-label {
-    background: rgba(var(--accent-rgb), 0.2);
-    border-color: var(--accent-color);
+    background: var(--surface-hover);
+    border-color: var(--white-a40);
     color: var(--text-primary);
   }
 
@@ -438,47 +349,27 @@
     margin-bottom: 12px;
   }
 
-  /* Detect Button */
-  .detect-btn {
-    width: 100%;
-    background: rgba(var(--accent-rgb), 0.1);
-    border: 1px solid rgba(var(--accent-rgb), 0.3);
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--accent-color);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-    margin-bottom: 12px;
-  }
-
+  /* Detect and Manage: the same calm buttons as the rest of the app */
+  .detect-btn,
   .manage-locations-btn {
     width: 100%;
-    background: var(--surface-1);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--text-primary);
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    transition: all 0.3s ease;
-    margin-top: 12px;
+    padding: 9px 12px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
   }
 
+  .detect-btn:hover,
   .manage-locations-btn:hover {
-    background: var(--surface-2);
-    border-color: var(--accent-color);
-    transform: translateY(-1px);
+    background: var(--surface-3);
   }
 
   .location-actions-row .detect-btn,
@@ -505,16 +396,6 @@
     .location-actions-row {
       flex-direction: column;
     }
-  }
-
-  .detect-btn:hover {
-    background: rgba(var(--accent-rgb), 0.15);
-    border-color: rgba(var(--accent-rgb), 0.5);
-    transform: translateY(-1px);
-  }
-
-  .detect-btn:active {
-    transform: translateY(0);
   }
 
   .detect-btn.loading {
@@ -568,340 +449,6 @@
   }
 
   /* ========================================
-     THEME SELECTION
-     ======================================== */
-
-  .theme-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-
-  .theme-card {
-    cursor: pointer;
-    border-radius: 8px;
-    padding: 6px;
-    background: var(--surface-subtle);
-    border: 2px solid transparent;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .theme-card:hover {
-    background: var(--surface-1);
-    border-color: var(--border-medium);
-    transform: translateY(-2px);
-  }
-
-  .theme-card.selected {
-    border-color: var(--accent-color);
-    background: rgba(var(--accent-rgb), 0.1);
-  }
-
-  .theme-preview {
-    width: 100%;
-    max-width: 46px;
-    aspect-ratio: 1;
-    border-radius: 6px;
-    position: relative;
-    overflow: hidden;
-    margin: 0 auto;
-  }
-
-  .theme-card.selected .theme-preview::after {
-    content: "\f00c";
-    font-family: var(--font-icons);
-    font-weight: 900;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: var(--text-bright);
-    font-size: 14px;
-    text-shadow: 0 2px 4px var(--black-a30);
-  }
-
-  .theme-name {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    text-align: center;
-  }
-
-  .theme-card.selected .theme-name {
-    color: var(--accent-color);
-    font-weight: 600;
-  }
-
-  /* Theme Preview Colors */
-  .theme-navy-preview {
-    background: linear-gradient(135deg, #0a1128, #1a237e);
-  }
-
-  .theme-green-preview {
-    background: linear-gradient(135deg, #1b5e20, #2e7d32);
-  }
-
-  .theme-brown-preview {
-    background: linear-gradient(135deg, #4e342e, #6d4c41);
-  }
-
-  .theme-dark-preview {
-    background: linear-gradient(135deg, #0f1011, #2a2b2f);
-  }
-
-  .theme-pink-preview {
-    background: linear-gradient(135deg, #7a1a4a, #b51a5c);
-  }
-
-  .theme-purple-preview {
-    background: linear-gradient(135deg, #311b92, #4527a0);
-  }
-
-  .theme-emerald-preview {
-    background: linear-gradient(135deg, #006064, #00838f);
-  }
-
-  .theme-ocean-preview {
-    background: linear-gradient(135deg, #01579b, #0277bd);
-  }
-
-  .theme-royal-preview {
-    background: linear-gradient(135deg, #0d47a1, #1565c0);
-  }
-
-  .theme-indigo-preview {
-    background: linear-gradient(135deg, #1a237e, #283593);
-  }
-
-  .theme-classic-preview {
-    background: linear-gradient(135deg, #212121, #424242);
-  }
-
-  .theme-ramadan-preview {
-    background: linear-gradient(135deg, #1b5e20, #ffd700);
-  }
-
-  /* Responsive Theme Grid */
-  @media (width <= 400px) {
-    .theme-grid {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-  }
-
-  /* ========================================
-     LANGUAGE SELECTION
-     ======================================== */
-
-  .language-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .language-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: var(--surface-subtle);
-    border: 2px solid transparent;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .language-card:hover {
-    background: var(--surface-1);
-    border-color: var(--border-medium);
-    transform: translateX(4px);
-  }
-
-  .language-card.selected {
-    background: rgba(var(--accent-rgb), 0.1);
-    border-color: var(--accent-color);
-  }
-
-  .language-card.selected i {
-    color: var(--accent-color);
-  }
-
-  .language-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 1;
-  }
-
-  .language-card .lang-name {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .language-card .lang-native {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  .language-card.selected .lang-native {
-    color: var(--accent-color);
-  }
-
-  /* ========================================
-     SCREEN SIZE SELECTION - CARD VERSION
-     ======================================== */
-
-  .screen-size-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-
-  .size-card {
-    cursor: pointer;
-    border-radius: 10px;
-    padding: 10px;
-    background: var(--surface-subtle);
-    border: 2px solid transparent;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .size-card:hover {
-    background: var(--surface-1);
-    border-color: var(--border-medium);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px var(--black-a20);
-  }
-
-  .size-card.selected {
-    background: rgba(var(--accent-rgb), 0.1);
-    border-color: var(--accent-color);
-    transform: translateY(-1px);
-  }
-
-  .size-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 9px;
-    background: var(--surface-2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 7px;
-    font-size: 14px;
-    color: var(--text-primary);
-    transition: all 0.3s ease;
-  }
-
-  .size-card.selected .size-icon {
-    background: rgba(var(--accent-rgb), 0.2);
-    color: var(--accent-color);
-    transform: scale(1.1);
-  }
-
-  .size-info {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    flex: 1;
-  }
-
-  .size-name {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: -0.2px;
-  }
-
-  .size-card.selected .size-name {
-    color: var(--accent-color);
-  }
-
-  .size-check {
-    position: absolute;
-    top: 8px;
-    inset-inline-end: 8px;
-    width: 20px;
-    height: 20px;
-    background: var(--accent-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transform: scale(0);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .size-card.selected .size-check {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  /* Responsive adjustments for Screen Size */
-  @media (width <= 400px) {
-    .screen-size-grid {
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    .size-card {
-      padding: 14px;
-      flex-direction: row;
-      text-align: start;
-    }
-
-    .size-icon {
-      width: 40px;
-      height: 40px;
-      margin-bottom: 0;
-      margin-inline-end: 12px;
-      flex-shrink: 0;
-    }
-
-    .size-info {
-      flex: 1;
-      align-items: flex-start;
-    }
-
-    .size-check {
-      position: static;
-      margin-inline-start: auto;
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
-    }
-  }
-
-  /* Big screen adjustments for Screen Size */
-  @media (width >= 600px) {
-    .size-card {
-      padding: 12px;
-    }
-
-    .size-icon {
-      width: 34px;
-      height: 34px;
-      font-size: 15px;
-    }
-  }
-
-  /* ========================================
      TOGGLE FIELDS
      ======================================== */
 
@@ -910,12 +457,6 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-  }
-
-  .location-travel-toggle {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border-color);
   }
 
   .toggle-info .subsection-label {
@@ -944,24 +485,6 @@
   .conditional-field.active {
     opacity: 1;
     pointer-events: auto;
-  }
-
-  /* ========================================
-     ACTIONS & FOOTER
-     ======================================== */
-
-  .settings-footer {
-    margin-top: 20px;
-    padding-top: 16px;
-    text-align: center;
-    border-top: 1px solid var(--white-a05);
-  }
-
-  .footer-text {
-    font-size: 12px;
-    color: var(--text-secondary);
-    opacity: 0.7;
-    font-style: italic;
   }
 
   /* ========================================
@@ -1035,9 +558,9 @@
   .about-app-version {
     font-size: 10.5px;
     font-weight: 600;
-    color: var(--accent-color);
-    background: rgba(var(--accent-rgb), 0.12);
-    border: 1px solid rgba(var(--accent-rgb), 0.25);
+    color: var(--text-muted);
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
     border-radius: 20px;
     padding: 1px 8px;
     display: inline-block;
@@ -1120,10 +643,10 @@
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: rgba(var(--accent-rgb), 0.12);
-    border: 1px solid rgba(var(--accent-rgb), 0.3);
-    border-radius: 7px;
-    color: var(--accent-color);
+    background: var(--surface-1);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
     font-size: 11px;
     font-weight: 600;
     cursor: pointer;
@@ -1138,9 +661,7 @@
   }
 
   .about-check-btn:hover:not(:disabled) {
-    background: rgba(var(--accent-rgb), 0.22);
-    border-color: var(--accent-color);
-    transform: translateY(-1px);
+    background: var(--surface-3);
   }
 
   /* Progress */
@@ -1235,10 +756,8 @@
   }
 
   .about-link-btn:hover {
-    background: rgba(var(--accent-rgb), 0.1);
-    border-color: rgba(var(--accent-rgb), 0.35);
+    background: var(--surface-3);
     color: var(--text-primary);
-    transform: translateY(-1px);
   }
 
   .about-link-btn.copied {
@@ -1265,9 +784,9 @@
     background: var(--surface-1);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
-    border-radius: 8px;
-    padding: 10px 12px;
-    min-height: 42px;
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    min-height: 38px;
     box-shadow: none;
   }
 
@@ -1276,8 +795,14 @@
   }
 
   .ts-wrapper.focus .ts-control {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
+    border-color: var(--white-a40);
+  }
+
+  /* the picker replaces the select: its box is the only frame */
+  .ts-wrapper.field-input {
+    padding: 0;
+    border: none;
+    background: none;
   }
 
   .ts-dropdown {
@@ -1621,63 +1146,6 @@
     box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
   }
 
-  /* ========================================
-     RESPONSIVE DESIGN
-     ======================================== */
-
-  /* Big Screen (850x600) */
-  @media (width >= 600px) {
-    .settings-content {
-      padding: 8px 0; /* same as the other pages */
-    }
-
-    .settings-section {
-      padding: 20px;
-    }
-
-    .theme-grid {
-      grid-template-columns: repeat(6, 1fr);
-    }
-
-    .language-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  /* Small Screen Adjustments (320x575) */
-  @media (width <= 400px) {
-    .settings-container {
-      padding: 12px; /* same as the other pages */
-      gap: 8px;
-    }
-
-    .settings-content {
-      padding: 4px 0; /* same as the other pages */
-    }
-
-    .settings-section {
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-
-    .section-header {
-      margin-bottom: 12px;
-    }
-
-    .section-icon {
-      width: 28px;
-      height: 28px;
-    }
-
-    .section-title {
-      font-size: 14px;
-    }
-
-    .subsection + .subsection {
-      padding-top: 12px;
-    }
-  }
-
   /* Hide modal-header border for Add/Edit Location Modal */
   .location-edit-modal .modal-header {
     display: flex;
@@ -1691,22 +1159,6 @@
   /* ========================================
      ARABIC (RTL)
      ======================================== */
-
-  /* The scroll area stays LTR so its scrollbar stays on the right (like every other
-     page); everything inside it reads right-to-left, so rows, grids, text alignment and
-     logical margins mirror by themselves. */
-  [dir="rtl"] .settings-content {
-    direction: ltr;
-  }
-
-  [dir="rtl"] .settings-content > * {
-    direction: rtl;
-  }
-
-  /* A transform can't be logical, so the hover nudge is mirrored here */
-  [dir="rtl"] .language-card:hover {
-    transform: translateX(-4px);
-  }
 
   /* Tom Select dropdowns stay LTR */
   [dir="rtl"] .ts-wrapper.single .ts-control,

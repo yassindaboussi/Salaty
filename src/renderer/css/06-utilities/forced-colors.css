@@ -42,6 +42,8 @@
     .theme-card.selected,
     .ak-cat[aria-current="true"],
     .ak-rail-btn[aria-current="true"],
+    .st-nav-item[aria-current="page"],
+    .st-rail-btn[aria-current="page"],
     .quran-tab.active,
     .numerals-btn.active,
     .ayah-list mark.is-current,

@@ -1,0 +1,605 @@
+/* ========================================
+   SETTINGS - the side menu, one category at a time, and the rows (like Windows 11 Settings)
+   The menu: pages/settings/nav.js, search.js, panel-fold.js.
+   ======================================== */
+
+@layer pages {
+  .st-layout {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 12px;
+    -webkit-app-region: no-drag;
+  }
+
+  /* ── The menu ──────────────────────────────────────────────────────── */
+
+  .st-panel {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+  }
+
+  .st-panel-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .st-search {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .st-search > i {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 10px;
+    translate: 0 -50%;
+    font-size: 12px;
+    color: var(--text-faint);
+    pointer-events: none;
+  }
+
+  .st-search-input {
+    width: 100%;
+    height: 32px;
+    padding-inline: 30px 8px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+  }
+
+  .st-search-input::placeholder {
+    color: var(--text-faint);
+  }
+
+  .st-search-input:focus {
+    border-color: var(--white-a40);
+    outline: none;
+  }
+
+  .st-panel-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden auto;
+    scrollbar-width: none;
+  }
+
+  .st-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .st-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .st-nav-item:hover {
+    background: var(--surface-3);
+  }
+
+  .st-nav-item[aria-current="page"] {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
+  }
+
+  .st-nav-icon {
+    flex-shrink: 0;
+    width: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .st-nav-item[aria-current="page"] .st-nav-icon {
+    color: var(--text-primary);
+  }
+
+  .st-nav-label {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.35;
+  }
+
+  /* ── The menu folded to the edge: a strip of icons ─────────────────── */
+
+  .st-panel-toggle,
+  .st-rail-btn {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .st-panel-toggle:hover,
+  .st-rail-btn:hover {
+    background: var(--surface-3);
+  }
+
+  .st-rail-btn[aria-current="page"] {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
+  }
+
+  /* the arrows point to the edge the menu folds to (mirrored in Arabic) */
+  [dir="rtl"] .st-panel-toggle i {
+    transform: scaleX(-1);
+  }
+
+  .st-rail {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-height: 0;
+    overflow: hidden auto;
+    scrollbar-width: none;
+  }
+
+  .st-layout.is-panel-folded {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .st-layout.is-panel-folded .st-panel {
+    align-items: center;
+    padding: 12px 0;
+  }
+
+  .st-layout.is-panel-folded .st-search,
+  .st-layout.is-panel-folded .st-panel-body {
+    display: none;
+  }
+
+  .st-layout.is-panel-folded .st-rail {
+    display: flex;
+  }
+
+  .st-layout.is-panel-folded .st-panel-toggle i {
+    transform: rotate(180deg);
+  }
+
+  [dir="rtl"] .st-layout.is-panel-folded .st-panel-toggle i {
+    transform: none;
+  }
+
+  /* ── The open category ─────────────────────────────────────────────── */
+
+  .st-main {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden auto;
+    padding-inline-end: 6px; /* room for the scrollbar */
+  }
+
+  .st-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* several categories show at once only while searching */
+  .is-searching .st-pane {
+    margin-block-end: 20px;
+  }
+
+  .st-pane[hidden],
+  .st-item[hidden] {
+    display: none;
+  }
+
+  .st-pane .section-header {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    margin-block-end: 8px;
+  }
+
+  .st-pane .section-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .is-searching .st-pane .section-title {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .st-pane .notif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* one setting = one row card */
+  .st-item {
+    min-width: 0;
+    margin: 0;
+    padding: 12px 16px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .st-item.notif-row,
+  .st-item.toggle-field {
+    min-height: 62px;
+  }
+
+  .st-location .location-actions-row {
+    margin: 0;
+  }
+
+  .st-item.about-card {
+    padding: 0;
+  }
+
+  .st-item .subsection-label {
+    margin-block-end: 10px;
+  }
+
+  .st-item .toggle-info .subsection-label {
+    margin-block-end: 2px;
+  }
+
+  .calc-select {
+    flex: 0 0 auto;
+    width: min(300px, 50%);
+  }
+
+  /* "Saved ✓": stays in the top corner while the category scrolls */
+  .st-saved {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 2;
+    height: 0;
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    line-height: 32px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+
+  .st-saved.is-visible {
+    opacity: 1;
+  }
+
+  .st-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 48px 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .st-empty[hidden] {
+    display: none;
+  }
+
+  .st-empty .fa-magnifying-glass {
+    font-size: 22px;
+    color: var(--text-faint);
+  }
+
+  .footer-text {
+    margin: 0;
+    padding: 0 16px 12px;
+    font-size: 12px;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  /* ── One-page view (Appearance > Settings view): no menu, every category ── */
+
+  .st-layout.is-one-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .st-layout.is-one-page .st-panel {
+    display: none;
+  }
+
+  .is-one-page .st-pane[hidden] {
+    display: flex;
+  }
+
+  .is-one-page .st-pane {
+    margin-block-end: 24px;
+  }
+
+  /* ── Theme: colour swatches ────────────────────────────────────────── */
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    gap: 6px;
+  }
+
+  .theme-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 4px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+
+  .theme-card:hover {
+    background: var(--surface-3);
+  }
+
+  .theme-card.selected {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
+  }
+
+  .theme-preview {
+    position: relative;
+    width: 100%;
+    max-width: 46px;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    border: 1px solid var(--white-a20);
+  }
+
+  .theme-card.selected .theme-preview::after {
+    content: "\f00c";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-icons);
+    font-weight: 900;
+    font-size: 14px;
+    color: var(--text-bright);
+    text-shadow: 0 1px 3px var(--black-a30);
+  }
+
+  .theme-name {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  .theme-card.selected .theme-name {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .theme-navy-preview {
+    background: linear-gradient(135deg, #0a1128, #1a237e);
+  }
+
+  .theme-green-preview {
+    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+  }
+
+  .theme-brown-preview {
+    background: linear-gradient(135deg, #4e342e, #6d4c41);
+  }
+
+  .theme-dark-preview {
+    background: linear-gradient(135deg, #0f1011, #2a2b2f);
+  }
+
+  .theme-pink-preview {
+    background: linear-gradient(135deg, #7a1a4a, #b51a5c);
+  }
+
+  .theme-purple-preview {
+    background: linear-gradient(135deg, #311b92, #4527a0);
+  }
+
+  .theme-emerald-preview {
+    background: linear-gradient(135deg, #006064, #00838f);
+  }
+
+  .theme-ocean-preview {
+    background: linear-gradient(135deg, #01579b, #0277bd);
+  }
+
+  .theme-royal-preview {
+    background: linear-gradient(135deg, #0d47a1, #1565c0);
+  }
+
+  .theme-indigo-preview {
+    background: linear-gradient(135deg, #1a237e, #283593);
+  }
+
+  .theme-classic-preview {
+    background: linear-gradient(135deg, #212121, #424242);
+  }
+
+  .theme-ramadan-preview {
+    background: linear-gradient(135deg, #1b5e20, #ffd700);
+  }
+
+  /* ── Language and window size: choice cards ────────────────────────── */
+
+  .language-grid,
+  .screen-size-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 6px;
+  }
+
+  .language-card,
+  .size-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    cursor: pointer;
+  }
+
+  .language-card:hover,
+  .size-card:hover {
+    background: var(--surface-3);
+  }
+
+  .language-card.selected,
+  .size-card.selected {
+    border-color: var(--white-a40);
+    background: var(--surface-hover);
+  }
+
+  .language-card > .fa-globe,
+  .size-icon {
+    flex-shrink: 0;
+    width: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .language-card.selected > .fa-globe,
+  .size-card.selected .size-icon {
+    color: var(--text-primary);
+  }
+
+  .language-info,
+  .size-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .language-card .lang-native,
+  .size-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .language-card .lang-name {
+    order: 2;
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  .size-check {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--text-primary);
+    visibility: hidden;
+  }
+
+  .size-card.selected .size-check {
+    visibility: visible;
+  }
+
+  /* ── Narrow window: the menu becomes a row of tabs above the settings ── */
+
+  @media (width <= 700px) {
+    .st-panel-body {
+      overflow: auto hidden;
+    }
+
+    .st-layout,
+    .st-layout.is-panel-folded {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .st-layout.is-one-page {
+      grid-template-rows: minmax(0, 1fr);
+    }
+
+    .st-panel-toggle,
+    .st-layout.is-panel-folded .st-rail {
+      display: none;
+    }
+
+    .st-layout.is-panel-folded .st-panel {
+      align-items: stretch;
+      padding: 12px;
+    }
+
+    .st-layout.is-panel-folded .st-search,
+    .st-layout.is-panel-folded .st-panel-body {
+      display: flex;
+    }
+
+    .st-nav {
+      flex-direction: row;
+    }
+
+    .st-nav-item {
+      width: auto;
+      white-space: nowrap;
+    }
+  }
+
+  @media (width <= 480px) {
+    .st-item.notif-row,
+    .st-item.toggle-field {
+      flex-wrap: wrap;
+    }
+
+    .calc-select {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .st-saved {
+      transition: none;
+    }
+  }
+}

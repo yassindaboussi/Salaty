@@ -42,5 +42,16 @@
   "calcAsrStandard": "الجمهور",
   "calcAsrHanafi": "الحنفي",
   "calcAsrLineStandard": "العصر: الجمهور",
-  "calcAsrLineHanafi": "العصر: الحنفي"
+  "calcAsrLineHanafi": "العصر: الحنفي",
+  "stNavPrayer": "مواقيت الصلاة",
+  "stCategories": "أقسام الإعدادات",
+  "stSearchPlaceholder": "ابحث في الإعدادات",
+  "stPanelHide": "إخفاء القائمة",
+  "stPanelShow": "إظهار القائمة",
+  "stSaved": "تم الحفظ",
+  "stNoResults": "لا يوجد إعداد يطابق «{query}»",
+  "stViewLabel": "عرض الإعدادات",
+  "stViewDesc": "القائمة: قسم واحد في كل مرة. صفحة واحدة: كل الإعدادات في قائمة واحدة.",
+  "stViewMenu": "القائمة",
+  "stViewPage": "صفحة واحدة"
 }
