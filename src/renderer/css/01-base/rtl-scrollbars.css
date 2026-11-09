@@ -46,7 +46,8 @@
     .locations-list,
     .tb-counter,
     .tb-panel-body,
-    .tb-editor
+    .tb-editor,
+    .ts-dropdown-content
   ) {
   direction: ltr;
 }
@@ -85,7 +86,8 @@
     .locations-list,
     .tb-counter,
     .tb-panel-body,
-    .tb-editor
+    .tb-editor,
+    .ts-dropdown-content
   )
   > * {
   direction: rtl;

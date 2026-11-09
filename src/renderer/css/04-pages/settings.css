@@ -861,12 +861,36 @@
     color: var(--text-primary);
     border-radius: var(--radius-md);
     padding: 8px 12px;
+    padding-inline-end: 34px;
     min-height: 38px;
     box-shadow: none;
+
+    /* the search caret stays on the same line: the box keeps its height when open */
+    flex-wrap: nowrap;
+    overflow: hidden;
   }
 
   .ts-wrapper.single .ts-control input {
     color: var(--text-primary);
+    min-width: 0;
+  }
+
+  /* a chevron shows it is a list (like the native select it replaces); it flips when open */
+  .ts-wrapper.single .ts-control::after {
+    content: "";
+    position: absolute;
+    inset-inline-end: 14px;
+    inset-block-start: 50%;
+    width: 7px;
+    height: 7px;
+    border-inline-end: 2px solid var(--text-secondary);
+    border-block-end: 2px solid var(--text-secondary);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  .ts-wrapper.single.dropdown-active .ts-control::after {
+    transform: translateY(-20%) rotate(225deg);
   }
 
   .ts-wrapper.focus .ts-control {
@@ -880,9 +904,10 @@
     background: none;
   }
 
+  /* opaque: the theme's surface over its base colour, so the rows behind don't show through */
   .ts-dropdown {
-    background: var(--bg-surface);
-    backdrop-filter: blur(20px);
+    background:
+      linear-gradient(var(--bg-surface), var(--bg-surface)), var(--bg-primary);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     box-shadow: var(--shadow-lg);
@@ -905,6 +930,20 @@
     background: rgba(var(--accent-rgb), 0.2);
     color: var(--accent-color);
   }
+
+  /* Calculation method list: as wide as its box, 6 rows then it scrolls, long names wrap */
+  .ts-dropdown.calc-dropdown .ts-dropdown-content {
+    max-height: calc(6 * 40px + 8px);
+    padding-block: 4px;
+  }
+
+  .ts-dropdown.calc-dropdown .option {
+    padding: 8px 10px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+
 
   /* ========================================
      LOCATION MANAGEMENT
