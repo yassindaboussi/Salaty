@@ -8,9 +8,22 @@
   previous / play / next on the left, the volume (slider on hover / focus) and the list button
   on the right. Square buttons like the app's; the play button is drawn in white, not an accent.
 */
+
+/* The window is transparent, so the page is too and the rounded #app card is drawn on it.
+   The card can't be <body> itself: with a clear <html>, CSS moves body's background onto the
+   whole (square) window. body[class] beats the .theme-* background (body carries the theme
+   class too, for the tooltips' colours). */
+html,
+body[class],
 body {
+  height: 100%;
   margin: 0;
-  height: 100vh;
+  overflow: hidden;
+  background: transparent;
+}
+
+.fp-card {
+  height: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

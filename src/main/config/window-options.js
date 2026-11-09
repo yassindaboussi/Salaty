@@ -71,6 +71,7 @@ function createBackgroundPlayerOptions() {
     height: PLAYER_HEIGHT,
     frame: false,
     transparent: true,
+    backgroundColor: "#00000000", // fully clear before the page paints
     show: false,
     resizable: false,
     skipTaskbar: true,

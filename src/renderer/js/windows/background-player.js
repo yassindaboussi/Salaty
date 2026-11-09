@@ -35,7 +35,8 @@ class BackgroundPlayer {
   }
 
   applyTheme(theme) {
-    setThemeClass([document.body], theme);
+    // body too: tooltips are added to it and read its colours
+    setThemeClass([document.body, document.getElementById("app")], theme);
   }
 
   initIPC() {
