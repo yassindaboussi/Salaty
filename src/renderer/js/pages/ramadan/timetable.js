@@ -8,6 +8,7 @@ const { byId } = require("../../core/dom");
 const fmt = require("../../core/date-format");
 const { view } = require("./state");
 const { fastMinutes, isOddNight } = require("./data");
+const { clock } = require("../../core/time-format");
 
 function renderTimetable() {
   setHtml(
@@ -23,9 +24,9 @@ function renderTimetable() {
       return html`<tr class="${classes}" ${day.iso === view.todayIso && html`aria-current="date"`}>
         <th scope="row">${day.day}${isOddNight(day.day) && html` <i class="fas fa-moon rm-table-night" role="img" aria-label="${t("ramadanLegendOddNights")}"></i>`}</th>
         <td>${fmt.gregorian(day.date, { weekday: "short", day: "numeric", month: "short" })}</td>
-        <td class="rm-muted">${day.imsak}</td>
-        <td>${day.fajr}</td>
-        <td class="rm-strong">${day.maghrib}</td>
+        <td class="rm-muted">${clock(day.imsak)}</td>
+        <td>${clock(day.fajr)}</td>
+        <td class="rm-strong">${clock(day.maghrib)}</td>
         <td class="rm-muted">${fmt.duration({ hours: Math.floor(minutes / 60), minutes: minutes % 60 }, "narrow")}</td>
       </tr>`;
     })}`,

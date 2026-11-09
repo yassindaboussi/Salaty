@@ -421,6 +421,39 @@
                     </label>
                   </div>
                 </div>
+                <!-- 24-hour or 12-hour times (pages/settings/calculation.js) -->
+                <div class="notif-row st-item">
+                  <div class="toggle-info">
+                    <span
+                      class="subsection-label"
+                      id="timeFormatLabel"
+                      data-i18n="timeFormatLabel"
+                      >Time format</span
+                    >
+                    <span class="toggle-description" data-i18n="timeFormatDesc"
+                      >How prayer times are written in the app and the
+                      widget.</span
+                    >
+                  </div>
+                  <div
+                    class="segmented"
+                    role="radiogroup"
+                    aria-labelledby="timeFormatLabel"
+                  >
+                    <label class="segmented-option">
+                      <input type="radio" name="timeFormat" value="24" />
+                      <span class="segmented-label" data-time-sample="24"
+                        >17:05</span
+                      >
+                    </label>
+                    <label class="segmented-option">
+                      <input type="radio" name="timeFormat" value="12" />
+                      <span class="segmented-label" data-time-sample="12"
+                        >5:05 PM</span
+                      >
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
 

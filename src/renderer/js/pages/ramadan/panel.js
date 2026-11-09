@@ -14,6 +14,7 @@ const fmt = require("../../core/date-format");
 const { view } = require("./state");
 const { fastMinutes, isOddNight } = require("./data");
 const store = require("../../services/ramadan-fasts");
+const { clock } = require("../../core/time-format");
 
 const longDate = (/** @type {Date} */ date) =>
   fmt.gregorian(date, { weekday: "long", day: "numeric", month: "long" });
@@ -56,12 +57,12 @@ function renderDayCard() {
       </div>
       <p class="rm-card-date">${fmt.gregorian(day.date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</p>
       <dl class="rm-times">
-        ${timeRow(t("ramadanImsak"), day.imsak)}
-        ${timeRow(t("ramadanSuhoorEnds"), day.fajr)}
-        ${timeRow(t("iftar"), day.maghrib)}
+        ${timeRow(t("ramadanImsak"), clock(day.imsak))}
+        ${timeRow(t("ramadanSuhoorEnds"), clock(day.fajr))}
+        ${timeRow(t("iftar"), clock(day.maghrib))}
         ${timeRow(t("ramadanFastLength"), hoursAndMinutes(fastMinutes(day)))}
       </dl>
-      ${isOddNight(day.day) && html`<p class="rm-night-note"><i class="fas fa-moon" aria-hidden="true"></i><span>${t("ramadanOddNight").replace("{day}", String(day.day))} ${eve ? t("ramadanNightBegins").replace("{date}", longDate(eve.date)).replace("{time}", eve.maghrib) : ""}</span></p>`}
+      ${isOddNight(day.day) && html`<p class="rm-night-note"><i class="fas fa-moon" aria-hidden="true"></i><span>${t("ramadanOddNight").replace("{day}", String(day.day))} ${eve ? t("ramadanNightBegins").replace("{date}", longDate(eve.date)).replace("{time}", clock(eve.maghrib)) : ""}</span></p>`}
       <p class="rm-ask">${future ? t("ramadanFutureHint") : t("ramadanAskFasted")}</p>
       <div class="rm-status" role="group" aria-label="${t("ramadanAskFasted")}">
         ${statusButton("fasted", "check")}

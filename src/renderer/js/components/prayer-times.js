@@ -3,6 +3,7 @@
 const { ipcRenderer } = require("electron");
 const { t, getLanguage } = require("../core/i18n");
 const { showToast } = require("../core/toast");
+const { clock } = require("../core/time-format");
 const {
   PRAYER_KEYS,
   formatTime,
@@ -65,6 +66,15 @@ ipcRenderer.on("prayer-data-from-main", (_e, data) => {
 ipcRenderer.on("extra-times-changed", (_e, extraTimes) => {
   state.settings.extraTimes = extraTimes;
   if (prayerData?.timings) _renderPrayerUI();
+});
+
+// Settings → Time format changed: 24-hour or 12-hour
+ipcRenderer.on("time-format-changed", (_e, timeFormat) => {
+  state.settings.timeFormat = timeFormat;
+  if (!prayerData?.timings) return;
+  currentActivePrayer = null; // the current / next cards are drawn again too
+  _renderPrayerUI();
+  updateCurrentAndNextPrayer();
 });
 
 // Name shown for a prayer. On Fridays (in the prayer location's own time zone) Dhuhr reads
@@ -153,7 +163,7 @@ function _renderPrayerUI() {
       return html`<div class="prayer-item${cur ? " current-prayer" : ""}" data-prayer="${key}">
       <i class="fas fa-${icon}" aria-hidden="true"></i>
       <span class="prayer-name">${name}</span>
-      <span class="prayer-time">${cur ? html`<span class="current-indicator">${t("now")}</span>` : ""}${time}</span>
+      <span class="prayer-time">${cur ? html`<span class="current-indicator">${t("now")}</span>` : ""}${clock(time)}</span>
       <button type="button" class="adhan-toggle-btn" data-prayer="${key}" aria-label="${btnLabel}" data-tip="${btnTip}">
         <i class="fas fa-${btnIcon} adhan-toggle-icon" aria-hidden="true"></i>
       </button>
@@ -177,7 +187,7 @@ function _extraRow(key) {
   return html`<div class="prayer-item is-extra" data-prayer="${key}">
       <i class="fas fa-${prayerIcons[key] ?? "clock"}" aria-hidden="true"></i>
       <span class="prayer-name">${t(key, "prayerNames")}</span>
-      <span class="prayer-time">${prayerData.timings[key] ?? "--:--"}</span>
+      <span class="prayer-time">${clock(prayerData.timings[key])}</span>
       <span class="adhan-toggle-btn is-placeholder" aria-hidden="true"></span>
     </div>`;
 }
@@ -204,13 +214,13 @@ function updateCurrentAndNextPrayer() {
           <div class="prayer-card current">
             <div class="prayer-label">${t("currentPrayer")}</div>
             <div class="prayer-name">${currentPrayer.name}</div>
-            <div class="prayer-time">${currentPrayer.time}</div>
-            <div class="time-remaining">${t("endTime")} – ${nextPrayer.time}</div>
+            <div class="prayer-time">${clock(currentPrayer.time)}</div>
+            <div class="time-remaining">${t("endTime")} – ${clock(nextPrayer.time)}</div>
           </div>
           <div class="prayer-card next">
             <div class="prayer-label">${t("nextPrayer")}</div>
             <div class="prayer-name">${nextPrayer.name}</div>
-            <div class="prayer-time">${nextPrayer.time}</div>
+            <div class="prayer-time">${clock(nextPrayer.time)}</div>
             <div class="countdown" id="countdown">${formatTime(timeRemaining)}</div>
           </div>`,
         );

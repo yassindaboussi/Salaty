@@ -4,13 +4,13 @@ require("../core/error-watch"); // first: errors while the page starts are logge
 const { ipcRenderer } = require("electron");
 const {
   PRAYER_KEYS,
-  cleanTime,
   secondsFromTime,
   secondsSinceMidnight,
   isFridayIn,
   displayPrayerKey,
   shownTimeKeys,
   isExtraTime,
+  displayTime,
 } = require("../../../shared/prayerUtils");
 const { t } = require("../core/i18n");
 const { loadSettings } = require("../core/bootstrap");
@@ -23,7 +23,10 @@ const { initWidgetTips } = require("../components/widget-tip");
 /** @type {any} */
 let prayerData = null;
 let lang = "en";
-let isPinned = true;
+/** Settings → Time format: "24" or "12" */
+let timeFormat = "24";
+// pinned (always on top) when it opens; "#unpinned" after a reload for a new language
+let isPinned = location.hash !== "#unpinned";
 /** Settings → Show times: Sunrise, Midnight... as extra columns (main resizes the bar) */
 /** @type {Record<string, boolean> | undefined} */
 let extraTimes;
@@ -66,7 +69,11 @@ function computePrayers() {
   const prayers = PRAYER_KEYS.filter((k) => prayerData.timings[k]).map(
     (key) => {
       const raw = prayerData.timings[key];
-      return { key, time: cleanTime(raw), sec: secondsFromTime(raw) };
+      return {
+        key,
+        time: displayTime(raw, timeFormat, lang),
+        sec: secondsFromTime(raw),
+      };
     },
   );
   if (!prayers.length) return null;
@@ -81,7 +88,7 @@ function computePrayers() {
       const raw = prayerData.timings[key];
       let sec = secondsFromTime(raw);
       if (isExtraTime(key) && key !== "Sunrise" && sec < fajr) sec += 86400;
-      return { key, time: cleanTime(raw), sec };
+      return { key, time: displayTime(raw, timeFormat, lang), sec };
     });
   return { prayers, columns, next, remaining, now };
 }
@@ -162,11 +169,16 @@ function reveal() {
   ipcRenderer.send("prayer-widget-ready");
 }
 
+function showPin() {
+  pinBtnEl.classList.toggle("is-pinned", isPinned);
+  pinBtnEl.setAttribute("aria-pressed", String(isPinned));
+}
+showPin();
+
 pinBtnEl.addEventListener("click", () => {
   isPinned = !isPinned;
   ipcRenderer.send("widget-set-always-on-top", isPinned);
-  pinBtnEl.classList.toggle("is-pinned", isPinned);
-  pinBtnEl.setAttribute("aria-pressed", String(isPinned));
+  showPin();
 });
 
 closeBtnEl.addEventListener("click", () => {
@@ -176,6 +188,11 @@ closeBtnEl.addEventListener("click", () => {
 
 ipcRenderer.on("theme-changed", (_e, theme) => applyTheme(theme));
 ipcRenderer.on("prayer-data-from-main", (_e, data) => setPrayerData(data));
+ipcRenderer.on("time-format-changed", (_e, value) => {
+  timeFormat = value;
+  drawnMinute = -1;
+  tick();
+});
 ipcRenderer.on("extra-times-changed", (_e, value) => {
   extraTimes = value;
   drawnMinute = -1;
@@ -187,6 +204,7 @@ async function init() {
     const settings = await loadSettings();
     lang = settings.language || "en";
     extraTimes = settings.extraTimes;
+    timeFormat = settings.timeFormat ?? "24";
     applyTheme(settings.theme || "navy");
     initWidgetTips();
 

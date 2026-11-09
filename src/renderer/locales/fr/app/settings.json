@@ -55,5 +55,7 @@
   "stViewMenu": "Menu",
   "stViewPage": "Une page",
   "showTimesLabel": "Horaires affichés",
-  "showTimesDesc": "Horaires en plus sur l'accueil et le widget. Les cinq prières sont toujours affichées. Minuit est le milieu de la nuit, où finit le temps d'Icha."
+  "showTimesDesc": "Horaires en plus sur l'accueil et le widget. Les cinq prières sont toujours affichées. Minuit est le milieu de la nuit, où finit le temps d'Icha.",
+  "timeFormatLabel": "Format de l'heure",
+  "timeFormatDesc": "Comment les heures de prière s'affichent dans l'application et le widget."
 }

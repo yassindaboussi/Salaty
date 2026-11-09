@@ -10,6 +10,7 @@ const { html, setHtml } = require("../../utils/html");
 const fmt = require("../../core/date-format");
 const { hijriMonthName } = require("../../core/dates");
 const { view, TIME_KEYS } = require("./state");
+const { clock } = require("../../core/time-format");
 
 /** The row naming a Hijri month that starts on this day. @param {import("./state").MonthDay} day */
 function hijriMonthRow(day) {
@@ -45,7 +46,7 @@ function renderTable() {
       return html`${day.hijri.day === 1 ? hijriMonthRow(day) : ""}<tr class="${classes}" data-iso="${day.iso}" aria-selected="${String(selected)}" tabindex="${selected ? "0" : "-1"}" ${today && html`aria-current="date"`}>
         <th scope="row"><span class="mp-day-num">${day.date.getDate()}</span> <span class="mp-weekday">${fmt.gregorian(day.date, { weekday: "short" })}</span></th>
         <td class="mp-hijri">${day.hijri.day}</td>
-        ${TIME_KEYS.map((k) => html`<td class="${k === "Sunrise" ? "mp-muted" : ""}">${day.times[k]}</td>`)}
+        ${TIME_KEYS.map((k) => html`<td class="${k === "Sunrise" ? "mp-muted" : ""}">${clock(day.times[k])}</td>`)}
       </tr>`;
     })}`,
   );

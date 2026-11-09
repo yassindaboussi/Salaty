@@ -24,6 +24,7 @@ const THEMES = new Set([
 ]);
 const LANGUAGES = new Set(["en", "ar", "fr"]);
 const WEEK_STARTS = new Set(["auto", "sat", "sun", "mon"]);
+const TIME_FORMATS = new Set(["24", "12"]);
 const PRAYERS = new Set(["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"]);
 
 const MAX_TEXT = 200; // a city, a country, a location name
@@ -142,6 +143,7 @@ const SETTINGS_SCHEMA = {
   prayerMethod: (v) => (v === "auto" || METHOD_IDS.includes(v) ? v : undefined),
   asrSchool: (v) => (v === "standard" || v === "hanafi" ? v : undefined),
   weekStart: oneOf(WEEK_STARTS),
+  timeFormat: oneOf(TIME_FORMATS),
   position,
   locations,
 };
