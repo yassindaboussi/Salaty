@@ -78,7 +78,6 @@ const icons = {
 };
 
 // The adhan the pages play. An app:// page cannot load file:// media, so it is served too.
-const ADHAN_AUDIO_URL = appUrl(path.join(ASSETS_DIR, "adhan.mp3"));
 
 module.exports = {
   ROOT_DIR,
@@ -95,5 +94,4 @@ module.exports = {
   PAGE_ROUTE_MAP,
   pages,
   icons,
-  ADHAN_AUDIO_URL,
 };

@@ -21,10 +21,15 @@ const {
   APP_ORIGIN,
 } = require("../config/paths");
 const log = require("../services/logger").logger("Protocol");
+const {
+  CUSTOM_URL_PATH,
+  customAdhanFile,
+} = require("../services/adhan-voices");
 
-// What the pages may load, as paths under src/: their own folder, the images and the adhan.
+// What the pages may load, as paths under src/: their own folder, the images and the adhan
+// voices. Also one file outside src/: the user's own adhan (services/adhan-voices.js).
 // Not main/, preload/, shared/ (bundled into the pages already) or the installer files.
-const SERVED = ["renderer", "assets/images", "assets/adhan.mp3"];
+const SERVED = ["renderer", "assets/images", "assets/adhan"];
 
 /** Must run before the app's "ready" event (Electron requires it). */
 function registerAppScheme() {
@@ -60,6 +65,7 @@ function resolveAppFile(url) {
   }
   if (u.protocol !== `${APP_SCHEME}:` || u.host !== APP_HOST) return null;
   if (pathname.includes("\0")) return null;
+  if (pathname === CUSTOM_URL_PATH) return customAdhanFile();
 
   const file = path.resolve(SRC_DIR, `.${pathname}`);
   const rel = path.relative(SRC_DIR, file);

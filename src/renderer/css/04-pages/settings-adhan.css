@@ -1,0 +1,203 @@
+/*
+  Settings → Notifications → Adhan voice (js/pages/settings/adhan-voice.js): one row per
+  voice, like the Show times chips (surface-1, white when chosen), a round dot for the choice,
+  the licence and ▶ as small square buttons at the end of the row.
+*/
+@layer pages {
+  /* (its padding is the card's: .st-item in settings-layout.css) */
+  .adhan-voice-block {
+    container-type: inline-size; /* the tiles per row follow its width */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* the six tiles fill the width: one row of 6 when there is room, 3 + 3 in the usual window,
+     2 per row when narrow (sized by the card's width: a container query) */
+  .adhan-voices {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @container (width >= 360px) {
+    .adhan-voices {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @container (width >= 820px) {
+    .adhan-voices {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+
+  .adhan-voice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-block: 6px;
+    padding-inline: 10px 6px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+  }
+
+  .adhan-voice:hover {
+    background: var(--surface-2);
+  }
+
+  .adhan-voice.is-chosen {
+    background: var(--surface-hover);
+    border-color: var(--white-a40);
+  }
+
+  /* the label takes the free space: a click anywhere on the name chooses the voice */
+  .adhan-voice-pick {
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 10px;
+    min-inline-size: 0;
+    cursor: pointer;
+  }
+
+  /* the real radio, drawn as a round dot: empty, white with a dark centre when chosen */
+  .adhan-voice-pick input {
+    flex: 0 0 auto;
+    inline-size: 16px;
+    block-size: 16px;
+    margin: 0;
+    border: 1.5px solid var(--white-a40);
+    border-radius: 50%;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .adhan-voice-pick input:checked {
+    background: radial-gradient(
+      circle,
+      var(--bg-primary) 0 3px,
+      var(--text-primary) 3.5px
+    );
+    border-color: var(--text-primary);
+  }
+
+  .adhan-voice-pick input:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+  }
+
+  .adhan-voice-text {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+
+  .adhan-voice-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .adhan-voice.is-chosen .adhan-voice-name {
+    color: var(--text-primary);
+  }
+
+  .adhan-voice-by {
+    overflow: hidden;
+    font-size: 11px;
+    color: var(--text-faint);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ▶ / ■ and the folder: square icon buttons, like copy / undo elsewhere */
+  .adhan-voice-btn {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    inline-size: 30px;
+    block-size: 30px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    font-size: 11px;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .adhan-voice-btn:hover,
+  .adhan-voice-btn.is-playing {
+    color: var(--text-primary);
+    background: var(--surface-2);
+  }
+
+  .adhan-voice-btn:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 1px;
+  }
+
+  .adhan-credits {
+    margin: 0;
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  /* a tile: the name on top, the licence and ▶ at the bottom (after the row rules above) */
+  .adhan-voice.is-tile {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .adhan-voice.is-tile .adhan-voice-pick {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .adhan-voice.is-tile .adhan-voice-pick input {
+    margin-block-start: 1px;
+  }
+
+  .adhan-voice.is-tile .adhan-voice-by {
+    white-space: normal;
+  }
+
+  /* the file name: one line, cut with "…" (the whole name is its tooltip) */
+  .adhan-voice.is-tile .adhan-voice-by.is-file {
+    white-space: nowrap;
+  }
+
+  /* ⓘ and ▶ at the end of the tile */
+  .adhan-voice-foot {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+    margin-block-start: auto;
+  }
+
+  .adhan-voice-length {
+    font-size: 11px;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Fajr adhan: the list opens upward when there is no room below (adhan-voice.js) */
+  .ts-wrapper.is-dropup .ts-dropdown {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: 4px;
+  }
+
+  /* the 7 choices all shown: no scrollbar for one more row */
+  .ts-dropdown.fajr-dropdown .ts-dropdown-content {
+    max-height: none;
+  }
+}

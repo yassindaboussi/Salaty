@@ -7,6 +7,7 @@ const log = require("../services/logger").logger("IPC");
 const { TYPES: FAST_TYPES } = require("../../shared/fasting-rules");
 const { METHOD_IDS } = require("../../shared/aladhan");
 const { EXTRA_TIME_KEYS } = require("../../shared/prayerUtils");
+const { isAdhanVoice, FAJR_SAME_VOICE } = require("../../shared/adhan-voices");
 
 const THEMES = new Set([
   "brown",
@@ -122,6 +123,12 @@ function locations(v) {
 }
 
 // Every setting a page may change, and how to check it. Anything else is dropped.
+/** An adhan voice id (shared/adhan-voices.js), or undefined. */
+const adhanVoiceId = (v) => (isAdhanVoice(v) ? String(v) : undefined);
+
+/** "Fajr", "Dhuhr"... or undefined. */
+const prayerKey = (v) => (PRAYERS.has(v) ? String(v) : undefined);
+
 const SETTINGS_SCHEMA = {
   theme: oneOf(THEMES),
   themeChosen: bool,
@@ -144,6 +151,9 @@ const SETTINGS_SCHEMA = {
   asrSchool: (v) => (v === "standard" || v === "hanafi" ? v : undefined),
   weekStart: oneOf(WEEK_STARTS),
   timeFormat: oneOf(TIME_FORMATS),
+  adhanVoice: (v) => adhanVoiceId(v),
+  adhanVoiceFajr: (v) => (v === FAJR_SAME_VOICE ? v : adhanVoiceId(v)),
+  adhanCustomName: (v) => (v === "" ? "" : text(v)), // "": the file was deleted
   position,
   locations,
 };
@@ -270,5 +280,7 @@ module.exports = {
   analyticsName,
   analyticsParams,
   clipboardText,
+  adhanVoiceId,
+  prayerKey,
   THEMES,
 };
