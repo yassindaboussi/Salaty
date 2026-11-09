@@ -47,7 +47,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/howler": "^2.2.13",
-    "@types/node": "^24.19.2",
+    "@types/node": "^25.9.9",
     "electron": "^44.10.2",
     "electron-builder": "^26.18.0",
     "esbuild": "^0.28.2",
