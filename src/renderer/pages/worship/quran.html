@@ -176,121 +176,129 @@
               <div class="ayah-list" id="ayahList"></div>
             </main>
 
-            <!-- Listening: the surah recited, the ayah marked in the text -->
-            <div class="q-player" id="qPlayer" hidden>
-              <button
-                type="button"
-                class="q-player-back"
-                id="qPlayerBack"
-                hidden
-              >
-                <i class="fas fa-arrow-down" aria-hidden="true"></i>
-                <span data-i18n="quranBackToAyah">Back to the ayah</span>
-              </button>
-              <input
-                type="range"
-                class="q-player-seek"
-                id="qPlayerSeek"
-                min="0"
-                max="0"
-                step="1"
-                value="0"
-                data-i18n-aria-label="quranPosition"
-              />
-              <div class="q-player-row">
+            <!-- the footer: previous / next surah and "Listen", or the player between them -->
+            <div class="reader-foot">
+              <!-- Listening: the surah recited, the ayah marked in the text -->
+              <div class="q-player" id="qPlayer" hidden>
                 <button
                   type="button"
-                  class="q-player-reciter"
-                  id="qPlayerReciter"
-                  data-tooltip="quranChooseReciter"
+                  class="q-player-back"
+                  id="qPlayerBack"
+                  hidden
                 >
-                  <span class="q-player-photo" id="qPlayerPhoto"></span>
-                  <span class="q-player-text">
-                    <span class="q-player-title" id="qPlayerTitle"></span>
-                    <span class="q-player-sub" id="qPlayerSub"></span>
-                  </span>
+                  <i class="fas fa-arrow-down" aria-hidden="true"></i>
+                  <span data-i18n="quranBackToAyah">Back to the ayah</span>
+                </button>
+                <input
+                  type="range"
+                  class="q-player-seek"
+                  id="qPlayerSeek"
+                  min="0"
+                  max="0"
+                  step="1"
+                  value="0"
+                  data-i18n-aria-label="quranPosition"
+                />
+                <div class="q-player-row">
+                  <button
+                    type="button"
+                    class="q-player-reciter"
+                    id="qPlayerReciter"
+                    data-tooltip="quranChooseReciter"
+                  >
+                    <span class="q-player-photo" id="qPlayerPhoto"></span>
+                    <span class="q-player-text">
+                      <span class="q-player-title" id="qPlayerTitle"></span>
+                      <span class="q-player-sub" id="qPlayerSub"></span>
+                    </span>
+                    <i
+                      class="fas fa-chevron-down q-player-more"
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                  <span class="q-player-time" id="qPlayerTime"></span>
+                  <!-- the app's one volume (the radio and the archive share it) -->
+                  <div class="q-player-volume">
+                    <button
+                      type="button"
+                      class="q-icon-btn"
+                      id="qPlayerMute"
+                      data-tooltip="tooltipMute"
+                    >
+                      <i class="fas fa-volume-high" aria-hidden="true"></i>
+                    </button>
+                    <input
+                      type="range"
+                      class="q-player-range"
+                      id="qPlayerVolume"
+                      min="0"
+                      max="100"
+                      value="100"
+                      data-i18n-aria-label="volume"
+                      aria-label="Volume"
+                    />
+                  </div>
+                  <div class="q-player-controls">
+                    <button
+                      type="button"
+                      class="q-icon-btn"
+                      id="qPlayerPrev"
+                      data-tooltip="quranPrevAyah"
+                    >
+                      <i class="fas fa-backward-step" aria-hidden="true"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="q-icon-btn q-player-play"
+                      id="qPlayerPlay"
+                      data-tooltip="quranPause"
+                    >
+                      <i class="fas fa-pause" aria-hidden="true"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="q-icon-btn"
+                      id="qPlayerNext"
+                      data-tooltip="quranNextAyah"
+                    >
+                      <i class="fas fa-forward-step" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    class="q-icon-btn"
+                    id="qPlayerStop"
+                    data-tooltip="quranStopListening"
+                  >
+                    <i class="fas fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <p class="q-player-status" id="qPlayerStatus" role="status"></p>
+              </div>
+
+              <nav class="reader-nav">
+                <button type="button" class="reader-nav-btn" id="prevSurahBtn">
+                  <i class="fas fa-chevron-left q-back" aria-hidden="true"></i>
+                  <span class="reader-nav-label" id="prevSurahLabel"></span>
+                </button>
+                <button
+                  type="button"
+                  class="reader-listen"
+                  id="readerListenBtn"
+                >
+                  <i class="fas fa-play" aria-hidden="true"></i>
+                  <span data-i18n="quranListen">Listen</span>
+                  <span class="reader-listen-who" id="readerListenWho"></span>
+                </button>
+                <button type="button" class="reader-nav-btn" id="nextSurahBtn">
+                  <span class="reader-nav-label" id="nextSurahLabel"></span>
                   <i
-                    class="fas fa-chevron-down q-player-more"
+                    class="fas fa-chevron-right q-forward"
                     aria-hidden="true"
                   ></i>
                 </button>
-                <span class="q-player-time" id="qPlayerTime"></span>
-                <!-- the app's one volume (the radio and the archive share it) -->
-                <div class="q-player-volume">
-                  <button
-                    type="button"
-                    class="q-icon-btn"
-                    id="qPlayerMute"
-                    data-tooltip="tooltipMute"
-                  >
-                    <i class="fas fa-volume-high" aria-hidden="true"></i>
-                  </button>
-                  <input
-                    type="range"
-                    class="q-player-range"
-                    id="qPlayerVolume"
-                    min="0"
-                    max="100"
-                    value="100"
-                    data-i18n-aria-label="volume"
-                    aria-label="Volume"
-                  />
-                </div>
-                <div class="q-player-controls">
-                  <button
-                    type="button"
-                    class="q-icon-btn"
-                    id="qPlayerPrev"
-                    data-tooltip="quranPrevAyah"
-                  >
-                    <i class="fas fa-backward-step" aria-hidden="true"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="q-icon-btn q-player-play"
-                    id="qPlayerPlay"
-                    data-tooltip="quranPause"
-                  >
-                    <i class="fas fa-pause" aria-hidden="true"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="q-icon-btn"
-                    id="qPlayerNext"
-                    data-tooltip="quranNextAyah"
-                  >
-                    <i class="fas fa-forward-step" aria-hidden="true"></i>
-                  </button>
-                </div>
-                <button
-                  type="button"
-                  class="q-icon-btn"
-                  id="qPlayerStop"
-                  data-tooltip="quranStopListening"
-                >
-                  <i class="fas fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
-              <p class="q-player-status" id="qPlayerStatus" role="status"></p>
+              </nav>
             </div>
-
-            <nav class="reader-nav">
-              <button type="button" class="reader-nav-btn" id="prevSurahBtn">
-                <i class="fas fa-chevron-left q-back" aria-hidden="true"></i>
-                <span class="reader-nav-label" id="prevSurahLabel"></span>
-              </button>
-              <button type="button" class="reader-listen" id="readerListenBtn">
-                <i class="fas fa-play" aria-hidden="true"></i>
-                <span data-i18n="quranListen">Listen</span>
-              </button>
-              <button type="button" class="reader-nav-btn" id="nextSurahBtn">
-                <span class="reader-nav-label" id="nextSurahLabel"></span>
-                <i
-                  class="fas fa-chevron-right q-forward"
-                  aria-hidden="true"
-                ></i>
-              </button>
-            </nav>
           </section>
 
           <!-- Display settings (folds to a strip of icons) -->

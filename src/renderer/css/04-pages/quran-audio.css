@@ -469,14 +469,21 @@
 
   /* ── Narrow window: no room for the time (the slider still reads it out) */
 
-  @media (width <= 560px) {
+  /* by the footer's width (the side panel takes some of the window): the reciter's name
+     keeps its room */
+  @container reader-foot (width <= 520px) {
     .q-player-time {
       display: none;
     }
   }
 
-  @media (width <= 680px) {
+  @container reader-foot (width <= 640px) {
     .q-player-range {
+      display: none;
+    }
+
+    /* "Listen" (another surah) in the row too: the name before the time */
+    .reader-foot:has(.reader-listen:not([hidden])) .q-player-time {
       display: none;
     }
   }
@@ -486,5 +493,88 @@
     .q-player-seek::-webkit-slider-thumb {
       transition: none;
     }
+  }
+
+  /* ── "Listen · reciter" and the footer with the player in it ──────── */
+
+  .reader-listen-who {
+    max-width: 200px;
+    overflow: hidden;
+    padding-inline-start: 8px;
+    border-inline-start: 1px solid var(--border-medium);
+    color: var(--text-muted);
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .reader-listen-who:empty {
+    display: none;
+  }
+
+  .reader-foot {
+    position: relative;
+    flex-shrink: 0;
+    container: reader-foot / inline-size;
+  }
+
+  /* while listening: one row, the previous / next surah as arrows on both sides of the
+     player (the position line along the whole top) */
+  .reader-foot:has(> .q-player:not([hidden])) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    column-gap: 8px;
+    padding: 0 10px 8px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .reader-foot:has(> .q-player:not([hidden])) > .q-player,
+  .reader-foot:has(> .q-player:not([hidden])) > .reader-nav {
+    display: contents;
+  }
+
+  .reader-foot:has(> .q-player:not([hidden])) .q-player-seek {
+    grid-area: 1 / 1 / 2 / -1;
+  }
+
+  .reader-foot:has(> .q-player:not([hidden])) .q-player-row {
+    grid-area: 2 / 2;
+  }
+
+  .reader-foot:has(> .q-player:not([hidden])) .q-player-status {
+    grid-area: 3 / 2;
+  }
+
+  .reader-foot:has(> .q-player:not([hidden])) .reader-nav-btn {
+    grid-row: 2;
+    width: 32px;
+    max-width: none;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .reader-foot:has(> .q-player:not([hidden])) .reader-nav-btn:last-child {
+    grid-column: 4;
+  }
+
+  /* another surah open than the one playing: "Listen" (to it) before the next arrow; the
+     player already names the reciter */
+  .reader-foot:has(> .q-player:not([hidden])) .reader-listen {
+    grid-area: 2 / 3;
+  }
+
+  .reader-foot:has(> .q-player:not([hidden])) .reader-listen-who {
+    display: none;
+  }
+
+  /* the name stays for screen readers (and in the hover text) */
+  .reader-foot:has(> .q-player:not([hidden])) .reader-nav-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
