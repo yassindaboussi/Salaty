@@ -164,6 +164,53 @@ async function surahArabic(surahNum, riwaya = "hafs") {
   return verses.map((v) => v.ar);
 }
 
+/** @typedef {{ surah: number, ayah: number, ar: string, en: string }} BundledVerse */
+
+/** Every Hafs ayah with its Sahih International translation (bundled, works offline).
+ * @returns {Promise<BundledVerse[]>} */
+async function allVerses() {
+  const data = await getLocalQuranData();
+  return data.flatMap((s) =>
+    ((s.Array_Verses && s.Array_Verses[0]) || []).map(
+      (/** @type {{ id: number, ar: string, en?: string }} */ v) => ({
+        surah: s.Number,
+        ayah: v.id,
+        ar: v.ar,
+        en: v.en ?? "",
+      }),
+    ),
+  );
+}
+
+/**
+ * The ayahs of a translation that contain a word (AlQuran Cloud's search, online only).
+ * null when offline or the search failed; [] when nothing was found.
+ * @param {string} keyword @param {string} edition
+ * @returns {Promise<{ surah: number, ayah: number, text: string }[] | null>}
+ */
+async function searchTranslation(keyword, edition) {
+  if (!navigator.onLine) return null;
+  try {
+    const res = await fetch(
+      `${ALQURAN_CLOUD_API}/search/${encodeURIComponent(keyword)}/all/${edition}`,
+      { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) },
+    );
+    if (res.status === 404) return []; // its answer for "no match"
+    if (!res.ok) throw new Error(`alquran.cloud ${res.status}`);
+    const json = await res.json();
+    const matches = json?.data?.matches;
+    if (!Array.isArray(matches)) return [];
+    return matches.map((m) => ({
+      surah: Number(m?.surah?.number),
+      ayah: Number(m?.numberInSurah),
+      text: stripHtmlTags(String(m?.text ?? "")),
+    }));
+  } catch (e) {
+    console.warn("AlQuran Cloud search failed:", e);
+    return null;
+  }
+}
+
 /** @param {string} str */
 function stripHtmlTags(str) {
   return str
@@ -172,4 +219,11 @@ function stripHtmlTags(str) {
     .trim();
 }
 
-module.exports = { fetchQuranSurah, ayahArabic, surahArabic, TRANSLATIONS };
+module.exports = {
+  fetchQuranSurah,
+  ayahArabic,
+  surahArabic,
+  allVerses,
+  searchTranslation,
+  TRANSLATIONS,
+};

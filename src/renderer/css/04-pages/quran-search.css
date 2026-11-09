@@ -1,0 +1,278 @@
+/*
+  Quran page: the ayahs found by the search box (js/pages/quran/verse-results.js), under the
+  surahs it found. A title with the count, then one group per surah that opens to its ayahs
+  (like the Athkar groups), the words found marked in white (accents clash with some themes).
+  <mark> takes the system Mark colours in Windows contrast themes by itself.
+*/
+@layer pages {
+  .surah-grid:empty {
+    display: none;
+  }
+
+  .q-verses {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-block-start: 16px;
+  }
+
+  .surah-grid:empty + .q-verses {
+    margin-block-start: 0;
+  }
+
+  .q-verses[hidden] {
+    display: none;
+  }
+
+  .q-verses-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 2px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .q-verses-title > span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .q-verses-count,
+  .q-vgroup-count {
+    flex-shrink: 0;
+    padding: 1px 8px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+
+  .q-verses-note {
+    margin: 0 2px;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  .q-verses-tip {
+    display: block;
+    margin-block-start: 6px;
+    color: var(--text-faint);
+    font-size: 12px;
+  }
+
+  /* ── A surah's group ───────────────────────────────────────────────── */
+
+  .q-vgroup {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--surface-subtle);
+  }
+
+  .q-vgroup-head {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .q-vgroup-head:hover {
+    background: var(--surface-hover);
+  }
+
+  .q-vgroup-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .q-vgroup-chevron {
+    color: var(--text-faint);
+    font-size: 11px;
+    transition: rotate 0.2s ease;
+  }
+
+  .q-vgroup-head[aria-expanded="true"] .q-vgroup-chevron {
+    rotate: 180deg;
+  }
+
+  .q-vgroup-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.2s ease;
+  }
+
+  .q-vgroup-head[aria-expanded="true"] + .q-vgroup-body {
+    grid-template-rows: 1fr;
+  }
+
+  .q-vgroup-rows {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* closed: its ayahs are out of the Tab order too */
+  .q-vgroup-head[aria-expanded="false"] + .q-vgroup-body .q-vgroup-rows {
+    visibility: hidden;
+  }
+
+  /* ── An ayah ───────────────────────────────────────────────────────── */
+
+  .q-verse {
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 0;
+    border-block-start: 1px solid var(--border-subtle);
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .q-verse:hover,
+  .q-verse:focus-visible {
+    background: var(--surface-hover);
+  }
+
+  .q-vgroup-rows > .q-verse:last-child {
+    border-end-start-radius: var(--radius-lg);
+    border-end-end-radius: var(--radius-lg);
+  }
+
+  .q-verse-num {
+    flex-shrink: 0;
+    min-width: 28px;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .q-verse-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 13.5px;
+    line-height: 1.6;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  .q-verse-text.is-arabic {
+    font-family: var(--font-quran);
+    font-size: 21px;
+    line-height: 1.9;
+    text-align: right;
+  }
+
+  .q-verse-text mark {
+    padding-inline: 2px;
+    border-radius: 4px;
+    background: var(--white-a20);
+    color: var(--text-primary);
+  }
+
+  /* ── "Find in this surah" (the reader's panel) ───────────────────────── */
+
+  .q-find-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .q-find-box {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .q-find-icon {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 10px;
+    translate: 0 -50%;
+    color: var(--text-muted);
+    font-size: 11px;
+    pointer-events: none;
+  }
+
+  .q-find-input {
+    width: 100%;
+    height: 32px;
+    padding-block: 0;
+    padding-inline: 28px 62px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+  }
+
+  .q-find-input::placeholder {
+    color: var(--text-faint);
+  }
+
+  .q-find-input:focus-visible {
+    outline: none;
+    border-color: var(--white-a40);
+  }
+
+  /* no native ✕ in the box: Esc clears it, and the count sits there */
+  .q-find-input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .q-find-count {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: 10px;
+    translate: 0 -50%;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .q-find-count.is-none {
+    color: var(--text-faint);
+  }
+
+  /* the words found in the text; the one at hand in white */
+  .ayah-list mark {
+    border-radius: 4px;
+    background: var(--white-a20);
+    color: inherit;
+  }
+
+  .ayah-list mark.is-current {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .q-vgroup-body,
+    .q-vgroup-chevron {
+      transition: none;
+    }
+  }
+}

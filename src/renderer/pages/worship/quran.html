@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
     <link rel="stylesheet" href="../../css/04-pages/quran.css" />
     <link rel="stylesheet" href="../../css/04-pages/quran-audio.css" />
+    <link rel="stylesheet" href="../../css/04-pages/quran-search.css" />
   </head>
   <body class="page-loading">
     <div class="app-container" id="app">
@@ -109,6 +110,13 @@
               role="tabpanel"
               aria-labelledby="tabSurah"
             ></div>
+            <!-- the ayahs containing the words typed in the search box (verse-results.js) -->
+            <section
+              class="q-verses"
+              id="verseResults"
+              aria-live="polite"
+              hidden
+            ></section>
             <div
               class="juz-list"
               id="juzList"
@@ -310,9 +318,67 @@
               >
                 <i class="fas fa-text-height" aria-hidden="true"></i>
               </button>
+              <button
+                type="button"
+                class="q-panel-toggle"
+                data-rail="find"
+                data-tooltip="quranFindLabel"
+              >
+                <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+              </button>
             </div>
 
             <div class="q-panel-body" id="qPanelBody">
+              <!-- "Find in this surah" (reader-find.js); Ctrl+F comes here -->
+              <div class="q-field q-find" role="search">
+                <label
+                  class="q-field-label"
+                  for="qFindInput"
+                  data-i18n="quranFindLabel"
+                  >Find in this surah</label
+                >
+                <div class="q-find-row">
+                  <div class="q-find-box">
+                    <i
+                      class="fas fa-magnifying-glass q-find-icon"
+                      aria-hidden="true"
+                    ></i>
+                    <input
+                      type="search"
+                      id="qFindInput"
+                      class="q-find-input"
+                      data-i18n-placeholder="quranFindPlaceholder"
+                      autocomplete="off"
+                      spellcheck="false"
+                      aria-describedby="qFindCount"
+                    />
+                    <span
+                      class="q-find-count"
+                      id="qFindCount"
+                      aria-live="polite"
+                    ></span>
+                  </div>
+                  <button
+                    type="button"
+                    class="q-step"
+                    id="qFindPrev"
+                    data-tooltip="quranFindPrev"
+                    disabled
+                  >
+                    <i class="fas fa-chevron-up" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="q-step"
+                    id="qFindNext"
+                    data-tooltip="quranFindNext"
+                    disabled
+                  >
+                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+
               <div
                 class="q-field"
                 id="riwayaGroup"
@@ -347,29 +413,6 @@
                     data-i18n="quranRiwayaWarsh"
                   >
                     Warsh
-                  </button>
-                </div>
-              </div>
-
-              <div class="q-field">
-                <p class="q-field-label" data-i18n="quranFontSize">Text size</p>
-                <div class="q-stepper">
-                  <button
-                    type="button"
-                    class="q-step"
-                    id="fontDecBtn"
-                    data-tooltip="decreaseFontSize"
-                  >
-                    <i class="fas fa-minus" aria-hidden="true"></i>
-                  </button>
-                  <span class="q-step-value" id="fontSizeDisplay">26</span>
-                  <button
-                    type="button"
-                    class="q-step"
-                    id="fontIncBtn"
-                    data-tooltip="increaseFontSize"
-                  >
-                    <i class="fas fa-plus" aria-hidden="true"></i>
                   </button>
                 </div>
               </div>
@@ -522,6 +565,29 @@
                     data-tooltip="numeralsLatin"
                   >
                     123
+                  </button>
+                </div>
+              </div>
+
+              <div class="q-field">
+                <p class="q-field-label" data-i18n="quranFontSize">Text size</p>
+                <div class="q-stepper">
+                  <button
+                    type="button"
+                    class="q-step"
+                    id="fontDecBtn"
+                    data-tooltip="decreaseFontSize"
+                  >
+                    <i class="fas fa-minus" aria-hidden="true"></i>
+                  </button>
+                  <span class="q-step-value" id="fontSizeDisplay">26</span>
+                  <button
+                    type="button"
+                    class="q-step"
+                    id="fontIncBtn"
+                    data-tooltip="increaseFontSize"
+                  >
+                    <i class="fas fa-plus" aria-hidden="true"></i>
                   </button>
                 </div>
               </div>

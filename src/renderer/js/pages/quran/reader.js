@@ -23,6 +23,7 @@ const { saveFontSize, clampFont } = require("./storage");
 const { isBookmarked } = require("./bookmarks");
 const { trackReading, rememberAyah } = require("./reading-position");
 const { flowHtml, cardsHtml, ayahEndLabel } = require("./reader-text");
+const { refreshFind, resetFind } = require("./reader-find");
 const { rec } = require("./recitation");
 const { recitedAyah, setFollow } = require("./recitation-follow");
 
@@ -69,6 +70,7 @@ function revealAyah(ayah) {
 async function openSurah(surahNum, ayah) {
   const meta = surahMeta(surahNum);
   if (!meta) return;
+  if (state.currentSurah !== meta) resetFind();
   state.currentSurah = meta;
 
   byId("viewSurahList", HTMLElement).hidden = true;
@@ -158,6 +160,7 @@ function renderAyahs() {
   applyFontSize();
   setHtml(list, cards ? cardsHtml() : flowHtml());
   refreshTooltips();
+  refreshFind(); // the words found, marked again in the new text
 }
 
 /** The text sizes: the Arabic at the chosen size, a translation a bit over half of it. */
@@ -223,10 +226,12 @@ function showSurahList() {
   const list = byId("viewSurahList", HTMLElement);
   list.hidden = false;
   state.currentSurah = null;
-  // focus back on the row that was opened (else the tabs), not lost on the hidden reader
-  const row = [...list.querySelectorAll(`.surah-row[data-surah="${n}"]`)].find(
-    (el) => el instanceof HTMLElement && el.offsetParent,
-  );
+  // focus back on the row that was opened (an ayah found by the search, a surah; else the
+  // tabs), not lost on the hidden reader
+  const row = [
+    ...list.querySelectorAll(`.q-verse[data-opened]`),
+    ...list.querySelectorAll(`.surah-row[data-surah="${n}"]`),
+  ].find((el) => el instanceof HTMLElement && el.offsetParent);
   const target = row ?? list.querySelector(".q-tab[aria-selected='true']");
   if (!(target instanceof HTMLElement)) return;
   target.focus({ preventScroll: true });

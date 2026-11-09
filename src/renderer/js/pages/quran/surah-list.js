@@ -1,9 +1,16 @@
 "use strict";
 
-// The list view: "Continue reading", and three tabs: the 114 surahs (searchable), the 30 juz
+// The list view: "Continue reading", and three tabs: the 114 surahs (the search box also finds
+// ayahs by their words: verse-results.js), the 30 juz
 // (each opens the reader at the ayah it starts with) and the bookmarks.
 const { t } = require("../../core/i18n");
 const { findSurahs } = require("./surah-search");
+const {
+  searchVerses,
+  bindVerseResults,
+  renderVerseResults,
+} = require("./verse-results");
+const { queryWords } = require("./verse-search");
 const { byId, queryAll } = require("../../core/dom");
 const { html, setHtml } = require("../../utils/html");
 const {
@@ -36,24 +43,33 @@ function switchTab(tab) {
   byId("juzList", HTMLElement).hidden = tab !== "juz";
   byId("bookmarkList", HTMLElement).hidden = tab !== "bookmarks";
   byId("surahSearch", HTMLElement).hidden = tab !== "surah";
+  renderVerseResults();
   if (tab === "bookmarks") renderBookmarkList();
 }
 
 /** @param {string} query */
 const filterSurahs = (query) => findSurahs(SURAH_META, query);
 
+// One box finds both: the surahs by name or number, then the ayahs containing the words.
 function onSearch() {
-  state.filteredSurahs = filterSurahs(
-    byId("surahSearchInput", HTMLInputElement).value,
-  );
+  const query = byId("surahSearchInput", HTMLInputElement).value;
+  state.filteredSurahs = filterSurahs(query);
   renderSurahGrid();
+  searchVerses(query);
 }
 
 function renderSurahGrid() {
   const grid = byId("surahGrid", HTMLElement);
   const surahs = state.filteredSurahs;
   if (!surahs.length) {
-    setHtml(grid, html`<p class="q-empty-line">${t("noResults")}</p>`);
+    // a word: the ayah results below say whether anything was found
+    const word = queryWords(byId("surahSearchInput", HTMLInputElement).value);
+    setHtml(
+      grid,
+      word.length
+        ? html``
+        : html`<p class="q-empty-line">${t("noResults")}</p>`,
+    );
     return;
   }
   setHtml(
@@ -113,6 +129,7 @@ function renderLists() {
   renderSurahGrid();
   renderJuzList();
   renderContinue();
+  renderVerseResults();
   if (state.activeTab === "bookmarks") renderBookmarkList();
 }
 
@@ -122,6 +139,9 @@ function bindSurahList(openAt) {
   const openRow = (e) => {
     const row = /** @type {Element} */ (e.target).closest("[data-surah]");
     if (!(row instanceof HTMLElement) || row.closest(".bookmark-list")) return;
+    document
+      .querySelector(".q-verse[data-opened]")
+      ?.removeAttribute("data-opened");
     const riwaya = isRiwaya(row.dataset.riwaya)
       ? row.dataset.riwaya
       : undefined;
@@ -138,6 +158,7 @@ function bindSurahList(openAt) {
     "input",
     onSearch,
   );
+  bindVerseResults(openAt);
 
   // tabs: click, or the arrow keys along them (one tab in the Tab order)
   const tabs = queryAll(".q-tab", HTMLButtonElement);
