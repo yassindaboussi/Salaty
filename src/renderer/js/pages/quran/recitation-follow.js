@@ -2,8 +2,9 @@
 
 // The ayah being recited, marked in the reader's text, and the text kept on it: when the ayah
 // leaves the middle of the view the text scrolls to bring it back. Scrolling by hand (wheel,
-// touch, the scroll keys, the scrollbar) stops that, so the reader can look elsewhere; "Back to
-// the ayah" (shown in the player bar) turns it on again.
+// touch, the scroll keys, the scrollbar when the text really moves) stops that, so the reader
+// can look elsewhere; "Back to the ayah" (shown in the player bar) turns it on again, and so does
+// scrolling back by hand until the ayah is in the middle of the view.
 const { byId } = require("../../core/dom");
 const { state } = require("./state");
 const {
@@ -53,15 +54,26 @@ const recitedAyah = (surah) =>
 const reduceMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/** Whether the ayah is in the middle of the view. @param {HTMLElement} el */
+function inMiddle(el) {
+  const box = byId("readerContent", HTMLElement).getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  return (
+    r.top >= box.top + box.height * 0.12 &&
+    r.bottom <= box.top + box.height * 0.75
+  );
+}
+
+/** Pressed on the scrollbar: the text is not moved for the ayah meanwhile. */
+let holdingScrollbar = false;
+
 /** Brings the ayah to a third of the view, when it is outside its middle. @param {HTMLElement} el */
 function keepInView(el, force = false) {
+  if (holdingScrollbar && !force) return;
   const content = byId("readerContent", HTMLElement);
   const box = content.getBoundingClientRect();
   const r = el.getBoundingClientRect();
-  const inMiddle =
-    r.top >= box.top + box.height * 0.12 &&
-    r.bottom <= box.top + box.height * 0.75;
-  if (inMiddle && !force) return;
+  if (inMiddle(el) && !force) return;
   content.scrollTo({
     top: content.scrollTop + r.top - box.top - box.height * 0.3,
     behavior: reduceMotion() ? "auto" : "smooth",
@@ -103,8 +115,16 @@ function backToAyah() {
 
 function bindFollow() {
   const content = byId("readerContent", HTMLElement);
+  // scrolled by hand: following goes on only while the ayah stays in the middle of the view
+  // (so scrolling back to it follows again), decided once the text really moved. A scroll
+  // soon after a wheel / touch / key is the user's (a wheel at the end moves nothing).
+  let byHandAt = -Infinity;
   const byHand = () => {
-    if (rec.track) setFollow(false);
+    byHandAt = performance.now();
+  };
+  const decide = () => {
+    if (!rec.track) return;
+    setFollow(Boolean(follow.el && inMiddle(follow.el)));
   };
   content.addEventListener("wheel", byHand, { passive: true });
   content.addEventListener("touchmove", byHand, { passive: true });
@@ -112,16 +132,33 @@ function bindFollow() {
     if (SCROLL_KEYS.has(e.key)) byHand();
   });
   // the scrollbar: a press on the strip outside the box's content width (on the right, or on
-  // the left in a right-to-left page). A press on its empty space (under a short surah) is
-  // not a scroll.
+  // the left in a right-to-left page). Only when the text moved (a drag, a press on the empty
+  // track): a click on the thumb that moves nothing keeps following.
   content.addEventListener("pointerdown", (e) => {
-    if (e.target !== content) return;
+    if (e.target !== content || e.button !== 0) return;
     const box = content.getBoundingClientRect();
     const from = box.left + content.clientLeft;
     const onScrollbar =
       e.clientX < from || e.clientX > from + content.clientWidth;
-    if (onScrollbar) byHand();
+    if (!onScrollbar) return;
+    const top = content.scrollTop;
+    holdingScrollbar = true;
+    const release = () => {
+      holdingScrollbar = false;
+      // a press on the empty track scrolls (smoothly) after the release
+      if (Math.abs(content.scrollTop - top) > 2) decide();
+      else byHand();
+    };
+    window.addEventListener("pointerup", release, { once: true });
   });
+  content.addEventListener(
+    "scroll",
+    () => {
+      if (holdingScrollbar || performance.now() - byHandAt > 500) return;
+      decide();
+    },
+    { passive: true },
+  );
   // the text is drawn again (translation, size, digits): the mark goes on the new one
   new MutationObserver(() => {
     follow.el = null;

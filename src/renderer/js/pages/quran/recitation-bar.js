@@ -3,7 +3,8 @@
 // The player bar under the reader's text, while a surah is recited: the position (a slider),
 // the reciter (opens the reciter list), the time, the previous / play / next ayah and stop.
 // It shows in the reader whatever surah is playing; "Listen" in the reader's footer plays the
-// open surah. Listening needs the internet: offline, "Listen" says so instead of playing.
+// open surah, and names the reciter who will read it (the last one chosen for the riwaya).
+// Space plays / pauses. Listening needs the internet: offline, "Listen" says so instead of playing.
 const { t } = require("../../core/i18n");
 const { byId } = require("../../core/dom");
 const { updateTooltip, refreshTooltips } = require("../../core/tooltips");
@@ -21,6 +22,7 @@ const {
 const {
   rec,
   currentTime,
+  chosenReciter,
   listen,
   seek,
   stepAyah,
@@ -80,6 +82,8 @@ function render() {
   // the mini player hides while this bar shows (the surah list shows the mini player)
   document.body.classList.toggle("has-own-player", !bar.hidden);
   byId("readerListenBtn", HTMLButtonElement).hidden = showsTrack();
+  renderNavTips(!bar.hidden);
+  renderListenWho();
   if (!track) return;
 
   setHtml(
@@ -117,6 +121,55 @@ function render() {
     ? t("quranNoFollow")
     : "";
   renderTime();
+}
+
+/** With the player, the previous / next surah show only their arrow: the name moves to the
+ * hover text. @param {boolean} compact */
+function renderNavTips(compact) {
+  for (const side of ["prev", "next"]) {
+    const button = byId(`${side}SurahBtn`, HTMLButtonElement);
+    const name = byId(`${side}SurahLabel`, HTMLElement).textContent ?? "";
+    if (compact && name) button.dataset.tip = name;
+    else delete button.dataset.tip;
+  }
+  refreshTooltips();
+}
+
+let whoAsked = "";
+
+/** "Listen | Mishary Alafasy": the reciter "Listen" plays (needs the reciter list: online). */
+async function renderListenWho() {
+  const who = byId("readerListenWho", HTMLElement);
+  const riwaya = state.riwaya;
+  const ask = `${riwaya}/${navigator.onLine}/${rec.track?.read ?? ""}`;
+  if (ask === whoAsked) return;
+  whoAsked = ask;
+  if (!navigator.onLine) return;
+  try {
+    const reciter = await chosenReciter(riwaya);
+    if (whoAsked !== ask) return;
+    who.textContent = reciter?.name ?? "";
+  } catch {
+    whoAsked = ""; // tried again on the next change
+  }
+}
+
+/** Space plays / pauses while the player shows (not when a button, field or menu has the key). */
+function onSpace(/** @type {KeyboardEvent} */ e) {
+  if (e.key !== " " || e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) return;
+  if (
+    byId("qPlayer", HTMLElement).hidden ||
+    document.querySelector("dialog[open]")
+  )
+    return;
+  const target = e.target instanceof Element ? e.target : null;
+  const typing = target?.closest(
+    "input, textarea, select, button, a, [contenteditable], [role='menu'], [role='listbox'], [role='option']",
+  );
+  if (typing) return;
+  e.preventDefault();
+  e.stopPropagation(); // not a scroll: the text keeps following the ayah
+  if (!e.repeat) togglePlay();
 }
 
 /** "Listen" is unavailable offline (aria-disabled, so its tooltip still shows). */
@@ -202,7 +255,11 @@ function bindRecitationBar() {
     attributes: true,
     attributeFilter: ["hidden"],
   });
-  window.addEventListener("online", renderListenAvailability);
+  document.addEventListener("keydown", onSpace, { capture: true });
+  window.addEventListener("online", () => {
+    renderListenAvailability();
+    renderListenWho();
+  });
   window.addEventListener("offline", renderListenAvailability);
   renderListenAvailability();
   // the time moves on between the player's reports
