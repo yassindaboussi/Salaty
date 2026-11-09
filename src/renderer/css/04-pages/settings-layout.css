@@ -353,8 +353,65 @@
     display: flex;
   }
 
+  /* like the old page: each category is one card, its icon beside the title, and thin lines
+     between the settings (the icon only shows here: in the menu view the menu has them) */
+  .section-icon {
+    display: none;
+  }
+
   .is-one-page .st-pane {
-    margin-block-end: 24px;
+    gap: 0;
+    margin-block-end: 16px;
+    padding: 16px 20px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+  }
+
+  .is-one-page .st-pane .section-header {
+    gap: 10px;
+    margin-block-end: 6px;
+  }
+
+  .is-one-page .section-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    background: rgba(var(--accent-rgb), 0.15);
+    color: var(--accent-color);
+    font-size: 14px;
+  }
+
+  .is-one-page .st-pane .section-title {
+    font-size: 16px;
+  }
+
+  .is-one-page .st-pane .notif-list {
+    gap: 0;
+  }
+
+  .is-one-page .st-item {
+    min-height: 0;
+    padding: 12px 0;
+    background: none;
+    border: none;
+    border-block-start: 1px solid var(--white-a05);
+    border-radius: 0;
+  }
+
+  .is-one-page .section-header + .st-item,
+  .is-one-page .section-header + .notif-list > .st-item:first-child {
+    border-block-start: none;
+  }
+
+  .is-one-page .about-card.st-item {
+    padding: 0;
+    background: var(--white-a04);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
   }
 
   /* ── Theme: colour swatches ────────────────────────────────────────── */

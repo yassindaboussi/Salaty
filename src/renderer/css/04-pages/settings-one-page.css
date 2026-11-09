@@ -1,0 +1,309 @@
+/* ========================================
+   SETTINGS - the one-page view (Appearance > Settings view) keeps the page's first design:
+   full-width theme, language and screen size cards. Only under .is-one-page; the menu view
+   uses settings-layout.css.
+   ======================================== */
+
+@layer pages {
+  /* ========================================
+     THEME SELECTION
+     ======================================== */
+
+  .is-one-page .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .is-one-page .theme-card {
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 6px;
+    background: var(--surface-subtle);
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .is-one-page .theme-card:hover {
+    background: var(--surface-1);
+    border-color: var(--border-medium);
+    transform: translateY(-2px);
+  }
+
+  .is-one-page .theme-card.selected {
+    border-color: var(--accent-color);
+    background: rgba(var(--accent-rgb), 0.1);
+  }
+
+  .is-one-page .theme-preview {
+    width: 100%;
+    max-width: 46px;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+  }
+
+  .is-one-page .theme-card.selected .theme-preview::after {
+    content: "\f00c";
+    font-family: var(--font-icons);
+    font-weight: 900;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-bright);
+    font-size: 14px;
+    text-shadow: 0 2px 4px var(--black-a30);
+  }
+
+  .is-one-page .theme-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  .is-one-page .theme-card.selected .theme-name {
+    color: var(--accent-color);
+    font-weight: 600;
+  }
+
+  /* Responsive Theme Grid */
+  @media (width <= 400px) {
+    .is-one-page .theme-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+  }
+
+  /* ========================================
+     LANGUAGE SELECTION
+     ======================================== */
+
+  .is-one-page .language-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .is-one-page .language-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--surface-subtle);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .is-one-page .language-card:hover {
+    background: var(--surface-1);
+    border-color: var(--border-medium);
+    transform: translateX(4px);
+  }
+
+  .is-one-page .language-card.selected {
+    background: rgba(var(--accent-rgb), 0.1);
+    border-color: var(--accent-color);
+  }
+
+  .is-one-page .language-card.selected i {
+    color: var(--accent-color);
+  }
+
+  .is-one-page .language-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+
+  .is-one-page .language-card .lang-name {
+    order: 0; /* the menu view puts it second */
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .is-one-page .language-card .lang-native {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .is-one-page .language-card.selected .lang-native {
+    color: var(--accent-color);
+  }
+
+  /* ========================================
+     SCREEN SIZE SELECTION - CARD VERSION
+     ======================================== */
+
+  .is-one-page .screen-size-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .is-one-page .size-card {
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 10px;
+    background: var(--surface-subtle);
+    border: 2px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .is-one-page .size-card:hover {
+    background: var(--surface-1);
+    border-color: var(--border-medium);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--black-a20);
+  }
+
+  .is-one-page .size-card.selected {
+    background: rgba(var(--accent-rgb), 0.1);
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+  }
+
+  .is-one-page .size-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 7px;
+    font-size: 14px;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+  }
+
+  .is-one-page .size-card.selected .size-icon {
+    background: rgba(var(--accent-rgb), 0.2);
+    color: var(--accent-color);
+    transform: scale(1.1);
+  }
+
+  .is-one-page .size-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+  }
+
+  .is-one-page .size-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+  }
+
+  .is-one-page .size-card.selected .size-name {
+    color: var(--accent-color);
+  }
+
+  .is-one-page .size-check {
+    visibility: visible; /* the menu view hides it */
+    position: absolute;
+    top: 8px;
+    inset-inline-end: 8px;
+    width: 20px;
+    height: 20px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .is-one-page .size-card.selected .size-check {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Responsive adjustments for Screen Size */
+  @media (width <= 400px) {
+    .is-one-page .screen-size-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .is-one-page .size-card {
+      padding: 14px;
+      flex-direction: row;
+      text-align: start;
+    }
+
+    .is-one-page .size-icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 0;
+      margin-inline-end: 12px;
+      flex-shrink: 0;
+    }
+
+    .is-one-page .size-info {
+      flex: 1;
+      align-items: flex-start;
+    }
+
+    .is-one-page .size-check {
+      position: static;
+      margin-inline-start: auto;
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+  }
+
+  /* Big screen adjustments for Screen Size */
+  @media (width >= 600px) {
+    .is-one-page .size-card {
+      padding: 12px;
+    }
+
+    .is-one-page .size-icon {
+      width: 34px;
+      height: 34px;
+      font-size: 15px;
+    }
+  }
+
+  @media (width >= 600px) {
+    .is-one-page .theme-grid {
+      grid-template-columns: repeat(6, 1fr);
+    }
+
+    .is-one-page .language-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* a transform can't be logical: the hover nudge is mirrored in Arabic */
+  [dir="rtl"] .is-one-page .language-card:hover {
+    transform: translateX(-4px);
+  }
+}
