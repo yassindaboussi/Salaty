@@ -81,6 +81,7 @@ export type ReceiveChannel =
   | "connection-restored"
   | "download-progress"
   | "extra-times-changed"
+  | "time-format-changed"
   | "force-hide-tooltip"
   | "force-stop-adhan"
   | "init-themed-popup"

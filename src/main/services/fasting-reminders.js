@@ -18,6 +18,7 @@ const fastingDays = require("./fasting-days");
 const prayerTimes = require("./prayer-times");
 const { t } = require("./i18n");
 const { TYPES, reasonName } = require("../../shared/fasting-rules");
+const { displayTime } = require("../../shared/prayerUtils");
 const log = require("./logger").logger("Fasting");
 
 /** @typedef {import("./fasting-days").FastingDay} FastingDay */
@@ -192,7 +193,12 @@ function show(reminder, settings) {
   )
     .replace("{date}", date)
     .replace("{reasons}", reasons)
-    .replace("{time}", reminder.fajr ?? "");
+    .replace(
+      "{time}",
+      reminder.fajr
+        ? displayTime(reminder.fajr, settings.timeFormat, lang)
+        : "",
+    );
   const { showThemedPopup } = require("../ipc/handlers/popup-handlers");
   showThemedPopup(
     {

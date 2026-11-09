@@ -13,6 +13,7 @@ const {
   secondsSinceMidnight,
 } = require("../../../../shared/prayerUtils");
 const { view, TIME_KEYS } = require("./state");
+const { clock } = require("../../core/time-format");
 
 const ICONS = { ...prayerIcons, Sunrise: "sun" };
 
@@ -59,7 +60,7 @@ function renderDay() {
         <i class="fas fa-${ICONS[k] ?? "clock"}" aria-hidden="true"></i>
         <span class="mp-time-name">${name}</span>
         ${k === next ? html`<span class="mp-next-tag">${t("mpNext")}</span>` : ""}
-        <span class="mp-time-value">${day.times[k]}</span>
+        <span class="mp-time-value">${clock(day.times[k])}</span>
       </li>`;
     })}`,
   );

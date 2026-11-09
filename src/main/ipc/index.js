@@ -111,7 +111,12 @@ function registerIpcHandlers({ getMainWindow }) {
     // Settings → Show times: the home page draws its list again, the widget too (and resizes)
     onExtraTimesChange: (extraTimes) => {
       sendToMain("extra-times-changed", extraTimes);
-      popupHandlers.applyExtraTimes(extraTimes);
+      popupHandlers.resizeWidget("extra-times-changed", extraTimes);
+    },
+    // Settings → Time format: the home page and the widget write their times again
+    onTimeFormatChange: (timeFormat) => {
+      sendToMain("time-format-changed", timeFormat);
+      popupHandlers.resizeWidget("time-format-changed", timeFormat);
     },
     onLanguageChange: () => refreshTrayMenu(),
     onAnalyticsChange: (enabled) => analytics.applyConsent(enabled),

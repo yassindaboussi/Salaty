@@ -17,6 +17,7 @@ let registered = false;
  * @param {Function} [callbacks.onLanguageChange]  (language)
  * @param {Function} [callbacks.onAnalyticsChange] (enabled)
  * @param {Function} [callbacks.onExtraTimesChange] (extraTimes)
+ * @param {Function} [callbacks.onTimeFormatChange] (timeFormat)
  */
 function registerSettingsHandlers({
   onLocationChange,
@@ -26,6 +27,7 @@ function registerSettingsHandlers({
   onLanguageChange,
   onAnalyticsChange,
   onExtraTimesChange,
+  onTimeFormatChange,
 }) {
   if (registered) return;
   registered = true;
@@ -41,6 +43,7 @@ function registerSettingsHandlers({
     else if (changed.hijriAdjustment) onHijriAdjustmentChange?.();
     if (changed.fastingReminders) onFastingRemindersChange?.();
     if (changed.extraTimes) onExtraTimesChange?.(settings.extraTimes);
+    if (changed.timeFormat) onTimeFormatChange?.(settings.timeFormat);
     if (changed.theme) onThemeChange?.(settings.theme);
     if (changed.language) onLanguageChange?.(settings.language);
     if (changed.analytics)

@@ -17,6 +17,46 @@ function cleanTime(raw) {
 }
 
 /**
+ * A time as the user reads it (Settings → Time format): "17:05" in 24-hour, "5:05 PM" in
+ * 12-hour, with the language's own AM/PM ("م" / "ص" in Arabic). Digits stay Western, as in
+ * the rest of the app.
+ * @param {string | undefined} raw "HH:MM", a suffix allowed
+ * @param {string} [format] "12" or "24" (default)
+ * @param {string} [lang]
+ */
+function displayTime(raw, format, lang = "en") {
+  const NBSP = String.fromCharCode(0xa0); // keeps "5:05 PM" on one line
+  const time = cleanTime(raw);
+  const match = /^(\d{1,2}):(\d{2})$/.exec(time);
+  if (format !== "12" || !match) return time;
+  const hour = Number(match[1]) % 24;
+  return `${hour % 12 || 12}:${match[2]}${NBSP}${dayPeriod(hour, lang)}`;
+}
+
+/** @type {Map<string, string>} */
+const periods = new Map();
+
+/** "AM" / "PM" in the language, from the browser's own data (Unicode CLDR). */
+function dayPeriod(hour, lang) {
+  const key = `${lang}:${hour < 12 ? "am" : "pm"}`;
+  if (!periods.has(key)) {
+    let text = hour < 12 ? "AM" : "PM";
+    try {
+      const parts = new Intl.DateTimeFormat(`${lang}-u-nu-latn`, {
+        hour: "numeric",
+        hourCycle: "h12",
+        timeZone: "UTC",
+      }).formatToParts(new Date(Date.UTC(2000, 0, 1, hour < 12 ? 9 : 21)));
+      text = parts.find((p) => p.type === "dayPeriod")?.value ?? text;
+    } catch {
+      // unknown language: keep AM / PM
+    }
+    periods.set(key, text);
+  }
+  return periods.get(key);
+}
+
+/**
  * Convert "HH:MM" (suffix allowed) → total seconds from midnight. Unreadable parts count as 0.
  */
 function secondsFromTime(t) {
@@ -174,6 +214,7 @@ module.exports = {
   PRAYER_KEYS,
   JUMUAH_KEY,
   cleanTime,
+  displayTime,
   secondsFromTime,
   secondsSinceMidnight,
   formatTime,

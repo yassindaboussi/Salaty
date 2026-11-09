@@ -97,6 +97,7 @@ const RECEIVE = {
   "connection-restored": true,
   "download-progress": true,
   "extra-times-changed": true,
+  "time-format-changed": true,
   "force-hide-tooltip": true,
   "force-stop-adhan": true,
   "init-themed-popup": true,

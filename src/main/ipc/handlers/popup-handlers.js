@@ -26,6 +26,8 @@ let getMainWindow = () => null;
 // turned on in Settings → Show times adds one column
 const WIDGET_WIDTH = 380;
 const WIDGET_EXTRA_COLUMN = 78;
+// 12-hour times ("12:03 PM") are wider: each column gets this much more
+const WIDGET_12H_COLUMN = 14;
 const WIDGET_HEIGHT = 40; // Windows keeps windows at least ~39px high at 125% scale
 // closer than this to a screen edge when dropped: it snaps to the edge
 const WIDGET_SNAP = 16;
@@ -84,29 +86,31 @@ function snapAndSave(widget) {
   settings.saveWidgetPosition(x, y);
 }
 
-/** The bar's width for the times shown now. */
-function widgetWidth(extraTimes = settings.get().extraTimes) {
-  const extras = shownTimeKeys(extraTimes).length - 5;
-  return WIDGET_WIDTH + extras * WIDGET_EXTRA_COLUMN;
+/** The bar's width for the times shown now (Show times, Time format). */
+function widgetWidth({ extraTimes, timeFormat } = settings.get()) {
+  const columns = shownTimeKeys(extraTimes).length;
+  const wide = timeFormat === "12" ? columns * WIDGET_12H_COLUMN : 0;
+  return WIDGET_WIDTH + (columns - 5) * WIDGET_EXTRA_COLUMN + wide;
 }
 
 /**
- * Settings → Show times changed: the open widget gets the new width (same centre, kept on
- * its screen) and draws its columns again.
- * @param {Record<string, boolean>} extraTimes
+ * Settings → Show times or Time format changed: the open widget gets the new width (same
+ * centre, kept on its screen); `channel` tells it to draw its columns again.
+ * @param {"extra-times-changed" | "time-format-changed"} channel
+ * @param {unknown} value the new setting
  */
-function applyExtraTimes(extraTimes) {
+function resizeWidget(channel, value) {
   const widget = openWidget();
   if (!widget) return;
   const b = widget.getBounds();
-  const width = widgetWidth(extraTimes);
+  const width = widgetWidth();
   const { workArea } = screen.getDisplayMatching(b);
   const centred = b.x + Math.round((b.width - width) / 2);
   const max = workArea.x + workArea.width - width;
   const x = Math.max(workArea.x, Math.min(centred, max));
   widget.setBounds({ x, y: b.y, width, height: WIDGET_HEIGHT });
   settings.saveWidgetPosition(x, b.y);
-  widget.webContents.send("extra-times-changed", extraTimes);
+  widget.webContents.send(channel, value);
 }
 
 function createPrayerWidget() {
@@ -282,7 +286,7 @@ function getPrayerWidgetWindow() {
 module.exports = {
   registerPopupHandlers,
   broadcastThemeToPopups,
-  applyExtraTimes,
+  resizeWidget,
   getPrayerWidgetWindow,
   showThemedPopup,
 };

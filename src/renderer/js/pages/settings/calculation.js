@@ -4,12 +4,15 @@
 // location, or one of Aladhan's methods) and the Asr rule (standard or Hanafi). Main reloads
 // the times when either changes (settings-handlers.js), like after a new location.
 const { ipcRenderer } = require("electron");
-const { t } = require("../../core/i18n");
+const { t, getLanguage } = require("../../core/i18n");
 const { state } = require("../../core/store");
 const { byId, queryAll } = require("../../core/dom");
 const TomSelect = require("tom-select").default;
 const { METHOD_IDS } = require("../../../../shared/aladhan");
-const { DEFAULT_EXTRA_TIMES } = require("../../../../shared/prayerUtils");
+const {
+  DEFAULT_EXTRA_TIMES,
+  displayTime,
+} = require("../../../../shared/prayerUtils");
 const { persistSettings } = require("./persist");
 
 /** The method's name in the UI language (Aladhan's for one the app has no name for). */
@@ -106,6 +109,7 @@ function initCalculationSettings() {
     });
   });
   initShowTimes();
+  initTimeFormat();
 }
 
 // Show times: the extra times (Sunrise, Midnight...) on the home page and the widget. Main
@@ -125,10 +129,32 @@ function initShowTimes() {
   });
 }
 
+// 24-hour or 12-hour times; main tells the home page and the widget (settings-handlers.js)
+function initTimeFormat() {
+  const current = state.settings.timeFormat ?? "24";
+  queryAll('input[name="timeFormat"]', HTMLInputElement).forEach((input) => {
+    input.checked = input.value === current;
+    input.addEventListener("change", () => {
+      if (!input.checked) return;
+      state.settings.timeFormat = input.value;
+      persistSettings();
+    });
+  });
+  renderTimeSamples();
+}
+
+/** Each choice shows how 17:05 looks with it, in the UI language ("5:05 م" in Arabic). */
+function renderTimeSamples() {
+  queryAll("[data-time-sample]", HTMLElement).forEach((el) => {
+    el.textContent = displayTime("17:05", el.dataset.timeSample, getLanguage());
+  });
+}
+
 /** After a language change (names) or a location change (the automatic method). */
 function updateCalculationText() {
   renderOptions();
   renderDescription();
+  renderTimeSamples();
 }
 
 module.exports = { initCalculationSettings, updateCalculationText };

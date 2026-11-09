@@ -13,6 +13,7 @@ const { view } = require("./state");
 const { timesOn, shownReasons } = require("./data");
 const { dayName } = require("./names");
 const store = require("./sunnah-store");
+const { clock } = require("../../core/time-format");
 
 /** The day shown: today if it is a fast, else the next one. */
 const nextFast = () =>
@@ -80,8 +81,8 @@ async function renderHero() {
   const mine = ++request;
   const times = await timesOn(day.iso);
   if (mine !== request || !times) return;
-  byId("vfFajr", HTMLElement).textContent = times.fajr;
-  byId("vfMaghrib", HTMLElement).textContent = times.maghrib;
+  byId("vfFajr", HTMLElement).textContent = clock(times.fajr);
+  byId("vfMaghrib", HTMLElement).textContent = clock(times.maghrib);
 }
 
 /** @param {string} message */

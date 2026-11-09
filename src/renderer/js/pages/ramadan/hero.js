@@ -15,6 +15,7 @@ const { byId } = require("../../core/dom");
 const fmt = require("../../core/date-format");
 const { view } = require("./state");
 const { fastMinutes } = require("./data");
+const { clock } = require("../../core/time-format");
 
 /**
  * @typedef {import("./data").RamadanDay} RamadanDay
@@ -75,9 +76,9 @@ function countdown(now, target) {
 /** Imsak, suhoor end and iftar of a day, as small tiles. @param {RamadanDay} day */
 const timeTiles = (day) => html`
   <div class="rm-hero-times">
-    <div class="rm-tile"><span class="rm-tile-label">${t("ramadanImsak")}</span><span class="rm-tile-time">${day.imsak}</span></div>
-    <div class="rm-tile"><span class="rm-tile-label">${t("ramadanSuhoorEnds")}</span><span class="rm-tile-time">${day.fajr}</span></div>
-    <div class="rm-tile is-iftar"><span class="rm-tile-label">${t("iftar")}</span><span class="rm-tile-time">${day.maghrib}</span></div>
+    <div class="rm-tile"><span class="rm-tile-label">${t("ramadanImsak")}</span><span class="rm-tile-time">${clock(day.imsak)}</span></div>
+    <div class="rm-tile"><span class="rm-tile-label">${t("ramadanSuhoorEnds")}</span><span class="rm-tile-time">${clock(day.fajr)}</span></div>
+    <div class="rm-tile is-iftar"><span class="rm-tile-label">${t("iftar")}</span><span class="rm-tile-time">${clock(day.maghrib)}</span></div>
   </div>`;
 
 /** The Ramadan day as a ring: how far into the month. @param {number} day */

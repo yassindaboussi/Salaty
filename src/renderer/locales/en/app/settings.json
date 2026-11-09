@@ -55,5 +55,7 @@
   "stViewMenu": "Menu",
   "stViewPage": "One page",
   "showTimesLabel": "Show times",
-  "showTimesDesc": "Extra times on the home page and the widget. The five prayers are always shown. Midnight is the middle of the night, when Isha time ends."
+  "showTimesDesc": "Extra times on the home page and the widget. The five prayers are always shown. Midnight is the middle of the night, when Isha time ends.",
+  "timeFormatLabel": "Time format",
+  "timeFormatDesc": "How prayer times are written in the app and the widget."
 }

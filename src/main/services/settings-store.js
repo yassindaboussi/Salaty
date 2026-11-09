@@ -27,7 +27,7 @@ const { DEFAULT_EXTRA_TIMES } = require("../../shared/prayerUtils");
  *   widgetPosition?: { x: number, y: number },
  *   bigScreen: boolean, locations: SavedLocation[],
  *   openAtLogin: boolean, travelMode: boolean, analyticsEnabled: boolean,
- *   hijriAdjustment: number, weekStart: string, [key: string]: any }} Settings
+ *   hijriAdjustment: number, weekStart: string, timeFormat: string, [key: string]: any }} Settings
  */
 
 /** @type {Settings} */
@@ -55,6 +55,7 @@ let settingsData = {
   prayerMethod: "auto", // calculation method: "auto" (by location) or an Aladhan id (shared/aladhan.js)
   asrSchool: "standard", // "standard" (Shafi'i, Maliki, Hanbali) or "hanafi"
   weekStart: "auto", // first day of the calendar's week: "auto" (by country), "sat", "sun", "mon"
+  timeFormat: "24", // how times are written: "24" (17:05) or "12" (5:05 PM), shared/prayerUtils.js
   analyticsEnabled: false, // opt-in, see PRIVACY.md
 };
 
@@ -238,6 +239,8 @@ function update(changes) {
     extraTimes:
       JSON.stringify(settingsData.extraTimes) !==
       JSON.stringify(before.extraTimes),
+    timeFormat:
+      (settingsData.timeFormat ?? "24") !== (before.timeFormat ?? "24"),
     theme: Boolean(changes.theme) && changes.theme !== before.theme,
     language: Boolean(changes.language) && changes.language !== before.language,
     analytics:
