@@ -109,13 +109,13 @@ function _registerIpcListeners() {
   });
 }
 
-/** @type {Promise<any> | null} */
-let _adhanAudioSrcPromise = null;
-function _getAdhanAudioSrc() {
-  if (!_adhanAudioSrcPromise) {
-    _adhanAudioSrcPromise = ipcRenderer.invoke("get-adhan-audio-src");
-  }
-  return _adhanAudioSrcPromise;
+/**
+ * The adhan for this prayer: Settings → Adhan voice (Fajr may have its own). Asked each time,
+ * so a voice changed in Settings plays at the next prayer.
+ * @param {string | undefined} prayerKey
+ */
+function _getAdhanAudioSrc(prayerKey) {
+  return ipcRenderer.invoke("get-adhan-audio-src", prayerKey);
 }
 
 async function _playAdhan(prayer, mode, seekSec = 0) {
@@ -138,7 +138,7 @@ async function _playAdhan(prayer, mode, seekSec = 0) {
 
   _cleanupAudio();
 
-  const soundSrc = await _getAdhanAudioSrc();
+  const soundSrc = await _getAdhanAudioSrc(prayer?.key);
   adhanAudio = new Audio(soundSrc);
 
   adhanAudio.volume = 0.01;

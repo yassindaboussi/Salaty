@@ -4,7 +4,9 @@
 const { app, clipboard } = require("electron");
 const secureIpc = require("../secure-ipc");
 const check = require("../validate");
-const { pages, ADHAN_AUDIO_URL } = require("../../config/paths");
+const { pages } = require("../../config/paths");
+const settingsStore = require("../../services/settings-store");
+const adhanVoices = require("../../services/adhan-voices");
 const {
   showExistingWindow,
   syncWindowState,
@@ -85,7 +87,23 @@ function registerWindowHandlers(getMainWindow) {
   });
 
   secureIpc.handle("get-app-version", () => app.getVersion());
-  secureIpc.handle("get-adhan-audio-src", () => ADHAN_AUDIO_URL);
+  // the adhan for a prayer (Settings → Adhan voice; Fajr may have its own), and one voice
+  // for the ▶ preview in Settings
+  secureIpc.handle("get-adhan-audio-src", (_e, prayer) =>
+    adhanVoices.adhanUrlFor(check.prayerKey(prayer), settingsStore.get()),
+  );
+  secureIpc.handle("get-adhan-voice-src", (_e, id) =>
+    adhanVoices.voiceUrl(check.adhanVoiceId(id) ?? ""),
+  );
+  secureIpc.handle("choose-custom-adhan", () =>
+    adhanVoices.chooseCustomAdhan(win()),
+  );
+  secureIpc.handle("remove-custom-adhan", () =>
+    adhanVoices.removeCustomAdhan(),
+  );
+  secureIpc.handle("confirm-custom-adhan", (_e, playable) =>
+    adhanVoices.confirmCustomAdhan(playable === true),
+  );
   secureIpc.handle("check-for-updates-manual", () => checkForUpdatesNow());
 
   // Electron 44+: clipboard calls return a Promise

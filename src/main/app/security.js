@@ -22,6 +22,7 @@ const EXTERNAL_HOSTS = new Set([
   "sunnah.com",
   "www.youtube.com",
   "www.openstreetmap.org",
+  "commons.wikimedia.org", // sources of the adhan recordings
 ]);
 
 // Who embeds YouTube's player (see applySecurityRules): the project's page.

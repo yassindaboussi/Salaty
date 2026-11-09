@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../../css/04-pages/settings.css" />
     <link rel="stylesheet" href="../../css/04-pages/settings-layout.css" />
     <link rel="stylesheet" href="../../css/04-pages/settings-one-page.css" />
+    <link rel="stylesheet" href="../../css/04-pages/settings-adhan.css" />
     <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
     <link rel="stylesheet" href="../../css/03-components/feedback-dialog.css" />
   </head>
@@ -647,6 +648,51 @@
                     <input type="checkbox" id="preAdhanNotificationToggle" />
                     <span class="toggle-slider"></span>
                   </label>
+                </div>
+
+                <!-- the adhan's voice, ▶ to listen; Fajr's own voice (pages/settings/adhan-voice.js) -->
+                <div class="st-item adhan-voice-block">
+                  <div class="toggle-info">
+                    <span
+                      class="subsection-label"
+                      id="adhanVoiceLabel"
+                      data-i18n="adhanVoiceLabel"
+                      >Adhan voice</span
+                    >
+                    <span class="toggle-description" data-i18n="adhanVoiceDesc"
+                      >Played at each prayer time. Press ▶ to listen.</span
+                    >
+                  </div>
+                  <ul
+                    class="adhan-voices"
+                    id="adhanVoiceList"
+                    role="radiogroup"
+                    aria-labelledby="adhanVoiceLabel"
+                  ></ul>
+                  <p class="adhan-credits">
+                    <span data-i18n="adhanCreditsText"
+                      >Recordings from Wikimedia Commons, under their own
+                      licences.</span
+                    >
+                  </p>
+                </div>
+
+                <div class="notif-row st-item">
+                  <div class="toggle-info">
+                    <label
+                      class="subsection-label"
+                      for="adhanFajrInput"
+                      data-i18n="adhanFajrLabel"
+                      >Fajr adhan</label
+                    >
+                    <span class="toggle-description" data-i18n="adhanFajrDesc"
+                      >Fajr can have its own voice.</span
+                    >
+                  </div>
+                  <select
+                    id="adhanFajrInput"
+                    class="field-input calc-select"
+                  ></select>
                 </div>
               </div>
             </div>
