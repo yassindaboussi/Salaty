@@ -10,6 +10,8 @@ const {
   getCurrentAndNext,
   isFridayIn,
   displayPrayerKey,
+  shownTimeKeys,
+  isExtraTime,
 } = require("../../../shared/prayerUtils");
 const {
   getGregorianDate,
@@ -57,6 +59,12 @@ function showPrayerData(data) {
 // Main sends new times by itself: a new day, another location, back online.
 ipcRenderer.on("prayer-data-from-main", (_e, data) => {
   if (data?.timings) showPrayerData(data);
+});
+
+// Settings → Show times changed (in the settings page, another window)
+ipcRenderer.on("extra-times-changed", (_e, extraTimes) => {
+  state.settings.extraTimes = extraTimes;
+  if (prayerData?.timings) _renderPrayerUI();
 });
 
 // Name shown for a prayer. On Fridays (in the prayer location's own time zone) Dhuhr reads
@@ -127,7 +135,8 @@ function _renderPrayerUI() {
 
   setHtml(
     listEl,
-    html`${prayerKeys.map((key) => {
+    html`${shownTimeKeys(state.settings.extraTimes).map((key) => {
+      if (isExtraTime(key)) return _extraRow(key);
       const name = prayerDisplayName(key);
       const time = prayerData.timings[key];
       const icon = prayerIcons[key] ?? "clock";
@@ -161,6 +170,16 @@ function _renderPrayerUI() {
     const btn = e.target.closest(".adhan-toggle-btn");
     if (btn instanceof HTMLElement) _toggleAdhan(btn.dataset.prayer);
   };
+}
+
+// Sunrise, Midnight...: a quieter row, no adhan button (an empty box keeps the times aligned)
+function _extraRow(key) {
+  return html`<div class="prayer-item is-extra" data-prayer="${key}">
+      <i class="fas fa-${prayerIcons[key] ?? "clock"}" aria-hidden="true"></i>
+      <span class="prayer-name">${t(key, "prayerNames")}</span>
+      <span class="prayer-time">${prayerData.timings[key] ?? "--:--"}</span>
+      <span class="adhan-toggle-btn is-placeholder" aria-hidden="true"></span>
+    </div>`;
 }
 
 function updateCurrentAndNextPrayer() {

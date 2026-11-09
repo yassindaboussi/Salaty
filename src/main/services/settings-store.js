@@ -8,6 +8,7 @@ const fs = require("fs");
 const path = require("path");
 const { ROOT_DIR } = require("../config/paths");
 const log = require("./logger").logger("Settings");
+const { DEFAULT_EXTRA_TIMES } = require("../../shared/prayerUtils");
 
 /**
  * @typedef {object} SavedLocation
@@ -48,6 +49,8 @@ let settingsData = {
     suhoor: false,
     suhoorMinutes: 30,
   },
+  // extra times on the home page and widget (shared/prayerUtils.js EXTRA_TIME_KEYS)
+  extraTimes: { ...DEFAULT_EXTRA_TIMES },
   hijriAdjustment: 0, // days added to the Hijri date (-2…+2), see services/islamic-calendar.js
   prayerMethod: "auto", // calculation method: "auto" (by location) or an Aladhan id (shared/aladhan.js)
   asrSchool: "standard", // "standard" (Shafi'i, Maliki, Hanbali) or "hanafi"
@@ -232,6 +235,9 @@ function update(changes) {
     fastingReminders:
       JSON.stringify(settingsData.fastingReminders) !==
       JSON.stringify(before.fastingReminders),
+    extraTimes:
+      JSON.stringify(settingsData.extraTimes) !==
+      JSON.stringify(before.extraTimes),
     theme: Boolean(changes.theme) && changes.theme !== before.theme,
     language: Boolean(changes.language) && changes.language !== before.language,
     analytics:

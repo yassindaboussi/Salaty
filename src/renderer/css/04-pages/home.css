@@ -351,6 +351,12 @@
     height: 32px;
   }
 
+  /* extra times (Sunrise, Midnight...) stay slim: the five prayers take the space */
+  body.fullscreen-mode .prayer-item.is-extra {
+    flex: 0 0 auto;
+    padding-block: 4px;
+  }
+
   body.fullscreen-mode .current-indicator {
     font-size: 11px;
     padding: 2px 7px;

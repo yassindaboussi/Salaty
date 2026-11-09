@@ -9,6 +9,7 @@ const {
 } = require("../../config/window-options");
 const settings = require("../../services/settings-store");
 const prayerTimerManager = require("../../services/prayer-timer-manager");
+const { shownTimeKeys } = require("../../../shared/prayerUtils");
 
 /** @import { BrowserWindow as Window } from "electron" */
 
@@ -21,8 +22,10 @@ let prayerWidgetWindow = null;
 /** @type {() => Window | null} */
 let getMainWindow = () => null;
 
-// small bar: the five prayer names + times fit in en/ar/fr (checked)
+// small bar: the five prayer names + times fit in en/ar/fr (checked); each extra time
+// turned on in Settings → Show times adds one column
 const WIDGET_WIDTH = 380;
+const WIDGET_EXTRA_COLUMN = 78;
 const WIDGET_HEIGHT = 40; // Windows keeps windows at least ~39px high at 125% scale
 // closer than this to a screen edge when dropped: it snaps to the edge
 const WIDGET_SNAP = 16;
@@ -81,6 +84,31 @@ function snapAndSave(widget) {
   settings.saveWidgetPosition(x, y);
 }
 
+/** The bar's width for the times shown now. */
+function widgetWidth(extraTimes = settings.get().extraTimes) {
+  const extras = shownTimeKeys(extraTimes).length - 5;
+  return WIDGET_WIDTH + extras * WIDGET_EXTRA_COLUMN;
+}
+
+/**
+ * Settings → Show times changed: the open widget gets the new width (same centre, kept on
+ * its screen) and draws its columns again.
+ * @param {Record<string, boolean>} extraTimes
+ */
+function applyExtraTimes(extraTimes) {
+  const widget = openWidget();
+  if (!widget) return;
+  const b = widget.getBounds();
+  const width = widgetWidth(extraTimes);
+  const { workArea } = screen.getDisplayMatching(b);
+  const centred = b.x + Math.round((b.width - width) / 2);
+  const max = workArea.x + workArea.width - width;
+  const x = Math.max(workArea.x, Math.min(centred, max));
+  widget.setBounds({ x, y: b.y, width, height: WIDGET_HEIGHT });
+  settings.saveWidgetPosition(x, b.y);
+  widget.webContents.send("extra-times-changed", extraTimes);
+}
+
 function createPrayerWidget() {
   const existing = openWidget();
   if (existing) {
@@ -89,11 +117,12 @@ function createPrayerWidget() {
   }
   // where the user left it, if still on a connected screen; else top centre, against the edge
   const { workArea } = screen.getPrimaryDisplay();
-  const saved = visiblePosition(settings.get().widgetPosition, WIDGET_WIDTH);
+  const width = widgetWidth();
+  const saved = visiblePosition(settings.get().widgetPosition, width);
   const widget = new BrowserWindow({
-    width: WIDGET_WIDTH,
+    width,
     height: WIDGET_HEIGHT,
-    x: saved.x ?? workArea.x + Math.round((workArea.width - WIDGET_WIDTH) / 2),
+    x: saved.x ?? workArea.x + Math.round((workArea.width - width) / 2),
     y: saved.y ?? workArea.y,
     frame: false,
     transparent: true,
@@ -253,6 +282,7 @@ function getPrayerWidgetWindow() {
 module.exports = {
   registerPopupHandlers,
   broadcastThemeToPopups,
+  applyExtraTimes,
   getPrayerWidgetWindow,
   showThemedPopup,
 };

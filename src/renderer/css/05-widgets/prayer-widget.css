@@ -113,7 +113,7 @@ body {
 
 .pw-col {
   display: flex;
-  flex: 1;
+  flex: 1 1 auto; /* the space left is shared; a long name ("Dernier tiers") keeps its width */
   flex-direction: column;
   align-items: center;
   min-inline-size: 0;
@@ -140,6 +140,11 @@ body {
 
 .pw-col.is-past :is(.pw-col-name, .pw-col-time) {
   color: var(--text-dim);
+}
+
+/* extra times (Settings → Show times): lighter time, the prayers stay first to the eye */
+.pw-col.is-extra .pw-col-time {
+  font-weight: 400;
 }
 
 /* the next prayer: drawn in white like "today" elsewhere in the app */

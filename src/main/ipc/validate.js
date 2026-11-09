@@ -6,6 +6,7 @@
 const log = require("../services/logger").logger("IPC");
 const { TYPES: FAST_TYPES } = require("../../shared/fasting-rules");
 const { METHOD_IDS } = require("../../shared/aladhan");
+const { EXTRA_TIME_KEYS } = require("../../shared/prayerUtils");
 
 const THEMES = new Set([
   "brown",
@@ -60,6 +61,16 @@ function adhanByPrayer(v) {
     if (PRAYERS.has(key) && (typeof mode === "boolean" || mode === "silent"))
       out[key] = mode;
   }
+  return out;
+}
+
+// Settings → Show times: which extra times (Sunrise, Midnight...) the home page and widget show.
+function extraTimes(v) {
+  if (!isPlainObject(v)) return undefined;
+  /** @type {Record<string, boolean>} */
+  const out = {};
+  for (const key of EXTRA_TIME_KEYS)
+    if (typeof v[key] === "boolean") out[key] = v[key];
   return out;
 }
 
@@ -126,6 +137,7 @@ const SETTINGS_SCHEMA = {
   preAdhanMinutes: (v) => int(v, 1, 60),
   adhanEnabledByPrayer: adhanByPrayer,
   fastingReminders,
+  extraTimes,
   hijriAdjustment: (v) => int(v, -2, 2),
   prayerMethod: (v) => (v === "auto" || METHOD_IDS.includes(v) ? v : undefined),
   asrSchool: (v) => (v === "standard" || v === "hanafi" ? v : undefined),

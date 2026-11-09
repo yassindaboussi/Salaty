@@ -128,7 +128,49 @@ function displayPrayerKey(key, { isFriday } = {}) {
   return key === "Dhuhr" && isFriday ? JUMUAH_KEY : key;
 }
 
+// ── Extra times (Settings → Show times) ─────────────────────────────────────
+// Not prayers, so no adhan: Sunrise ends Fajr's time, Sunset is when the day's fast ends,
+// Midnight ends Isha's preferred time, the last third of the night is for Tahajjud.
+// The five prayers are always shown.
+
+const EXTRA_TIME_KEYS = ["Sunrise", "Sunset", "Midnight", "Lastthird"];
+/** @type {Record<string, boolean>} */
+const DEFAULT_EXTRA_TIMES = {
+  Sunrise: true,
+  Sunset: false,
+  Midnight: false,
+  Lastthird: false,
+};
+const DAY_ORDER = [
+  "Fajr",
+  "Sunrise",
+  "Dhuhr",
+  "Asr",
+  "Sunset",
+  "Maghrib",
+  "Isha",
+  "Midnight",
+  "Lastthird",
+];
+
+/**
+ * The times to show, in the order of the day: the five prayers and the extra times turned on.
+ * @param {Record<string, boolean> | undefined} extraTimes the setting (missing keys: default)
+ */
+function shownTimeKeys(extraTimes) {
+  const on = { ...DEFAULT_EXTRA_TIMES, ...(extraTimes ?? {}) };
+  return DAY_ORDER.filter((k) => PRAYER_KEYS.includes(k) || on[k] === true);
+}
+
+function isExtraTime(key) {
+  return EXTRA_TIME_KEYS.includes(key);
+}
+
 module.exports = {
+  EXTRA_TIME_KEYS,
+  DEFAULT_EXTRA_TIMES,
+  shownTimeKeys,
+  isExtraTime,
   PRAYER_KEYS,
   JUMUAH_KEY,
   cleanTime,

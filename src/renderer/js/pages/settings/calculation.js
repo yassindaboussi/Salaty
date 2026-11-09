@@ -9,6 +9,7 @@ const { state } = require("../../core/store");
 const { byId, queryAll } = require("../../core/dom");
 const { html, setHtml } = require("../../utils/html");
 const { METHOD_IDS } = require("../../../../shared/aladhan");
+const { DEFAULT_EXTRA_TIMES } = require("../../../../shared/prayerUtils");
 const { persistSettings } = require("./persist");
 
 /** The method's name in the UI language (Aladhan's for one the app has no name for). */
@@ -79,6 +80,24 @@ function initCalculationSettings() {
       if (!input.checked) return;
       state.settings.asrSchool = input.value;
       save();
+    });
+  });
+  initShowTimes();
+}
+
+// Show times: the extra times (Sunrise, Midnight...) on the home page and the widget. Main
+// tells both, the widget resizes (settings-handlers.js).
+function initShowTimes() {
+  const on = { ...DEFAULT_EXTRA_TIMES, ...(state.settings.extraTimes ?? {}) };
+  queryAll('input[name="extraTime"]', HTMLInputElement).forEach((input) => {
+    input.checked = on[input.value] === true;
+    input.addEventListener("change", () => {
+      state.settings.extraTimes = {
+        ...DEFAULT_EXTRA_TIMES,
+        ...(state.settings.extraTimes ?? {}),
+        [input.value]: input.checked,
+      };
+      persistSettings();
     });
   });
 }

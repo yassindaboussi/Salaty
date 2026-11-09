@@ -14,5 +14,9 @@
   "adhanLabelSound": "{prayer} adhan: with sound",
   "adhanLabelSilent": "{prayer} adhan: notification only",
   "adhanLabelOff": "{prayer} adhan: off",
-  "widgetNextLabel": "{prayer} at {time}, in {remaining}"
+  "widgetNextLabel": "{prayer} at {time}, in {remaining}",
+  "widgetSunrise": "Sunrise",
+  "widgetSunset": "Sunset",
+  "widgetMidnight": "Midnight",
+  "widgetLastthird": "Last third"
 }
