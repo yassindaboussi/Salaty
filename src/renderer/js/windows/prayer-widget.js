@@ -25,7 +25,8 @@ let prayerData = null;
 let lang = "en";
 /** Settings → Time format: "24" or "12" */
 let timeFormat = "24";
-let isPinned = true;
+// pinned (always on top) when it opens; "#unpinned" after a reload for a new language
+let isPinned = location.hash !== "#unpinned";
 /** Settings → Show times: Sunrise, Midnight... as extra columns (main resizes the bar) */
 /** @type {Record<string, boolean> | undefined} */
 let extraTimes;
@@ -168,11 +169,16 @@ function reveal() {
   ipcRenderer.send("prayer-widget-ready");
 }
 
+function showPin() {
+  pinBtnEl.classList.toggle("is-pinned", isPinned);
+  pinBtnEl.setAttribute("aria-pressed", String(isPinned));
+}
+showPin();
+
 pinBtnEl.addEventListener("click", () => {
   isPinned = !isPinned;
   ipcRenderer.send("widget-set-always-on-top", isPinned);
-  pinBtnEl.classList.toggle("is-pinned", isPinned);
-  pinBtnEl.setAttribute("aria-pressed", String(isPinned));
+  showPin();
 });
 
 closeBtnEl.addEventListener("click", () => {

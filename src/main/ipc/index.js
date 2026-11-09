@@ -118,7 +118,22 @@ function registerIpcHandlers({ getMainWindow }) {
       sendToMain("time-format-changed", timeFormat);
       popupHandlers.resizeWidget("time-format-changed", timeFormat);
     },
-    onLanguageChange: () => refreshTrayMenu(),
+    // the open widget loads its page again: new texts, and right-to-left for Arabic.
+    // "#unpinned" keeps the pin button as the user left it.
+    onLanguageChange: () => {
+      refreshTrayMenu();
+      const widget = popupHandlers.getPrayerWidgetWindow();
+      if (!widget || widget.isDestroyed()) return;
+      const url = new URL(widget.webContents.getURL());
+      url.hash = widget.isAlwaysOnTop() ? "" : "unpinned";
+      // a new #hash alone is not a reload: go to it, then reload
+      widget
+        .loadURL(url.toString())
+        .catch(() => {})
+        .finally(() => {
+          if (!widget.isDestroyed()) widget.webContents.reload();
+        });
+    },
     onAnalyticsChange: (enabled) => analytics.applyConsent(enabled),
   });
 
