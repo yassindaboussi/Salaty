@@ -7,7 +7,7 @@ const { ipcRenderer } = require("electron");
 const { t } = require("../../core/i18n");
 const { state } = require("../../core/store");
 const { byId, queryAll } = require("../../core/dom");
-const { html, setHtml } = require("../../utils/html");
+const TomSelect = require("tom-select").default;
 const { METHOD_IDS } = require("../../../../shared/aladhan");
 const { DEFAULT_EXTRA_TIMES } = require("../../../../shared/prayerUtils");
 const { persistSettings } = require("./persist");
@@ -21,19 +21,37 @@ function methodName(
   return t(key) === key ? fallback || String(id) : t(key);
 }
 
+/** @type {InstanceType<typeof TomSelect> | null} */
+let picker = null;
+
 /** Fills the list: Automatic first, then the methods by name. */
 function renderOptions() {
-  const select = byId("prayerMethodInput", HTMLSelectElement);
   const sorted = [...METHOD_IDS].sort((a, b) =>
     methodName(a).localeCompare(methodName(b)),
   );
-  setHtml(
-    select,
-    html`<option value="auto">${t("calcMethodAuto")}</option>${sorted.map(
-      (id) => html`<option value="${String(id)}">${methodName(id)}</option>`,
-    )}`,
-  );
-  select.value = String(state.settings.prayerMethod ?? "auto");
+  const options = [
+    { value: "auto", text: t("calcMethodAuto") },
+    ...sorted.map((id) => ({ value: String(id), text: methodName(id) })),
+  ];
+  const current = String(state.settings.prayerMethod ?? "auto");
+  if (!picker) {
+    // The app's own list (like Country / City): Windows draws a native <select> list wider
+    // than its box, 20 rows tall and in its own colours.
+    picker = new TomSelect("#prayerMethodInput", {
+      options,
+      items: [current],
+      maxOptions: 100,
+      // a plain list: no typing to filter (only 24 methods)
+      controlInput: null,
+      dropdownClass: "ts-dropdown calc-dropdown",
+      // keep "Automatic" first, the rest by name
+      sortField: [{ field: "$order" }, { field: "$score" }],
+    });
+    return;
+  }
+  picker.clearOptions();
+  picker.addOptions(options);
+  picker.setValue(current, true);
 }
 
 /** Under the label: which method Automatic uses here, or that a fixed one is used. */
@@ -64,9 +82,14 @@ function initCalculationSettings() {
   renderOptions();
   renderDescription();
 
-  const select = byId("prayerMethodInput", HTMLSelectElement);
-  select.addEventListener("change", () => {
-    const value = select.value === "auto" ? "auto" : Number(select.value);
+  picker?.on("change", (/** @type {string} */ raw) => {
+    // a cleared box (Backspace) goes back to the saved method
+    if (!raw)
+      return picker?.setValue(
+        String(state.settings.prayerMethod ?? "auto"),
+        true,
+      );
+    const value = raw === "auto" ? "auto" : Number(raw);
     if (value === (state.settings.prayerMethod ?? "auto")) return;
     state.settings.prayerMethod = value;
     renderDescription();
