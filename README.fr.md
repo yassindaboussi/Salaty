@@ -63,6 +63,8 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 <br/>
 <img src="docs/screenshots/fr/albums.webp" width="49%" alt="Archive audio" />
 <img src="docs/screenshots/fr/quran.webp" width="49%" alt="Saint Coran" />
+<br/>
+<img src="docs/screenshots/fr/settings.webp" width="49%" alt="Paramètres" />
 </div>
 
 ---
@@ -71,10 +73,14 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 
 ### 🕌 Heures de prière
 - Détection de votre position au démarrage (désactivable), avec plusieurs lieux enregistrés
-- Adhan à l'heure de la prière, réglable pour chaque prière (avec son, notification seule ou désactivé), et rappel facultatif un nombre de minutes choisi avant
+- Adhan à l'heure de la prière, réglable pour chaque prière (adhan complet, tonalité courte, notification seule ou désactivé), et rappel facultatif un nombre de minutes choisi avant
+- Choix de la voix de l'adhan : cinq enregistrements (La Mecque par défaut), votre propre fichier audio, et une voix à part pour Fajr
 - Méthode de calcul choisie automatiquement selon votre lieu, ou parmi 23 méthodes (Ligue islamique mondiale, Umm al-Qura, Karachi, ISNA…), et Asr selon l'avis majoritaire ou hanafite
 - Jumu'a affichée à la place de Dhuhr le vendredi
-- Un petit widget sur le bureau qui affiche le temps restant avant la prochaine prière
+- Horaires calculés sur votre appareil quand internet n'est pas disponible
+- Horaires supplémentaires à afficher : lever et coucher du soleil, milieu de la nuit et dernier tiers
+- Format 24 heures ou 12 heures
+- Un petit widget sur le bureau avec les cinq prières et le temps restant avant la prochaine
 - Un calendrier mensuel des horaires
 
 ### 📖 Saint Coran
@@ -84,7 +90,10 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 - Traductions anglaises (Sahih International, Muhammad Asad) et française (Hamidullah), avec l'option de n'afficher que la traduction
 - Reprise de la lecture là où vous vous êtes arrêté, et signets sur n'importe quel verset
 - Une copie complète du Coran dans l'application, utilisée automatiquement hors connexion
-- Réglage de la taille du texte, chiffres arabes ou occidentaux, et mode plein écran
+- Recherche d'un mot dans tous les versets, ou dans une sourate
+- Écoute pendant la lecture : choisissez un récitateur, le verset récité est suivi à l'écran, Espace pour lire ou mettre en pause
+- Numéros de versets dessinés dans le style de chaque riwaya
+- Réglage de la taille du texte (aussi en pinçant le pavé tactile), chiffres arabes ou occidentaux, et mode plein écran
 
 ### 🎧 Archive audio
 - Récitation du Coran : plus de 240 récitateurs avec leur photo, filtres par riwaya (Hafs, Warsh, Qalun…), favoris et liste de lecture
@@ -101,6 +110,7 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 - Outils pour le **Ramadan**, **radio islamique** 📻 et les **directs officiels de La Mecque et Médine**
 
 ### ⚙️ Paramètres
+- Un menu latéral avec recherche, ou tout sur une seule page
 - 12 thèmes de couleurs, dont un thème sombre
 - 3 langues (arabe, anglais, français)
 - Chaque modification est enregistrée automatiquement, sans bouton « Enregistrer »

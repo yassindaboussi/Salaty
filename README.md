@@ -63,6 +63,8 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 <br/>
 <img src="docs/screenshots/en/albums.webp" width="49%" alt="Audio archive" />
 <img src="docs/screenshots/en/quran.webp" width="49%" alt="Holy Quran" />
+<br/>
+<img src="docs/screenshots/en/settings.webp" width="49%" alt="Settings" />
 </div>
 
 ---
@@ -71,10 +73,14 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 
 ### 🕌 Prayer times
 - Detects your location at start-up (can be turned off), and keeps several saved locations
-- Adhan when the prayer time comes in, set per prayer (sound, notification only, or off), and an optional reminder a chosen number of minutes before
+- Adhan when the prayer time comes in, set per prayer (full adhan, a short tone, notification only, or off), and an optional reminder a chosen number of minutes before
+- Choose the adhan voice: five recordings (Makkah by default), your own audio file, and a separate voice for Fajr
 - Calculation method chosen automatically for your location, or picked from 23 methods (Muslim World League, Umm al-Qura, Karachi, ISNA…), and Asr by the standard or the Hanafi rule
 - Jumu'ah shown in place of Dhuhr on Fridays
-- A small desktop widget showing the time left until the next prayer
+- Prayer times calculated on your device when the internet is not available
+- Extra times you can show: sunrise, sunset, midnight and the last third of the night
+- 24-hour or 12-hour time format
+- A small desktop widget with all five prayers and the time left until the next one
 - A monthly timetable
 
 ### 📖 Holy Quran
@@ -84,7 +90,10 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 - English (Sahih International, Muhammad Asad) and French (Hamidullah) translations, with an option to show only the translation
 - Continue reading where you stopped, and bookmark any ayah
 - A complete copy of the Quran inside the app, used automatically when you are offline
-- Font size control, Arabic or Western numerals, and full-screen mode
+- Search a word in all the verses, or find it inside a surah
+- Listen while reading: pick a reciter, the recited ayah is followed on the page, Space to play or pause
+- Ayah numbers drawn in each riwaya's own style
+- Font size control (also by pinching the touchpad), Arabic or Western numerals, and full-screen mode
 
 ### 🎧 Audio archive
 - Quran recitation: more than 240 reciters with their photos, filters by riwaya (Hafs, Warsh, Qalun…), favourites and a playlist
@@ -101,6 +110,7 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 - **Ramadan** tools, **Muslim radio** 📻 and the official **live streams from Makkah and Madinah**
 
 ### ⚙️ Settings
+- A side menu with search, or everything on one page
 - 12 colour themes, including a dark theme
 - 3 languages (Arabic, English, French)
 - Every change is saved automatically, with no "Save" button
