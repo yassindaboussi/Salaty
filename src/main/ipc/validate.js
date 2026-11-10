@@ -60,7 +60,10 @@ function adhanByPrayer(v) {
   if (!isPlainObject(v)) return undefined;
   const out = {};
   for (const [key, mode] of Object.entries(v)) {
-    if (PRAYERS.has(key) && (typeof mode === "boolean" || mode === "silent"))
+    if (
+      PRAYERS.has(key) &&
+      (typeof mode === "boolean" || mode === "silent" || mode === "tone")
+    )
       out[key] = mode;
   }
   return out;
