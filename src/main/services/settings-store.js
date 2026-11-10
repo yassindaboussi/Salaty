@@ -55,7 +55,7 @@ let settingsData = {
   prayerMethod: "auto", // calculation method: "auto" (by location) or an Aladhan id (shared/aladhan.js)
   asrSchool: "standard", // "standard" (Shafi'i, Maliki, Hanbali) or "hanafi"
   weekStart: "auto", // first day of the calendar's week: "auto" (by country), "sat", "sun", "mon"
-  adhanVoice: "algiers", // shared/adhan-voices.js, or "custom" (<userData>/adhan/)
+  adhanVoice: "makkah", // shared/adhan-voices.js, or "custom" (<userData>/adhan/)
   adhanVoiceFajr: "same", // Fajr's own voice, or "same"
   adhanCustomName: "", // name of the user's own adhan file, shown in Settings
   timeFormat: "24", // how times are written: "24" (17:05) or "12" (5:05 PM), shared/prayerUtils.js

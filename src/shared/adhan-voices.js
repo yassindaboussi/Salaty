@@ -12,7 +12,6 @@
 
 /** @type {readonly AdhanVoice[]} */
 const ADHAN_VOICES = Object.freeze([
-  { id: "algiers", file: "algiers.mp3", seconds: 173 },
   {
     id: "makkah",
     file: "makkah.mp3",
@@ -29,6 +28,7 @@ const ADHAN_VOICES = Object.freeze([
       "https://commons.wikimedia.org/wiki/File:33937_ejaz215_call-to-prayer-from-the-prophet-s-mo.ogg",
     licence: "CC BY 3.0",
   },
+  { id: "algiers", file: "algiers.mp3", seconds: 173 },
   {
     id: "aleppo",
     file: "aleppo.mp3",
@@ -47,7 +47,7 @@ const ADHAN_VOICES = Object.freeze([
   },
 ]);
 
-const DEFAULT_ADHAN_VOICE = "algiers";
+const DEFAULT_ADHAN_VOICE = "makkah"; // first in the list
 /** the user's own audio file, copied to <userData>/adhan/ */
 const CUSTOM_ADHAN_VOICE = "custom";
 /** Fajr plays the same voice as the other prayers */

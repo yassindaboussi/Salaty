@@ -57,7 +57,7 @@ function voiceUrl(id) {
   const voice =
     ADHAN_VOICES.find((v) => v.id === id) ??
     ADHAN_VOICES.find((v) => v.id === DEFAULT_ADHAN_VOICE);
-  return appUrl(path.join(ASSETS_DIR, "adhan", voice?.file ?? "algiers.mp3"));
+  return appUrl(path.join(ASSETS_DIR, "adhan", voice?.file ?? "makkah.mp3"));
 }
 
 /**
