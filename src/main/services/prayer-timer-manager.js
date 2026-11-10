@@ -16,7 +16,7 @@ const { bringToFrontForAdhan } = require("../windows/main-window");
 /**
  * @import { BrowserWindow } from "electron"
  * @import { PrayerDay } from "./prayer-times"
- * @typedef {{ prayer: object, mode: true | "silent", theme: string, startedAt: number }} AdhanSession
+ * @typedef {{ prayer: object, mode: true | "silent" | "tone", theme: string, startedAt: number }} AdhanSession
  */
 
 /** @type {() => BrowserWindow | null} */
@@ -241,7 +241,8 @@ function _maybeFireAdhan(prayer, nowSec) {
     return;
   }
 
-  adhanIsPlaying = adhanState !== "silent";
+  // the short tone is a reminder: no full adhan, no window brought to the front
+  adhanIsPlaying = adhanState === true;
   activeAdhanSession = {
     prayer: _withDisplayKey(prayer),
     mode: adhanState,

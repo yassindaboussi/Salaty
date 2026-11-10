@@ -32,7 +32,7 @@ function initAdhanPlayer() {
       const elapsedSec = (Date.now() - session.startedAt) / 1000;
       const audioDurSec = 300;
 
-      if (session.mode !== "silent" && elapsedSec < audioDurSec) {
+      if (session.mode === true && elapsedSec < audioDurSec) {
         _playAdhan(session.prayer, session.mode, elapsedSec);
       } else {
         const nameEl = document.getElementById("__adhan-prayer-name__");
@@ -135,6 +135,10 @@ async function _playAdhan(prayer, mode, seekSec = 0) {
   if (mode === "silent") {
     return;
   }
+  if (mode === "tone") {
+    playShortTone();
+    return;
+  }
 
   _cleanupAudio();
 
@@ -187,6 +191,16 @@ async function _playAdhan(prayer, mode, seekSec = 0) {
     },
     { once: true },
   );
+}
+
+// The "Short tone" reminder: two soft plain notes, no melody (src/assets/adhan/short-tone.wav).
+// Also the preview when it is chosen on the home page.
+const SHORT_TONE_SRC = "../../../assets/adhan/short-tone.wav";
+
+function playShortTone() {
+  const audio = new Audio(SHORT_TONE_SRC);
+  audio.volume = 0.8;
+  audio.play().catch((err) => console.error("Error playing short tone:", err));
 }
 
 function _stopAdhan(notifyMain = true) {
@@ -271,4 +285,4 @@ function _showPreAdhanNotification(prayer, minutes) {
   });
 }
 
-module.exports = { initAdhanPlayer };
+module.exports = { initAdhanPlayer, playShortTone };

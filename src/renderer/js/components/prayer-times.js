@@ -21,6 +21,7 @@ const {
 } = require("../core/dates");
 const { state, prayerIcons } = require("../core/store");
 const { updateRamadanCountdown } = require("./ramadan-countdown");
+const { playShortTone } = require("./adhan-player");
 const screenSizeManager = require("../core/screen-size");
 const { html, setHtml } = require("../utils/html");
 const { refreshTooltips } = require("../core/tooltips");
@@ -152,10 +153,7 @@ function _renderPrayerUI() {
       const icon = prayerIcons[key] ?? "clock";
       const cur = key === currentActivePrayer;
       const state_ = adhanByPrayer[key] ?? true;
-      const look =
-        ADHAN_LOOK[
-          state_ === true ? "sound" : state_ === "silent" ? "silent" : "off"
-        ];
+      const look = ADHAN_LOOK[_lookOf(state_)];
       const btnIcon = look.icon;
       // tooltip: the mode now and what a click does; name: which prayer and its mode
       const btnTip = t(look.tip);
@@ -239,17 +237,28 @@ function updateCurrentAndNextPrayer() {
   }
 }
 
-// The adhan of a prayer: sound → notification only → off → sound (see _toggleAdhan).
+// The adhan of a prayer: sound → short tone → notification only → off → sound.
 const ADHAN_LOOK = {
   sound: { icon: "volume-up", tip: "adhanTipSound", label: "adhanLabelSound" },
+  tone: { icon: "volume-down", tip: "adhanTipTone", label: "adhanLabelTone" },
   silent: { icon: "bell", tip: "adhanTipSilent", label: "adhanLabelSilent" },
   off: { icon: "volume-mute", tip: "adhanTipOff", label: "adhanLabelOff" },
 };
 
+/** @param {boolean | "silent" | "tone" | undefined} mode */
+const _lookOf = (mode) =>
+  mode === true || mode === undefined
+    ? "sound"
+    : mode === "tone" || mode === "silent"
+      ? mode
+      : "off";
+
+/** @type {Record<string, boolean | "silent" | "tone">} */
+const NEXT_MODE = { sound: "tone", tone: "silent", silent: false, off: true };
+
 function _toggleAdhan(key) {
-  const cur = adhanByPrayer[key];
-  adhanByPrayer[key] =
-    cur === true || cur === undefined ? "silent" : cur !== "silent";
+  adhanByPrayer[key] = NEXT_MODE[_lookOf(adhanByPrayer[key])];
+  if (adhanByPrayer[key] === "tone") playShortTone(); // let the user hear it
   state.settings.adhanEnabledByPrayer = adhanByPrayer;
   ipcRenderer.invoke("save-settings", state.settings);
   _renderPrayerUI();

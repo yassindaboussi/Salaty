@@ -11,3 +11,7 @@ The voices in Settings → Notifications → Adhan voice. Each file was cut at t
 | madinah.mp3 | Call to prayer from the Prophet's Mosque, Madinah, recorded by ejaz215 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:33937_ejaz215_call-to-prayer-from-the-prophet-s-mo.ogg) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
 | aleppo.mp3 | Call to prayer by Sabah Fakhri | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Call_to_prayer_by_Sabah_Fakhry.mp3) | Public domain |
 | short.mp3 | The Adhan, Aaqib Azeez, uploaded by Atcovi | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:The_Adhan_-_Muslim_Call_to_Prayer_-_Aaqib_Azeez.mp3) | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/): this edited file is shared under the same licence |
+
+## Short tone
+
+`short-tone.wav` is the "Short tone" reminder on the home page: two plain 660 Hz sine notes (0.4 s each, 0.18 s apart) with soft fades, no melody and no bell sound. Made for this app by a small script, no outside recording, so no licence applies.
