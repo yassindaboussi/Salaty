@@ -53,7 +53,7 @@ function cleanText(range) {
   }
   for (const el of box.querySelectorAll(".ayah-end")) {
     const n = Number(/** @type {HTMLElement} */ (el).dataset.ayah);
-    el.replaceWith(`﴿${formatNumerals(n, "arabic")}﴾`);
+    el.replaceWith(`﴿${formatNumerals(n, state.numerals)}﴾`);
   }
   for (const el of box.querySelectorAll(".ayah-card")) el.append("\n");
   return (box.textContent ?? "")
