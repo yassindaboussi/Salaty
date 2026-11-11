@@ -139,7 +139,7 @@ body {
   line-height: 1.8;
   color: var(--text-primary, #fff);
   text-align: center;
-  direction: rtl;
+  unicode-bidi: plaintext; /* Arabic athkar right to left, English/French reminders left to right */
   font-family:
     "Traditional Arabic", "Arabic Typesetting", Amiri, "Scheherazade New",
     "Segoe UI", sans-serif;

@@ -18,5 +18,8 @@
   "fastReasonAshura": "عاشوراء",
   "fastReasonArafah": "يوم عرفة",
   "fastReasonDhulHijjah": "الأيام التسعة الأولى من ذي الحجة",
-  "fastReasonShawwal6": "بداية الست من شوال"
+  "fastReasonShawwal6": "بداية الست من شوال",
+  "updatePopupTitle": "تحديث متوفر",
+  "updatePopupText": "الإصدار {version} جاهز. حدّث التطبيق متى ناسبك.",
+  "updatePopupButton": "تحديث"
 }

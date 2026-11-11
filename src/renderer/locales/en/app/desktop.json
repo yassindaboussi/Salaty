@@ -18,5 +18,8 @@
   "fastReasonAshura": "Ashura",
   "fastReasonArafah": "Day of Arafah",
   "fastReasonDhulHijjah": "First nine days of Dhul-Hijjah",
-  "fastReasonShawwal6": "The six days of Shawwal begin"
+  "fastReasonShawwal6": "The six days of Shawwal begin",
+  "updatePopupTitle": "Update available",
+  "updatePopupText": "Version {version} is ready. Update when it suits you.",
+  "updatePopupButton": "Update"
 }
