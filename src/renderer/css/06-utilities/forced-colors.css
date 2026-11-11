@@ -57,6 +57,7 @@
     .vf-done-btn.is-on,
     .tb-item.is-active,
     .an-tile[aria-pressed="true"],
+    .ac-td-listen[aria-pressed="true"],
     .ayah-text.is-target,
     .ayah-text.is-reciting,
     .ayah-card.is-reciting,

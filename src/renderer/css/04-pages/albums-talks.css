@@ -1,0 +1,671 @@
+@layer pages {
+  /* Audio Archive: the Tafasir tab (Continue, surah cards, the parts panel) and the Tadabor tab (video
+     cards, and the dialog that plays one). The shared rows, headings and dialog are albums.css. */
+
+  .ac-heading-count {
+    margin-inline-start: 2px;
+  }
+
+  /* ── Tafasir: Continue, the surah cards, the parts panel ──────────── */
+
+  /* the tab's own columns scroll, not the list around them */
+  .ac-list:has(> .tf-layout) {
+    overflow: hidden;
+  }
+
+  .tf-layout {
+    height: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 290px;
+    gap: 12px;
+  }
+
+  .tf-layout.is-panel-folded {
+    grid-template-columns: minmax(0, 1fr) 46px;
+  }
+
+  .tf-main {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 2px 2px;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .tf-books {
+    margin-block-end: 10px;
+  }
+
+  /* Continue listening (every tab): the last thing played, from where it stopped */
+  .ac-continue {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+
+  .ac-continue-play {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .ac-continue-play:hover {
+    background: var(--surface-3);
+  }
+
+  .ac-continue-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ac-continue-text p {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ac-continue-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  [lang="ar"] .ac-continue-label {
+    font-size: 12px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  /* a clip's title is dir="auto": aligned with the page, not with its own script */
+  .ac-continue-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: left;
+  }
+
+  .ac-continue-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  [dir="rtl"] .ac-continue-title {
+    text-align: right;
+  }
+
+  /* the card's place on the Recitations and Tadabor tabs (empty before the first listen) */
+  .ac-continue-slot {
+    flex-shrink: 0;
+  }
+
+  .ac-continue-slot:empty {
+    display: none;
+  }
+
+  /* the surahs */
+  .tf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tf-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .tf-card:hover {
+    background: var(--surface-3);
+  }
+
+  .tf-card[aria-pressed="true"] {
+    border-color: var(--text-primary);
+  }
+
+  .tf-num {
+    flex-shrink: 0;
+    min-width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    padding: 0 4px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tf-card-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .tf-card-name {
+    overflow: hidden;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tf-card-meta {
+    font-size: 11.5px;
+    color: var(--text-faint);
+  }
+
+  /* the parts panel */
+  .tf-panel {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--surface-subtle);
+  }
+
+  .tf-panel-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tf-panel-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    color: var(--text-primary);
+    font-size: 13.5px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tf-panel-count {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tf-icon-btn {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .tf-icon-btn:hover {
+    background: var(--surface-3);
+  }
+
+  /* » folds to the window's edge; mirrored when folded and in Arabic */
+  .is-panel-folded .tf-icon-btn i,
+  [dir="rtl"] .tf-icon-btn i {
+    transform: scaleX(-1);
+  }
+
+  [dir="rtl"] .is-panel-folded .tf-icon-btn i {
+    transform: none;
+  }
+
+  .tf-parts {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--white-a20) transparent;
+  }
+
+  .tf-part {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 13px;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .tf-part:hover {
+    background: var(--surface-1);
+    color: var(--text-primary);
+  }
+
+  .tf-part[aria-current="true"] {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .tf-part-icon {
+    flex-shrink: 0;
+    width: 14px;
+    font-size: 10px;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .tf-part[aria-current="true"] .tf-part-icon {
+    color: var(--text-primary);
+  }
+
+  /* folded: a thin strip with only the button */
+  .is-panel-folded .tf-panel {
+    align-items: center;
+    padding: 8px 0;
+  }
+
+  .is-panel-folded .tf-panel-title,
+  .is-panel-folded .tf-panel-count,
+  .is-panel-folded .tf-parts {
+    display: none;
+  }
+
+  /* one column: Continue, the parts, then the surahs, all in one scroll; nothing folds */
+  @media (width < 700px) {
+    .ac-list:has(> .tf-layout) {
+      overflow: hidden auto;
+    }
+
+    .tf-layout,
+    .tf-layout.is-panel-folded {
+      height: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tf-main {
+      display: contents;
+    }
+
+    .tf-panel {
+      order: 1;
+    }
+
+    .tf-surahs {
+      order: 2;
+    }
+
+    .tf-panel-toggle {
+      display: none;
+    }
+
+    .is-panel-folded .tf-panel {
+      align-items: stretch;
+      padding: 12px;
+    }
+
+    .is-panel-folded .tf-panel-title,
+    .is-panel-folded .tf-panel-count {
+      display: block;
+    }
+
+    .tf-parts {
+      max-height: 260px;
+    }
+
+    .is-panel-folded .tf-parts {
+      display: flex;
+    }
+  }
+
+  /* ── Tadabor: video cards ─────────────────────────────────────────── */
+
+  .ac-td-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0 2px 2px;
+    list-style: none;
+  }
+
+  .ac-td-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+    padding: 0 0 10px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .ac-td-card:hover {
+    background: var(--surface-3);
+  }
+
+  .ac-td-thumb {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 5;
+    margin-block-end: 4px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+
+  .ac-td-thumb img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  /* square icon-style play button, like the app's other small buttons */
+  .ac-td-play {
+    position: absolute;
+    inset-block-end: 8px;
+    inset-inline-start: 8px;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--white-a20);
+    border-radius: var(--radius-md);
+    background: var(--black-a60);
+    color: var(--white);
+    font-size: 11px;
+  }
+
+  /* sound only: a square button on the picture's top corner (the card is the "watch" button) */
+  .ac-td-item {
+    position: relative;
+  }
+
+  .ac-td-listen {
+    position: absolute;
+    top: 8px;
+    inset-inline-end: 8px;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--white-a20);
+    border-radius: var(--radius-md);
+    background: var(--black-a60);
+    color: var(--white);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .ac-td-listen:hover {
+    background: var(--black);
+  }
+
+  /* playing: white, like the app's other "on" states */
+  .ac-td-listen[aria-pressed="true"] {
+    border-color: var(--white);
+    background: var(--white);
+    color: var(--black);
+  }
+
+  /* dir="auto" names: aligned with the page, not with their own script */
+  .ac-td-title,
+  .ac-td-speaker {
+    padding: 0 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+  }
+
+  .ac-td-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .ac-td-speaker {
+    font-size: 11.5px;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  [dir="rtl"] .ac-td-title,
+  [dir="rtl"] .ac-td-speaker {
+    text-align: right;
+  }
+
+  /* ── The video dialog ─────────────────────────────────────────────── */
+
+  .ac-video-dialog {
+    width: fit-content;
+    min-width: min(360px, 92vw);
+    max-width: min(760px, 92vw);
+    max-height: 92vh;
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    box-shadow: 0 20px 60px var(--black-a50);
+    overflow: hidden;
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  @starting-style {
+    .ac-video-dialog[open] {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+  }
+
+  .ac-video-dialog::backdrop {
+    background: var(--black-a60);
+    backdrop-filter: blur(3px);
+  }
+
+  .ac-video-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .ac-video-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .ac-video-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ac-video-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .ac-video-meta {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    color: var(--text-faint);
+  }
+
+  .ac-video-title,
+  .ac-video-meta {
+    text-align: left;
+  }
+
+  [dir="rtl"] .ac-video-title,
+  [dir="rtl"] .ac-video-meta {
+    text-align: right;
+  }
+
+  .ac-video-close {
+    position: static;
+    flex-shrink: 0;
+  }
+
+  .ac-video {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: min(calc(92vh - 110px), 640px);
+    margin-inline: auto;
+    border-radius: var(--radius-md);
+    background: var(--black);
+  }
+
+  /* the video and its buttons (this box is what goes fullscreen). Media controls stay
+     left-to-right in Arabic: previous on the left, next on the right. */
+  .ac-video-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    direction: ltr;
+    border-radius: var(--radius-md);
+    background: var(--black);
+    overflow: hidden;
+  }
+
+  .ac-video-stage:fullscreen {
+    border-radius: 0;
+  }
+
+  .ac-video-stage:fullscreen .ac-video {
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .ac-video-nav,
+  .ac-video-full {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--white-a20);
+    border-radius: var(--radius-md);
+    background: var(--black-a60);
+    color: var(--white);
+    cursor: pointer;
+  }
+
+  .ac-video-nav {
+    top: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+    transform: translateY(-50%);
+  }
+
+  .ac-video-prev {
+    left: 10px;
+  }
+
+  .ac-video-next {
+    right: 10px;
+  }
+
+  .ac-video-full {
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .ac-video-nav:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .ac-video-nav:hover:not(:disabled),
+  .ac-video-full:hover {
+    background: var(--black);
+  }
+
+  .ac-video-count {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 3px 8px;
+    border-radius: var(--radius-md);
+    background: var(--black-a60);
+    color: var(--white);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+}

@@ -56,12 +56,25 @@ function markCurrent() {
 /** @param {number} index  plays it, the whole list as the playlist */
 function playTrack(index) {
   if (!state.tracks[index]) return;
-  // the reciter goes with each track: the mini players show his photo
-  const reciterId = state.album?.reciterId;
+  // the reciter goes with each track: the mini players show his photo; a recitation also says
+  // how to play it again (the archive's "Continue listening": services/listening-resume.js)
+  const album = state.album;
+  const reciterId = album?.reciterId;
+  const resume =
+    album?.source === "mp3quran"
+      ? {
+          kind: "recite",
+          reciterId,
+          reciterName: album.reciterName,
+          moshafName: album.artist,
+          server: album.server,
+          surahList: album.surahList,
+        }
+      : undefined;
   ipcRenderer.send("player-command", {
     type: "set-playlist",
     tracks: reciterId
-      ? state.tracks.map((track) => ({ ...track, reciterId }))
+      ? state.tracks.map((track) => ({ ...track, reciterId, resume }))
       : state.tracks,
     startIndex: index,
   });

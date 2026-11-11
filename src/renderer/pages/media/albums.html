@@ -4,12 +4,13 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org; font-src 'self' data:; connect-src 'self' https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io; media-src 'self' https: blob:; frame-src https://www.youtube-nocookie.com; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org https://server18.mp3quran.net https://cdn.mp3quran.net; font-src 'self' data:; connect-src 'self' https://api.alquran.cloud https://mp3quran.net https://www.mp3quran.net https://countriesnow.space https://photon.komoot.io; media-src 'self' https: blob:; frame-src https://www.youtube-nocookie.com; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="audioArchive">Audio Albums - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/albums.css" />
+    <link rel="stylesheet" href="../../css/04-pages/albums-talks.css" />
   </head>
   <body class="page-loading">
     <div class="app-container" id="app">
@@ -97,6 +98,7 @@
             role="tabpanel"
             aria-labelledby="acTabRecite"
           >
+            <div class="ac-continue-slot" id="acReciteContinue"></div>
             <div class="ac-filters">
               <div
                 class="ac-chips"
@@ -134,6 +136,7 @@
             aria-labelledby="acTabTadabor"
             hidden
           >
+            <div class="ac-continue-slot" id="acTadaborContinue"></div>
             <div class="ac-list" id="acTadabor"></div>
           </section>
         </main>
@@ -151,6 +154,66 @@
           <i class="fas fa-xmark" aria-hidden="true"></i>
         </button>
         <ul class="ac-dialog-list" id="acDialogList"></ul>
+      </dialog>
+
+      <!-- A Tadabor video -->
+      <dialog
+        class="ac-video-dialog"
+        id="acVideoDialog"
+        aria-labelledby="acVideoTitle"
+      >
+        <div class="ac-video-inner">
+          <div class="ac-video-head">
+            <div class="ac-video-text">
+              <h2 class="ac-video-title" id="acVideoTitle" dir="auto"></h2>
+              <p class="ac-video-meta" id="acVideoMeta"></p>
+            </div>
+            <button
+              type="button"
+              class="ac-dialog-close ac-video-close"
+              id="acVideoClose"
+              data-tooltip="close"
+            >
+              <i class="fas fa-xmark" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="ac-video-stage" id="acVideoStage">
+            <video
+              class="ac-video"
+              id="acVideo"
+              controls
+              controlslist="nofullscreen"
+              disablepictureinpicture
+              playsinline
+              preload="none"
+            ></video>
+            <button
+              type="button"
+              class="ac-video-nav ac-video-prev"
+              id="acVideoPrev"
+              data-tooltip="acPrevVideo"
+            >
+              <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            </button>
+            <button
+              type="button"
+              class="ac-video-nav ac-video-next"
+              id="acVideoNext"
+              data-tooltip="acNextVideo"
+            >
+              <i class="fas fa-chevron-right" aria-hidden="true"></i>
+            </button>
+            <span class="ac-video-count" id="acVideoCount"></span>
+            <button
+              type="button"
+              class="ac-video-full"
+              id="acVideoFull"
+              data-tooltip="acFullscreen"
+            >
+              <i class="fas fa-expand" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
       </dialog>
     </div>
     <script src="../../js-bundled/albums.bundle.js"></script>

@@ -152,24 +152,6 @@ async function getTadabor(language = "eng") {
   return bySura;
 }
 
-function getTadaborTracksForSura(entries, suraName) {
-  return entries
-    .filter((e) => e.audio_url || e.video_url)
-    .map((e, index) => {
-      const snippet = (e.text || "").replace(/\s+/g, " ").trim();
-      const title =
-        e.title ||
-        (snippet.length > 60 ? `${snippet.slice(0, 60)}…` : snippet) ||
-        `${suraName} — ${index + 1}`;
-      return {
-        title,
-        artist: e.reciter_name || e.rewaya_name || suraName,
-        url: e.audio_url || e.video_url,
-        filename: `tadabor-${e.id || index}.mp3`,
-      };
-    });
-}
-
 // Our own names for some tafsir books (locales/<lang>/media/media.json); otherwise the API name.
 function localizedTafsirBookName(book) {
   return t("tafsirBookNames")?.[book.id] || book.name;
@@ -284,8 +266,8 @@ module.exports = {
   getSurahNames,
   getReciterTracks,
   getTadabor,
-  getTadaborTracksForSura,
   getTafasirBooks,
   getTafsirSurahs,
   getTafsirTracksForSura,
+  parseAyahRangeFromUrl,
 };
