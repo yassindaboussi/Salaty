@@ -67,5 +67,8 @@
   "quranFindPlaceholder": "A word...",
   "quranFindPrev": "Previous (Shift+Enter)",
   "quranFindNext": "Next (Enter)",
-  "quranFindNone": "None"
+  "quranFindNone": "None",
+  "quranPageLabel": "Page",
+  "quranPageApp": "App",
+  "quranPagePaper": "Paper"
 }
