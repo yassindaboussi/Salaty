@@ -9,6 +9,7 @@
 //   steppers.js     the − / + buttons of the number inputs
 //   appearance.js   theme, language and window size (and the page text after a language switch)
 //   alerts.js       athkar alerts and the notification before the adhan
+//   popup-settings.js the corner popups: time, size, place, Test
 //   adhan-voice.js  the adhan's voice (▶ to listen: adhan-preview.js), Fajr's own voice
 //   hijri.js        the Hijri calendar's first day of the week and the Hijri date correction
 //   toggles.js      travel mode and usage statistics (opt-in)
@@ -34,6 +35,7 @@ const {
   initScreenSizeSetting,
 } = require("./appearance");
 const { initAthkarAlerts, initPreAdhanNotification } = require("./alerts");
+const { initPopupSettings } = require("./popup-settings");
 const { initAdhanVoice } = require("./adhan-voice");
 const { initHijriSettings, updateHijriText } = require("./hijri");
 const {
@@ -78,6 +80,7 @@ function initSettingsPage() {
   initLanguageSelection();
   initAthkarAlerts();
   initPreAdhanNotification();
+  initPopupSettings();
   initAdhanVoice();
   initHijriSettings();
   initCalculationSettings();

@@ -84,5 +84,20 @@
   "adhanCustomBroken": "لا يمكن تشغيل هذا الملف الصوتي.",
   "adhanPublicDomain": "ملكية عامة",
   "adhanCustomRemove": "حذف ملفك",
-  "adhanCustomRemoveConfirm": "حذف «{name}»؟"
+  "adhanCustomRemoveConfirm": "حذف «{name}»؟",
+  "popupDurationLabel": "مدة البقاء",
+  "popupDurationDesc": "يتوقف العدّ ما دام المؤشر فوق التنبيه.",
+  "popupDuration10": "10 ث",
+  "popupDuration30": "30 ث",
+  "popupDurationStay": "حتى أغلقه",
+  "popupTest": "عرض تجربة",
+  "popupTestTitle": "تجربة",
+  "popupStyleLabel": "الحجم",
+  "popupStyleFull": "كامل",
+  "popupStyleCompact": "مضغوط",
+  "popupPositionLabel": "الزاوية",
+  "popupPositionBottom": "أسفل",
+  "popupPositionTop": "أعلى",
+  "popupCardLabel": "نافذة التنبيه",
+  "popupCardDesc": "شكل التنبيهات في زاوية الشاشة. اضغط «عرض تجربة» لترى اختياراتك."
 }

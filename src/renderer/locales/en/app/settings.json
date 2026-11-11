@@ -84,5 +84,20 @@
   "adhanCustomBroken": "This audio file cannot be played.",
   "adhanPublicDomain": "Public domain",
   "adhanCustomRemove": "Delete your file",
-  "adhanCustomRemoveConfirm": "Delete “{name}”?"
+  "adhanCustomRemoveConfirm": "Delete “{name}”?",
+  "popupDurationLabel": "How long it stays",
+  "popupDurationDesc": "The time stops while your mouse is on the popup.",
+  "popupDuration10": "10 s",
+  "popupDuration30": "30 s",
+  "popupDurationStay": "Until closed",
+  "popupTest": "Show test",
+  "popupTestTitle": "Test",
+  "popupStyleLabel": "Size",
+  "popupStyleFull": "Full",
+  "popupStyleCompact": "Compact",
+  "popupPositionLabel": "Corner",
+  "popupPositionBottom": "Bottom",
+  "popupPositionTop": "Top",
+  "popupCardLabel": "Reminder popup",
+  "popupCardDesc": "How reminders look in the screen corner. Press “Show test” to see your choices."
 }

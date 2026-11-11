@@ -447,6 +447,69 @@
     background: var(--surface-3);
   }
 
+  /* Notifications → "Reminder popup": one card, "Show test" at its top corner, then the
+     three choices as rows (how long, size, corner) */
+  .popup-settings-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding-block-end: 10px;
+  }
+
+  .popup-opt {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding-block: 10px;
+    border-block-start: 1px solid var(--border-color);
+  }
+
+  /* the choices stay at the end of the row, even when they wrap under a long label */
+  .popup-opt .segmented {
+    margin-inline-start: auto;
+  }
+
+  .popup-opt-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .popup-opt-label {
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .popup-opt-hint {
+    color: var(--text-secondary);
+    font-size: 11.5px;
+    opacity: 0.8;
+  }
+
+  .popup-test-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding-block: 0;
+    padding-inline: 12px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .popup-test-btn:hover {
+    background: var(--surface-3);
+  }
+
   .location-actions-row .detect-btn,
   .location-actions-row .manage-locations-btn {
     flex: 1;

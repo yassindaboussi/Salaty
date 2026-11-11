@@ -84,5 +84,20 @@
   "adhanCustomBroken": "Ce fichier audio ne peut pas être lu.",
   "adhanPublicDomain": "Domaine public",
   "adhanCustomRemove": "Supprimer votre fichier",
-  "adhanCustomRemoveConfirm": "Supprimer « {name} » ?"
+  "adhanCustomRemoveConfirm": "Supprimer « {name} » ?",
+  "popupDurationLabel": "Durée d’affichage",
+  "popupDurationDesc": "Le temps s’arrête quand la souris est sur le rappel.",
+  "popupDuration10": "10 s",
+  "popupDuration30": "30 s",
+  "popupDurationStay": "Jusqu’à fermeture",
+  "popupTest": "Voir un test",
+  "popupTestTitle": "Test",
+  "popupStyleLabel": "Taille",
+  "popupStyleFull": "Complet",
+  "popupStyleCompact": "Compact",
+  "popupPositionLabel": "Coin",
+  "popupPositionBottom": "En bas",
+  "popupPositionTop": "En haut",
+  "popupCardLabel": "Fenêtre de rappel",
+  "popupCardDesc": "L’aspect des rappels dans le coin de l’écran. Appuyez sur « Voir un test » pour voir vos choix."
 }

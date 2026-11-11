@@ -194,7 +194,13 @@ function showThemedPopup(data, type) {
   win.setAlwaysOnTop(true, "pop-up-menu");
   win.loadURL(pages.athkarPopup);
   win.once("ready-to-show", () =>
-    win.webContents.send("init-themed-popup", { ...data, type }),
+    win.webContents.send("init-themed-popup", {
+      ...data,
+      type,
+      // Settings → Notifications
+      duration: settings.get().popupDuration ?? "10",
+      style: settings.get().popupStyle ?? "full",
+    }),
   );
   win.on("closed", () => {
     if (type === "adhan") adhanPopupWindow = null;
@@ -258,10 +264,13 @@ function registerPopupHandlers({ getMainWindow: getMainWindowFn } = {}) {
     const height = Number(data?.height);
     if (!Number.isFinite(height)) return;
     const { workArea } = screen.getPrimaryDisplay();
-    const newHeight = Math.round(Math.min(Math.max(height, 120), 520));
+    const newHeight = Math.round(Math.min(Math.max(height, 100), 520));
+    const top = settings.get().popupPosition === "top"; // Settings → Notifications
     win.setBounds({
       x: workArea.x + workArea.width - POPUP_WIDTH - POPUP_MARGIN,
-      y: workArea.y + workArea.height - newHeight - POPUP_MARGIN,
+      y: top
+        ? workArea.y + POPUP_MARGIN
+        : workArea.y + workArea.height - newHeight - POPUP_MARGIN,
       width: POPUP_WIDTH,
       height: newHeight,
     });
