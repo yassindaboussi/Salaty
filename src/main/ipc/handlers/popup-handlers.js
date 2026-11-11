@@ -166,9 +166,10 @@ function createPrayerWidget() {
 }
 
 /**
- * The athkar/adhan/fasting popup at the bottom corner of the screen.
- * @param {object} data what the popup shows (see ipc/validate.js popupData)
- * @param {"adhan" | "athkar"} type
+ * The athkar/adhan/fasting/update popup at the bottom corner of the screen.
+ * @param {object} data what the popup shows (see ipc/validate.js popupData); `button` is the
+ *   update popup's button text
+ * @param {"adhan" | "athkar" | "update"} type the update popup shares the athkar one's place
  */
 function showThemedPopup(data, type) {
   const existing = type === "adhan" ? adhanPopupWindow : athkarPopupWindow;

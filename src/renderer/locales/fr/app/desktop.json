@@ -18,5 +18,8 @@
   "fastReasonAshura": "Achoura",
   "fastReasonArafah": "Jour d’Arafat",
   "fastReasonDhulHijjah": "Neuf premiers jours de Dhou al-Hijja",
-  "fastReasonShawwal6": "Début des six jours de Chawwal"
+  "fastReasonShawwal6": "Début des six jours de Chawwal",
+  "updatePopupTitle": "Mise à jour disponible",
+  "updatePopupText": "La version {version} est prête. Mettez à jour quand cela vous convient.",
+  "updatePopupButton": "Mettre à jour"
 }

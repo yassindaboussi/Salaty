@@ -9,6 +9,7 @@ const { setThemeClass } = require("../core/theme");
 const { byId } = require("../core/dom");
 
 const CLOSE_DELAY_MS = 10000;
+const UPDATE_CLOSE_DELAY_MS = 30000; // time to read it and press "Update"
 
 const app = byId("app", HTMLElement);
 const athkarText = byId("athkarText", HTMLElement);
@@ -20,7 +21,8 @@ const openAppBtn = document.getElementById("openAppBtn");
 loadSettings()
   .then(() => {
     const openAppLabel = document.getElementById("openAppLabel");
-    if (openAppLabel) openAppLabel.textContent = t("openApp");
+    if (openAppLabel && !openAppLabel.dataset.custom)
+      openAppLabel.textContent = t("openApp");
   })
   .finally(initTooltipSystem);
 
@@ -32,7 +34,7 @@ function closePopup() {
 }
 
 ipcRenderer.once("init-themed-popup", (_event, data) => {
-  const { theme, content, title, icon, type } = data;
+  const { theme, content, title, icon, type, button } = data;
 
   setThemeClass([app], theme);
 
@@ -51,12 +53,30 @@ ipcRenderer.once("init-themed-popup", (_event, data) => {
     });
   }
 
+  // a new version: "Update" opens the app on its update dialog (main)
+  if (type === "update" && openAppBtn) {
+    openAppBtn.classList.remove("hidden");
+    const label = document.getElementById("openAppLabel");
+    if (label && button) {
+      label.textContent = button;
+      label.dataset.custom = "1";
+    }
+    openAppBtn.querySelector("i")?.setAttribute("class", "fas fa-download");
+    openAppBtn.addEventListener("click", () => {
+      ipcRenderer.send("open-update-dialog");
+      closePopup();
+    });
+  }
+
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       const neededHeight = Math.ceil(document.body.scrollHeight) + 2;
       ipcRenderer.send("show-themed-popup-ready", { height: neededHeight });
 
-      const autoCloseTimer = setTimeout(closePopup, CLOSE_DELAY_MS);
+      const autoCloseTimer = setTimeout(
+        closePopup,
+        type === "update" ? UPDATE_CLOSE_DELAY_MS : CLOSE_DELAY_MS,
+      );
 
       closeBtn.addEventListener("click", () => {
         clearTimeout(autoCloseTimer);

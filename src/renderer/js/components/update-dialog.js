@@ -190,6 +190,14 @@ function initUpdateDialog() {
     render("available");
     if (!isPutOff(version)) open();
   });
+  // "Update" on the update popup (main brings the window to the front): open even if put off
+  ipcRenderer.on("open-update-dialog", (_e, info) => {
+    if (!version && info?.version) {
+      version = String(info.version);
+      render("available");
+    }
+    if (version) open();
+  });
   ipcRenderer.on("download-progress", (_e, p) => {
     if (current !== "downloading") render("downloading");
     showProgress(p?.percent ?? 0, p?.transferred, p?.total);

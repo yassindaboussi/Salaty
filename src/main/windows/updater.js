@@ -19,6 +19,13 @@
 // again if that file is gone or damaged. So the page says "Update ready", not "Download".
 // Once per run: later checks of the same run don't bring the dialog back.
 //
+// A new version found by an automatic check is also told outside the window, once per version
+// (<userData>/update-notified.json), without taking the focus (an update is not urgent, unlike
+// the adhan): the app's own small popup in the screen corner, the same one as the athkar and
+// fasting reminders on every OS, with an "Update" button that opens the window on the update
+// dialog; and a flashing taskbar button (a bouncing Dock icon on macOS) when the window is open
+// but behind other windows. No popup when the user is already looking at the window.
+//
 // When to check: 3 s after start, then every 12 h of real time. The app starts with Windows,
 // often before the network is up, and laptops sleep (a timer doesn't run then), so a failed
 // check is tried again when the connection comes back, and an hourly tick (and waking from
@@ -30,6 +37,9 @@ const secureIpc = require("../ipc/secure-ipc");
 const { openExternalSafely } = require("../app/security");
 const connectionManager = require("../services/connection-manager");
 const log = require("../services/logger").logger("Updater");
+const { t } = require("../services/i18n");
+const settingsStore = require("../services/settings-store");
+const { pages } = require("../config/paths");
 
 /**
  * @import { BrowserWindow } from "electron"
@@ -47,6 +57,8 @@ let readyVersion = ""; // the version the page was told is ready, this run
 let manualCheck = false; // a check started from Settings: its page waits for an answer
 let lastCheckAt = 0; // Date.now() of the last automatic or manual check
 let lastCheckFailed = false;
+/** @type {any} the last "update-available" info, for the popup's "Update" */
+let lastFound = null;
 
 const FIRST_CHECK_MS = 3000;
 const CHECK_EVERY_MS = 12 * 60 * 60 * 1000;
@@ -113,6 +125,8 @@ function getUpdater() {
   autoUpdater.autoInstallOnAppQuit = true;
 
   autoUpdater.on("update-available", (info) => {
+    lastFound = info;
+    if (!manualCheck) tellOutsideWindow(String(info?.version ?? ""));
     const kept = updateMode() === "auto" && info?.version === pendingVersion();
     // already ready this run: the dialog said so once; Settings still gets its answer
     if (kept && info.version === readyVersion) {
@@ -156,6 +170,71 @@ function getUpdater() {
   return autoUpdater;
 }
 
+// ── Telling the user outside the window ─────────────────────────────────────
+
+const notifiedFile = () =>
+  path.join(app.getPath("userData"), "update-notified.json");
+
+/** @param {string} version @returns {boolean} the popup was shown for it already */
+function wasNotified(version) {
+  try {
+    return (
+      JSON.parse(fs.readFileSync(notifiedFile(), "utf8")).version === version
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** @param {string} version */
+function setNotified(version) {
+  try {
+    fs.writeFileSync(notifiedFile(), JSON.stringify({ version }), "utf8");
+  } catch (err) {
+    log.warn("update notified file:", err);
+  }
+}
+
+/** The popup and the taskbar flash, once per version (see the top of this file). */
+function tellOutsideWindow(version) {
+  if (!version || wasNotified(version)) return;
+  const win = getMainWindow();
+  if (win && !win.isDestroyed() && win.isVisible() && win.isFocused()) return;
+  setNotified(version);
+  const settings = settingsStore.get();
+  const lang = settings.language || "en";
+  const { showThemedPopup } = require("../ipc/handlers/popup-handlers");
+  showThemedPopup(
+    {
+      icon: "fa-circle-arrow-down",
+      theme: settings.theme || "navy",
+      title: `Salaty Time · ${t("updatePopupTitle", lang)}`,
+      content: t("updatePopupText", lang).replace("{version}", version),
+      button: t("updatePopupButton", lang),
+    },
+    "update",
+  );
+  if (win && !win.isDestroyed() && win.isVisible()) {
+    win.flashFrame(true);
+    win.once("focus", () => !win.isDestroyed() && win.flashFrame(false));
+  }
+}
+
+/** "Update" on the popup: the window in front, on the home page's update dialog. */
+function openUpdateDialog() {
+  const win = getMainWindow();
+  if (!win || win.isDestroyed()) return;
+  require("./main-window").showExistingWindow(win);
+  win.flashFrame(false);
+  const tell = () => win.webContents.send("open-update-dialog", lastFound);
+  if (win.webContents.getURL().split(/[?#]/)[0] === pages.index) tell();
+  else {
+    // the dialog lives on the home page; it listens once its script has run
+    win.webContents.once("did-finish-load", () => setTimeout(tell, 800));
+    win.loadURL(pages.index);
+  }
+}
+
 /**
  * @param {() => BrowserWindow | null} getMainWindowFn
  * @param {() => void} [markQuitting] called before quitting to install an update
@@ -163,6 +242,7 @@ function getUpdater() {
 function configureAutoUpdater(getMainWindowFn, markQuitting) {
   getMainWindow = getMainWindowFn;
   secureIpc.handle("get-update-mode", () => updateMode());
+  secureIpc.on("open-update-dialog", () => openUpdateDialog());
   // "Download" on the page: the update itself, or (notify mode) the download page. Download
   // failures arrive through the "error" event (getUpdater): logged and shown on the page.
   secureIpc.on("start-download", () => {
