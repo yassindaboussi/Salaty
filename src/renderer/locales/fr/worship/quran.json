@@ -67,5 +67,8 @@
   "quranFindPlaceholder": "Un mot...",
   "quranFindPrev": "Précédent (Maj+Entrée)",
   "quranFindNext": "Suivant (Entrée)",
-  "quranFindNone": "Aucun"
+  "quranFindNone": "Aucun",
+  "quranPageLabel": "Page",
+  "quranPageApp": "Appli",
+  "quranPagePaper": "Papier"
 }

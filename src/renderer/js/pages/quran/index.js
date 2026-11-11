@@ -68,6 +68,7 @@ const {
   updateTranslationUI,
 } = require("./translation-picker");
 const { bindPanelFold, unfoldPanel } = require("./panel-fold");
+const { bindPageStyle } = require("./page-style");
 const { bindReaderFind } = require("./reader-find");
 const { bindSelectionBar } = require("./selection-bar");
 const { handleOpenRequest } = require("./open-request");
@@ -203,6 +204,7 @@ function initQuranPage() {
   bindTitleAlign();
   bindAyahActions();
   bindPanelFold();
+  bindPageStyle();
   bindReaderFind(unfoldPanel);
   bindSelectionBar(copyAndTell);
   bindTranslationCombo();

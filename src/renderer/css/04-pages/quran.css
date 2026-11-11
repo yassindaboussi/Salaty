@@ -528,6 +528,31 @@
     scrollbar-color: var(--white-a20) transparent;
   }
 
+  /* Paper: the reading area in cream with warm near-black text, like a printed Mushaf (plain
+     colour only, no texture). It only swaps the colour tokens, so the text, the riwaya fonts, the
+     ayah marks, the found words and the recited ayah keep their own styles. Contrast: text
+     ~14:1, ayah numbers ~6.5:1 (WCAG AA). Windows contrast themes ignore it. */
+  .reader-content.is-paper {
+    --paper: #f6eedc;
+    --bg-primary: var(--paper);
+    --text-primary: #2b2118;
+    --text-secondary: #6b5238;
+    --text-muted: #7a6650;
+    --text-faint: #8a7660;
+    --surface-1: #efe4cc;
+    --surface-2: #e8dbbf;
+    --surface-subtle: #f1e7d1;
+    --border-subtle: rgb(90 66 40 / 18%);
+    --white-a06: rgb(90 66 40 / 8%);
+    --white-a12: rgb(90 66 40 / 14%);
+    --white-a20: rgb(90 66 40 / 22%);
+
+    border-start-start-radius: var(--radius-lg);
+    border-start-end-radius: var(--radius-lg);
+    background: var(--paper);
+    color-scheme: light;
+  }
+
   /* focused on open so ↑ ↓, Page Up/Down and Space scroll the text; no ring around the page */
   .reader-content:focus {
     outline: none;
@@ -967,7 +992,8 @@
   }
 
   .numerals-btn,
-  .riwaya-btn {
+  .riwaya-btn,
+  .page-style-btn {
     flex: 1;
     height: 28px;
     padding: 0 8px;
@@ -983,12 +1009,14 @@
   }
 
   .numerals-btn:hover,
-  .riwaya-btn:hover {
+  .riwaya-btn:hover,
+  .page-style-btn:hover {
     color: var(--text-primary);
   }
 
   .numerals-btn.active,
-  .riwaya-btn.active {
+  .riwaya-btn.active,
+  .page-style-btn.active {
     border-color: var(--white-a40);
     background: var(--surface-hover);
     color: var(--text-primary);

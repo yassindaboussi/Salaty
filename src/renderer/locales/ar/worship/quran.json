@@ -67,5 +67,8 @@
   "quranFindPlaceholder": "كلمة...",
   "quranFindPrev": "السابق (Shift+Enter)",
   "quranFindNext": "التالي (Enter)",
-  "quranFindNone": "لا شيء"
+  "quranFindNone": "لا شيء",
+  "quranPageLabel": "الصفحة",
+  "quranPageApp": "التطبيق",
+  "quranPagePaper": "ورقي"
 }
