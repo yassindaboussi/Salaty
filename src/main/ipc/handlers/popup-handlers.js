@@ -189,11 +189,15 @@ function showThemedPopup(data, type) {
     alwaysOnTop: true,
     focusable: true,
     show: false,
-    webPreferences: secureWebPreferences(),
+    webPreferences: secureWebPreferences({ backgroundThrottling: false }),
   });
   win.setAlwaysOnTop(true, "pop-up-menu");
   win.loadURL(pages.athkarPopup);
-  win.once("ready-to-show", () =>
+  // The page is shown when it says it is ready (show-themed-popup-ready). Not on
+  // "ready-to-show": it waits for a paint, which a hidden window can delay by a second or
+  // more (see the widget above). backgroundThrottling off: the page measures itself in
+  // requestAnimationFrame, which a hidden window would otherwise slow down.
+  win.webContents.once("did-finish-load", () =>
     win.webContents.send("init-themed-popup", {
       ...data,
       type,
@@ -203,8 +207,10 @@ function showThemedPopup(data, type) {
     }),
   );
   win.on("closed", () => {
-    if (type === "adhan") adhanPopupWindow = null;
-    else athkarPopupWindow = null;
+    // a quick second click: the old window closes after the new one is saved
+    if (type === "adhan" && adhanPopupWindow === win) adhanPopupWindow = null;
+    else if (type !== "adhan" && athkarPopupWindow === win)
+      athkarPopupWindow = null;
   });
   if (type === "adhan") adhanPopupWindow = win;
   else athkarPopupWindow = win;
