@@ -25,10 +25,20 @@ const { playShortTone } = require("./adhan-player");
 const screenSizeManager = require("../core/screen-size");
 const { html, setHtml } = require("../utils/html");
 const { refreshTooltips } = require("../core/tooltips");
+const {
+  AFTER_SUNRISE_SEC,
+  BEFORE_DHUHR_SEC,
+  prayerPhase,
+  nightMiddle,
+  shiftTime,
+} = require("./prayer-phase");
 
 /** @type {any} */
 let prayerData = null;
+/** @type {string | null} */
 let currentActivePrayer = null;
+/** @type {string | null} */
+let currentCardKey = null; // the prayer and its phase (see prayer-phase.js): the cards are drawn again when it changes
 let adhanByPrayer = {};
 
 async function loadPrayerTimes() {
@@ -74,6 +84,7 @@ ipcRenderer.on("time-format-changed", (_e, timeFormat) => {
   state.settings.timeFormat = timeFormat;
   if (!prayerData?.timings) return;
   currentActivePrayer = null; // the current / next cards are drawn again too
+  currentCardKey = null;
   _renderPrayerUI();
   updateCurrentAndNextPrayer();
 });
@@ -188,6 +199,51 @@ function _extraRow(key) {
     </div>`;
 }
 
+/** The "current prayer" card: the prayer and when its time ends (see prayer-phase.js). */
+function _currentCard(currentPrayer, nextPrayer, phase) {
+  const tm = prayerData.timings;
+  // sunrise to Dhuhr: no prayer is due; what this part of the morning is
+  const morning = {
+    sunrise: [
+      t("Sunrise", "prayerNames"),
+      tm.Sunrise,
+      `${t("duhaFrom")} – ${clock(shiftTime(tm.Sunrise, AFTER_SUNRISE_SEC))}`,
+    ],
+    duha: [
+      t("duhaTime"),
+      shiftTime(tm.Sunrise, AFTER_SUNRISE_SEC),
+      `${t("until")} – ${clock(shiftTime(tm.Dhuhr, -BEFORE_DHUHR_SEC))}`,
+    ],
+    zawal: [
+      t("beforeDhuhr"),
+      shiftTime(tm.Dhuhr, -BEFORE_DHUHR_SEC),
+      t("noNaflNow"),
+    ],
+  }[phase];
+  if (morning)
+    return html`<div class="prayer-card current">
+            <div class="prayer-label">${t("now")}</div>
+            <div class="prayer-name">${morning[0]}</div>
+            <div class="prayer-time">${clock(morning[1])}</div>
+            <div class="time-remaining">${morning[2]}</div>
+          </div>`;
+  let end = `${t("endTime")} – ${clock(nextPrayer.time)}`;
+  if (currentPrayer.key === "Fajr" && tm.Sunrise)
+    end = `${t("endTime")} – ${clock(tm.Sunrise)}`;
+  else if (
+    currentPrayer.key === "Isha" &&
+    nightMiddle(tm) &&
+    phase !== "ishaLate"
+  )
+    end = `${t("bestBefore")} – ${clock(nightMiddle(tm))}`;
+  return html`<div class="prayer-card current">
+            <div class="prayer-label">${t("currentPrayer")}</div>
+            <div class="prayer-name">${currentPrayer.name}</div>
+            <div class="prayer-time">${clock(currentPrayer.time)}</div>
+            <div class="time-remaining">${end}</div>
+          </div>`;
+}
+
 function updateCurrentAndNextPrayer() {
   if (!prayerData?.timings) return;
   try {
@@ -201,18 +257,20 @@ function updateCurrentAndNextPrayer() {
 
     if (!currentPrayer || !nextPrayer) return;
 
+    const phase = prayerPhase(currentPrayer.key, nowSec, prayerData.timings);
+    // after sunrise no prayer is due until Dhuhr: no row is "Now"
+    const activeKey =
+      currentPrayer.key === "Fajr" && phase ? "" : currentPrayer.key;
+    const cardKey = `${currentPrayer.key}:${phase}`;
+
     const cardsEl = document.getElementById("prayerCards");
     if (cardsEl) {
-      if (currentActivePrayer !== currentPrayer.key) {
+      if (currentCardKey !== cardKey) {
+        currentCardKey = cardKey;
         setHtml(
           cardsEl,
           html`
-          <div class="prayer-card current">
-            <div class="prayer-label">${t("currentPrayer")}</div>
-            <div class="prayer-name">${currentPrayer.name}</div>
-            <div class="prayer-time">${clock(currentPrayer.time)}</div>
-            <div class="time-remaining">${t("endTime")} – ${clock(nextPrayer.time)}</div>
-          </div>
+          ${_currentCard(currentPrayer, nextPrayer, phase)}
           <div class="prayer-card next">
             <div class="prayer-label">${t("nextPrayer")}</div>
             <div class="prayer-name">${nextPrayer.name}</div>
@@ -226,8 +284,8 @@ function updateCurrentAndNextPrayer() {
       }
     }
 
-    if (currentActivePrayer !== currentPrayer.key) {
-      currentActivePrayer = currentPrayer.key;
+    if (currentActivePrayer !== activeKey) {
+      currentActivePrayer = activeKey;
       _renderPrayerUI();
     }
   } catch (err) {
