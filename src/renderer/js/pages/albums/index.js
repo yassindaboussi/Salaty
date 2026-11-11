@@ -4,8 +4,9 @@
 //   reciters.js       Recitations: reciter cards with photos, favourites first
 //   filters.js        the riwaya chips and "complete Quran only" (riwaya.js: the groups)
 //   moshaf-dialog.js  a reciter's recitations, to pick one
-//   tafsir.js         Tafasir: the books, then a book's surahs
-//   tadabor.js        Tadabor: reflections by surah
+//   tafsir.js         Tafasir: the surahs as cards, a surah's parts in the side panel
+//   tadabor.js        Tadabor: reflection videos by surah (tadabor-video.js: the dialog)
+//   continue.js       "Continue listening" on each tab (recite-continue.js: Recitations)
 //   open-album.js     opening something in the playlist page
 //   messages.js       loading / nothing found / error + retry
 //   state.js          what is shown, what is remembered (tab, filters, favourites)
@@ -19,6 +20,12 @@ const { bindMoshafDialog } = require("./moshaf-dialog");
 const reciters = require("./reciters");
 const tafsir = require("./tafsir");
 const tadabor = require("./tadabor");
+const { bindVideoDialog } = require("./tadabor-video");
+const { followPlayer, onPlayingChange } = require("./continue");
+const {
+  renderReciteContinue,
+  continueRecitation,
+} = require("./recite-continue");
 
 const TABS = {
   recite: {
@@ -56,7 +63,12 @@ function showTab(tab, focus = false) {
   state.query = "";
   search.placeholder = t(`acSearch_${tab}`);
   search.setAttribute("aria-label", search.placeholder);
-  TABS[tab].load();
+  const loaded = TABS[tab].load();
+  if (tab === "recite") {
+    renderReciteContinue();
+    // again with the reciters loaded: the reciter's name in the app language
+    Promise.resolve(loaded).then(renderReciteContinue);
+  }
 }
 
 // The tabs follow the ARIA tabs pattern: arrows move between them (mirrored in Arabic),
@@ -104,14 +116,16 @@ function bindLists() {
     const button = /** @type {Element} */ (e.target).closest("button");
     if (!(button instanceof HTMLButtonElement)) return;
     const retry = button.dataset.retry;
-    if (retry) {
+    if (button.dataset.action === "recite-continue") {
+      continueRecitation();
+    } else if (retry) {
       const tab = retry === "reciters" ? "recite" : retry;
       TABS[tab].load();
     } else if (button.closest("#acReciters")) {
       reciters.onCardAction(button);
     } else if (button.closest("#acTafsir")) {
       tafsir.onTafsirAction(button);
-    } else if (button.closest("#acTadabor")) {
+    } else if (button.closest("#acTadabor, #acTadaborContinue")) {
       tadabor.onTadaborAction(button);
     }
   });
@@ -123,6 +137,13 @@ function initAlbumsPage() {
   bindSearch();
   bindFilters(reciters.renderReciters);
   bindMoshafDialog();
+  bindVideoDialog(tadabor.onTadaborChange);
+  onPlayingChange(tafsir.onPlaying);
+  onPlayingChange(tadabor.onTadaborChange);
+  onPlayingChange(() => {
+    if (state.tab === "recite") renderReciteContinue();
+  });
+  followPlayer();
   bindLists();
   showTab(state.tab);
 }

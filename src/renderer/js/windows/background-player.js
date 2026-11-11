@@ -9,6 +9,7 @@ const { loadSettings } = require("../core/bootstrap");
 const { applyTranslations } = require("../core/i18n");
 const { initTooltipSystem } = require("../core/tooltips");
 const { createPlayerUi } = require("../components/floating-player");
+const { saveTrackPosition } = require("../services/listening-resume");
 
 class BackgroundPlayer {
   constructor() {
@@ -108,6 +109,8 @@ class BackgroundPlayer {
     if (this.sound && this.isPlaying) {
       const seek = this.sound.seek() || 0;
       this.ui?.onTime(seek);
+      // the Audio Archive's "Continue listening" (tracks with a `resume`)
+      saveTrackPosition(this.tracks[this.currentTrackIndex], seek);
       ipcRenderer.send("player-update", {
         type: "time-update",
         currentTime: seek,
@@ -131,14 +134,9 @@ class BackgroundPlayer {
 
     const track = this.tracks[index];
 
-    // Only treat this as "the same track is already loaded" if the index
-    // AND the actual track URL match. Comparing index alone is unsafe:
-    // setPlaylist() replaces the whole tracks array before calling this,
-    // so a brand new track can coincidentally share the same start index
-    // as whatever was already playing (e.g. picking a different reciter —
-    // both naturally start at index 0), which was being wrongly treated
-    // as "nothing to do," silently ignoring the request to switch tracks
-    // until the original track finished on its own.
+    // "The same track is already loaded" only if the index AND the url match: setPlaylist()
+    // replaces the whole list, so a new track can share the start index of the one playing
+    // (two reciters both start at 0), which would wrongly be ignored.
     if (
       this.currentTrackIndex === index &&
       this.sound &&

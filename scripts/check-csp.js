@@ -29,6 +29,9 @@ const POLICY = {
     "data:",
     "blob:",
     "https://tile.openstreetmap.org", // Qibla: the map's tiles
+    // Audio Archive, Tadabor: the videos' pictures (server18 redirects to the cdn)
+    "https://server18.mp3quran.net",
+    "https://cdn.mp3quran.net",
   ],
   "font-src": ["'self'", "data:"],
   "connect-src": [
