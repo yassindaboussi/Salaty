@@ -1,7 +1,7 @@
 "use strict";
 
 const { ipcRenderer } = require("electron");
-const { t, getLanguage } = require("../core/i18n");
+const { t } = require("../core/i18n");
 const { showToast } = require("../core/toast");
 const { clock } = require("../core/time-format");
 const {
@@ -169,8 +169,6 @@ function _renderPrayerUI() {
     })}`,
   );
 
-  _renderMethod();
-
   refreshTooltips(); // binds the app tooltip to the new adhan buttons
 
   listEl.onclick = (e) => {
@@ -267,24 +265,6 @@ function _toggleAdhan(key) {
     .querySelector(`.adhan-toggle-btn[data-prayer="${key}"]`)
     ?.closest("button")
     ?.focus();
-}
-
-// The calculation method of today's times, in the UI language (Aladhan's own name for a
-// method newer than the app), under the list. Same names as the monthly times page.
-function _renderMethod() {
-  const box = document.getElementById("prayerMethodBox");
-  const nameEl = document.getElementById("prayerMethod");
-  if (!box || !nameEl) return;
-  const method = prayerData?.meta?.method;
-  const key = `mpMethod${method?.id}`;
-  const name = !method?.name ? "" : t(key) === key ? method.name : t(key);
-  // and the Asr rule, from the same data (Settings → Asr time)
-  const hanafi =
-    String(prayerData?.meta?.school ?? "").toUpperCase() === "HANAFI";
-  const asr = t(hanafi ? "calcAsrLineHanafi" : "calcAsrLineStandard");
-  const sep = getLanguage() === "ar" ? "، " : " · ";
-  nameEl.textContent = name ? `${name}${sep}${asr}` : "";
-  box.hidden = !name;
 }
 
 function _setText(id, text) {
