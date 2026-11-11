@@ -102,17 +102,18 @@ ipcRenderer.once("init-themed-popup", (_event, data) => {
   // "until closed": no countdown bar (hidden before the height is measured)
   if (ms === null) progressBar?.parentElement?.classList.add("hidden");
 
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const neededHeight = Math.ceil(document.body.scrollHeight) + 2;
-      ipcRenderer.send("show-themed-popup-ready", { height: neededHeight });
+  // Measured now, not in requestAnimationFrame: a window that was never shown gets no
+  // frames, and the popup could wait seconds. Reading scrollHeight lays the page out
+  // at once; fonts first, so the text has its real height.
+  document.fonts.ready.then(() => {
+    const neededHeight = Math.ceil(document.body.scrollHeight) + 2;
+    ipcRenderer.send("show-themed-popup-ready", { height: neededHeight });
 
-      const stopAutoClose = ms === null ? () => {} : startAutoClose(ms);
+    const stopAutoClose = ms === null ? () => {} : startAutoClose(ms);
 
-      closeBtn.addEventListener("click", () => {
-        stopAutoClose();
-        closePopup();
-      });
+    closeBtn.addEventListener("click", () => {
+      stopAutoClose();
+      closePopup();
     });
   });
 });

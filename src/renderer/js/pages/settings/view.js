@@ -43,8 +43,17 @@ function initViewSetting() {
       } catch {
         // storage unavailable: the choice lasts until the page closes
       }
-      radio.focus(); // the row moved: keep the focus on it, and show it
-      radio.closest(".st-item")?.scrollIntoView({ block: "center" });
+      // the row moved: keep the focus on it, and show it. Only the settings list may
+      // scroll: by default focus() and scrollIntoView() also scroll the app around it
+      // (overflow: hidden boxes too), which pushed the header out of the window.
+      radio.focus({ preventScroll: true });
+      radio.closest(".st-item")?.scrollIntoView(
+        // "container" (Chromium 140+) is not in TypeScript's DOM types yet
+        /** @type {ScrollIntoViewOptions} */ ({
+          block: "center",
+          container: "nearest",
+        }),
+      );
     });
   });
 }
