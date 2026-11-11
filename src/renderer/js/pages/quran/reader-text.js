@@ -4,8 +4,8 @@
 // ending with its number (a button: it opens the ayah's menu). The number is written in
 // Arabic-Indic digits in the riwaya's Quran font, which draws them as the riwaya's own ayah mark
 // (round for Hafs, a star for Qalun, a pendant for Warsh) sized for one to three digits, as in a
-// printed Mushaf; with Western digits the font would leave them bare, so the mark keeps
-// Arabic-Indic digits whatever the digits setting (its spoken name follows the setting); with a translation each ayah
+// printed Mushaf. The font leaves Western digits bare, so with Western digits the mark is a plain
+// ring drawn in CSS (.is-latin); the digits follow the setting either way. With a translation each ayah
 // is a card (its number, play, copy and bookmark icons, the Arabic, the translation under it).
 const { t } = require("../../core/i18n");
 const { html } = require("../../utils/html");
@@ -35,11 +35,12 @@ const ayahEndLabel = (n, bookmarked) =>
 
 /** The running text of the surah (no translation). */
 function flowHtml() {
+  const latin = state.numerals === "latin";
   return html`<div class="surah-flow" lang="ar" dir="rtl">${state.currentAyahs.map(
     (a) => {
       const on = isBookmarked(state.currentSurah?.n ?? 0, a.number);
       const label = ayahEndLabel(a.number, on);
-      return html`<span class="ayah-text" id="ayah-${a.number}" data-ayah="${a.number}">${a.arabic}</span> <button type="button" class="ayah-end${on ? " is-on" : ""}" data-action="menu" data-ayah="${a.number}" aria-haspopup="menu" aria-expanded="false" aria-label="${label}" data-tip="${label}"><span class="ayah-end-mark" aria-hidden="true">${formatNumerals(a.number, "arabic")}</span></button> `;
+      return html`<span class="ayah-text" id="ayah-${a.number}" data-ayah="${a.number}">${a.arabic}</span> <button type="button" class="ayah-end${on ? " is-on" : ""}" data-action="menu" data-ayah="${a.number}" aria-haspopup="menu" aria-expanded="false" aria-label="${label}" data-tip="${label}"><span class="ayah-end-mark${latin ? " is-latin" : ""}" aria-hidden="true">${formatNumerals(a.number, state.numerals)}</span></button> `;
     },
   )}</div>`;
 }

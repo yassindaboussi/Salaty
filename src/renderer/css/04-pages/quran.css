@@ -667,6 +667,20 @@
     line-height: 1;
   }
 
+  /* Western digits: the Quran font draws no ornament around them, so a plain ring */
+  .ayah-end-mark.is-latin {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.9em;
+    height: 1.9em;
+    padding: 0 0.3em;
+    border: 1.5px solid currentcolor;
+    border-radius: 999px;
+    font-family: var(--font-ui);
+    font-size: 0.55em;
+    font-variant-numeric: tabular-nums;
+  }
+
   .ayah-end:hover {
     background: var(--white-a06);
     color: var(--text-primary);
