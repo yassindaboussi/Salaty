@@ -652,129 +652,176 @@
 
                 <!-- the corner popups: time, size, place, and a test popup (pages/settings/popup-settings.js) -->
                 <div class="st-item popup-settings-card">
-                  <div class="popup-settings-head">
-                    <div class="toggle-info">
-                      <span class="subsection-label" data-i18n="popupCardLabel"
-                        >Reminder popup</span
-                      >
-                      <span class="toggle-description" data-i18n="popupCardDesc"
-                        >How reminders look in the screen corner. Press “Show
-                        test” to see your choices.</span
-                      >
-                    </div>
-                    <button
-                      type="button"
-                      id="popupTestBtn"
-                      class="popup-test-btn"
+                  <div class="toggle-info">
+                    <span class="subsection-label" data-i18n="popupCardLabel"
+                      >Reminder popup</span
                     >
-                      <i class="fas fa-eye" aria-hidden="true"></i>
-                      <span data-i18n="popupTest">Show test</span>
-                    </button>
+                    <span class="toggle-description" data-i18n="popupCardDesc"
+                      >How reminders look in the screen corner. The picture
+                      shows your choices.</span
+                    >
                   </div>
-                  <div class="popup-opt">
-                    <div class="popup-opt-text">
-                      <span
-                        class="popup-opt-label"
-                        id="popupDurationLabel"
-                        data-i18n="popupDurationLabel"
-                        >How long it stays</span
-                      ><span
-                        class="popup-opt-hint"
-                        data-i18n="popupDurationDesc"
-                        >The time stops while your mouse is on the popup.</span
+                  <div class="popup-layout">
+                    <div class="popup-opts">
+                      <div class="popup-opt">
+                        <div class="popup-opt-text">
+                          <span
+                            class="popup-opt-label"
+                            id="popupDurationLabel"
+                            data-i18n="popupDurationLabel"
+                            >How long it stays</span
+                          ><span
+                            class="popup-opt-hint"
+                            data-i18n="popupDurationDesc"
+                            >The time stops while your mouse is on the
+                            popup.</span
+                          >
+                        </div>
+                        <div
+                          class="segmented"
+                          role="radiogroup"
+                          aria-labelledby="popupDurationLabel"
+                        >
+                          <label class="segmented-option">
+                            <input
+                              type="radio"
+                              name="popupDuration"
+                              value="10"
+                            />
+                            <span
+                              class="segmented-label"
+                              data-i18n="popupDuration10"
+                              >10 s</span
+                            >
+                          </label>
+                          <label class="segmented-option">
+                            <input
+                              type="radio"
+                              name="popupDuration"
+                              value="30"
+                            />
+                            <span
+                              class="segmented-label"
+                              data-i18n="popupDuration30"
+                              >30 s</span
+                            >
+                          </label>
+                          <label class="segmented-option">
+                            <input
+                              type="radio"
+                              name="popupDuration"
+                              value="stay"
+                            />
+                            <span
+                              class="segmented-label"
+                              data-i18n="popupDurationStay"
+                              >Until closed</span
+                            >
+                          </label>
+                        </div>
+                      </div>
+                      <div class="popup-opt">
+                        <span
+                          class="popup-opt-label"
+                          id="popupStyleLabel"
+                          data-i18n="popupStyleLabel"
+                          >Size</span
+                        >
+                        <div
+                          class="segmented"
+                          role="radiogroup"
+                          aria-labelledby="popupStyleLabel"
+                        >
+                          <label class="segmented-option">
+                            <input
+                              type="radio"
+                              name="popupStyle"
+                              value="full"
+                            />
+                            <span
+                              class="segmented-label"
+                              data-i18n="popupStyleFull"
+                              >Full</span
+                            >
+                          </label>
+                          <label class="segmented-option">
+                            <input
+                              type="radio"
+                              name="popupStyle"
+                              value="compact"
+                            />
+                            <span
+                              class="segmented-label"
+                              data-i18n="popupStyleCompact"
+                              >Compact</span
+                            >
+                          </label>
+                        </div>
+                      </div>
+                      <div class="popup-opt">
+                        <span
+                          class="popup-opt-label"
+                          id="popupPositionLabel"
+                          data-i18n="popupPositionLabel"
+                          >Corner</span
+                        >
+                        <div
+                          class="segmented"
+                          role="radiogroup"
+                          aria-labelledby="popupPositionLabel"
+                        >
+                          <label class="segmented-option">
+                            <input
+                              type="radio"
+                              name="popupPosition"
+                              value="bottom"
+                            />
+                            <span
+                              class="segmented-label"
+                              data-i18n="popupPositionBottom"
+                              >Bottom</span
+                            >
+                          </label>
+                          <label class="segmented-option">
+                            <input
+                              type="radio"
+                              name="popupPosition"
+                              value="top"
+                            />
+                            <span
+                              class="segmented-label"
+                              data-i18n="popupPositionTop"
+                              >Top</span
+                            >
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- live picture of the choices: a small screen with the popup in its corner -->
+                    <div class="popup-preview-col">
+                      <div class="popup-preview" aria-hidden="true">
+                        <div class="popup-preview-card">
+                          <span class="popup-preview-dot"></span>
+                          <span class="popup-preview-lines"
+                            ><span class="popup-preview-line"></span
+                            ><span
+                              class="popup-preview-line popup-preview-line-short"
+                            ></span
+                          ></span>
+                        </div>
+                        <div class="popup-preview-taskbar"></div>
+                      </div>
+                      <button
+                        type="button"
+                        id="popupTestBtn"
+                        class="popup-test-btn"
                       >
-                    </div>
-                    <div
-                      class="segmented"
-                      role="radiogroup"
-                      aria-labelledby="popupDurationLabel"
-                    >
-                      <label class="segmented-option">
-                        <input type="radio" name="popupDuration" value="10" />
-                        <span
-                          class="segmented-label"
-                          data-i18n="popupDuration10"
-                          >10 s</span
-                        >
-                      </label>
-                      <label class="segmented-option">
-                        <input type="radio" name="popupDuration" value="30" />
-                        <span
-                          class="segmented-label"
-                          data-i18n="popupDuration30"
-                          >30 s</span
-                        >
-                      </label>
-                      <label class="segmented-option">
-                        <input type="radio" name="popupDuration" value="stay" />
-                        <span
-                          class="segmented-label"
-                          data-i18n="popupDurationStay"
-                          >Until closed</span
-                        >
-                      </label>
-                    </div>
-                  </div>
-                  <div class="popup-opt">
-                    <span
-                      class="popup-opt-label"
-                      id="popupStyleLabel"
-                      data-i18n="popupStyleLabel"
-                      >Size</span
-                    >
-                    <div
-                      class="segmented"
-                      role="radiogroup"
-                      aria-labelledby="popupStyleLabel"
-                    >
-                      <label class="segmented-option">
-                        <input type="radio" name="popupStyle" value="full" />
-                        <span class="segmented-label" data-i18n="popupStyleFull"
-                          >Full</span
-                        >
-                      </label>
-                      <label class="segmented-option">
-                        <input type="radio" name="popupStyle" value="compact" />
-                        <span
-                          class="segmented-label"
-                          data-i18n="popupStyleCompact"
-                          >Compact</span
-                        >
-                      </label>
-                    </div>
-                  </div>
-                  <div class="popup-opt">
-                    <span
-                      class="popup-opt-label"
-                      id="popupPositionLabel"
-                      data-i18n="popupPositionLabel"
-                      >Corner</span
-                    >
-                    <div
-                      class="segmented"
-                      role="radiogroup"
-                      aria-labelledby="popupPositionLabel"
-                    >
-                      <label class="segmented-option">
-                        <input
-                          type="radio"
-                          name="popupPosition"
-                          value="bottom"
-                        />
-                        <span
-                          class="segmented-label"
-                          data-i18n="popupPositionBottom"
-                          >Bottom</span
-                        >
-                      </label>
-                      <label class="segmented-option">
-                        <input type="radio" name="popupPosition" value="top" />
-                        <span
-                          class="segmented-label"
-                          data-i18n="popupPositionTop"
-                          >Top</span
-                        >
-                      </label>
+                        <i
+                          class="fas fa-play"
+                          aria-hidden="true"
+                        ></i>
+                        <span data-i18n="popupTest">Show test</span>
+                      </button>
                     </div>
                   </div>
                 </div>

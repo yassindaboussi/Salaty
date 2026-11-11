@@ -447,13 +447,18 @@
     background: var(--surface-3);
   }
 
-  /* Notifications → "Reminder popup": one card, "Show test" at its top corner, then the
-     three choices as rows (how long, size, corner) */
-  .popup-settings-head {
+  /* Notifications → "Reminder popup": the three choices on the start side, a live
+     picture of the popup on its screen corner on the end side, "Show test" under it.
+     One column on narrow windows. */
+  .popup-layout {
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding-block-end: 10px;
+    gap: 20px;
+    margin-block-start: 12px;
+  }
+
+  .popup-opts {
+    flex: 1;
+    min-width: 0;
   }
 
   .popup-opt {
@@ -489,10 +494,106 @@
     opacity: 0.8;
   }
 
-  .popup-test-btn {
+  .popup-preview-col {
+    flex: 0 0 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* the small screen: the popup always sits on the right, like the real one */
+  .popup-preview {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: var(--surface-1);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    direction: ltr;
+  }
+
+  .popup-preview-taskbar {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    height: 10px;
+    background: var(--surface-3);
+  }
+
+  .popup-preview-card {
+    position: absolute;
+    inset-inline-end: 8px;
+    inset-block-end: 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 96px;
+    height: 34px;
+    padding-inline: 7px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-medium);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
+    transition:
+      inset-block-end 0.25s ease,
+      width 0.25s ease,
+      height 0.25s ease;
+  }
+
+  .popup-preview-dot {
     flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    opacity: 0.6;
+  }
+
+  .popup-preview-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .popup-preview-line {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--text-secondary);
+    opacity: 0.5;
+  }
+
+  .popup-preview-line-short {
+    width: 60%;
+  }
+
+  .popup-settings-card:has(input[name="popupStyle"][value="compact"]:checked)
+    .popup-preview-card {
+    width: 72px;
+    height: 22px;
+  }
+
+  .popup-settings-card:has(input[name="popupStyle"][value="compact"]:checked)
+    .popup-preview-line-short {
+    display: none;
+  }
+
+  .popup-settings-card:has(input[name="popupPosition"][value="top"]:checked)
+    .popup-preview-card {
+    inset-block-end: calc(100% - 8px - 34px);
+  }
+
+  .popup-settings-card:has(
+      input[name="popupPosition"][value="top"]:checked
+    ):has(input[name="popupStyle"][value="compact"]:checked)
+    .popup-preview-card {
+    inset-block-end: calc(100% - 8px - 22px);
+  }
+
+  .popup-test-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     min-height: 32px;
     padding-block: 0;
@@ -508,6 +609,22 @@
 
   .popup-test-btn:hover {
     background: var(--surface-3);
+  }
+
+  @media (width < 700px) {
+    .popup-layout {
+      flex-direction: column;
+    }
+
+    .popup-preview-col {
+      flex-basis: auto;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .popup-preview {
+      width: 160px;
+    }
   }
 
   .location-actions-row .detect-btn,
