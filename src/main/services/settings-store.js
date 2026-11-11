@@ -59,6 +59,9 @@ let settingsData = {
   adhanVoiceFajr: "same", // Fajr's own voice, or "same"
   adhanCustomName: "", // name of the user's own adhan file, shown in Settings
   timeFormat: "24", // how times are written: "24" (17:05) or "12" (5:05 PM), shared/prayerUtils.js
+  popupDuration: "10", // how long the corner popups stay: "10" / "30" seconds, or "stay" (until closed)
+  popupStyle: "full", // the popups' size: "full" or "compact" (smaller text, no divider)
+  popupPosition: "bottom", // the screen corner of the popups: "bottom" or "top" (right side)
   analyticsEnabled: false, // opt-in, see PRIVACY.md
 };
 

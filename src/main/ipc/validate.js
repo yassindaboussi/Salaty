@@ -26,6 +26,9 @@ const THEMES = new Set([
 const LANGUAGES = new Set(["en", "ar", "fr"]);
 const WEEK_STARTS = new Set(["auto", "sat", "sun", "mon"]);
 const TIME_FORMATS = new Set(["24", "12"]);
+const POPUP_DURATIONS = new Set(["10", "30", "stay"]);
+const POPUP_STYLES = new Set(["full", "compact"]);
+const POPUP_POSITIONS = new Set(["bottom", "top"]);
 const PRAYERS = new Set(["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"]);
 
 const MAX_TEXT = 200; // a city, a country, a location name
@@ -154,6 +157,9 @@ const SETTINGS_SCHEMA = {
   asrSchool: (v) => (v === "standard" || v === "hanafi" ? v : undefined),
   weekStart: oneOf(WEEK_STARTS),
   timeFormat: oneOf(TIME_FORMATS),
+  popupDuration: oneOf(POPUP_DURATIONS),
+  popupStyle: oneOf(POPUP_STYLES),
+  popupPosition: oneOf(POPUP_POSITIONS),
   adhanVoice: (v) => adhanVoiceId(v),
   adhanVoiceFajr: (v) => (v === FAJR_SAME_VOICE ? v : adhanVoiceId(v)),
   adhanCustomName: (v) => (v === "" ? "" : text(v)), // "": the file was deleted
