@@ -14,3 +14,13 @@ The voices in Settings → Notifications → Adhan voice. Each file was cut at t
 ## Short tone
 
 `short-tone.wav` is the "Short tone" reminder on the home page: two plain 660 Hz sine notes (0.4 s each, 0.18 s apart) with soft fades, no melody and no bell sound. Made for this app by a small script, no outside recording, so no licence applies.
+
+## Voice reminders (`voice/`)
+
+Settings → Notifications → Voice reminder and Hadith after the adhan.
+
+- `near-fajr.mp3` … `near-isha.mp3`: "اقتربت صلاة …", one per prayer. Made for this app with
+  [SILMA TTS v1](https://huggingface.co/silma-ai/silma-tts) ([Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)),
+  using a voice sample from the [ClArTTS](https://huggingface.co/datasets/MBZUAI/ClArTTS) dataset by MBZUAI
+  ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)). Light EQ, compression, -16 LUFS, mono MP3 96 kbps.
+- `hadith-before.mp3`, `hadith-after.mp3`: short hadith audio. Source unknown. Mono MP3 96 kbps.

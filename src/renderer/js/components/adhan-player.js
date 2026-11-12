@@ -5,6 +5,7 @@ const { ipcRenderer } = require("electron");
 const { t } = require("../core/i18n");
 const { state } = require("../core/store");
 const { html, setHtml } = require("../utils/html");
+const { playBeforeAdhan, playAfterAdhan, stopVoice } = require("./adhan-voice");
 
 /** @type {HTMLAudioElement | null} */
 let adhanAudio = null;
@@ -33,7 +34,12 @@ function initAdhanPlayer() {
       const audioDurSec = 300;
 
       if (session.mode === true && elapsedSec < audioDurSec) {
-        _playAdhan(session.prayer, session.mode, elapsedSec);
+        _playAdhan(
+          session.prayer,
+          session.mode,
+          elapsedSec,
+          session.afterHadith === true,
+        );
       } else {
         const nameEl = document.getElementById("__adhan-prayer-name__");
         const timeEl = document.getElementById("__adhan-prayer-time__");
@@ -91,18 +97,25 @@ function _registerIpcListeners() {
   ipcRenderer.removeAllListeners("force-stop-adhan");
   ipcRenderer.removeAllListeners("show-pre-adhan-notification");
 
-  ipcRenderer.on("trigger-adhan", (_ev, { prayer, mode }) => {
+  ipcRenderer.on("trigger-adhan", (_ev, { prayer, mode, afterHadith }) => {
     if (mode === false) return;
-    _playAdhan(prayer, mode);
+    _playAdhan(prayer, mode, 0, afterHadith === true);
   });
 
   ipcRenderer.on("force-stop-adhan", () => {
     _stopAdhan(false);
   });
 
-  ipcRenderer.on("show-pre-adhan-notification", (_ev, { prayer, minutes }) => {
-    _showPreAdhanNotification(prayer, minutes);
-  });
+  ipcRenderer.on(
+    "show-pre-adhan-notification",
+    (_ev, { prayer, minutes, voice, hadith }) => {
+      _showPreAdhanNotification(prayer, minutes);
+      playBeforeAdhan(prayer.key, {
+        near: voice === true,
+        hadith: hadith === true,
+      });
+    },
+  );
 
   ipcRenderer.on("theme-changed", () => {
     requestAnimationFrame(_syncThemeVars);
@@ -118,7 +131,7 @@ function _getAdhanAudioSrc(prayerKey) {
   return ipcRenderer.invoke("get-adhan-audio-src", prayerKey);
 }
 
-async function _playAdhan(prayer, mode, seekSec = 0) {
+async function _playAdhan(prayer, mode, seekSec = 0, afterHadith = false) {
   const prayerName = _prayerName(prayer);
   const prayerTime = prayer.time || "";
 
@@ -131,6 +144,7 @@ async function _playAdhan(prayer, mode, seekSec = 0) {
   if (labelEl) labelEl.textContent = t("stopAdhan");
 
   _showOverlay(true);
+  stopVoice();
 
   if (mode === "silent") {
     return;
@@ -188,6 +202,8 @@ async function _playAdhan(prayer, mode, seekSec = 0) {
     () => {
       _showOverlay(false);
       ipcRenderer.send("stop-adhan");
+      // only after an adhan that ended by itself: Stop never leads to more sound
+      if (afterHadith) playAfterAdhan();
     },
     { once: true },
   );
@@ -204,6 +220,9 @@ function playShortTone() {
 }
 
 function _stopAdhan(notifyMain = true) {
+  // Main answers every "stop-adhan" with force-stop-adhan (notifyMain false): that echo
+  // must not cut the hadith that starts when the adhan ends by itself.
+  if (notifyMain) stopVoice();
   // Detach the playing audio first: _cleanupAudio() pauses whatever adhanAudio points to,
   // which used to cut the sound before the fade-out below could run.
   const audio = adhanAudio;

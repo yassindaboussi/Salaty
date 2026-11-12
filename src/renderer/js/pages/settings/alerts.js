@@ -82,6 +82,36 @@ function initPreAdhanNotification() {
     state.settings.preAdhanMinutes = isNaN(v) || v < 1 ? 5 : v;
     scheduleAutoSave();
   });
+
+  // both play with the pre-adhan alert: dim their switches while that one is off
+  const before = [
+    _bindSwitch("preAdhanVoiceToggle", "preAdhanVoiceEnabled", true),
+    _bindSwitch("preAdhanHadithToggle", "preAdhanHadithEnabled"),
+  ];
+  const syncVoice = () => {
+    for (const input of before) if (input) input.disabled = !toggle.checked;
+  };
+  syncVoice();
+  toggle.addEventListener("change", syncVoice);
+  _bindSwitch("afterAdhanHadithToggle", "afterAdhanHadithEnabled");
+}
+
+/**
+ * A plain on/off setting.
+ * @param {string} id
+ * @param {"preAdhanVoiceEnabled" | "preAdhanHadithEnabled" | "afterAdhanHadithEnabled"} key
+ * @param {boolean} [onByDefault] its value before the user ever changed it
+ */
+function _bindSwitch(id, key, onByDefault = false) {
+  const input = document.getElementById(id);
+  if (!(input instanceof HTMLInputElement)) return null;
+  const saved = state.settings[key];
+  input.checked = saved === undefined ? onByDefault : saved === true;
+  input.addEventListener("change", () => {
+    state.settings[key] = input.checked;
+    persistSettings();
+  });
+  return input;
 }
 
 module.exports = { initAthkarAlerts, initPreAdhanNotification };

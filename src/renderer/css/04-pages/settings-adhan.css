@@ -137,6 +137,46 @@
     background: var(--surface-2);
   }
 
+  /* Settings → Notifications → Voice reminders: slim rows, ▶ then the switch at the end;
+     the title and its hint share one line */
+  .voice-reminders-card > .toggle-info {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: baseline;
+    gap: 2px 10px;
+  }
+
+  .voice-reminders-card .popup-opts {
+    margin-block-start: 8px;
+  }
+
+  .voice-reminders-card .popup-opt {
+    position: relative;
+    flex-wrap: nowrap;
+    padding-block: 6px;
+  }
+
+  /* each option's hint: hidden to keep the rows slim, still read by screen readers */
+  .voice-reminders-card .popup-opt-hint {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .voice-reminders-card .popup-opt-text {
+    flex: 1;
+  }
+
+  .voice-opt-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-inline-start: auto;
+  }
+
   .adhan-voice-btn:focus-visible {
     outline: 2px solid var(--accent-color);
     outline-offset: 1px;

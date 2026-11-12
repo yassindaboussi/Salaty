@@ -16,7 +16,7 @@ const { bringToFrontForAdhan } = require("../windows/main-window");
 /**
  * @import { BrowserWindow } from "electron"
  * @import { PrayerDay } from "./prayer-times"
- * @typedef {{ prayer: object, mode: true | "silent" | "tone", theme: string, startedAt: number }} AdhanSession
+ * @typedef {{ prayer: object, mode: true | "silent" | "tone", theme: string, startedAt: number, afterHadith: boolean }} AdhanSession
  */
 
 /** @type {() => BrowserWindow | null} */
@@ -207,9 +207,14 @@ function _startTickLoop() {
             1,
             Math.round(timeRemaining / 60),
           );
+          // the spoken reminders follow the prayer's own sound: none for Off or Silent
+          const mode = settings.adhanEnabledByPrayer?.[nextPrayer.key];
+          const sound = mode !== false && mode !== "silent";
           _sendToMain("show-pre-adhan-notification", {
             prayer: _withDisplayKey(nextPrayer),
             minutes: actualMinutesRemaining,
+            voice: sound && settings.preAdhanVoiceEnabled !== false,
+            hadith: sound && settings.preAdhanHadithEnabled === true,
           });
         }
       }
@@ -248,6 +253,7 @@ function _maybeFireAdhan(prayer, nowSec) {
     mode: adhanState,
     theme: settings.theme || "navy",
     startedAt: Date.now(),
+    afterHadith: settings.afterAdhanHadithEnabled === true,
   };
 
   if (adhanIsPlaying) {

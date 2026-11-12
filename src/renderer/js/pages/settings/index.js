@@ -11,6 +11,7 @@
 //   alerts.js       athkar alerts and the notification before the adhan
 //   popup-settings.js the corner popups: time, size, place, Test
 //   adhan-voice.js  the adhan's voice (▶ to listen: adhan-preview.js), Fajr's own voice
+//   voice-preview.js  ▶ / ■ of the voice reminders before and after the adhan
 //   hijri.js        the Hijri calendar's first day of the week and the Hijri date correction
 //   toggles.js      travel mode and usage statistics (opt-in)
 //   about.js        app version, contact, update check and install
@@ -37,6 +38,7 @@ const {
 const { initAthkarAlerts, initPreAdhanNotification } = require("./alerts");
 const { initPopupSettings } = require("./popup-settings");
 const { initAdhanVoice } = require("./adhan-voice");
+const { initVoicePreview } = require("./voice-preview");
 const { initHijriSettings, updateHijriText } = require("./hijri");
 const {
   initCalculationSettings,
@@ -80,6 +82,7 @@ function initSettingsPage() {
   initLanguageSelection();
   initAthkarAlerts();
   initPreAdhanNotification();
+  initVoicePreview();
   initPopupSettings();
   initAdhanVoice();
   initHijriSettings();

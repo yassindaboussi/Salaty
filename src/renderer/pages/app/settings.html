@@ -650,6 +650,124 @@
                   </label>
                 </div>
 
+                <!-- spoken reminders around the adhan, ▶ to listen (components/adhan-voice.js) -->
+                <div class="st-item voice-reminders-card">
+                  <div class="toggle-info">
+                    <span
+                      class="subsection-label"
+                      data-i18n="voiceRemindersLabel"
+                      >Voice reminders</span
+                    >
+                    <span
+                      class="toggle-description"
+                      data-i18n="voiceRemindersDesc"
+                      >Spoken around the adhan. Press ▶ to listen.</span
+                    >
+                  </div>
+                  <div class="popup-opts">
+                    <div class="popup-opt">
+                      <div class="popup-opt-text">
+                        <label
+                          class="popup-opt-label"
+                          for="preAdhanVoiceToggle"
+                          data-i18n="preAdhanVoice"
+                          >Prayer is near</label
+                        ><span
+                          class="popup-opt-hint"
+                          id="preAdhanVoiceHint"
+                          data-i18n="preAdhanVoiceDesc"
+                          >Names the coming prayer, with the pre-adhan
+                          notification</span
+                        >
+                      </div>
+                      <div class="voice-opt-actions">
+                        <button
+                          type="button"
+                          class="adhan-voice-btn"
+                          data-voice-play="near"
+                          aria-pressed="false"
+                        >
+                          <i class="fas fa-play" aria-hidden="true"></i>
+                        </button>
+                        <label class="toggle-switch">
+                          <input
+                            type="checkbox"
+                            id="preAdhanVoiceToggle"
+                            aria-describedby="preAdhanVoiceHint"
+                          />
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div>
+                    </div>
+                    <div class="popup-opt">
+                      <div class="popup-opt-text">
+                        <label
+                          class="popup-opt-label"
+                          for="preAdhanHadithToggle"
+                          data-i18n="preAdhanHadith"
+                          >Hadith before the adhan</label
+                        ><span
+                          class="popup-opt-hint"
+                          id="preAdhanHadithHint"
+                          data-i18n="preAdhanHadithDesc"
+                          >A short hadith, with the pre-adhan notification</span
+                        >
+                      </div>
+                      <div class="voice-opt-actions">
+                        <button
+                          type="button"
+                          class="adhan-voice-btn"
+                          data-voice-play="before"
+                          aria-pressed="false"
+                        >
+                          <i class="fas fa-play" aria-hidden="true"></i>
+                        </button>
+                        <label class="toggle-switch">
+                          <input
+                            type="checkbox"
+                            id="preAdhanHadithToggle"
+                            aria-describedby="preAdhanHadithHint"
+                          />
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div>
+                    </div>
+                    <div class="popup-opt">
+                      <div class="popup-opt-text">
+                        <label
+                          class="popup-opt-label"
+                          for="afterAdhanHadithToggle"
+                          data-i18n="afterAdhanHadith"
+                          >Hadith after the adhan</label
+                        ><span
+                          class="popup-opt-hint"
+                          id="afterAdhanHadithHint"
+                          data-i18n="afterAdhanHadithDesc"
+                          >When the full adhan ends by itself</span
+                        >
+                      </div>
+                      <div class="voice-opt-actions">
+                        <button
+                          type="button"
+                          class="adhan-voice-btn"
+                          data-voice-play="after"
+                          aria-pressed="false"
+                        >
+                          <i class="fas fa-play" aria-hidden="true"></i>
+                        </button>
+                        <label class="toggle-switch">
+                          <input
+                            type="checkbox"
+                            id="afterAdhanHadithToggle"
+                            aria-describedby="afterAdhanHadithHint"
+                          />
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- the corner popups: time, size, place, and a test popup (pages/settings/popup-settings.js) -->
                 <div class="st-item popup-settings-card">
                   <div class="toggle-info">

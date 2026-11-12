@@ -17,12 +17,14 @@ const { persistSettings } = require("./persist");
 const { updateHijriText } = require("./hijri");
 const { updateCalculationText } = require("./calculation");
 const { updateAdhanVoiceText } = require("./adhan-voice");
+const { updateVoicePreviewText } = require("./voice-preview");
 
 function updateAllText() {
   applyTranslations(); // every [data-i18n] text on the page (they follow the language switch)
   updateHijriText(); // weekday names and today's Hijri date
   updateCalculationText(); // method names
   updateAdhanVoiceText(); // voice names
+  updateVoicePreviewText(); // ▶ tooltips
 
   const aboutStatusEl = document.getElementById("aboutStatusText");
   const aboutIconEl = document.getElementById("aboutStatusIcon");
