@@ -55,7 +55,7 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 <img src="docs/screenshots/fr/index.webp" width="49%" alt="Heures de prière" />
 <img src="docs/screenshots/fr/features.webp" width="49%" alt="Toutes les fonctionnalités" />
 <br/>
-<img src="docs/screenshots/fr/qibla.webp" width="49%" alt="Boussole Qibla" />
+<img src="docs/screenshots/fr/settings.webp" width="49%" alt="Paramètres" />
 <img src="docs/screenshots/fr/athkar.webp" width="49%" alt="Athkar" />
 <br/>
 <img src="docs/screenshots/fr/tasbih.webp" width="49%" alt="Tasbih" />
@@ -63,8 +63,6 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 <br/>
 <img src="docs/screenshots/fr/albums.webp" width="49%" alt="Archive audio" />
 <img src="docs/screenshots/fr/quran.webp" width="49%" alt="Saint Coran" />
-<br/>
-<img src="docs/screenshots/fr/settings.webp" width="49%" alt="Paramètres" />
 </div>
 
 ---
@@ -106,7 +104,6 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 - **Les 99 noms d'Allah** 🌟 avec les versets d'où ils viennent
 - **Calendrier hégirien** 🗓️ avec les événements islamiques et les Jours blancs
 - **Jeûnes surérogatoires** 🌙 : lundis et jeudis, Jours blancs, Arafat, Achoura et plus, avec des rappels
-- **Boussole Qibla** 🧭 : la direction et la distance de la Kaaba sur une carte, par le chemin le plus court ; déplacez votre repère à votre position exacte, et vérifiez la direction avec le soleil deux fois par an
 - Outils pour le **Ramadan**, **radio islamique** 📻 et les **directs officiels de La Mecque et Médine**
 
 ### ⚙️ Paramètres

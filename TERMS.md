@@ -27,7 +27,6 @@ We grant you a **non-exclusive, non-transferable, revocable license** to use the
 ✅ Read the full Quran  
 ✅ View and reference all Islamic content (Athkar, Asma ul-Husna, etc.)  
 ✅ Set up prayer notifications and reminders  
-✅ View and use the Qibla direction tool  
 ✅ Access your prayer times history  
 
 ### What You Cannot Do
@@ -64,10 +63,6 @@ We grant you a **non-exclusive, non-transferable, revocable license** to use the
 ### Aladhan API
 - Prayer time calculations powered by [Aladhan.com](https://aladhan.com)
 - Subject to [Aladhan's Terms of Service](https://aladhan.com)
-
-### Leaflet & OpenStreetMap
-- Qibla map uses [Leaflet.js](https://leafletjs.com) and [OpenStreetMap](https://www.openstreetmap.org)
-- Subject to their respective licenses (Leaflet: BSD 2-Clause; OSM: ODbL)
 
 ---
 
@@ -135,7 +130,7 @@ We make **no representations or warranties**, express or implied, including:
 
 ### Third-Party Services
 - We are **not responsible** for:
-  - Downtime or errors from Aladhan API, Google Analytics, GitHub, OpenStreetMap, or audio CDNs
+  - Downtime or errors from Aladhan API, Google Analytics, GitHub, or audio CDNs
   - Data breaches or security incidents at those services
   - Their privacy practices or terms changes
   - Loss of service or functionality if third parties discontinue service

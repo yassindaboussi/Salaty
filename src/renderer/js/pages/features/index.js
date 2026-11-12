@@ -14,7 +14,6 @@ const ROUTES = {
   tasbih: "tasbih",
   asma: "asma",
   "monthly-prayer-times": "monthly-prayer-times",
-  qibla: "qibla",
   calendar: "hijri-calendar",
   ramadhan: "ramadan",
   fasting: "fasting",

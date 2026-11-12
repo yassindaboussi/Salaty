@@ -15,13 +15,11 @@ const PAGES_DIR = path.join(RENDERER_DIR, "pages");
 
 // Sites a link inside the app may open in the user's browser.
 // github.com: the project; sunnah.com: the hadith references of the Sunnah fasting page;
-// www.youtube.com: the Haramain live channels ("Open on YouTube");
-// www.openstreetmap.org: the Qibla map's copyright notice
+// www.youtube.com: the Haramain live channels ("Open on YouTube")
 const EXTERNAL_HOSTS = new Set([
   "github.com",
   "sunnah.com",
   "www.youtube.com",
-  "www.openstreetmap.org",
   "commons.wikimedia.org", // sources of the adhan recordings
 ]);
 
@@ -86,24 +84,12 @@ function applySecurityRules() {
     ses.setPermissionCheckHandler((_wc, permission) =>
       ALLOWED_PERMISSIONS.has(permission),
     );
-    // Both sites ask who is calling; app:// pages say nothing. One listener only: a session
-    // keeps the last onBeforeSendHeaders it was given.
-    // - YouTube's embedded player wants the embedding site (the Referer, YouTube API terms),
-    //   or it shows "Error 153": the Haramain live page's player says it is Salaty.
-    // - OpenStreetMap's tile servers want an app to name itself in its User-Agent, or they
-    //   may block it (https://operations.osmfoundation.org/policies/tiles/): the Qibla map.
-    const tileAgent = `SalatyTime/${app.getVersion()} (+${APP_HOMEPAGE})`;
+    // YouTube's embedded player wants the embedding site (the Referer, YouTube API terms),
+    // or it shows "Error 153": the Haramain live page's player says it is Salaty.
     ses.webRequest.onBeforeSendHeaders(
-      {
-        urls: [
-          "https://www.youtube-nocookie.com/embed/*",
-          "https://tile.openstreetmap.org/*",
-        ],
-      },
-      ({ url, requestHeaders, resourceType }, callback) => {
-        if (url.startsWith("https://tile.openstreetmap.org/")) {
-          requestHeaders["User-Agent"] = tileAgent;
-        } else if (resourceType === "subFrame" && !requestHeaders.Referer) {
+      { urls: ["https://www.youtube-nocookie.com/embed/*"] },
+      ({ requestHeaders, resourceType }, callback) => {
+        if (resourceType === "subFrame" && !requestHeaders.Referer) {
           requestHeaders.Referer = APP_HOMEPAGE;
         }
         callback({ requestHeaders });
