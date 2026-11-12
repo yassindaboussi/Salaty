@@ -28,7 +28,6 @@ const ADHAN_VOICES = Object.freeze([
       "https://commons.wikimedia.org/wiki/File:33937_ejaz215_call-to-prayer-from-the-prophet-s-mo.ogg",
     licence: "CC BY 3.0",
   },
-  { id: "algiers", file: "algiers.mp3", seconds: 173 },
   {
     id: "aleppo",
     file: "aleppo.mp3",

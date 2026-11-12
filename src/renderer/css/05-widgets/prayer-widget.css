@@ -131,6 +131,16 @@ body {
   white-space: nowrap;
 }
 
+/* Arabic letters are shorter and their dots need room: bigger name, looser lines (still fits 40px) */
+[dir="rtl"] .pw-col {
+  padding-block: 1px;
+  line-height: 1.3;
+}
+
+[dir="rtl"] .pw-col-name {
+  font-size: 11px;
+}
+
 .pw-col-time {
   font-size: 12px;
   font-weight: 600;
