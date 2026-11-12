@@ -28,7 +28,6 @@ const POLICY = {
     "'self'",
     "data:",
     "blob:",
-    "https://tile.openstreetmap.org", // Qibla: the map's tiles
     // Audio Archive, Tadabor: the videos' pictures (server18 redirects to the cdn)
     "https://server18.mp3quran.net",
     "https://cdn.mp3quran.net",
@@ -41,7 +40,6 @@ const POLICY = {
     "https://mp3quran.net",
     "https://www.mp3quran.net", // mp3quran.net/api redirects here
     "https://countriesnow.space",
-    "https://photon.komoot.io", // Qibla: city -> coordinates
   ],
   // Quran recitations and radio streams come from many hosts, but always over HTTPS
   "media-src": ["'self'", "https:", "blob:"],

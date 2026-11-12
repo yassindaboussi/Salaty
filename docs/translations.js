@@ -6,7 +6,7 @@ const translations = {
 
         // Hero Section
         'hero.title': 'Never Miss a Prayer',
-        'hero.subtitle': 'Accurate Islamic prayer times, beautiful Adhan notifications, and Qibla direction - all in one elegant desktop app',
+        'hero.subtitle': 'Accurate Islamic prayer times and beautiful Adhan notifications - all in one elegant desktop app',
         'hero.download': 'Download Now',
         'hero.learn': 'Learn More',
 
@@ -24,8 +24,6 @@ const translations = {
         'features.times.desc': 'Get precise prayer times for your location using multiple calculation methods including MWL, ISNA, and Umm al-Qura',
         'features.adhan.title': 'Adhan Notifications',
         'features.adhan.desc': 'Beautiful audio notifications with authentic Adhan recitations. Customize volume and choose your favorite muezzin',
-        'features.qibla.title': 'Qibla Direction',
-        'features.qibla.desc': 'Find the precise direction to the Kaaba from anywhere in the world with our interactive Qibla compass',
         'features.hijri.title': 'Hijri Calendar',
         'features.hijri.desc': 'View the Islamic calendar with accurate Hijri dates and important Islamic events',
         'features.design.title': 'Beautiful Design',
@@ -73,7 +71,7 @@ const translations = {
 
         // Hero Section
         'hero.title': 'Ne Manquez Plus Aucune Prière',
-        'hero.subtitle': 'Horaires de prière islamiques précis, belles notifications Adhan et direction de la Qibla - tout dans une application de bureau élégante',
+        'hero.subtitle': 'Horaires de prière islamiques précis et belles notifications Adhan - tout dans une application de bureau élégante',
         'hero.download': 'Télécharger Maintenant',
         'hero.learn': 'En Savoir Plus',
 
@@ -91,8 +89,6 @@ const translations = {
         'features.times.desc': 'Obtenez des horaires de prière précis pour votre emplacement en utilisant plusieurs méthodes de calcul dont MWL, ISNA et Umm al-Qura',
         'features.adhan.title': 'Notifications Adhan',
         'features.adhan.desc': 'Belles notifications audio avec des récitations Adhan authentiques. Personnalisez le volume et choisissez votre muezzin préféré',
-        'features.qibla.title': 'Direction de la Qibla',
-        'features.qibla.desc': 'Trouvez la direction précise vers la Kaaba depuis n\'importe où dans le monde avec notre boussole Qibla interactive',
         'features.hijri.title': 'Calendrier Hégirien',
         'features.hijri.desc': 'Consultez le calendrier islamique avec des dates hégiriennes précises et les événements islamiques importants',
         'features.design.title': 'Design Magnifique',
@@ -140,7 +136,7 @@ const translations = {
 
         // Hero Section
         'hero.title': 'لن تفوتك صلاة بعد الآن',
-        'hero.subtitle': 'مواقيت الصلاة الإسلامية الدقيقة، إشعارات الأذان الجميلة، واتجاه القبلة - كل ذلك في تطبيق سطح مكتب أنيق',
+        'hero.subtitle': 'مواقيت الصلاة الإسلامية الدقيقة وإشعارات الأذان الجميلة - كل ذلك في تطبيق سطح مكتب أنيق',
         'hero.download': 'حمّل الآن',
         'hero.learn': 'اعرف المزيد',
 
@@ -158,8 +154,6 @@ const translations = {
         'features.times.desc': 'احصل على مواقيت صلاة دقيقة لموقعك باستخدام طرق حساب متعددة بما في ذلك رابطة العالم الإسلامي وإسنا وأم القرى',
         'features.adhan.title': 'إشعارات الأذان',
         'features.adhan.desc': 'إشعارات صوتية جميلة مع تلاوات أذان أصلية. خصص مستوى الصوت واختر مؤذنك المفضل',
-        'features.qibla.title': 'اتجاه القبلة',
-        'features.qibla.desc': 'اعثر على الاتجاه الدقيق للكعبة من أي مكان في العالم مع بوصلة القبلة التفاعلية',
         'features.hijri.title': 'التقويم الهجري',
         'features.hijri.desc': 'شاهد التقويم الإسلامي بتواريخ هجرية دقيقة والأحداث الإسلامية المهمة',
         'features.design.title': 'تصميم جميل',

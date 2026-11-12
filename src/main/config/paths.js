@@ -33,7 +33,6 @@ const PAGE_GROUPS = Object.freeze({
     "tasbih",
     "ramadan",
     "fasting",
-    "qibla",
     "hijri-calendar",
     "monthly-prayer-times",
   ],

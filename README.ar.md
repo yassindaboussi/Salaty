@@ -57,7 +57,7 @@
 <img src="docs/screenshots/ar/index.webp" width="49%" alt="مواقيت الصلاة" />
 <img src="docs/screenshots/ar/features.webp" width="49%" alt="جميع المزايا" />
 <br/>
-<img src="docs/screenshots/ar/qibla.webp" width="49%" alt="محدد القبلة" />
+<img src="docs/screenshots/ar/settings.webp" width="49%" alt="الإعدادات" />
 <img src="docs/screenshots/ar/athkar.webp" width="49%" alt="الأذكار" />
 <br/>
 <img src="docs/screenshots/ar/tasbih.webp" width="49%" alt="التسبيح" />
@@ -65,8 +65,6 @@
 <br/>
 <img src="docs/screenshots/ar/albums.webp" width="49%" alt="أرشيف الصوتيات" />
 <img src="docs/screenshots/ar/quran.webp" width="49%" alt="القرآن الكريم" />
-<br/>
-<img src="docs/screenshots/ar/settings.webp" width="49%" alt="الإعدادات" />
 </div>
 
 ---
@@ -108,7 +106,6 @@
 - **أسماء الله الحسنى** 🌟 مع الآيات التي وردت فيها
 - **التقويم الهجري** 🗓️ مع المناسبات الإسلامية والأيام البيض
 - **صيام السنة** 🌙: الاثنين والخميس، والأيام البيض، وعرفة، وعاشوراء وغيرها، مع تذكيرات
-- **محدد القبلة** 🧭: الاتجاه والمسافة إلى الكعبة على خريطة، على أقصر طريق؛ اسحب علامتك إلى مكانك بدقة، وتحقّق من الاتجاه بالشمس مرتين في السنة
 - أدوات **رمضان**، و**إذاعات إسلامية** 📻، و**البث المباشر الرسمي من مكة والمدينة**
 
 ### ⚙️ الإعدادات

@@ -94,10 +94,6 @@ function livestreamSwitch(streamKey) {
   track("livestream_switch", { stream: streamKey });
 }
 
-function qiblaLocationResolved(source) {
-  track("qibla_location_resolved", { source });
-}
-
 function ramadanTabSwitch(tabName) {
   track("ramadan_tab_switch", { tab_name: tabName });
 }
@@ -154,8 +150,6 @@ module.exports = {
   athkarCategoryCompleted,
 
   livestreamSwitch,
-
-  qiblaLocationResolved,
 
   fastingReminderToggled,
   sunnahFastMarked,

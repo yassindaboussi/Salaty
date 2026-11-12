@@ -10,7 +10,7 @@
 
 Salaty Time ("App", "we", "us", "our") is a lightweight Electron-based Islamic prayer times desktop application. This Privacy Policy explains how we collect, use, disclose, and safeguard your information.
 
-**Our Core Commitment:** We believe privacy is a right. The App is designed to operate **offline-first** — you never *have* to share personal data with us. All prayer times, Quran content, Athkar reminders, and Qibla calculations work on your computer without sending anything to our servers.
+**Our Core Commitment:** We believe privacy is a right. The App is designed to operate **offline-first** — you never *have* to share personal data with us. All prayer times, Quran content and Athkar reminders work on your computer without sending anything to our servers.
 
 ---
 
@@ -23,7 +23,6 @@ Salaty Time ("App", "we", "us", "our") is a lightweight Electron-based Islamic p
    - These locations are stored **only on your device**
    - They are **never sent to us** — only to the [Aladhan API](https://aladhan.com) to calculate prayer times
    - Once per city, the app sends the city name to [Open-Meteo](https://open-meteo.com) to find its coordinates, so prayer times can still be calculated on your device when Aladhan can't be reached
-   - The Qibla page sends your city and country to [Photon](https://photon.komoot.io) (OpenStreetMap) to find its coordinates (if it can't, [ipapi.co](https://ipapi.co) guesses them from your IP address), and loads [OpenStreetMap](https://www.openstreetmap.org) map tiles
    - **Auto Detect Location** (only when you press it) asks [freeipapi.com](https://freeipapi.com) to guess your city from your IP address
    - All of these requests use encrypted HTTPS connections
    - You can delete this at any time via Settings
@@ -96,13 +95,7 @@ The App communicates with external services **only when you interact with them:*
    - Data received: the city's coordinates, kept only on your device
    - Open-Meteo's terms: see [open-meteo.com/en/terms](https://open-meteo.com/en/terms)
 
-3. **[Leaflet.js](https://leafletjs.com/) & [OpenStreetMap](https://www.openstreetmap.org/)**
-   - Qibla direction map (interactive)
-   - Triggered when: you open the Qibla feature
-   - Data sent: none (map tiles are cached)
-   - Leaflet and OSM have their own privacy policies
-
-4. **[Google Analytics 4](https://policies.google.com/privacy)**
+3. **[Google Analytics 4](https://policies.google.com/privacy)**
    - Optional analytics (see Analytics section above)
    - Events sent only when online
    - Google's privacy policy applies to GA4 data
@@ -155,7 +148,7 @@ The App communicates with external services **only when you interact with them:*
    - Build and run your own version if you wish
 
 5. **Minimal Dependencies**
-   - We use only essential libraries (Electron, Leaflet, Howler.js)
+   - We use only essential libraries (Electron, Howler.js)
    - No invasive SDKs or tracking bloat
    - Regular dependency updates for security patches
 
@@ -172,7 +165,6 @@ Data is shared only in these scenarios:
    - Open-Meteo (city coordinates)
    - Google Analytics (optional analytics)
    - GitHub (update checks)
-   - OpenStreetMap (Qibla map)
 
 2. **Legal Compliance**
    - If required by law, court order, or government request

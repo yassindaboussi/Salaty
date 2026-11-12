@@ -55,7 +55,7 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 <img src="docs/screenshots/en/index.webp" width="49%" alt="Prayer times" />
 <img src="docs/screenshots/en/features.webp" width="49%" alt="All features" />
 <br/>
-<img src="docs/screenshots/en/qibla.webp" width="49%" alt="Qibla finder" />
+<img src="docs/screenshots/en/settings.webp" width="49%" alt="Settings" />
 <img src="docs/screenshots/en/athkar.webp" width="49%" alt="Athkar" />
 <br/>
 <img src="docs/screenshots/en/tasbih.webp" width="49%" alt="Tasbih" />
@@ -63,8 +63,6 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 <br/>
 <img src="docs/screenshots/en/albums.webp" width="49%" alt="Audio archive" />
 <img src="docs/screenshots/en/quran.webp" width="49%" alt="Holy Quran" />
-<br/>
-<img src="docs/screenshots/en/settings.webp" width="49%" alt="Settings" />
 </div>
 
 ---
@@ -106,7 +104,6 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 - **The 99 Names of Allah** 🌟 with the verses they come from
 - **Hijri calendar** 🗓️ with Islamic events and the White Days
 - **Sunnah fasting** 🌙: Mondays and Thursdays, the White Days, Arafah, Ashura and more, with reminders
-- **Qibla finder** 🧭: the direction and distance to the Kaaba on a map, along the shortest route; drag your marker to your exact place, and check the direction with the sun twice a year
 - **Ramadan** tools, **Muslim radio** 📻 and the official **live streams from Makkah and Madinah**
 
 ### ⚙️ Settings
