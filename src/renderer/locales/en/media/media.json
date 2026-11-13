@@ -119,5 +119,6 @@
   "tafsirPanelShow": "Show the parts",
   "tafsirPanelHide": "Hide the parts",
   "tafsirParts": "Parts: {count}",
-  "acContinueWatching": "Continue watching"
+  "acContinueWatching": "Continue watching",
+  "acOpenList": "Open the surahs"
 }

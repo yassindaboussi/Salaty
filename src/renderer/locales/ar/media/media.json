@@ -119,5 +119,6 @@
   "tafsirPanelShow": "إظهار الأجزاء",
   "tafsirPanelHide": "إخفاء الأجزاء",
   "tafsirParts": "الأجزاء: {count}",
-  "acContinueWatching": "متابعة المشاهدة"
+  "acContinueWatching": "متابعة المشاهدة",
+  "acOpenList": "فتح السور"
 }
