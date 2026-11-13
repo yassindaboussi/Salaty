@@ -153,6 +153,7 @@ function renderTadaborContinue() {
       started: true,
       video: entry.mode === "video",
       action: "tadabor-continue",
+      url: entry.url,
     }),
   );
 }

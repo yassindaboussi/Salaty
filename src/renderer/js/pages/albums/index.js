@@ -25,6 +25,7 @@ const { followPlayer, onPlayingChange } = require("./continue");
 const {
   renderReciteContinue,
   continueRecitation,
+  openReciteList,
 } = require("./recite-continue");
 
 const TABS = {
@@ -118,6 +119,8 @@ function bindLists() {
     const retry = button.dataset.retry;
     if (button.dataset.action === "recite-continue") {
       continueRecitation();
+    } else if (button.dataset.action === "recite-open") {
+      openReciteList();
     } else if (retry) {
       const tab = retry === "reciters" ? "recite" : retry;
       TABS[tab].load();
