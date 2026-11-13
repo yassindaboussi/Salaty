@@ -223,7 +223,12 @@
 
   .ac-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+
+    /* at most 4 per row: each column is at least a quarter of the row */
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(max(230px, calc((100% - 3 * 8px) / 4)), 1fr)
+    );
     gap: 8px;
     margin: 0;
     padding: 0 2px 2px;
