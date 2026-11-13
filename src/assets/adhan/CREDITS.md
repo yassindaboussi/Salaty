@@ -17,10 +17,13 @@ The voices in Settings → Notifications → Adhan voice. Each file was cut at t
 
 ## Voice reminders (`voice/`)
 
-Settings → Notifications → Voice reminder and Hadith after the adhan.
+Settings → Notifications → Voice reminders. Voices generated with [Grok](https://grok.com) by xAI: the
+user owns the output and may use it commercially ([xAI FAQ](https://x.ai/legal/faq)). Saved as mono MP3,
+96 kbps, with no other change.
 
-- `near-fajr.mp3` … `near-isha.mp3`: "اقتربت صلاة …", one per prayer. Made for this app with
-  [SILMA TTS v1](https://huggingface.co/silma-ai/silma-tts) ([Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)),
-  using a voice sample from the [ClArTTS](https://huggingface.co/datasets/MBZUAI/ClArTTS) dataset by MBZUAI
-  ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)). Light EQ, compression, -16 LUFS, mono MP3 96 kbps.
-- `hadith-before.mp3`, `hadith-after.mp3`: short hadith audio. Source unknown. Mono MP3 96 kbps.
+- `near-fajr.mp3` … `near-isha.mp3`: "اقتربت صلاة …", one per prayer.
+- `hadith-before.mp3`: «صلاةُ الجماعةِ أفضلُ من صلاةِ الفذِّ بسبعٍ وعشرينَ درجةً», agreed upon:
+  [Sahih Muslim 650](https://sunnah.com/muslim:650a) (this wording) and
+  [Sahih al-Bukhari 645](https://sunnah.com/bukhari:645).
+- `hadith-after.mp3`: «مَنْ قَالَ حِينَ يَسْمَعُ النِّدَاءَ: اللَّهُمَّ رَبَّ هَذِهِ الدَّعْوَةِ التَّامَّةِ… حَلَّتْ لَهُ شَفَاعَتِي يَوْمَ الْقِيَامَةِ».
+  [Sahih al-Bukhari 614](https://sunnah.com/bukhari:614).
