@@ -87,8 +87,10 @@ function setupHeaderButtons() {
  * @param {string}  [options.feature]    name recorded as "feature opened" (usage statistics)
  * @param {boolean} [options.awaitInit]  wait for init before showing the page (the home page
  *                                       reveals itself as soon as its frame is ready)
- * @param {boolean} [options.miniPlayer] show the floating mini player (pages with their own
- *                                       player controls turn it off)
+ * @param {boolean} [options.miniPlayer] show the title bar mini player (the playlist page, the
+ *                                       player itself, turns it off)
+ * @param {string}  [options.ownPlayerFor] what this page plays and shows in its own panel
+ *                                       ("radio"): the mini player hides for that only
  */
 async function startPage({
   init,
@@ -96,6 +98,7 @@ async function startPage({
   feature,
   awaitInit = false,
   miniPlayer = true,
+  ownPlayerFor,
 }) {
   try {
     // before the first await: listening by the time the page finishes loading
@@ -118,7 +121,7 @@ async function startPage({
     else init();
     revealPage();
 
-    if (miniPlayer) setupMiniPlayer();
+    if (miniPlayer) setupMiniPlayer(ownPlayerFor);
     initTooltipSystem();
 
     ipcRenderer.send("app-ready");

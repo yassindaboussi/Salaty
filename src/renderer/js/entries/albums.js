@@ -7,5 +7,4 @@ startPageWhenReady({
   init: initAlbumsPage,
   screenSize: "albums-container",
   feature: "albums",
-  miniPlayer: false,
 });
