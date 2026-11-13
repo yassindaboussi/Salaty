@@ -1,62 +1,104 @@
-/* Mini Player Styles - Injected globally or used in layout */
-.mini-player {
-  position: fixed;
-  top: 60px; /* Under Header */
-  left: 50%;
-  width: 60%;
-  max-width: 500px;
-  background: var(--bg-surface);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(var(--accent-rgb), 0.2);
-  border-radius: 0 0 12px 12px;
-  padding: 8px 16px;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 4px 12px var(--black-a20);
-  z-index: var(--z-floating);
+/*
+  Mini player: what plays, in the title bar (js/components/mini-player.js puts it there), so it
+  never covers the page. Wide windows: in the exact middle of the title bar, like the
+  now-playing block of desktop music apps; the page title gives way (cut with "…").
+  Narrow windows: between the title and the window buttons, with fewer controls.
+  Windows title bar guidance: buttons may sit in the title bar; its empty space and text keep
+  dragging the window (https://learn.microsoft.com/windows/apps/develop/title-bar). So the
+  player box itself stays part of the drag area and only its buttons are no-drag (window.css).
 
-  /* Fully removed from the render tree by default — not just invisible.
-     Electron's own docs note that draggable regions "ignore all pointer
-     events," meaning drag-region hit-testing operates independently of
-     pointer-events/opacity/visibility. display:none is the only thing
-     that guarantees this element can never contribute a phantom drag
-     region or swallow clicks/hover when it's supposed to be inert,
-     since there's simply no box there at all for any hit-testing system
-     to find. -webkit-app-region: no-drag also applies even while
-     visible, so this widget's own background never doubles as an
-     accidental window-drag handle. */
-  display: none;
-  opacity: 0;
-  transform: translateX(-50%) translateY(-100%);
-  transition:
-    transform 0.3s ease,
-    opacity 0.3s ease;
-  -webkit-app-region: no-drag;
+  Removed from the render tree when nothing plays (display: none, not just invisible): a
+  hidden box must never leave a no-drag hole or swallow clicks.
+*/
+.page-header,
+.window-controls,
+.mini-player {
+  --mini-width: 340px;
 }
 
+.mini-player {
+  display: none;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  max-width: var(--mini-width);
+  height: 40px;
+  margin-inline: auto;
+  padding-inline: 14px 6px;
+  background: var(--bg-surface);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px var(--black-a20);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  user-select: none;
+}
+
+/* fades in when shown (@starting-style: from display none, no script timing involved) */
 .mini-player.visible {
   display: flex;
+  opacity: 1;
+
+  @starting-style {
+    opacity: 0;
+  }
 }
 
-.mini-player.visible.active {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+/* wide windows: centred on the title bar row, whatever the title's length */
+@media (width > 768px) {
+  .page-header > .mini-player,
+  .draggable-header-space > .mini-player {
+    position: absolute;
+    inset-block: 0;
+    left: 50%;
+    width: var(--mini-width);
+    margin: auto 0; /* centred on the row height too */
+    transform: translateX(-50%);
+  }
+
+  /* the page header row ends above its bottom padding (under the border line) */
+  .page-header > .mini-player {
+    inset-block-end: var(--space-3);
+  }
+
+  /* the title stops before the player (back button 40 + gap 12 + air 12) */
+  .page-header:has(> .mini-player.visible) .page-header__title {
+    max-width: calc(50% - var(--mini-width) / 2 - 64px);
+  }
+}
+
+/* home page (narrow): the player in the empty space between the buttons */
+.draggable-header-space:has(.mini-player.visible) {
+  display: flex;
+  align-items: center;
+  min-width: 0;
 }
 
 .mini-track-info {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.mini-track-title,
+.mini-track-artist {
+  white-space: nowrap;
   overflow: hidden;
-  margin-inline-end: 12px;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+[dir="rtl"] :is(.mini-track-title, .mini-track-artist) {
+  text-align: right;
 }
 
 .mini-track-title {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--text-bright);
 }
 
 .mini-track-artist {
@@ -66,8 +108,9 @@
 
 .mini-controls {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
-  gap: 12px;
+  gap: 2px;
 }
 
 .mini-btn {
@@ -75,14 +118,16 @@
   border: none;
   color: var(--text-primary);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   width: 28px;
   height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition:
+    background 0.2s,
+    filter 0.2s;
 }
 
 /* previous / next ayah at the first or last ayah of a surah */
@@ -95,34 +140,47 @@
   background: var(--surface-3);
 }
 
+/* the main action stands out: a round accent button, a bit bigger */
 .mini-play-btn {
+  width: 30px;
+  height: 30px;
+  margin-inline: 2px;
   background: var(--accent-color);
   color: var(--text-bright);
 }
 
-.mini-play-btn:hover {
+.mini-play-btn:hover:not(:disabled) {
   background: var(--accent-color);
-  filter: brightness(1.1);
+  filter: brightness(1.12);
 }
 
+/* close: quieter, apart from the playback buttons */
 .mini-close-btn {
   margin-inline-start: 4px;
-  opacity: 0.6;
-  font-size: 12px;
+  color: var(--text-secondary);
+  font-size: 11px;
 }
 
-.mini-close-btn:hover {
-  opacity: 1;
+.mini-close-btn:hover:not(:disabled) {
   background: rgba(244, 67, 54, 0.15);
   color: var(--red-500);
 }
 
-/* Arabic: the previous/next arrows point the other way. Flipping the icon (not the
-   button) reverses the arrow without changing click targets or layout. */
-[dir="rtl"] .mini-prev-btn i,
-[dir="rtl"] .mini-next-btn i {
-  display: inline-block;
-  transform: scaleX(-1);
+/* narrower windows: the surah only, then play / close only */
+@media (width <= 700px) {
+  .mini-player {
+    height: 36px;
+  }
+
+  .mini-track-artist {
+    display: none;
+  }
+}
+
+@media (width <= 560px) {
+  .mini-player :is(.mini-prev-btn, .mini-next-btn, .mini-playlist-btn) {
+    display: none;
+  }
 }
 
 /* A page that shows its own player for what plays (the Quran reader's bar) hides this one */
