@@ -15,5 +15,6 @@
   "featHintToday": "اليوم: {date}",
   "featHintRamadanIn": "رمضان {when}",
   "featHintRamadanDay": "اليوم {day} من رمضان",
-  "moreFeaturesComingSoon": "المزيد من المزايا قريباً، إن شاء الله"
+  "featuresMissingFeature": "تفتقد ميزة؟",
+  "featuresSuggestOne": "اقترحها علينا"
 }

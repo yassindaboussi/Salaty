@@ -15,5 +15,6 @@
   "featHintToday": "Today: {date}",
   "featHintRamadanIn": "Ramadan {when}",
   "featHintRamadanDay": "Day {day} of Ramadan",
-  "moreFeaturesComingSoon": "More features coming soon, In Sha Allah"
+  "featuresMissingFeature": "Missing a feature?",
+  "featuresSuggestOne": "Suggest one"
 }
