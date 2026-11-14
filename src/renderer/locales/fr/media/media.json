@@ -119,5 +119,6 @@
   "tafsirPanelShow": "Afficher les parties",
   "tafsirPanelHide": "Masquer les parties",
   "tafsirParts": "Parties : {count}",
-  "acContinueWatching": "Reprendre la vidéo"
+  "acContinueWatching": "Reprendre la vidéo",
+  "acOpenList": "Ouvrir les sourates"
 }

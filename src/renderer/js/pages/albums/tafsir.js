@@ -160,6 +160,7 @@ function renderContinue() {
       playing: playingNow() === url,
       started: Boolean(stopped),
       action: "continue",
+      url,
     })}`,
   );
 }

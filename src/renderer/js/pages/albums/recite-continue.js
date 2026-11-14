@@ -10,6 +10,7 @@ const { byId } = require("../../core/dom");
 const { html, setHtml } = require("../../utils/html");
 const { state } = require("./state");
 const { playingNow, playFrom, pause, continueHtml } = require("./continue");
+const { openAlbum } = require("./open-album");
 
 const box = () => byId("acReciteContinue", HTMLElement);
 
@@ -33,8 +34,30 @@ function renderReciteContinue() {
       playing: playingNow() === entry.url,
       started: true,
       action: "recite-continue",
+      url: entry.url,
+      open: "recite-open",
     }),
   );
+}
+
+/** The recitation the card comes from, as the playlist page opens it.
+ * @param {any} entry @returns {any} */
+const albumOf = (entry) => ({
+  source: "mp3quran",
+  id: `${entry.reciterId}-continue`,
+  title: entry.reciterName,
+  artist: entry.moshafName,
+  icon: "fas fa-microphone-lines",
+  reciterId: entry.reciterId,
+  reciterName: entry.reciterName,
+  server: entry.server,
+  surahList: entry.surahList,
+});
+
+/** The card itself: the reciter's surahs (the playlist page), to pick another one. */
+function openReciteList() {
+  const entry = getResume("recite");
+  if (entry) openAlbum(albumOf(entry));
 }
 
 async function continueRecitation() {
@@ -66,21 +89,11 @@ async function continueRecitation() {
       tracks.map((track) => ({ ...track, reciterId: entry.reciterId, resume })),
       index,
       tracks[index]?.url === entry.url ? entry.time : 0,
-      {
-        source: "mp3quran",
-        id: `${entry.reciterId}-continue`,
-        title: entry.reciterName,
-        artist: entry.moshafName,
-        icon: "fas fa-microphone-lines",
-        reciterId: entry.reciterId,
-        reciterName: entry.reciterName,
-        server: entry.server,
-        surahList: entry.surahList,
-      },
+      albumOf(entry),
     );
   } catch (error) {
     console.error("Failed to continue the recitation:", error);
   }
 }
 
-module.exports = { renderReciteContinue, continueRecitation };
+module.exports = { renderReciteContinue, continueRecitation, openReciteList };

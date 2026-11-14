@@ -69,12 +69,50 @@
     background: var(--surface-3);
   }
 
+  /* Recitations: the card itself opens the reciter's surahs (› at its end, like a list row) */
+  .ac-continue-open {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-block: -8px;
+    margin-inline-end: -8px;
+    padding: 8px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .ac-continue-open:hover {
+    background: var(--surface-1);
+  }
+
+  .ac-continue-chevron {
+    flex-shrink: 0;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  [dir="rtl"] .ac-continue-chevron {
+    transform: scaleX(-1);
+  }
+
+  .ac-continue-open:hover .ac-continue-chevron {
+    color: var(--text-primary);
+  }
+
   .ac-continue-text {
     flex: 1;
     min-width: 0;
   }
 
-  .ac-continue-text p {
+  .ac-continue-text > span {
+    display: block;
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
