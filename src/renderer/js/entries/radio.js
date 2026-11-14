@@ -7,5 +7,5 @@ startPageWhenReady({
   init: initRadioPage,
   screenSize: "radio-container",
   feature: "radio",
-  miniPlayer: false, // the panel is the player here
+  ownPlayerFor: "radio", // its panel is the player for a radio; a surah keeps the mini player
 });

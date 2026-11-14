@@ -4,7 +4,10 @@ const { hideTooltip } = require("../core/tooltips");
 const { html, setHtml } = require("../utils/html");
 const { bindQuranMiniPlayer } = require("./mini-player-quran");
 
-function setupMiniPlayer() {
+/**
+ * @param {string} [ownPlayerFor] what the page shows in its own panel ("radio"): hidden for that
+ */
+function setupMiniPlayer(ownPlayerFor) {
   const wrap = document.createElement("div");
   wrap.id = "miniPlayer";
   wrap.className = "mini-player";
@@ -51,7 +54,12 @@ function setupMiniPlayer() {
     "tooltipNext",
     "mini-next-btn",
   );
-  const playlistBtn = mkBtn("miniPlaylistBtn", "list", "tooltipPlaylist");
+  const playlistBtn = mkBtn(
+    "miniPlaylistBtn",
+    "list",
+    "tooltipPlaylist",
+    "mini-playlist-btn",
+  );
   const closeBtn = mkBtn(
     "miniCloseBtn",
     "times",
@@ -60,16 +68,31 @@ function setupMiniPlayer() {
   );
   controls.append(prevBtn, playBtn, nextBtn, playlistBtn, closeBtn);
 
+  title.dir = "auto"; // an Arabic surah name inside the left-to-right title bar
+  artist.dir = "auto";
   wrap.append(info, controls);
-  (document.getElementById("app") ?? document.body).appendChild(wrap);
+
+  // The player lives in the title bar, between the title and the window buttons, so it never
+  // covers the page (Windows title bar guidance: buttons may sit in the title bar while its
+  // empty space and text still drag the window). Only its buttons are no-drag.
+  function placeInTitleBar() {
+    const header = [...document.querySelectorAll(".page-header")].find(
+      (h) => h instanceof HTMLElement && h.offsetParent !== null,
+    );
+    const buttons = header?.querySelector(".page-header__controls");
+    if (header && buttons) {
+      if (wrap.nextElementSibling !== buttons)
+        header.insertBefore(wrap, buttons);
+      return;
+    }
+    // the home page: the empty space between its buttons
+    const space = document.querySelector(".draggable-header-space");
+    if (space && wrap.parentElement !== space) space.append(wrap);
+  }
 
   function showMiniPlayer() {
-    if (wrap.classList.contains("visible")) return;
-    wrap.classList.add("visible");
-    // Force layout before adding "active" so the browser actually
-    // animates from the initial (translated-up, transparent) state
-    // instead of jumping straight to the final one.
-    requestAnimationFrame(() => wrap.classList.add("active"));
+    placeInTitleBar();
+    wrap.classList.add("visible"); // fades in by CSS (@starting-style)
   }
 
   function hideMiniPlayer() {
@@ -77,7 +100,7 @@ function setupMiniPlayer() {
     // must apply right away so the element is fully out of the render
     // tree with no window where it could still contribute a phantom
     // drag region or swallow clicks/hover.
-    wrap.classList.remove("active", "visible");
+    wrap.classList.remove("visible");
   }
 
   playBtn.addEventListener("click", () => {
@@ -108,7 +131,9 @@ function setupMiniPlayer() {
     return track ? track.url || `${track.title}|${track.artist}` : null;
   }
   let lastTrackKey = null;
+  let closedAt = 0;
   closeBtn.addEventListener("click", () => {
+    closedAt = Date.now();
     ipcRenderer.send("player-command", { type: "pause" });
     hideTooltip();
     // sessionStorage (not a plain variable) so this survives navigating to
@@ -118,18 +143,30 @@ function setupMiniPlayer() {
     // nothing once you navigated anywhere.
     sessionStorage.setItem("miniPlayerDismissedTrackKey", lastTrackKey || "");
     hideMiniPlayer();
+    window.dispatchEvent(new Event("mini-player-closed")); // e.g. the archive's cards come back
   });
 
   ipcRenderer.on("player-update", (_e, { type, state, currentTime }) => {
     if (type === "time-update") quran.onTime(currentTime || 0);
     if (type !== "state") return;
     lastTrackKey = trackKeyOf(state.currentTrack);
+    // The closed track playing again (its "continue" card, the playlist…) is the user wanting it:
+    // the player comes back. Not in the moment after the ✕ itself, while its pause arrives.
+    if (
+      state.isPlaying &&
+      lastTrackKey === sessionStorage.getItem("miniPlayerDismissedTrackKey") &&
+      Date.now() - closedAt > 1500
+    ) {
+      sessionStorage.removeItem("miniPlayerDismissedTrackKey");
+    }
     const dismissedTrackKey = sessionStorage.getItem(
       "miniPlayerDismissedTrackKey",
     );
     // (a page showing its own player for it hides this one: body.has-own-player, CSS)
     const visible =
-      Boolean(state.currentTrack) && lastTrackKey !== dismissedTrackKey;
+      Boolean(state.currentTrack) &&
+      lastTrackKey !== dismissedTrackKey &&
+      !(ownPlayerFor && state.currentTrack.page === ownPlayerFor);
     if (visible) {
       showMiniPlayer();
     } else {
