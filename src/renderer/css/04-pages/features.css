@@ -205,17 +205,32 @@
   }
 
   .features-footer-text {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-secondary);
-    font-style: italic;
-    opacity: 0.8;
-    background: linear-gradient(
-      135deg,
-      var(--text-secondary),
-      rgba(var(--accent-rgb), 0.8)
-    );
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  }
+
+  /* a button (it opens a window) that reads like a link */
+  .features-suggest-btn {
+    padding: 2px 4px;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, currentcolor 45%, transparent);
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .features-suggest-btn:hover {
+    text-decoration-color: currentcolor;
+  }
+
+  .features-suggest-btn:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
   }
 
   /* Fullscreen mode */

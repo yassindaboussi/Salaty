@@ -10,6 +10,8 @@
     <title data-i18n="islamicFeatures">Features - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/features.css" />
+    <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
+    <link rel="stylesheet" href="../../css/03-components/feedback-dialog.css" />
   </head>
   <body class="page-loading">
     <div class="app-container" id="app">
@@ -344,13 +346,17 @@
         </main>
 
         <footer class="features-footer">
-          <div
-            class="features-footer-text"
-            id="featuresFooterText"
-            data-i18n="moreFeaturesComingSoon"
-          >
-            More features coming soon, In Sha Allah
-          </div>
+          <p class="features-footer-text">
+            <span data-i18n="featuresMissingFeature">Missing a feature?</span>
+            <button
+              type="button"
+              class="features-suggest-btn"
+              id="featuresSuggestBtn"
+              data-i18n="featuresSuggestOne"
+            >
+              Suggest one
+            </button>
+          </p>
         </footer>
       </div>
     </div>

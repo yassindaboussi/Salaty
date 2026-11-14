@@ -5,6 +5,7 @@
 // Hijri date, and how far Ramadan is.
 const { ipcRenderer } = require("electron");
 const { byId } = require("../../core/dom");
+const { openFeedbackDialog } = require("../../components/feedback-dialog");
 const { showHints } = require("./hints");
 
 /** Tile → page it opens. @type {Record<string, string>} */
@@ -44,6 +45,10 @@ function initFeaturesPage() {
     openCard(card);
   });
   showHints();
+  // footer: "Missing a feature? Suggest one" opens the feedback window here, on "A suggestion"
+  byId("featuresSuggestBtn", HTMLButtonElement).addEventListener("click", () =>
+    openFeedbackDialog({ type: "suggestion" }),
+  );
 }
 
 module.exports = { initFeaturesPage };
