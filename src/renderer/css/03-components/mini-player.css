@@ -57,9 +57,14 @@
     transform: translateX(-50%);
   }
 
-  /* the page header row ends above its bottom padding (under the border line) */
+  /* page header: a tab standing on the header's bottom line. Its bottom edge lies on the
+     line (square bottom corners, same line colour), so player and line read as one frame. */
   .page-header > .mini-player {
-    inset-block-end: var(--space-3);
+    inset-block: auto -1px;
+    margin: 0;
+    border-color: var(--border-color);
+    border-radius: 12px 12px 0 0;
+    box-shadow: none;
   }
 
   /* the title stops before the player (back button 40 + gap 12 + air 12) */
