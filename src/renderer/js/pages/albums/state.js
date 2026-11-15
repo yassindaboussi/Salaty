@@ -14,7 +14,7 @@ const FAVORITES_KEY = "favoriteReciters";
  */
 
 const state = {
-  tab: "recite", // "recite" | "tafsir" | "tadabor"
+  tab: "recite", // "recite" | "tafsir" | "tadabor" | "downloads"
   query: "",
   riwaya: "all", // a key of riwaya.js GROUPS, or "all"
   completeOnly: false,
@@ -37,7 +37,7 @@ const state = {
 function loadPrefs() {
   try {
     const prefs = JSON.parse(localStorage.getItem(PREFS_KEY) ?? "{}");
-    if (["recite", "tafsir", "tadabor"].includes(prefs.tab))
+    if (["recite", "tafsir", "tadabor", "downloads"].includes(prefs.tab))
       state.tab = prefs.tab;
     if (typeof prefs.riwaya === "string") state.riwaya = prefs.riwaya;
     state.completeOnly = prefs.completeOnly === true;

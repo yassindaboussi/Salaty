@@ -25,6 +25,13 @@ const {
   CUSTOM_URL_PATH,
   customAdhanFile,
 } = require("../services/adhan-voices");
+const downloads = require("../services/quran-downloads/folder");
+const { Readable } = require("stream");
+
+// The downloaded audio (services/quran-downloads/), outside src/:
+//   app://salaty/offline-audio/<album>/<file>   e.g. 123-45/001.mp3, tafsir-1/002-1-25.mp3
+// (folder.js checks the album key and the file name)
+const OFFLINE_AUDIO_RE = /^\/offline-audio\/([\w-]{1,30})\/([\w.-]{1,30})$/;
 
 // What the pages may load, as paths under src/: their own folder, the images and the adhan
 // voices. Also one file outside src/: the user's own adhan (services/adhan-voices.js).
@@ -66,6 +73,8 @@ function resolveAppFile(url) {
   if (u.protocol !== `${APP_SCHEME}:` || u.host !== APP_HOST) return null;
   if (pathname.includes("\0")) return null;
   if (pathname === CUSTOM_URL_PATH) return customAdhanFile();
+  const offline = OFFLINE_AUDIO_RE.exec(pathname);
+  if (offline) return downloads.filePath(offline[1], offline[2]);
 
   const file = path.resolve(SRC_DIR, `.${pathname}`);
   const rel = path.relative(SRC_DIR, file);
@@ -133,8 +142,8 @@ function handleAppScheme() {
         if (!range) {
           return new Response(res.body, { status: res.status, headers });
         }
-        // The file loader ignores Range: send the part ourselves (readFile also reads
-        // inside app.asar; the only file seeked in is the 4 MB adhan).
+        // The file loader ignores Range: send the part ourselves. A file inside app.asar
+        // (the adhan) is read whole; a downloaded surah (up to ~150 MB) is streamed.
         await res.body?.cancel();
         if (range === "unsatisfiable") {
           return new Response(null, {
@@ -145,10 +154,17 @@ function handleAppScheme() {
         const [first, last] = range;
         headers.set("Content-Range", `bytes ${first}-${last}/${stat.size}`);
         headers.set("Content-Length", String(last - first + 1));
-        const body =
-          request.method === "HEAD"
-            ? null
-            : (await fs.promises.readFile(file)).subarray(first, last + 1);
+        const inAsar = file.includes(`.asar${path.sep}`);
+        let body = null;
+        if (request.method !== "HEAD") {
+          body = inAsar
+            ? (await fs.promises.readFile(file)).subarray(first, last + 1)
+            : /** @type {any} */ (
+                Readable.toWeb(
+                  fs.createReadStream(file, { start: first, end: last }),
+                )
+              );
+        }
         return new Response(body, { status: 206, headers });
       } catch (err) {
         log.warn("serving failed:", request.url, err.message);

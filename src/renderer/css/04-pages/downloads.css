@@ -1,0 +1,344 @@
+@layer pages {
+  /* Downloaded recitations: the playlist's surah buttons and "Download all" bar
+     (js/pages/playlist/downloads.js), the archive's Downloads tab (js/pages/albums/downloads.js)
+     and Settings → Downloads & storage (js/pages/settings/storage.js). Buttons are the square
+     icon-style buttons of the other pages; done / progress are white, not accent (themes). */
+
+  /* ── Playlist: one row = the surah + its download button ─────────────── */
+
+  .pl-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pl-row .pl-track {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .pl-track:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+
+  .pl-track:disabled:hover {
+    background: none;
+  }
+
+  .pl-dl,
+  .pl-dl-btn {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 32px;
+    height: 32px;
+    padding-inline: 8px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  /* one column: every row's button the same width, whatever it shows */
+  .pl-dl {
+    width: 84px;
+  }
+
+  .pl-dl:disabled,
+  .pl-dl-btn:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+
+  .pl-dl:hover:not(:disabled),
+  .pl-dl-btn:hover:not(:disabled) {
+    background: var(--surface-3);
+    color: var(--text-primary);
+  }
+
+  .pl-dl-btn[hidden] {
+    display: none;
+  }
+
+  .pl-dl-size {
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pl-dl[data-state="done"] {
+    color: var(--text-primary);
+  }
+
+  .pl-dl[data-state="failed"] {
+    color: var(--red-500);
+  }
+
+  /* a determinate ring (not a spinner): --p is the percent */
+  .pl-dl-ring {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: conic-gradient(
+      var(--text-primary) var(--p, 0%),
+      var(--white-a20) 0
+    );
+    mask: radial-gradient(circle, transparent 4.5px, #000 5px);
+  }
+
+  /* ── Playlist: the bar above the list ────────────────────────────────── */
+
+  /* the title on one side, the download action at the end of the same row (the header
+     actions of desktop music apps); under the title when the row is too narrow */
+  .pl-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+
+  .pl-head-text {
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+
+  .pl-dl-bar {
+    display: flex;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-inline-start: auto;
+  }
+
+  .pl-dl-bar[hidden] {
+    display: none;
+  }
+
+  .pl-dl-main {
+    color: var(--text-primary);
+  }
+
+  .pl-dl-text {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pl-dl-done {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-primary);
+  }
+
+  .pl-dl-progress {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 140px;
+    max-width: 180px;
+  }
+
+  .pl-dl-track,
+  .st-storage-meter {
+    display: block;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--white-a10);
+  }
+
+  .pl-dl-fill,
+  .st-storage-fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--text-primary);
+    transition: width 0.3s ease;
+  }
+
+  .pl-offline {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 8px 12px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    font-size: 12.5px;
+    color: var(--text-secondary);
+  }
+
+  .pl-offline[hidden] {
+    display: none;
+  }
+
+  /* ── Archive: the Tafasir panel (a surah's parts) ────────────────────── */
+
+  .tf-dl {
+    padding-block-end: 8px;
+  }
+
+  .pl-row .tf-part {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tf-part:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+
+  .is-panel-folded .tf-dl:not([hidden]) {
+    display: none;
+  }
+
+  @media (width < 700px) {
+    .is-panel-folded .tf-dl:not([hidden]) {
+      display: flex;
+    }
+  }
+
+  /* a surah card: ✓ all its parts saved, "⬇ 3/12" some */
+  .tf-dl-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-inline-start: 8px;
+    color: var(--text-primary);
+  }
+
+  .tf-dl-badge.is-partial {
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Archive: the Downloads tab ──────────────────────────────────────── */
+
+  .ac-dl-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-block-end: 12px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+  }
+
+  .ac-dl-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ac-dl-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+  }
+
+  .ac-dl-open {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .ac-dl-icon {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    color: var(--text-secondary);
+    font-size: 18px;
+  }
+
+  .ac-dl-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .ac-dl-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
+  }
+
+  .ac-dl-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ac-dl-empty {
+    margin: 0;
+    padding: 40px 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* ── Settings: Downloads & storage ───────────────────────────────────── */
+
+  .st-storage-usage {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .st-storage-path {
+    font-size: 12px;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+    direction: ltr;
+    text-align: start;
+    unicode-bidi: plaintext;
+  }
+
+  .st-storage-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .st-storage-error {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--red-500);
+  }
+}

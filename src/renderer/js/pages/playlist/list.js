@@ -10,6 +10,13 @@ const { html, setHtml } = require("../../utils/html");
 const { normalizeForSearch } = require("../../utils/search-text");
 const analytics = require("../../services/analytics");
 const { state } = require("./state");
+const downloads = require("./downloads");
+
+/** The playing one: by its URL, streamed or from the disk. @param {any} track */
+const isCurrent = (track) =>
+  Boolean(state.current) &&
+  (track.url === state.current?.url ||
+    downloads.urlFor(track) === state.current?.url);
 
 /** @param {any} track @param {number} index  "001.mp3" → 1; else its place in the list */
 const numberOf = (track, index) =>
@@ -33,17 +40,19 @@ function renderList() {
   setHtml(
     list,
     html`<ol class="pl-tracks">${rows.map(({ track, index }) => {
-      const current = track.url === state.current?.url;
-      return html`<li><button type="button" class="pl-track" data-index="${index}" aria-label="${t("acTrackLabel").replace("{title}", track.title)}" ${current ? html`aria-current="true"` : ""}><span class="pl-num">${numberOf(track, index)}</span><span class="pl-title">${track.title}</span><i class="fas ${current && state.playing ? "fa-volume-high" : "fa-play"} pl-state" aria-hidden="true"></i></button></li>`;
+      const current = isCurrent(track);
+      return html`<li class="pl-row"><button type="button" class="pl-track" data-index="${index}" aria-label="${t("acTrackLabel").replace("{title}", track.title)}" ${current ? html`aria-current="true"` : ""}><span class="pl-num">${numberOf(track, index)}</span><span class="pl-title">${track.title}</span><i class="fas ${current && state.playing ? "fa-volume-high" : "fa-play"} pl-state" aria-hidden="true"></i></button>${downloads.rowButtonHtml(track)}</li>`;
     })}</ol>`,
   );
+  downloads.paintRows();
 }
 
 // The playing row changes: only the marks, so the list keeps its scroll and focus.
 function markCurrent() {
   for (const row of byId("plList", HTMLElement).querySelectorAll(".pl-track")) {
-    const track = state.tracks[Number(row.getAttribute("data-index"))];
-    const current = Boolean(track) && track.url === state.current?.url;
+    const index = Number(row.getAttribute("data-index"));
+    const track = state.tracks[index];
+    const current = Boolean(track) && isCurrent(track);
     if (current) row.setAttribute("aria-current", "true");
     else row.removeAttribute("aria-current");
     const icon = row.querySelector(".pl-state");
@@ -55,7 +64,7 @@ function markCurrent() {
 
 /** @param {number} index  plays it, the whole list as the playlist */
 function playTrack(index) {
-  if (!state.tracks[index]) return;
+  if (!state.tracks[index] || !downloads.canPlay(index)) return;
   // the reciter goes with each track: the mini players show his photo; a recitation also says
   // how to play it again (the archive's "Continue listening": services/listening-resume.js)
   const album = state.album;
@@ -71,18 +80,27 @@ function playTrack(index) {
           surahList: album.surahList,
         }
       : undefined;
+  // downloaded surahs play from the disk; offline, the playlist is only those
+  const tracks = state.tracks
+    .map((track, i) => ({
+      ...track,
+      url: downloads.urlFor(track),
+      ...(reciterId ? { reciterId, resume } : {}),
+      keep: downloads.canPlay(i),
+    }))
+    .map(({ keep, ...track }) => (keep ? track : null));
+  const playable = tracks.filter(Boolean);
   ipcRenderer.send("player-command", {
     type: "set-playlist",
-    tracks: reciterId
-      ? state.tracks.map((track) => ({ ...track, reciterId, resume }))
-      : state.tracks,
-    startIndex: index,
+    tracks: playable,
+    startIndex: playable.indexOf(tracks[index]),
   });
   analytics.playlistTrackPlay();
 }
 
 function bindList() {
   byId("plList", HTMLElement).addEventListener("click", (e) => {
+    // (a row's download button is handled by components/download-group.js)
     const row = /** @type {Element} */ (e.target).closest(".pl-track");
     if (row instanceof HTMLButtonElement) playTrack(Number(row.dataset.index));
   });

@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="../../css/04-pages/settings-layout.css" />
     <link rel="stylesheet" href="../../css/04-pages/settings-one-page.css" />
     <link rel="stylesheet" href="../../css/04-pages/settings-adhan.css" />
+    <link rel="stylesheet" href="../../css/04-pages/downloads.css" />
     <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
     <link rel="stylesheet" href="../../css/03-components/feedback-dialog.css" />
   </head>
@@ -109,6 +110,14 @@
               <button
                 type="button"
                 class="st-rail-btn"
+                data-pane="storage"
+                data-tooltip="dlStorageTitle"
+              >
+                <i class="fas fa-hard-drive" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                class="st-rail-btn"
                 data-pane="privacy"
                 data-tooltip="privacySectionTitle"
               >
@@ -155,6 +164,18 @@
                   <button type="button" class="st-nav-item" data-pane="hijri">
                     <i class="fas fa-moon st-nav-icon" aria-hidden="true"></i>
                     <span class="st-nav-label" data-i18n="hijriCalendar"></span>
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="st-nav-item" data-pane="storage">
+                    <i
+                      class="fas fa-hard-drive st-nav-icon"
+                      aria-hidden="true"
+                    ></i>
+                    <span
+                      class="st-nav-label"
+                      data-i18n="dlStorageTitle"
+                    ></span>
                   </button>
                 </li>
                 <li>
@@ -1458,6 +1479,90 @@
                     >
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <!-- Downloads & storage: the downloaded recitations (js/pages/settings/storage.js) -->
+            <div
+              class="settings-section st-pane"
+              data-pane="storage"
+              role="region"
+              aria-labelledby="storageSectionTitle"
+            >
+              <div class="section-header">
+                <div class="section-icon" aria-hidden="true">
+                  <i class="fas fa-hard-drive"></i>
+                </div>
+                <h2
+                  class="section-title"
+                  id="storageSectionTitle"
+                  data-i18n="dlStorageTitle"
+                >
+                  Downloads &amp; storage
+                </h2>
+              </div>
+
+              <div class="st-item st-storage-usage">
+                <span class="subsection-label" data-i18n="dlQuranAudio"
+                  >Quran audio</span
+                >
+                <span id="stStorageUsed"></span>
+                <span
+                  class="st-storage-meter"
+                  id="stStorageMeter"
+                  role="meter"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                  data-i18n-aria-label="dlQuranAudio"
+                  ><span class="st-storage-fill" id="stStorageFill"></span
+                ></span>
+              </div>
+
+              <div class="st-item st-storage-usage">
+                <span class="subsection-label" data-i18n="dlLocation"
+                  >Location</span
+                >
+                <span class="st-storage-path" id="stStoragePath"></span>
+                <p
+                  class="st-storage-error"
+                  id="stStorageError"
+                  role="alert"
+                  hidden
+                ></p>
+                <div class="st-storage-actions">
+                  <button type="button" class="pl-dl-btn" id="stStorageOpen">
+                    <i class="fas fa-folder-open" aria-hidden="true"></i>
+                    <span data-i18n="dlOpenFolder">Open folder</span>
+                  </button>
+                  <button type="button" class="pl-dl-btn" id="stStorageChange">
+                    <i
+                      class="fas fa-arrow-right-arrow-left"
+                      aria-hidden="true"
+                    ></i>
+                    <span data-i18n="dlChangeFolder">Change folder</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="pl-dl-btn"
+                    id="stStorageReset"
+                    hidden
+                  >
+                    <i class="fas fa-rotate-left" aria-hidden="true"></i>
+                    <span data-i18n="dlResetFolder">Default folder</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="st-item st-storage-actions">
+                <button type="button" class="pl-dl-btn" id="stStorageManage">
+                  <i class="fas fa-list" aria-hidden="true"></i>
+                  <span data-i18n="dlManage">Manage downloads</span>
+                </button>
+                <button type="button" class="pl-dl-btn" id="stStorageDeleteAll">
+                  <i class="fas fa-trash-can" aria-hidden="true"></i>
+                  <span data-i18n="dlDeleteAll">Delete all</span>
+                </button>
               </div>
             </div>
 
