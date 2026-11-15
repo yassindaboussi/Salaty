@@ -102,7 +102,7 @@ function createDownloadGroup(o) {
         idle: html`<i class="fas fa-download" aria-hidden="true"></i><span class="pl-dl-size">${size}</span>`,
         queued: html`<i class="fas fa-clock" aria-hidden="true"></i>`,
         active: html`<span class="pl-dl-ring" aria-hidden="true"></span>`,
-        done: html`<i class="fas fa-circle-check" aria-hidden="true"></i>`,
+        done: html`<i class="fas fa-circle-down" aria-hidden="true"></i>`,
         failed: html`<i class="fas fa-rotate-right" aria-hidden="true"></i>`,
       }[s],
     );
@@ -132,7 +132,7 @@ function createDownloadGroup(o) {
     } else if (!left.length) {
       setHtml(
         o.bar,
-        html`<span class="pl-dl-text pl-dl-done"><i class="fas fa-circle-check" aria-hidden="true"></i> ${t("dlDownloaded")} · ${dl.formatBytes(doneBytes)}</span>
+        html`<span class="pl-dl-text pl-dl-done"><i class="fas fa-circle-down" aria-hidden="true"></i> ${t("dlDownloaded")} · ${dl.formatBytes(doneBytes)}</span>
           <button type="button" class="pl-dl-btn" data-dl="delete"><i class="fas fa-trash-can" aria-hidden="true"></i><span>${t("dlDelete")}</span></button>`,
       );
     } else {

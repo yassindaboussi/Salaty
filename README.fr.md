@@ -123,7 +123,7 @@ Une application de bureau qui réunit ce dont un musulman a besoin au quotidien 
 | Application de bureau | Electron |
 | Interface | HTML / CSS / JavaScript (sans framework) |
 | Heures de prière | API Aladhan, mise en cache pour le mode hors connexion ; calculées sur l'appareil avec [PrayTimes](https://praytimes.org) quand Aladhan est injoignable (coordonnées des villes : [Open-Meteo](https://open-meteo.com), données GeoNames) |
-| Données du Coran | Texte Hafs, Qalun et Warsh intégré (hors connexion) + API AlQuran Cloud pour les traductions |
+| Données du Coran | Texte Hafs, Qalun et Warsh, traductions Sahih International et Hamidullah intégrés (hors connexion, Hamidullah de [Tanzil.net](https://tanzil.net/trans/)) + API AlQuran Cloud pour Muhammad Asad |
 | Audio | API mp3quran.net |
 | Build et distribution | electron-builder, GitHub Actions |
 | Qualité du code | ESLint, Stylelint, Prettier, vérification des types TypeScript (JSDoc) |

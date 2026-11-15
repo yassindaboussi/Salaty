@@ -24,7 +24,7 @@
   "quranPanelHide": "Masquer le panneau",
   "quranPanelShow": "Afficher le panneau",
   "quranFontSize": "Taille du texte",
-  "quranSourceNote": "Le texte arabe fonctionne hors ligne. Les traductions autres que Sahih International nécessitent Internet.",
+  "quranSourceNote": "Le texte arabe, Sahih International et Hamidullah fonctionnent hors ligne. La traduction de Muhammad Asad nécessite Internet.",
   "quranAyahCount": "Versets : {count}",
   "quranAyah": "Verset",
   "quranNoBookmarks": "Aucun signet pour l'instant. Dans une sourate, cliquez sur le numéro d'un verset ou sur son icône de signet pour l'enregistrer ici.",
@@ -42,7 +42,7 @@
   "quranRiwayaWarsh": "Warsh",
   "quranRiwayaTranslationNote": "Les traductions suivent la numérotation de Hafs : elles s’affichent avec Hafs uniquement.",
   "quranListen": "Écouter",
-  "quranListenOffline": "L'écoute nécessite une connexion Internet",
+  "quranListenOffline": "Pas d’internet : téléchargez cette sourate (⬇ dans le lecteur) pour l’écouter hors ligne.",
   "quranPlayFromHere": "Écouter à partir de ce verset",
   "quranAyahActions": "Verset {n}",
   "quranBookmarked": "Enregistré",
@@ -70,5 +70,9 @@
   "quranFindNone": "Aucun",
   "quranPageLabel": "Page",
   "quranPageApp": "Appli",
-  "quranPagePaper": "Papier"
+  "quranPagePaper": "Papier",
+  "quranDownloadSurah": "Télécharger cette sourate pour l’écoute hors ligne",
+  "quranDownloading": "Téléchargement… (cliquer pour annuler)",
+  "quranDownloaded": "Téléchargée : s’écoute sans internet (cliquer pour retirer)",
+  "quranRemoveDownload": "Retirer « {title} » de vos téléchargements ?"
 }

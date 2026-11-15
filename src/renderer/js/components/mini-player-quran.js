@@ -8,11 +8,7 @@ const { ipcRenderer } = require("electron");
 const { t, getLanguage } = require("../core/i18n");
 const { updateTooltip } = require("../core/tooltips");
 const { html, setHtml } = require("../utils/html");
-const {
-  getAyahTimings,
-  ayahAt,
-  ayahStep,
-} = require("../services/api/ayah-timing");
+const { getAyahTimings, ayahStep } = require("../services/api/ayah-timing");
 
 /** @typedef {import("../services/api/ayah-timing").AyahTime} AyahTime */
 
@@ -49,9 +45,9 @@ function quranMiniPlayer(ui) {
   /** ⏮ off at the first ayah (and before it), ⏭ off at the last one */
   function renderSteps() {
     if (!on) return;
-    const ayah = ayahAt(timings, now());
-    ui.prev.disabled = !timings.length || ayah <= 1;
-    ui.next.disabled = !timings.length || ayah >= (timings.at(-1)?.ayah ?? 0);
+    // greyed out where there is nowhere to go (services/api/ayah-timing.js ayahStep)
+    ui.prev.disabled = ayahStep(timings, now(), -1) === null;
+    ui.next.disabled = ayahStep(timings, now(), 1) === null;
   }
 
   /** @param {any} track */

@@ -4,7 +4,8 @@
 // the reciter (opens the reciter list), the time, the previous / play / next ayah and stop.
 // It shows in the reader whatever surah is playing; "Listen" in the reader's footer plays the
 // open surah, and names the reciter who will read it (the last one chosen for the riwaya).
-// Space plays / pauses. Listening needs the internet: offline, "Listen" says so instead of playing.
+// Space plays / pauses. ⬇ keeps the playing surah for offline (recitation-offline.js); offline,
+// "Listen" plays a downloaded surah and says so for the others.
 const { t } = require("../../core/i18n");
 const { byId } = require("../../core/dom");
 const { updateTooltip, refreshTooltips } = require("../../core/tooltips");
@@ -26,6 +27,7 @@ const {
   listen,
   seek,
   stepAyah,
+  canStep,
   togglePlay,
   stop,
   onRecitationChange,
@@ -37,6 +39,11 @@ const {
   onFollowChange,
 } = require("./recitation-follow");
 const { openReciterDialog } = require("./reciter-dialog");
+const downloads = require("./recitation-offline");
+
+/** The recording playing (null before the reciter list is loaded). */
+const playingReciter = () =>
+  rec.reciters.find((r) => r.read === rec.track?.read) ?? null;
 
 /** "4:05" / "1:02:03" in the page's digits. @param {number} seconds */
 function clock(seconds) {
@@ -65,6 +72,9 @@ function renderTime() {
     "--q-seek",
     `${duration ? (shown / duration) * 100 : 0}%`,
   );
+  // greyed out where there is nowhere to go (the first / last ayah)
+  byId("qPlayerPrev", HTMLButtonElement).disabled = !canStep(-1);
+  byId("qPlayerNext", HTMLButtonElement).disabled = !canStep(1);
 }
 
 /** @param {string} id @param {string} key */
@@ -111,12 +121,10 @@ function render() {
   play.setAttribute("aria-busy", String(rec.loading));
   setTip("qPlayerPlay", rec.playing ? "quranPause" : "quranPlay");
 
-  const timed = rec.timings.length > 0;
-  byId("qPlayerPrev", HTMLButtonElement).disabled = !timed;
-  byId("qPlayerNext", HTMLButtonElement).disabled = !timed;
   // only when there is an ayah to go back to (not during the opening Isti'adha / Bismillah)
   byId("qPlayerBack", HTMLButtonElement).hidden =
     follow.on || !showsTrack() || !follow.el;
+  downloads.renderDownloadButton(playingReciter(), track.surah);
   byId("qPlayerStatus", HTMLElement).textContent = rec.timingsFailed
     ? t("quranNoFollow")
     : "";
@@ -144,7 +152,6 @@ async function renderListenWho() {
   const ask = `${riwaya}/${navigator.onLine}/${rec.track?.read ?? ""}`;
   if (ask === whoAsked) return;
   whoAsked = ask;
-  if (!navigator.onLine) return;
   try {
     const reciter = await chosenReciter(riwaya);
     if (whoAsked !== ask) return;
@@ -186,8 +193,13 @@ function renderListenAvailability() {
 /** Plays the open surah from an ayah; tells the user when it can't. @param {number} [ayah] */
 async function listenFrom(ayah = 1) {
   if (!navigator.onLine) {
-    showToast(t("quranListenOffline"), "error");
-    return;
+    // offline: only a downloaded surah of the chosen reciter
+    await downloads.refreshDownloads();
+    const reciter = await chosenReciter().catch(() => null);
+    if (!downloads.isSaved(reciter, state.currentSurah?.n ?? 0)) {
+      showToast(t("quranListenOffline"), "error");
+      return;
+    }
   }
   // the first time, the reciter list loads first: "Listen" shows it is working
   const button = byId("readerListenBtn", HTMLButtonElement);
@@ -213,6 +225,15 @@ function bindRecitationBar() {
   );
   byId("qPlayerPlay", HTMLButtonElement).addEventListener("click", togglePlay);
   byId("qPlayerStop", HTMLButtonElement).addEventListener("click", stop);
+  byId("qPlayerDl", HTMLButtonElement).addEventListener("click", () => {
+    const reciter = playingReciter();
+    if (reciter && rec.track)
+      downloads
+        .onDownloadButton(reciter, rec.track.surah, rec.track.title)
+        .then(render);
+  });
+  downloads.watchDownloads(render);
+  downloads.refreshDownloads().then(render);
   byId("qPlayerPrev", HTMLButtonElement).addEventListener("click", () =>
     stepAyah(-1),
   );
