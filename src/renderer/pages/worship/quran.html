@@ -10,6 +10,7 @@
     <title data-i18n="holyQuran">Holy Quran - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
+    <link rel="stylesheet" href="../../css/04-pages/downloads.css" />
     <link rel="stylesheet" href="../../css/04-pages/quran.css" />
     <link rel="stylesheet" href="../../css/04-pages/quran-audio.css" />
     <link rel="stylesheet" href="../../css/04-pages/quran-search.css" />
@@ -264,6 +265,14 @@
                       <i class="fas fa-forward-step" aria-hidden="true"></i>
                     </button>
                   </div>
+                  <!-- ⬇ the playing surah for offline (js/pages/quran/recitation-offline.js) -->
+                  <button
+                    type="button"
+                    class="q-icon-btn q-player-dl"
+                    id="qPlayerDl"
+                    data-tooltip="quranDownloadSurah"
+                    hidden
+                  ></button>
                   <button
                     type="button"
                     class="q-icon-btn"

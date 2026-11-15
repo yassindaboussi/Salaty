@@ -24,7 +24,7 @@
   "quranPanelHide": "إخفاء اللوحة",
   "quranPanelShow": "إظهار اللوحة",
   "quranFontSize": "حجم الخط",
-  "quranSourceNote": "النص العربي يعمل دون اتصال. الترجمات غير Sahih International تحتاج إلى الإنترنت.",
+  "quranSourceNote": "النص العربي وترجمتا صحيح إنترناشونال وحميد الله تعمل دون إنترنت. ترجمة محمد أسد تحتاج إلى الإنترنت.",
   "quranAyahCount": "عدد الآيات: {count}",
   "quranAyah": "الآية",
   "quranNoBookmarks": "لا توجد علامات بعد. داخل السورة، انقر على رقم الآية أو على أيقونة العلامة لحفظها هنا.",
@@ -42,7 +42,7 @@
   "quranRiwayaWarsh": "ورش",
   "quranRiwayaTranslationNote": "الترجمات مرقّمة على رواية حفص، لذلك تظهر مع حفص فقط.",
   "quranListen": "استماع",
-  "quranListenOffline": "الاستماع يحتاج إلى اتصال بالإنترنت",
+  "quranListenOffline": "لا يوجد إنترنت: نزّل هذه السورة (⬇ في المشغّل) للاستماع دون إنترنت.",
   "quranPlayFromHere": "تشغيل من هذه الآية",
   "quranAyahActions": "الآية {n}",
   "quranBookmarked": "محفوظة",
@@ -70,5 +70,9 @@
   "quranFindNone": "لا شيء",
   "quranPageLabel": "الصفحة",
   "quranPageApp": "التطبيق",
-  "quranPagePaper": "ورقي"
+  "quranPagePaper": "ورقي",
+  "quranDownloadSurah": "تنزيل هذه السورة للاستماع دون إنترنت",
+  "quranDownloading": "جارٍ التنزيل… (انقر للإلغاء)",
+  "quranDownloaded": "منزّلة: تعمل دون إنترنت (انقر للإزالة)",
+  "quranRemoveDownload": "إزالة «{title}» من التنزيلات؟"
 }

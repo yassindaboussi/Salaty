@@ -123,7 +123,7 @@ A desktop app that brings together what a Muslim needs every day: prayer times, 
 | Desktop app | Electron |
 | Interface | HTML / CSS / JavaScript (no framework) |
 | Prayer times | Aladhan API, cached for offline use; calculated on the device with [PrayTimes](https://praytimes.org) when Aladhan can't be reached (city coordinates: [Open-Meteo](https://open-meteo.com), GeoNames data) |
-| Quran data | Bundled Hafs, Qalun and Warsh text (offline) + AlQuran Cloud API for translations |
+| Quran data | Bundled Hafs, Qalun and Warsh text, Sahih International and Hamidullah translations (offline, Hamidullah from [Tanzil.net](https://tanzil.net/trans/)) + AlQuran Cloud API for Muhammad Asad |
 | Audio | mp3quran.net API |
 | Build and distribution | electron-builder, GitHub Actions |
 | Code quality | ESLint, Stylelint, Prettier, TypeScript type checks (JSDoc) |

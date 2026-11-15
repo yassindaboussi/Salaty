@@ -26,6 +26,7 @@ const RIWAYA_OF = {
  * @typedef {object} TimedReciter
  * @property {number} read        the recording's id (for its timings)
  * @property {number} reciterId   the reciter's id (photo)
+ * @property {number} moshafId    the recording's id in the Audio Archive (its downloads)
  * @property {string} name        in the app's language
  * @property {"hafs" | "warsh" | "qalun"} riwaya
  * @property {boolean} mujawwad   the slow, melodic style
@@ -43,20 +44,29 @@ const folderKey = (url) =>
 /** @returns {Promise<TimedReciter[]>} the recordings of the 114 surahs, by name */
 async function getTimedReciters() {
   const language = apiLanguage();
-  const key = `ayat-timing:reciters:${language}`;
+  const key = `ayat-timing:reciters:v2:${language}`;
   const cached = cacheGet(key);
   if (cached) return cached;
 
-  const [reads, reciters] = await Promise.all([
-    fetchJson(`${BASE_URL}/reads`),
-    getReciters(language),
-  ]);
-  /** @type {Map<string, { id: number, name: string, moshaf: string }>} */
+  let reads, reciters;
+  try {
+    [reads, reciters] = await Promise.all([
+      fetchJson(`${BASE_URL}/reads`),
+      getReciters(language),
+    ]);
+  } catch (err) {
+    // offline or down: the last list (downloaded surahs still play)
+    const old = cacheGet(key, { stale: true });
+    if (old) return old;
+    throw err;
+  }
+  /** @type {Map<string, { id: number, moshafId: number, name: string, moshaf: string }>} */
   const byFolder = new Map();
   for (const r of reciters) {
     for (const m of r.moshaf ?? []) {
       byFolder.set(folderKey(m.server), {
         id: r.id,
+        moshafId: m.id,
         name: r.name,
         moshaf: m.name,
       });
@@ -71,6 +81,7 @@ async function getTimedReciters() {
     list.push({
       read: read.id,
       reciterId: match.id,
+      moshafId: match.moshafId,
       name: match.name,
       riwaya,
       mujawwad: /mojawwad|mujawwad|مجود/i.test(
@@ -92,7 +103,15 @@ async function getAyahTimings(read, surah) {
   const key = `ayat-timing:${read}:${surah}`;
   const cached = cacheGet(key);
   if (cached) return cached;
-  const data = await fetchJson(`${BASE_URL}?surah=${surah}&read=${read}`);
+  const data = await fetchJson(`${BASE_URL}?surah=${surah}&read=${read}`).catch(
+    (err) => {
+      // offline: the timings saved before (with a downloaded surah, the ayah is still marked)
+      const old = cacheGet(key, { stale: true });
+      if (old) return { saved: old };
+      throw err;
+    },
+  );
+  if (data?.saved) return data.saved;
   /** @type {AyahTime[]} */
   const times = (Array.isArray(data) ? data : [])
     .filter((a) => Number.isInteger(a?.ayah) && a.end_time > a.start_time)
@@ -118,11 +137,23 @@ function ayahAt(timings, t) {
   return found;
 }
 
-/** Where the ayah before or after the one recited at a time starts, or null (none there).
- * @param {AyahTime[]} timings @param {number} t @param {-1 | 1} step */
+const RESTART_AFTER = 3; // seconds into an ayah after which "previous" restarts it
+
+/**
+ * Where previous / next goes from a time, or null when there is nowhere to go (the button is
+ * then greyed out). Like a music player's previous / next track: "previous" more than 3 s into
+ * an ayah goes back to its start (iTunes, Rhythmbox, Totem), else to the ayah before; from
+ * ayah 1 or the opening (Isti'adha, Bismillah) to the very start. "Next" on the last ayah: null.
+ * @param {AyahTime[]} timings @param {number} t @param {-1 | 1} step
+ */
 function ayahStep(timings, t, step) {
-  const target = Math.max(1, ayahAt(timings, t) + step);
-  return timings.find((a) => a.ayah === target)?.start ?? null;
+  if (!timings.length) return null;
+  const ayah = ayahAt(timings, t);
+  if (step === 1) return timings.find((a) => a.ayah > ayah)?.start ?? null;
+  const own = timings.find((a) => a.ayah === ayah);
+  if (own && t - own.start > RESTART_AFTER) return own.start;
+  if (ayah >= 2) return timings.find((a) => a.ayah === ayah - 1)?.start ?? null;
+  return t > 1 ? 0 : null;
 }
 
 /** The surah's file in a recording. @param {TimedReciter} reciter @param {number} surah */

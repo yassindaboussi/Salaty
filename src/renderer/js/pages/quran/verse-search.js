@@ -14,14 +14,10 @@
 //
 // Where the text comes from:
 //   Arabic letters typed      the bundled Hafs text (offline)
-//   Latin, French interface   AlQuran Cloud's Hamidullah translation (online); offline, the
-//                             bundled English one, and the page says so
+//   Latin, French interface   the bundled Hamidullah translation (offline)
 //   Latin, other interfaces   the bundled Sahih International translation (offline)
 const { normalizeForSearch } = require("../../utils/search-text");
-const {
-  allVerses,
-  searchTranslation,
-} = require("../../services/api/alquran-cloud");
+const { allVerses, frenchVerses } = require("../../services/api/alquran-cloud");
 
 /** @typedef {{ surah: number, ayah: number, text: string, lang: "ar" | "en" | "fr" }} VerseHit */
 
@@ -126,6 +122,20 @@ function getIndex() {
   return index;
 }
 
+/** @type {Promise<{ surah: number, ayah: number, text: string, words: string[] }[]> | null} */
+let frIndex = null;
+
+/** The bundled French ayahs with their words (built once, on the first French search). */
+function getFrenchIndex() {
+  frIndex ??= frenchVerses().then((verses) =>
+    verses.map((v) => ({ ...v, words: wordsOf(v.text) })),
+  );
+  frIndex.catch(() => {
+    frIndex = null; // try again next time
+  });
+  return frIndex;
+}
+
 /**
  * The ayahs containing the words, in Quran order.
  * @param {string} query what was typed
@@ -151,13 +161,16 @@ async function findVerses(query, uiLang) {
   }
 
   if (uiLang === "fr") {
-    const found = await searchTranslation(query.trim(), "fr.hamidullah");
-    if (found) {
-      const hits = found
-        .filter((m) => hasAll(wordsOf(m.text), words))
-        .map((m) => ({ ...m, lang: /** @type {const} */ ("fr") }));
-      return { hits, words, fellBack: false };
-    }
+    const all = await getFrenchIndex();
+    const hits = all
+      .filter((v) => hasAll(v.words, words))
+      .map(({ surah, ayah, text }) => ({
+        surah,
+        ayah,
+        text,
+        lang: /** @type {const} */ ("fr"),
+      }));
+    return { hits, words, fellBack: false };
   }
   const all = await getIndex();
   const hits = all
@@ -168,7 +181,7 @@ async function findVerses(query, uiLang) {
       text: v.en,
       lang: /** @type {const} */ ("en"),
     }));
-  return { hits, words, fellBack: uiLang === "fr" };
+  return { hits, words, fellBack: false };
 }
 
 module.exports = { findVerses, markWords, queryWords, wordMatches };

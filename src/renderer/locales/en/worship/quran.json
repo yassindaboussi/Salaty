@@ -24,7 +24,7 @@
   "quranPanelHide": "Hide the panel",
   "quranPanelShow": "Show the panel",
   "quranFontSize": "Text size",
-  "quranSourceNote": "The Arabic text works offline. Translations other than Sahih International need the internet.",
+  "quranSourceNote": "The Arabic text, Sahih International and Hamidullah work offline. Muhammad Asad's translation needs internet.",
   "quranAyahCount": "Ayahs: {count}",
   "quranAyah": "Ayah",
   "quranNoBookmarks": "No bookmarks yet. In a surah, click an ayah's number or its bookmark icon to save it here.",
@@ -42,7 +42,7 @@
   "quranRiwayaWarsh": "Warsh",
   "quranRiwayaTranslationNote": "Translations follow the Hafs numbering, so they show with Hafs only.",
   "quranListen": "Listen",
-  "quranListenOffline": "Listening needs an internet connection",
+  "quranListenOffline": "No internet: download this surah (⬇ in the player) to listen offline.",
   "quranPlayFromHere": "Play from this ayah",
   "quranAyahActions": "Ayah {n}",
   "quranBookmarked": "Bookmarked",
@@ -70,5 +70,9 @@
   "quranFindNone": "None",
   "quranPageLabel": "Page",
   "quranPageApp": "App",
-  "quranPagePaper": "Paper"
+  "quranPagePaper": "Paper",
+  "quranDownloadSurah": "Download this surah for offline",
+  "quranDownloading": "Downloading… (click to cancel)",
+  "quranDownloaded": "Downloaded: plays without internet (click to remove)",
+  "quranRemoveDownload": "Remove “{title}” from your downloads?"
 }

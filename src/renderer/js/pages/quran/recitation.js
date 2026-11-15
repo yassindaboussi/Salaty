@@ -10,13 +10,13 @@ const { ipcRenderer } = require("electron");
 const {
   getTimedReciters,
   getAyahTimings,
-  surahUrl,
   ayahAt: ayahAtIn,
   ayahStep,
 } = require("../../services/api/ayah-timing");
 const { mapAyah } = require("../../services/quran-ayah-map");
 const { state, surahMeta, surahName } = require("./state");
 const { loadReciter, saveReciter } = require("./storage");
+const { playUrl, refreshDownloads } = require("./recitation-offline");
 
 /** @typedef {import("../../services/api/ayah-timing").TimedReciter} TimedReciter */
 /** @typedef {import("../../services/api/ayah-timing").AyahTime} AyahTime */
@@ -114,7 +114,7 @@ function trackOf(reciter, surah) {
   return {
     title: meta ? surahName(meta) : String(surah),
     artist: reciter.name,
-    url: surahUrl(reciter, surah),
+    url: playUrl(reciter, surah), // the downloaded file when there is one
     page: "quran",
     surah,
     riwaya: reciter.riwaya,
@@ -140,6 +140,7 @@ async function listen({
   const sameTrack =
     rec.track?.read === chosen.read && rec.track.surah === surah;
   if (!sameTrack) {
+    await refreshDownloads();
     // the surah alone: it stops at its end (the next surah is the user's choice)
     const track = trackOf(chosen, surah);
     send("set-playlist", { tracks: [track], startIndex: 0, autoplay });
@@ -181,9 +182,16 @@ const believable = (reported) =>
   performance.now() > seekGuardUntil ||
   Math.abs(reported - currentTime()) < 1.5;
 
-/** The ayah before or after the one recited. @param {-1 | 1} step */
+// Previous / next ayah: services/api/ayah-timing.js ayahStep (restart rule, greyed out ends).
+/** Where previous / next goes now, or null. @param {-1 | 1} step */
+const stepTarget = (step) => ayahStep(rec.timings, currentTime(), step);
+
+/** @param {-1 | 1} step */
+const canStep = (step) => stepTarget(step) !== null;
+
+/** The ayah before or after the one recited (see above). @param {-1 | 1} step */
 function stepAyah(step) {
-  const start = ayahStep(rec.timings, currentTime(), step);
+  const start = stepTarget(step);
   if (start !== null) seek(start);
 }
 
@@ -315,6 +323,7 @@ module.exports = {
   listen,
   seek,
   stepAyah,
+  canStep,
   togglePlay,
   stop,
   chooseReciter,

@@ -115,7 +115,7 @@ function cardBadgeHtml(id) {
   const saved = parts.filter((e) => group?.isDone(nameOf(e.url))).length;
   if (!saved) return "";
   return saved === parts.length
-    ? html`<span class="tf-dl-badge" role="img" aria-label="${t("dlDownloaded")}" title="${t("dlDownloaded")}"><i class="fas fa-circle-check" aria-hidden="true"></i></span>`
+    ? html`<span class="tf-dl-badge" role="img" aria-label="${t("dlDownloaded")}" title="${t("dlDownloaded")}"><i class="fas fa-circle-down" aria-hidden="true"></i></span>`
     : html`<span class="tf-dl-badge is-partial" title="${t("dlPartsSaved").replace("{done}", String(saved)).replace("{total}", String(parts.length))}"><i class="fas fa-download" aria-hidden="true"></i> ${saved}/${parts.length}</span>`;
 }
 

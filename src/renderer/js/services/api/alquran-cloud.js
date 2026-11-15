@@ -12,7 +12,13 @@ const ALQURAN_CLOUD_API = "https://api.alquran.cloud/v1";
 
 /** The translations offered (AlQuran Cloud edition ids). */
 const TRANSLATIONS = new Set(["en.sahih", "en.asad", "fr.hamidullah"]);
-const BUNDLED_TRANSLATION = "en.sahih";
+const BUNDLED_TRANSLATION = "en.sahih"; // inside Quran.json
+// Bundled on their own: Hamidullah (French) from Tanzil.net, free for non-commercial use with
+// credit (https://tanzil.net/trans/). Muhammad Asad's stays online: © Pola Hamida Asad.
+/** @type {Record<string, string>} */
+const BUNDLED_FILES = {
+  "fr.hamidullah": "../../data/translation-fr-hamidullah.json",
+};
 // a slow or dead network gives up after this, and the reader says the translation is offline
 const FETCH_TIMEOUT_MS = 15000;
 
@@ -90,6 +96,26 @@ async function versesOf(surahNum, riwaya) {
   };
 }
 
+/** @type {Map<string, Promise<string[][]>>} */
+const bundledFiles = new Map();
+
+/** A bundled translation: its ayahs, surah by surah. @param {string} edition */
+function bundledTranslation(edition) {
+  let data = bundledFiles.get(edition);
+  if (!data) {
+    data = fetch(BUNDLED_FILES[edition])
+      .then((res) => {
+        if (!res.ok)
+          throw new Error(`Failed to load ${edition} (${res.status})`);
+        return res.json();
+      })
+      .then((json) => json.surahs);
+    data.catch(() => bundledFiles.delete(edition)); // try again next time
+    bundledFiles.set(edition, data);
+  }
+  return data;
+}
+
 /** @type {Map<string, string[]>} */
 const translationCache = new Map();
 
@@ -129,11 +155,13 @@ async function fetchQuranSurah(surahNum, translationId, riwaya = "hafs") {
   /** @type {(string | null)[] | null} */
   let translations = null;
   if (wanted) {
-    // the bundled copy first for Sahih International; the network for the others
-    translations =
-      translationId === BUNDLED_TRANSLATION
-        ? verses.map((v) => v.en || null)
-        : await onlineTranslation(surahNum, translationId);
+    // the bundled copies (Sahih International, Hamidullah); the network for the others
+    if (translationId === BUNDLED_TRANSLATION)
+      translations = verses.map((v) => v.en || null);
+    else if (BUNDLED_FILES[translationId])
+      translations =
+        (await bundledTranslation(translationId))[surahNum - 1] ?? null;
+    else translations = await onlineTranslation(surahNum, translationId);
   }
   return {
     ayahs: verses.map((v, i) => ({
@@ -182,33 +210,12 @@ async function allVerses() {
   );
 }
 
-/**
- * The ayahs of a translation that contain a word (AlQuran Cloud's search, online only).
- * null when offline or the search failed; [] when nothing was found.
- * @param {string} keyword @param {string} edition
- * @returns {Promise<{ surah: number, ayah: number, text: string }[] | null>}
- */
-async function searchTranslation(keyword, edition) {
-  if (!navigator.onLine) return null;
-  try {
-    const res = await fetch(
-      `${ALQURAN_CLOUD_API}/search/${encodeURIComponent(keyword)}/all/${edition}`,
-      { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) },
-    );
-    if (res.status === 404) return []; // its answer for "no match"
-    if (!res.ok) throw new Error(`alquran.cloud ${res.status}`);
-    const json = await res.json();
-    const matches = json?.data?.matches;
-    if (!Array.isArray(matches)) return [];
-    return matches.map((m) => ({
-      surah: Number(m?.surah?.number),
-      ayah: Number(m?.numberInSurah),
-      text: stripHtmlTags(String(m?.text ?? "")),
-    }));
-  } catch (e) {
-    console.warn("AlQuran Cloud search failed:", e);
-    return null;
-  }
+/** Every ayah of the bundled French translation (Hamidullah), for the search. */
+async function frenchVerses() {
+  const surahs = await bundledTranslation("fr.hamidullah");
+  return surahs.flatMap((ayahs, s) =>
+    ayahs.map((text, a) => ({ surah: s + 1, ayah: a + 1, text })),
+  );
 }
 
 /** @param {string} str */
@@ -224,6 +231,6 @@ module.exports = {
   ayahArabic,
   surahArabic,
   allVerses,
-  searchTranslation,
+  frenchVerses,
   TRANSLATIONS,
 };
