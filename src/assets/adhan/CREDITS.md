@@ -21,9 +21,16 @@ Settings → Notifications → Voice reminders. Voices generated with [Grok](htt
 user owns the output and may use it commercially ([xAI FAQ](https://x.ai/legal/faq)). Saved as mono MP3,
 96 kbps, with no other change.
 
-- `near-fajr.mp3` … `near-isha.mp3`: "اقتربت صلاة …", one per prayer.
-- `hadith-before.mp3`: «صلاةُ الجماعةِ أفضلُ من صلاةِ الفذِّ بسبعٍ وعشرينَ درجةً», agreed upon:
+- `near-fajr-ar.mp3` … `near-isha-ar.mp3`: "اقترب أذان …" (e.g. «اقترب أذان الفجر»), one per prayer.
+- `near-fajr-en.mp3` … `near-isha-en.mp3`: "The Fajr adhan is approaching." …, played when the app is
+  in English.
+- `near-fajr-fr.mp3` … `near-isha-fr.mp3`: « L'adhan du Fajr approche. » …, played when the app is in
+  French.
+- `hadith-before-ar.mp3`: «صلاةُ الجماعةِ أفضلُ من صلاةِ الفذِّ بسبعٍ وعشرينَ درجةً», agreed upon:
   [Sahih Muslim 650](https://sunnah.com/muslim:650a) (this wording) and
   [Sahih al-Bukhari 645](https://sunnah.com/bukhari:645).
-- `hadith-after.mp3`: «مَنْ قَالَ حِينَ يَسْمَعُ النِّدَاءَ: اللَّهُمَّ رَبَّ هَذِهِ الدَّعْوَةِ التَّامَّةِ… حَلَّتْ لَهُ شَفَاعَتِي يَوْمَ الْقِيَامَةِ».
+- `hadith-after-ar.mp3`: «مَنْ قَالَ حِينَ يَسْمَعُ النِّدَاءَ: اللَّهُمَّ رَبَّ هَذِهِ الدَّعْوَةِ التَّامَّةِ… حَلَّتْ لَهُ شَفَاعَتِي يَوْمَ الْقِيَامَةِ».
   [Sahih al-Bukhari 614](https://sunnah.com/bukhari:614).
+- `hadith-before-en.mp3` / `-fr.mp3`, `hadith-after-en.mp3` / `-fr.mp3`: the same two hadiths by their
+  meaning, played when the app is in English or French. "Twenty-seven degrees" as in
+  [HadeethEnc](https://hadeethenc.com/en/browse/hadith/3441); «الوسيلة» kept as "al-Wasilah".
