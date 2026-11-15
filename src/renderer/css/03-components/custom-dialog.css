@@ -88,7 +88,7 @@
 
   .custom-dialog-btn.btn-primary {
     background: var(--accent-color);
-    color: var(--text-bright);
+    color: var(--on-accent);
     box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
   }
 

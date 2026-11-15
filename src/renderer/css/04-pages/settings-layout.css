@@ -480,7 +480,7 @@
   }
 
   .theme-green-preview {
-    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+    background: linear-gradient(135deg, #154a19, #1f6324);
   }
 
   .theme-brown-preview {
@@ -492,35 +492,31 @@
   }
 
   .theme-pink-preview {
-    background: linear-gradient(135deg, #7a1a4a, #b51a5c);
+    background: linear-gradient(135deg, #5c1236, #7f1a4b);
   }
 
   .theme-purple-preview {
-    background: linear-gradient(135deg, #311b92, #4527a0);
+    background: linear-gradient(135deg, #2a1878, #3a2296);
   }
 
   .theme-emerald-preview {
-    background: linear-gradient(135deg, #006064, #00838f);
+    background: linear-gradient(135deg, #004d52, #00666e);
   }
 
   .theme-ocean-preview {
-    background: linear-gradient(135deg, #01579b, #0277bd);
+    background: linear-gradient(135deg, #0a3a5e, #0d4c7a);
   }
 
   .theme-royal-preview {
-    background: linear-gradient(135deg, #0d47a1, #1565c0);
+    background: linear-gradient(135deg, #0b3a82, #0f4c9e);
   }
 
   .theme-indigo-preview {
     background: linear-gradient(135deg, #1a237e, #283593);
   }
 
-  .theme-classic-preview {
-    background: linear-gradient(135deg, #212121, #424242);
-  }
-
   .theme-ramadan-preview {
-    background: linear-gradient(135deg, #1b5e20, #ffd700);
+    background: linear-gradient(135deg, #1b5e20, #ffd54f);
   }
 
   /* ── Language and window size: choice cards ────────────────────────── */

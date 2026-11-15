@@ -151,7 +151,7 @@
   height: 30px;
   margin-inline: 2px;
   background: var(--accent-color);
-  color: var(--text-bright);
+  color: var(--on-accent);
 }
 
 .mini-play-btn:hover:not(:disabled) {

@@ -142,9 +142,9 @@ function load() {
   }
 }
 
-// The Gold theme was replaced by Dark (1.3.0): users who had Gold get Dark.
+// Removed themes go to Dark: Gold (1.3.0) and Classic (a near copy of Dark).
 function migrateGoldTheme() {
-  if (settingsData.theme !== "gold") return;
+  if (settingsData.theme !== "gold" && settingsData.theme !== "classic") return;
   settingsData.theme = "dark";
   save();
 }

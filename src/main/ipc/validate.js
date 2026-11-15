@@ -11,7 +11,6 @@ const { isAdhanVoice, FAJR_SAME_VOICE } = require("../../shared/adhan-voices");
 
 const THEMES = new Set([
   "brown",
-  "classic",
   "dark",
   "emerald",
   "green",
