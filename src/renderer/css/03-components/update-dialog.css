@@ -169,6 +169,7 @@
   .update-btn--primary {
     border-color: transparent;
     background: var(--accent-color);
+    color: var(--on-accent);
   }
 
   .update-btn--primary:hover {
