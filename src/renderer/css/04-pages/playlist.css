@@ -170,11 +170,13 @@
     overflow-wrap: anywhere;
   }
 
+  /* ▶ always shown (faint), so a click on the row clearly plays it; the download button
+     beside it is the other choice, not the only way to listen */
   .pl-state {
     flex-shrink: 0;
     font-size: 11px;
     color: var(--text-faint);
-    opacity: 0;
+    opacity: 0.6;
   }
 
   .pl-track:hover .pl-state,

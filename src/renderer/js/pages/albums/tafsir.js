@@ -4,18 +4,19 @@
 // cards, and a side panel with the chosen surah's parts (the one playing marked). The panel folds
 // to a thin strip (remembered); a narrow window has one column. Today the API has one book; book
 // chips show only when it has more. The search filters the surah cards (name or number).
+// Downloading a surah's parts: tafsir-downloads.js.
 const mp3quranApi = require("../../services/api/mp3quran");
 const { t } = require("../../core/i18n");
 const { byId } = require("../../core/dom");
 const { html, setHtml } = require("../../utils/html");
 const { normalizeForSearch } = require("../../utils/search-text");
-const { updateTooltip } = require("../../core/tooltips");
 const { state, surahName, savePrefs } = require("./state");
 const { messageHtml } = require("./messages");
 const { getResume } = require("../../services/listening-resume");
 const { playingNow, playFrom, pause, continueHtml } = require("./continue");
+const td = require("./tafsir-downloads");
+const { isFolded, setFolded } = require("./tafsir-fold");
 
-const FOLD_KEY = "tafsirPanelFolded";
 const lang = () => mp3quranApi.apiLanguage();
 const box = () => byId("acTafsir", HTMLElement);
 
@@ -106,37 +107,19 @@ function partLabel(url) {
     : t("tafsirWholeSurah");
 }
 
-function isFolded() {
-  try {
-    return localStorage.getItem(FOLD_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-/** @param {boolean} folded */
-function setFolded(folded) {
-  byId("tfLayout", HTMLElement).classList.toggle("is-panel-folded", folded);
-  const toggle = byId("tfPanelToggle", HTMLButtonElement);
-  toggle.setAttribute("aria-expanded", String(!folded));
-  toggle.dataset.tooltip = folded ? "tafsirPanelShow" : "tafsirPanelHide";
-  updateTooltip(toggle);
-  try {
-    localStorage.setItem(FOLD_KEY, folded ? "1" : "0");
-  } catch {
-    // storage unavailable: the choice lasts until the page closes
-  }
-}
-
 /** The frame, drawn once per book, so the lists keep their scroll when re-drawn. */
 function frame() {
   if (box().querySelector("#tfLayout")) return;
   setHtml(
     box(),
-    html`<div class="tf-layout" id="tfLayout"><div class="tf-main"><div class="tf-top" id="tfContinue"></div><div class="tf-surahs" id="tfSurahs"></div></div><aside class="tf-panel"><div class="tf-panel-head"><button type="button" class="tf-icon-btn tf-panel-toggle" id="tfPanelToggle" data-action="fold"><i class="fas fa-angles-right" aria-hidden="true"></i></button><h2 class="tf-panel-title" id="tfPanelTitle"></h2><span class="tf-panel-count" id="tfPanelCount"></span></div><ul class="tf-parts" id="tfParts"></ul></aside></div>`,
+    html`<div class="tf-layout" id="tfLayout"><div class="tf-main"><div class="tf-top" id="tfContinue"></div><div class="tf-surahs" id="tfSurahs"></div></div><aside class="tf-panel"><div class="tf-panel-head"><button type="button" class="tf-icon-btn tf-panel-toggle" id="tfPanelToggle" data-action="fold"><i class="fas fa-angles-right" aria-hidden="true"></i></button><h2 class="tf-panel-title" id="tfPanelTitle"></h2><span class="tf-panel-count" id="tfPanelCount"></span></div><div class="pl-dl-bar tf-dl" id="tfDl" hidden></div><ul class="tf-parts" id="tfParts"></ul></aside></div>`,
   );
   setFolded(isFolded());
 }
+
+/** The panel's title for a part, or for the surah ("Al-Baqarah · Ayahs 1–25"). */
+const titleOf = (/** @type {string} */ id, /** @type {string} */ url) =>
+  url ? `${surahName(id)}${t("acSep")}${partLabel(url)}` : surahName(id);
 
 function renderContinue() {
   const book = state.tafsirBook;
@@ -179,7 +162,7 @@ function renderSurahs() {
     ids.length
       ? html`<ul class="tf-grid">${ids.map((id) => {
           const parts = partsOf(id);
-          return html`<li><button type="button" class="tf-card" data-surah="${id}" aria-pressed="${String(id === selected)}"><span class="tf-num">${id}</span><span class="tf-card-text"><span class="tf-card-name">${surahName(id)}</span><span class="tf-card-meta">${playingId === id ? html`<i class="fas fa-volume-high" aria-hidden="true"></i> ` : ""}${t("tafsirParts").replace("{count}", String(parts.length))}</span></span></button></li>`;
+          return html`<li><button type="button" class="tf-card" data-surah="${id}" aria-pressed="${String(id === selected)}"><span class="tf-num">${id}</span><span class="tf-card-text"><span class="tf-card-name">${surahName(id)}</span><span class="tf-card-meta">${playingId === id ? html`<i class="fas fa-volume-high" aria-hidden="true"></i> ` : ""}${t("tafsirParts").replace("{count}", String(parts.length))}${td.cardBadgeHtml(id)}</span></span></button></li>`;
         })}</ul>`
       : messageHtml("empty", t("noTracksFound")),
   );
@@ -199,14 +182,23 @@ function renderPanel() {
     byId("tfParts", HTMLElement),
     html`${parts.map((e, i) => {
       const on = e.url === playing;
-      return html`<li><button type="button" class="tf-part" data-part="${i}" aria-current="${String(on)}"><i class="fas ${on ? "fa-volume-high" : "fa-play"} tf-part-icon" aria-hidden="true"></i><span class="tf-part-name">${partLabel(e.url)}</span></button></li>`;
+      return html`<li class="pl-row"><button type="button" class="tf-part" data-part="${i}" aria-current="${String(on)}"><i class="fas ${on ? "fa-volume-high" : "fa-play"} tf-part-icon" aria-hidden="true"></i><span class="tf-part-name">${partLabel(e.url)}</span></button>${td.partButtonHtml(e.url)}</li>`;
     })}`,
   );
+  td.onSurahShown();
 }
 
 function renderTafsir() {
   if (!state.tafsirBook) return;
   frame();
+  td.setupTafsirDownloads({
+    book: state.tafsirBook,
+    selected: () => selected,
+    partsOf,
+    surahIds,
+    title: titleOf,
+    onCardsChange: renderSurahs,
+  });
   renderContinue();
   renderSurahs();
   renderPanel();
@@ -217,18 +209,20 @@ function renderTafsir() {
 function playPart(id, index, resumeAt = 0) {
   const book = state.tafsirBook;
   if (!book) return;
-  const tracks = mp3quranApi.getTafsirTracksForSura(
-    partsOf(id),
-    surahName(id),
-    book.name,
-  );
+  // saved parts play from the disk; offline, only those
+  const tracks = mp3quranApi
+    .getTafsirTracksForSura(partsOf(id), surahName(id), book.name)
+    .map((track, i) => ({ ...track, i, url: td.playUrl(track.url) }))
+    .filter((track) => td.canPlayUrl(partsOf(id)[track.i].url));
+  const at = tracks.findIndex((track) => track.i === index);
+  if (at === -1) return;
   savePrefs();
   playFrom(
-    tracks.map((track) => ({
+    tracks.map(({ i: _i, ...track }) => ({
       ...track,
       resume: { kind: "tafsir", bookId: book.id },
     })),
-    index,
+    at,
     resumeAt,
     {
       source: "mp3quran-tracks",

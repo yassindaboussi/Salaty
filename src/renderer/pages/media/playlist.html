@@ -10,6 +10,8 @@
     <title data-i18n="audioArchive">Audio Playlist - Salaty Time</title>
     <link rel="stylesheet" href="../../css/app.css" />
     <link rel="stylesheet" href="../../css/04-pages/playlist.css" />
+    <link rel="stylesheet" href="../../css/04-pages/downloads.css" />
+    <link rel="stylesheet" href="../../css/03-components/custom-dialog.css" />
   </head>
   <body class="page-loading">
     <div class="app-container" id="app">
@@ -38,7 +40,15 @@
                   <span class="pl-count" id="plCount"></span>
                 </p>
               </div>
+              <!-- Download all / progress / downloaded (js/pages/playlist/downloads.js) -->
+              <div class="pl-dl-bar" id="plDl" hidden></div>
             </div>
+            <p class="pl-offline" id="plOffline" role="status" hidden>
+              <i class="fas fa-wifi" aria-hidden="true"></i>
+              <span data-i18n="dlOfflineNote"
+                >No internet: only downloaded surahs can play.</span
+              >
+            </p>
             <div class="pl-search" role="search">
               <i
                 class="fas fa-magnifying-glass pl-search-icon"

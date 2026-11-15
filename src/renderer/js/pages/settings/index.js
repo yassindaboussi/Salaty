@@ -13,6 +13,7 @@
 //   adhan-voice.js  the adhan's voice (▶ to listen: adhan-preview.js), Fajr's own voice
 //   voice-preview.js  ▶ / ■ of the voice reminders before and after the adhan
 //   hijri.js        the Hijri calendar's first day of the week and the Hijri date correction
+//   storage.js      downloads & storage: space used, the folder (open, move), delete all
 //   toggles.js      travel mode and usage statistics (opt-in)
 //   about.js        app version, contact, update check and install
 //   persist.js      saving the settings (right away or after a short pause)
@@ -37,6 +38,7 @@ const {
 } = require("./appearance");
 const { initAthkarAlerts, initPreAdhanNotification } = require("./alerts");
 const { initPopupSettings } = require("./popup-settings");
+const { initStorage } = require("./storage");
 const { initAdhanVoice } = require("./adhan-voice");
 const { initVoicePreview } = require("./voice-preview");
 const { initHijriSettings, updateHijriText } = require("./hijri");
@@ -84,6 +86,7 @@ function initSettingsPage() {
   initPreAdhanNotification();
   initVoicePreview();
   initPopupSettings();
+  initStorage();
   initAdhanVoice();
   initHijriSettings();
   initCalculationSettings();

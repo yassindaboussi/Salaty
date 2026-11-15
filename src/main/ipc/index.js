@@ -4,6 +4,7 @@
 const { registerSettingsHandlers } = require("./handlers/settings-handlers");
 const { registerWindowHandlers } = require("./handlers/window-handlers");
 const { registerFeedbackHandlers } = require("./handlers/feedback-handlers");
+const { registerDownloadsHandlers } = require("./handlers/downloads-handlers");
 const popupHandlers = require("./handlers/popup-handlers");
 const playerManager = require("../services/player-manager");
 const prayerTimerManager = require("../services/prayer-timer-manager");
@@ -139,6 +140,7 @@ function registerIpcHandlers({ getMainWindow }) {
 
   registerWindowHandlers(getMainWindow);
   registerFeedbackHandlers();
+  registerDownloadsHandlers(getMainWindow);
   popupHandlers.registerPopupHandlers({ getMainWindow });
   playerManager.registerPlayerIpc(getMainWindow);
 }

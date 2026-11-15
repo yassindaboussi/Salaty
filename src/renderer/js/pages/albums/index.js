@@ -6,6 +6,7 @@
 //   moshaf-dialog.js  a reciter's recitations, to pick one
 //   tafsir.js         Tafasir: the surahs as cards, a surah's parts in the side panel
 //   tadabor.js        Tadabor: reflection videos by surah (tadabor-video.js: the dialog)
+//   downloads.js      Downloads: the recitations saved on this computer
 //   continue.js       "Continue listening" on each tab (recite-continue.js: Recitations)
 //   open-album.js     opening something in the playlist page
 //   messages.js       loading / nothing found / error + retry
@@ -20,6 +21,7 @@ const { bindMoshafDialog } = require("./moshaf-dialog");
 const reciters = require("./reciters");
 const tafsir = require("./tafsir");
 const tadabor = require("./tadabor");
+const downloads = require("./downloads");
 const { bindVideoDialog } = require("./tadabor-video");
 const { followPlayer, onPlayingChange } = require("./continue");
 const {
@@ -43,6 +45,11 @@ const TABS = {
     panel: "acPanelTadabor",
     load: tadabor.loadTadabor,
     render: tadabor.renderTadabor,
+  },
+  downloads: {
+    panel: "acPanelDownloads",
+    load: downloads.loadDownloads,
+    render: downloads.renderDownloads,
   },
 };
 
@@ -128,6 +135,8 @@ function bindLists() {
       reciters.onCardAction(button);
     } else if (button.closest("#acTafsir")) {
       tafsir.onTafsirAction(button);
+    } else if (button.closest("#acDownloads")) {
+      downloads.onDownloadsAction(button);
     } else if (button.closest("#acTadabor, #acTadaborContinue")) {
       tadabor.onTadaborAction(button);
     }
@@ -136,6 +145,7 @@ function bindLists() {
 
 function initAlbumsPage() {
   loadPrefs();
+  downloads.onOpenTafsir(() => showTab("tafsir", true));
   bindTabs();
   bindSearch();
   bindFilters(reciters.renderReciters);

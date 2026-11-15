@@ -21,12 +21,14 @@ function isMeaningful(data) {
   return Boolean(data);
 }
 
-function cacheGet(key) {
+// `stale`: an expired copy too. Used when the API can't be reached (offline, down), so the
+// reciters and the surah names, and with them the downloaded recitations, still show.
+function cacheGet(key, { stale = false } = {}) {
   try {
     const raw = localStorage.getItem(`${CACHE_PREFIX}:${key}`);
     if (!raw) return null;
     const { data, ts } = JSON.parse(raw);
-    if (Date.now() - ts > CACHE_TTL_MS) return null;
+    if (!stale && Date.now() - ts > CACHE_TTL_MS) return null;
     return isMeaningful(data) ? data : null;
   } catch {
     return null;
@@ -64,7 +66,13 @@ async function getReciters(language = "eng") {
   const cached = cacheGet(key);
   if (cached) return cached;
 
-  const data = await fetchJson(`${BASE_URL}/reciters?language=${language}`);
+  const data = await fetchJson(
+    `${BASE_URL}/reciters?language=${language}`,
+  ).catch((err) => {
+    const old = cacheGet(key, { stale: true });
+    if (old) return { reciters: old };
+    throw err;
+  });
   const reciters = data.reciters || [];
   cacheSet(key, reciters);
   return reciters;
@@ -87,14 +95,21 @@ async function getSurahNames(language = "eng") {
   const cached = cacheGet(key);
   if (cached) return cached;
 
-  const data = await fetchJson(`${BASE_URL}/suwar?language=${language}`);
+  const data = await fetchJson(`${BASE_URL}/suwar?language=${language}`).catch(
+    (err) => {
+      const old = cacheGet(key, { stale: true });
+      if (old) return { suwar: old };
+      throw err;
+    },
+  );
   const list = data.suwar || data.Suras_Name || [];
   cacheSet(key, list);
   return list;
 }
 
 async function getReciterTracks(reciterName, moshaf, language = "eng") {
-  const surahs = await getSurahNames(language);
+  // no names (offline, never loaded): the tracks still list, as "Surah 2"
+  const surahs = await getSurahNames(language).catch(() => []);
   const surahMap = {};
   surahs.forEach((s) => {
     surahMap[s.id] = (s.name || "").trim();

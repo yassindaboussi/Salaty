@@ -16,6 +16,7 @@ const analytics = require("../../services/analytics");
 const { state } = require("./state");
 const { renderList, markCurrent, bindList } = require("./list");
 const player = require("./player");
+const downloads = require("./downloads");
 
 function readAlbum() {
   try {
@@ -49,7 +50,10 @@ async function loadTracks() {
       album.source === "mp3quran"
         ? t("acSurahCount").replace("{count}", String(state.tracks.length))
         : "";
+    // (sets the album at once, so the rows get their download buttons)
+    const downloadsReady = downloads.initDownloads();
     renderList();
+    await downloadsReady;
   } catch (error) {
     console.error("Error loading tracks:", error);
     analytics.error("playlist_load_tracks", error.message || String(error));
