@@ -21,6 +21,31 @@ let isPlayerReady = false;
 /** @type {object[]} commands sent before the player page finished loading */
 let pendingCommands = [];
 
+// Nothing loaded any more (stopped, or the list ended): the hidden player window is closed
+// after a minute to free its memory (~125 MB). A paused track keeps it. The next
+// "set-playlist" opens it again (createPlayerWindow).
+const IDLE_CLOSE_MS = 60_000;
+/** @type {ReturnType<typeof setTimeout> | null} */
+let idleTimer = null;
+
+function cancelIdleClose() {
+  if (idleTimer) clearTimeout(idleTimer);
+  idleTimer = null;
+}
+
+/** @param {{ isPlaying?: boolean, currentTrack?: unknown } | undefined} state */
+function scheduleIdleClose(state) {
+  cancelIdleClose();
+  if (state?.isPlaying || state?.currentTrack) return;
+  idleTimer = setTimeout(() => {
+    idleTimer = null;
+    if (playerWindow && !playerWindow.isDestroyed()) {
+      log.info("player idle: window closed");
+      playerWindow.destroy();
+    }
+  }, IDLE_CLOSE_MS);
+}
+
 const PLAYBACK_STARTING_COMMANDS = new Set(["set-playlist"]);
 // What the pages may ask the background player to do (windows/background-player.js).
 const PLAYER_COMMANDS = new Set([
@@ -40,6 +65,7 @@ function createPlayerWindow() {
   if (playerWindow && !playerWindow.isDestroyed()) return playerWindow;
 
   isPlayerReady = false;
+  cancelIdleClose();
   const win = new BrowserWindow(createBackgroundPlayerOptions());
   playerWindow = win;
   win.loadURL(pages.backgroundPlayer);
@@ -64,6 +90,8 @@ function createPlayerWindow() {
   win.on("closed", () => {
     playerWindow = null;
     isPlayerReady = false;
+    isPlayerPlaying = false;
+    cancelIdleClose();
     pendingCommands = [];
   });
   return win;
@@ -127,7 +155,10 @@ function registerPlayerIpc(getMainWindow) {
 
   secureIpc.on("player-update", (_e, arg) => {
     if (!isPlainObject(arg)) return;
-    if (arg.type === "state") isPlayerPlaying = arg.state?.isPlaying === true;
+    if (arg.type === "state") {
+      isPlayerPlaying = arg.state?.isPlaying === true;
+      scheduleIdleClose(arg.state);
+    }
     const mainWindow = getMainWindow();
     if (mainWindow && !mainWindow.isDestroyed())
       mainWindow.webContents.send("player-update", arg);
